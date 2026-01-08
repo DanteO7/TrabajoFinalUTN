@@ -1,3 +1,6 @@
+using backend_proyecto.Config;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// DbContext configuration
+builder.Services.AddDbContext<ApplicationDbContext>(opts =>
+{
+    opts.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
+});
 
 var app = builder.Build();
 

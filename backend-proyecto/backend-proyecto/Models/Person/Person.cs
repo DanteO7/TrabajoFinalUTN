@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
 {
-    public abstract class Person
+    public class Person
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,7 +18,7 @@ namespace backend_proyecto.Models
         public string Surname { get; set; } = null!;
 
         [Required]
-        [EmailAddress]
+        [EmailAddress]  
         [MaxLength(100)]
         public string Email { get; set; } = null!;
 
