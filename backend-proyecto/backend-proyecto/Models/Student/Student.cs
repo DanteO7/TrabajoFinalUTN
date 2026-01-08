@@ -1,11 +1,20 @@
-﻿namespace backend_proyecto.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace backend_proyecto.Models
 {
     public class Student
     {
+        [Key]
+        [ForeignKey(nameof(Person))]
         public int IdPerson { get; set; }
         public Person Person { get; set; } = null!;
 
+        [ForeignKey(nameof(Plan))]
         public int IdPlan { get; set; }
+        public Plan Plan { get; set; } = null!;
+
+        [Required]
         public string  MonthlyFeeStatus { get; set; } = null!;
     }
 }
