@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Migrations\\20260108180104_DbCreated.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:backend-proyecto\\Migrations\\20260108180104_DbCreated.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\config\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -67,14 +67,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "20260108180104_DbCreated.cs",
-              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Migrations\\20260108180104_DbCreated.cs",
-              "RelativeDocumentMoniker": "backend-proyecto\\Migrations\\20260108180104_DbCreated.cs",
-              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Migrations\\20260108180104_DbCreated.cs",
-              "RelativeToolTip": "backend-proyecto\\Migrations\\20260108180104_DbCreated.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "Repository.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Repositories\\Repository.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs*",
+              "RelativeToolTip": "backend-proyecto\\Repositories\\Repository.cs*",
+              "ViewState": "AgIAAAoAAAAAAAAAAAA9wBsAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-08T18:01:05.117Z",
+              "WhenOpened": "2026-01-09T18:58:59.845Z",
               "EditorCaption": ""
             },
             {
@@ -87,8 +87,7 @@
               "RelativeToolTip": "backend-proyecto\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-08T17:36:10.549Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-08T17:36:10.549Z"
             },
             {
               "$type": "Document",
@@ -98,7 +97,7 @@
               "RelativeDocumentMoniker": "backend-proyecto\\Config\\ApplicationDbContext.cs",
               "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\ApplicationDbContext.cs",
               "RelativeToolTip": "backend-proyecto\\Config\\ApplicationDbContext.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAuwCMAAAAvAAAAAAAAAA==",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAQwDYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-08T17:03:51.16Z",
               "EditorCaption": ""
@@ -113,8 +112,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Person\\Person.cs",
               "ViewState": "AgIAAAgAAAAAAAAAAAAQwAUAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-05T18:12:03.227Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-05T18:12:03.227Z"
             },
             {
               "$type": "Document",
@@ -126,8 +124,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Class\\Class.cs",
               "ViewState": "AgIAAAQAAAAAAAAAAAAmwBIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:29:51.25Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:29:51.25Z"
             },
             {
               "$type": "Document",
@@ -139,8 +136,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Reservation\\Reservation.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:32:28.102Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:32:28.102Z"
             },
             {
               "$type": "Document",
@@ -152,8 +148,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Payment\\Payment.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:40:53.361Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:40:53.361Z"
             },
             {
               "$type": "Document",
@@ -165,8 +160,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Plan\\Plan.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:34:15.426Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:34:15.426Z"
             },
             {
               "$type": "Document",
@@ -178,8 +172,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Activity\\Activity.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:28:14.076Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:28:14.076Z"
             },
             {
               "$type": "Document",
@@ -191,8 +184,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Specialty\\ProfessorSpeciality.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:24:11.205Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:24:11.205Z"
             },
             {
               "$type": "Document",
@@ -204,8 +196,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Specialty\\Speciality.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-06T18:22:57.17Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-06T18:22:57.17Z"
             },
             {
               "$type": "Document",
@@ -217,8 +208,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Student\\Student.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-05T19:03:33.054Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-05T19:03:33.054Z"
             },
             {
               "$type": "Document",
@@ -230,8 +220,7 @@
               "RelativeToolTip": "backend-proyecto\\Models\\Professor\\Professor.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-05T18:38:02.225Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-05T18:38:02.225Z"
             }
           ]
         }

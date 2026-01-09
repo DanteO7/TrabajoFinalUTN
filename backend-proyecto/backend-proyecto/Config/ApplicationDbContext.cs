@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using backend_proyecto.Models;
-using backend_proyecto.Models.Professor;
-using backend_proyecto.Models.Payment;
 
 namespace backend_proyecto.Config
 {
