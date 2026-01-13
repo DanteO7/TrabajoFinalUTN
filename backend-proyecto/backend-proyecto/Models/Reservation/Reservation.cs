@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend_proyecto.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
@@ -19,6 +20,6 @@ namespace backend_proyecto.Models
         public DateTime ReservationDate { get; set; }
 
         [Required]
-        public string Status { get; set; } = null!;
+        public ReservationStatus ReservationStatus { get; set; } = null!;
     }
 }

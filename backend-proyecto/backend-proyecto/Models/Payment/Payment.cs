@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend_proyecto.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
@@ -23,6 +24,6 @@ namespace backend_proyecto.Models
         public decimal Amount { get; set; }
 
         [Required]
-        public string PaymentMethod { get; set; } = null!;
+        public PaymentMethod PaymentMethod { get; set; } = null!;
     }
 }
