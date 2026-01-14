@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\personservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\personservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PersonServices.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\PersonServices.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Services\\PersonServices.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\PersonServices.cs",
+              "RelativeToolTip": "backend-proyecto\\Services\\PersonServices.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAA9wDsAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-14T21:45:30.582Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

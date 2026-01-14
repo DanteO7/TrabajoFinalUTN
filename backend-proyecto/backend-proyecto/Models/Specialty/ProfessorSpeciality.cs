@@ -3,7 +3,7 @@
     public class ProfessorSpeciality
     {
         public int PersonId { get; set; }
-        public Professor.Professor Professor { get; set; } = null!;
+        public Professor Professor { get; set; } = null!;
         public int SpecialityId { get; set; }
         public Speciality Speciality { get; set; } = null!;
         
