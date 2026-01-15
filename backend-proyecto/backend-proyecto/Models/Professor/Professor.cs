@@ -6,8 +6,8 @@ namespace backend_proyecto.Models
     public class Professor
     {
         [Key]
-        [ForeignKey(nameof(Person))]
-        public int PersonId { get; set; }
-        public Person Person { get; set; } = null!;
+        [ForeignKey(nameof(User))]
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
     }
 }

@@ -10,9 +10,9 @@ namespace backend_proyecto.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(StudentPerson))]
-        public int StudentPersonId { get; set; }
-        public Person StudentPerson { get; set; } = null!;
+        [ForeignKey(nameof(StudentUser))]
+        public int StudentUserId { get; set; }
+        public User StudentUser { get; set; } = null!;
 
         [ForeignKey(nameof(Plan))]
         public int PlanId { get; set; }

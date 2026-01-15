@@ -3,8 +3,88 @@
   "WorkspaceRootPath": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\personservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\personservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\user\\dtos\\loginresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\user\\dtos\\loginresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\authservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\authservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\user\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\user\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\repositories\\personrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\repositories\\personrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\user\\dtos\\updateuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\user\\dtos\\updateuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\payment\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\payment\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\class\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\class\\class.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\config\\mapping.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\config\\mapping.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\config\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\config\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\plan\\plan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\plan\\plan.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\professor\\professor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\professor\\professor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\reservation\\reservation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\reservation\\reservation.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\specialty\\speciality.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\specialty\\speciality.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\specialty\\professorspeciality.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\specialty\\professorspeciality.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\student\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\student\\student.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\user\\dtos\\userwithoutpassdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\user\\dtos\\userwithoutpassdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\utils\\errors\\httpresponseerror.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\utils\\errors\\httpresponseerror.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\utils\\errors\\httpmessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\utils\\errors\\httpmessage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,19 +94,279 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 17,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "PersonServices.cs",
-              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\PersonServices.cs",
-              "RelativeDocumentMoniker": "backend-proyecto\\Services\\PersonServices.cs",
-              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\PersonServices.cs",
-              "RelativeToolTip": "backend-proyecto\\Services\\PersonServices.cs",
-              "ViewState": "AgIAABoAAAAAAAAAAAA9wDsAAAAsAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "LoginResponseDTO.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\LoginResponseDTO.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\User\\DTOs\\LoginResponseDTO.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\LoginResponseDTO.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\User\\DTOs\\LoginResponseDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-14T21:45:30.582Z",
+              "WhenOpened": "2026-01-15T21:06:42.956Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Repository.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Repositories\\Repository.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs",
+              "RelativeToolTip": "backend-proyecto\\Repositories\\Repository.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:32:56.48Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PersonRepository.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\PersonRepository.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Repositories\\PersonRepository.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\PersonRepository.cs",
+              "RelativeToolTip": "backend-proyecto\\Repositories\\PersonRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:32:49.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "RelativeToolTip": "backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAswDIAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:30:00.139Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Mapping.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\Mapping.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Config\\Mapping.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\Mapping.cs",
+              "RelativeToolTip": "backend-proyecto\\Config\\Mapping.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:29:48.109Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Class.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Class\\Class.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Class\\Class.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Class\\Class.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Class\\Class.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABAAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:29:35.732Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Payment.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Payment\\Payment.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Payment\\Payment.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Payment\\Payment.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Payment\\Payment.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:29:18.575Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Plan.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Plan\\Plan.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Plan\\Plan.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Plan\\Plan.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Plan\\Plan.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:29:15.024Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Professor.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Professor\\Professor.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Professor\\Professor.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Professor\\Professor.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Professor\\Professor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:29:01.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Reservation.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Reservation\\Reservation.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Reservation\\Reservation.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Reservation\\Reservation.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Reservation\\Reservation.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:28:41.001Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Speciality.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Specialty\\Speciality.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Specialty\\Speciality.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Specialty\\Speciality.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Specialty\\Speciality.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:28:37.837Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "ProfessorSpeciality.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Specialty\\ProfessorSpeciality.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Specialty\\ProfessorSpeciality.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Specialty\\ProfessorSpeciality.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Specialty\\ProfessorSpeciality.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:28:32.608Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Student.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Student\\Student.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Student\\Student.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Student\\Student.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Student\\Student.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:28:00.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\User.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\User\\User.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\User.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\User\\User.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwBAAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:27:40.523Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "UserWithoutPassDTO.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\UserWithoutPassDTO.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\User\\DTOs\\UserWithoutPassDTO.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\UserWithoutPassDTO.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\User\\DTOs\\UserWithoutPassDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:27:17.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "UpdateUserDTO.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\UpdateUserDTO.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\User\\DTOs\\UpdateUserDTO.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\User\\DTOs\\UpdateUserDTO.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\User\\DTOs\\UpdateUserDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T20:26:59.076Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\appsettings.json",
+              "RelativeDocumentMoniker": "backend-proyecto\\appsettings.json",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\appsettings.json",
+              "RelativeToolTip": "backend-proyecto\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-15T20:25:29.968Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserServices.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\UserServices.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Services\\UserServices.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\UserServices.cs",
+              "RelativeToolTip": "backend-proyecto\\Services\\UserServices.cs",
+              "ViewState": "AgIAACwAAAAAAAAAAAAYwE8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T19:55:22.818Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AuthServices.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\AuthServices.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Services\\AuthServices.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\AuthServices.cs",
+              "RelativeToolTip": "backend-proyecto\\Services\\AuthServices.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHEAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T19:46:26.238Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "HttpResponseError.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Utils\\Errors\\HttpResponseError.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Utils\\Errors\\HttpResponseError.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Utils\\Errors\\HttpResponseError.cs",
+              "RelativeToolTip": "backend-proyecto\\Utils\\Errors\\HttpResponseError.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAoAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T19:30:48.117Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "HttpMessage.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Utils\\Errors\\HttpMessage.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Utils\\Errors\\HttpMessage.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Utils\\Errors\\HttpMessage.cs",
+              "RelativeToolTip": "backend-proyecto\\Utils\\Errors\\HttpMessage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-15T19:30:32.628Z",
               "EditorCaption": ""
             }
           ]

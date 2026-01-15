@@ -7,7 +7,7 @@ namespace backend_proyecto.Config
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Person> Persons { get; set; } = null!;
+        public DbSet<User> User { get; set; } = null!;
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Professor> Professors { get; set; } = null!;
         public DbSet<Speciality> Specialities { get; set; } = null!;
@@ -20,9 +20,9 @@ namespace backend_proyecto.Config
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Reservation>()
-                .HasOne(r => r.StudentPerson)
+                .HasOne(r => r.StudentUser)
                 .WithMany()
-                .HasForeignKey(r => r.StudentPersonId)
+                .HasForeignKey(r => r.StudentUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Payment>(entity =>
@@ -37,8 +37,8 @@ namespace backend_proyecto.Config
                       .HasPrecision(10, 2);
             });
 
-            modelBuilder.Entity<Person>().HasData(
-                new Person
+            modelBuilder.Entity<User>().HasData(
+                new User
                 {
                     Id = 1,
                     Name = "Admin",

@@ -25,7 +25,7 @@ namespace backend_proyecto.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Persons",
+                name: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -38,7 +38,7 @@ namespace backend_proyecto.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Persons", x => x.Id);
+                    table.PrimaryKey("PK_users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -76,7 +76,7 @@ namespace backend_proyecto.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityId = table.Column<int>(type: "int", nullable: false),
-                    ProfessorPersonId = table.Column<int>(type: "int", nullable: false),
+                    ProfessoruserId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     MaxCapacity = table.Column<int>(type: "int", nullable: false)
@@ -91,9 +91,9 @@ namespace backend_proyecto.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Classes_Persons_ProfessorPersonId",
-                        column: x => x.ProfessorPersonId,
-                        principalTable: "Persons",
+                        name: "FK_Classes_users_ProfessoruserId",
+                        column: x => x.ProfessoruserId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -102,15 +102,15 @@ namespace backend_proyecto.Migrations
                 name: "Professors",
                 columns: table => new
                 {
-                    PersonId = table.Column<int>(type: "int", nullable: false)
+                    userId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Professors", x => x.PersonId);
+                    table.PrimaryKey("PK_Professors", x => x.userId);
                     table.ForeignKey(
-                        name: "FK_Professors_Persons_PersonId",
-                        column: x => x.PersonId,
-                        principalTable: "Persons",
+                        name: "FK_Professors_users_userId",
+                        column: x => x.userId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -121,7 +121,7 @@ namespace backend_proyecto.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentPersonId = table.Column<int>(type: "int", nullable: false),
+                    StudentuserId = table.Column<int>(type: "int", nullable: false),
                     PlanId = table.Column<int>(type: "int", nullable: false),
                     PaymentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
@@ -131,9 +131,9 @@ namespace backend_proyecto.Migrations
                 {
                     table.PrimaryKey("PK_Payments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Payments_Persons_StudentPersonId",
-                        column: x => x.StudentPersonId,
-                        principalTable: "Persons",
+                        name: "FK_Payments_users_StudentuserId",
+                        column: x => x.StudentuserId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -148,17 +148,17 @@ namespace backend_proyecto.Migrations
                 name: "Students",
                 columns: table => new
                 {
-                    IdPerson = table.Column<int>(type: "int", nullable: false),
+                    Iduser = table.Column<int>(type: "int", nullable: false),
                     IdPlan = table.Column<int>(type: "int", nullable: false),
                     MonthlyFeeStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.IdPerson);
+                    table.PrimaryKey("PK_Students", x => x.Iduser);
                     table.ForeignKey(
-                        name: "FK_Students_Persons_IdPerson",
-                        column: x => x.IdPerson,
-                        principalTable: "Persons",
+                        name: "FK_Students_users_Iduser",
+                        column: x => x.Iduser,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -176,7 +176,7 @@ namespace backend_proyecto.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClassId = table.Column<int>(type: "int", nullable: false),
-                    StudentPersonId = table.Column<int>(type: "int", nullable: false),
+                    StudentuserId = table.Column<int>(type: "int", nullable: false),
                     ReservationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -190,15 +190,15 @@ namespace backend_proyecto.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reservations_Persons_StudentPersonId",
-                        column: x => x.StudentPersonId,
-                        principalTable: "Persons",
+                        name: "FK_Reservations_users_StudentuserId",
+                        column: x => x.StudentuserId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.InsertData(
-                table: "Persons",
+                table: "users",
                 columns: new[] { "Id", "Email", "Name", "Password", "PhoneNumber", "Surname" },
                 values: new object[] { 1, "admin@example.com", "Admin", "Admin@123", "1234567890", "User" });
 
@@ -208,9 +208,9 @@ namespace backend_proyecto.Migrations
                 column: "ActivityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classes_ProfessorPersonId",
+                name: "IX_Classes_ProfessoruserId",
                 table: "Classes",
-                column: "ProfessorPersonId");
+                column: "ProfessoruserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_PlanId",
@@ -218,9 +218,9 @@ namespace backend_proyecto.Migrations
                 column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_StudentPersonId",
+                name: "IX_Payments_StudentuserId",
                 table: "Payments",
-                column: "StudentPersonId");
+                column: "StudentuserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_ClassId",
@@ -228,9 +228,9 @@ namespace backend_proyecto.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservations_StudentPersonId",
+                name: "IX_Reservations_StudentuserId",
                 table: "Reservations",
-                column: "StudentPersonId");
+                column: "StudentuserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_IdPlan",
@@ -266,7 +266,7 @@ namespace backend_proyecto.Migrations
                 name: "Activities");
 
             migrationBuilder.DropTable(
-                name: "Persons");
+                name: "users");
         }
     }
 }

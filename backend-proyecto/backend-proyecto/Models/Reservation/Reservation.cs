@@ -14,9 +14,9 @@ namespace backend_proyecto.Models
         public int ClassId { get; set; }
         public Class Class { get; set; } = null!;
 
-        [ForeignKey(nameof(StudentPerson))]
-        public int StudentPersonId { get; set; }
-        public Person StudentPerson { get; set; } = null!;
+        [ForeignKey(nameof(StudentUser))]
+        public int StudentUserId { get; set; }
+        public User StudentUser { get; set; } = null!;
         public DateTime ReservationDate { get; set; }
 
         [Required]

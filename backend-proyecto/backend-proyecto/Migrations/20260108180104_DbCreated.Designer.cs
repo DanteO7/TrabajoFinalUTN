@@ -60,7 +60,7 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("MaxCapacity")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfessorPersonId")
+                    b.Property<int>("ProfessoruserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -70,7 +70,7 @@ namespace backend_proyecto.Migrations
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("ProfessorPersonId");
+                    b.HasIndex("ProfessoruserId");
 
                     b.ToTable("Classes");
                 });
@@ -97,19 +97,19 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentPersonId")
+                    b.Property<int>("StudentuserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PlanId");
 
-                    b.HasIndex("StudentPersonId");
+                    b.HasIndex("StudentuserId");
 
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.Person", b =>
+            modelBuilder.Entity("backend_proyecto.Models.user", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,7 +144,7 @@ namespace backend_proyecto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Persons");
+                    b.ToTable("users");
 
                     b.HasData(
                         new
@@ -185,10 +185,10 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Professor.Professor", b =>
                 {
-                    b.Property<int>("PersonId")
+                    b.Property<int>("userId")
                         .HasColumnType("int");
 
-                    b.HasKey("PersonId");
+                    b.HasKey("userId");
 
                     b.ToTable("Professors");
                 });
@@ -211,14 +211,14 @@ namespace backend_proyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StudentPersonId")
+                    b.Property<int>("StudentuserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
 
-                    b.HasIndex("StudentPersonId");
+                    b.HasIndex("StudentuserId");
 
                     b.ToTable("Reservations");
                 });
@@ -243,7 +243,7 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
                 {
-                    b.Property<int>("IdPerson")
+                    b.Property<int>("Iduser")
                         .HasColumnType("int");
 
                     b.Property<int>("IdPlan")
@@ -253,7 +253,7 @@ namespace backend_proyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdPerson");
+                    b.HasKey("Iduser");
 
                     b.HasIndex("IdPlan");
 
@@ -268,15 +268,15 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.Person", "ProfessorPerson")
+                    b.HasOne("backend_proyecto.Models.user", "Professoruser")
                         .WithMany()
-                        .HasForeignKey("ProfessorPersonId")
+                        .HasForeignKey("ProfessoruserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Activity");
 
-                    b.Navigation("ProfessorPerson");
+                    b.Navigation("Professoruser");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Payment.Payment", b =>
@@ -287,26 +287,26 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.Person", "StudentPerson")
+                    b.HasOne("backend_proyecto.Models.user", "Studentuser")
                         .WithMany()
-                        .HasForeignKey("StudentPersonId")
+                        .HasForeignKey("StudentuserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Plan");
 
-                    b.Navigation("StudentPerson");
+                    b.Navigation("Studentuser");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Professor.Professor", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.Person", "Person")
+                    b.HasOne("backend_proyecto.Models.user", "user")
                         .WithMany()
-                        .HasForeignKey("PersonId")
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Person");
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Reservation", b =>
@@ -317,22 +317,22 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.Person", "StudentPerson")
+                    b.HasOne("backend_proyecto.Models.user", "Studentuser")
                         .WithMany()
-                        .HasForeignKey("StudentPersonId")
+                        .HasForeignKey("StudentuserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Class");
 
-                    b.Navigation("StudentPerson");
+                    b.Navigation("Studentuser");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.Person", "Person")
+                    b.HasOne("backend_proyecto.Models.user", "user")
                         .WithMany()
-                        .HasForeignKey("IdPerson")
+                        .HasForeignKey("Iduser")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -342,7 +342,7 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Person");
+                    b.Navigation("user");
 
                     b.Navigation("Plan");
                 });

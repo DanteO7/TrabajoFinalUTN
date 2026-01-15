@@ -7,9 +7,9 @@ namespace backend_proyecto.Models
     public class Student
     {
         [Key]
-        [ForeignKey(nameof(Person))]
-        public int IdPerson { get; set; }
-        public Person Person { get; set; } = null!;
+        [ForeignKey(nameof(User))]
+        public int IdUser { get; set; }
+        public User User { get; set; } = null!;
 
         [ForeignKey(nameof(Plan))]
         public int IdPlan { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace backend_proyecto.Models.DTOs
 {
-    public class PersonWithoutPassDTO
+    public class UserWithoutPassDTO
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

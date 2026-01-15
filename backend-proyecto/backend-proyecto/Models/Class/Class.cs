@@ -14,9 +14,9 @@ namespace backend_proyecto.Models
         public int ActivityId { get; set; }
         public Activity Activity { get; set; } = null!;
 
-        [ForeignKey(nameof(ProfessorPerson))]
-        public int ProfessorPersonId { get; set; }
-        public Person ProfessorPerson { get; set; } = null!;
+        [ForeignKey(nameof(ProfessorUser))]
+        public int ProfessorUserId { get; set; }
+        public User ProfessorUser { get; set; } = null!;
 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

@@ -3,11 +3,11 @@ using backend_proyecto.Models;
 
 namespace backend_proyecto.Repositories
 {
-    public interface IPersonRepository : IRepository<Person> { }
-    public class PersonRepository : Repository<Person>, IPersonRepository
+    public interface IuserRepository : IRepository<User> { }
+    public class userRepository : Repository<User>, IuserRepository
     {
         private readonly ApplicationDbContext _db;
-        public PersonRepository(ApplicationDbContext db) : base(db)
+        public userRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
