@@ -16,6 +16,6 @@ namespace backend_proyecto.Models
         public Plan Plan { get; set; } = null!;
 
         [Required]
-        public MonthlyFeeStatus MonthlyFeeStatus { get; set; } = null!;
+        public string MonthlyFeeStatus { get; set; } = null!;
     }
 }

@@ -17,7 +17,7 @@ namespace backend_proyecto.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -57,7 +57,7 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("MaxCapacity")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProfessoruserId")
+                    b.Property<int>("ProfessorUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
@@ -67,12 +67,12 @@ namespace backend_proyecto.Migrations
 
                     b.HasIndex("ActivityId");
 
-                    b.HasIndex("ProfessoruserId");
+                    b.HasIndex("ProfessorUserId");
 
                     b.ToTable("Classes");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.Payment.Payment", b =>
+            modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,19 +94,121 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentuserId")
+                    b.Property<int>("StudentUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PlanId");
 
-                    b.HasIndex("StudentuserId");
+                    b.HasIndex("StudentUserId");
 
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.user", b =>
+            modelBuilder.Entity("backend_proyecto.Models.Plan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassesInWeek")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Plans");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Professors");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Reservation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ReservationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReservationStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.ToTable("Reservations");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Speciality", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Specialities");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Student", b =>
+                {
+                    b.Property<int>("IdUser")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdPlan")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MonthlyFeeStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdUser");
+
+                    b.HasIndex("IdPlan");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,120 +243,18 @@ namespace backend_proyecto.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("users");
+                    b.ToTable("User");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Email = "admin@example.com",
+                            Email = "user@example.com",
                             Name = "Admin",
-                            Password = "Admin@123",
+                            Password = "stringst",
                             PhoneNumber = "1234567890",
                             Surname = "User"
                         });
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Plan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassesInWeek")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Plans");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Professor.Professor", b =>
-                {
-                    b.Property<int>("userId")
-                        .HasColumnType("int");
-
-                    b.HasKey("userId");
-
-                    b.ToTable("Professors");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Reservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReservationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StudentuserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("StudentuserId");
-
-                    b.ToTable("Reservations");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Speciality", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Specialities");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Student", b =>
-                {
-                    b.Property<int>("Iduser")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdPlan")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MonthlyFeeStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Iduser");
-
-                    b.HasIndex("IdPlan");
-
-                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Class", b =>
@@ -265,18 +265,18 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.user", "Professoruser")
+                    b.HasOne("backend_proyecto.Models.User", "ProfessorUser")
                         .WithMany()
-                        .HasForeignKey("ProfessoruserId")
+                        .HasForeignKey("ProfessorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Activity");
 
-                    b.Navigation("Professoruser");
+                    b.Navigation("ProfessorUser");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.Payment.Payment", b =>
+            modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
                 {
                     b.HasOne("backend_proyecto.Models.Plan", "Plan")
                         .WithMany()
@@ -284,26 +284,26 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.user", "Studentuser")
+                    b.HasOne("backend_proyecto.Models.User", "StudentUser")
                         .WithMany()
-                        .HasForeignKey("StudentuserId")
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Plan");
 
-                    b.Navigation("Studentuser");
+                    b.Navigation("StudentUser");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.Professor.Professor", b =>
+            modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.user", "user")
+                    b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("userId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("user");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Reservation", b =>
@@ -314,34 +314,34 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.user", "Studentuser")
+                    b.HasOne("backend_proyecto.Models.User", "StudentUser")
                         .WithMany()
-                        .HasForeignKey("StudentuserId")
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Class");
 
-                    b.Navigation("Studentuser");
+                    b.Navigation("StudentUser");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.user", "user")
-                        .WithMany()
-                        .HasForeignKey("Iduser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("backend_proyecto.Models.Plan", "Plan")
                         .WithMany()
                         .HasForeignKey("IdPlan")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("user");
+                    b.HasOne("backend_proyecto.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("IdUser")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Plan");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,6 @@
 ﻿namespace backend_proyecto.Enums
 {
-    public class MonthlyFeeStatus
+    public static class MonthlyFeeStatus
     {
         public const string PENDING = "Pending";
         public const string PAID = "Paid";

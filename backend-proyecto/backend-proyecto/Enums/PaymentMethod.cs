@@ -1,6 +1,6 @@
 ﻿namespace backend_proyecto.Enums
 {
-    public class PaymentMethod
+    public static class PaymentMethod
     {
         public const string CASH = "Cash";
         public const string BANK_TRANSFER = "Bank Transfer";

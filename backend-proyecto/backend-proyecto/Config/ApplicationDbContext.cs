@@ -37,16 +37,16 @@ namespace backend_proyecto.Config
                       .HasPrecision(10, 2);
             });
 
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Name = "Admin",
-                    Surname = "User",
-                    Email = "admin@example.com",
-                    Password = "Admin@123",
-                    PhoneNumber = "1234567890"
-                });
+            //modelBuilder.Entity<User>().HasData(
+            //    new User
+            //    {
+            //        Id = 1,
+            //        Name = "Admin",
+            //        Surname = "User",
+            //        Email = "user@example.com",
+            //        Password = "stringst",
+            //        PhoneNumber = "1234567890"
+            //    });
         }
     }
 }

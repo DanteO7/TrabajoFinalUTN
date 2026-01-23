@@ -32,7 +32,7 @@ namespace backend_proyecto.Services
         public async Task<UserWithoutPassDTO> Register(RegisterDTO register)
         {
             var user = await _userServices.GetOneByEmail(register.Email);
-            if (user == null)
+            if (user != null)
             {
                 throw new Exception($"El usuario con este mail '{register.Email}' ya existe.");
             }

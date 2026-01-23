@@ -20,6 +20,6 @@ namespace backend_proyecto.Models
         public DateTime ReservationDate { get; set; }
 
         [Required]
-        public ReservationStatus ReservationStatus { get; set; } = null!;
+        public string ReservationStatus { get; set; } = null!;
     }
 }

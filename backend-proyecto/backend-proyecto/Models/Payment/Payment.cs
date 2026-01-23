@@ -24,6 +24,6 @@ namespace backend_proyecto.Models
         public decimal Amount { get; set; }
 
         [Required]
-        public PaymentMethod PaymentMethod { get; set; } = null!;
+        public string PaymentMethod { get; set; } = null!;
     }
 }

@@ -9,11 +9,11 @@ namespace backend_proyecto.Services
 {
     public class UserServices
     {
-        private readonly IuserRepository _repo;
+        private readonly IUserRepository _repo;
         private readonly IMapper _mapper;
         private readonly IEncoderServices _encoderServices;
 
-        public UserServices(IuserRepository repo, IMapper mapper, IEncoderServices encoderServices)
+        public UserServices(IUserRepository repo, IMapper mapper, IEncoderServices encoderServices)
         {
             _repo = repo;
             _mapper = mapper;
@@ -39,10 +39,6 @@ namespace backend_proyecto.Services
         public async Task<User?> GetOneByEmail(string email)
         {
             var user = await _repo.GetOneAsync(p => p.Email == email);
-            if (user == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Email = {email}");
-            };
             return user;
 
         }
