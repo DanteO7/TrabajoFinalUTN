@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
+using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,14 +19,18 @@ namespace backend_proyecto.Services
         private readonly IEncoderServices _encoderServices;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private readonly IProfessorRepository _professorRepo;
+        private readonly IStudentRepository _studentRepo;
         internal readonly string _secret;
 
-        public AuthServices(UserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config)
+        public AuthServices(UserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;
             _mapper = mapper;
             _config = config;
+            _professorRepo = professorRepo;
+            _studentRepo = studentRepo;
             _secret = _config.GetSection("Secrets:JWT")?.Value?.ToString() ?? string.Empty;
         }
 
@@ -54,7 +59,7 @@ namespace backend_proyecto.Services
 
             await SetCookie(user, context);
 
-            string token = GenerateJwt(_mapper.Map<UserWithoutPassDTO>(user));
+            string token = await GenerateJwt(_mapper.Map<UserWithoutPassDTO>(user));
 
             return new LoginResponseDTO
             {
@@ -75,6 +80,16 @@ namespace backend_proyecto.Services
                 new Claim("id", user.Id.ToString())
             };
 
+            if (await _professorRepo.ExistsByUserId(user.Id))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "Professor"));
+            }
+
+            if (await _studentRepo.ExistsByUserId(user.Id))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "Student"));
+            }
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
@@ -89,7 +104,7 @@ namespace backend_proyecto.Services
             );
         }
 
-        public string GenerateJwt(UserWithoutPassDTO user)
+        public async Task<string> GenerateJwt(UserWithoutPassDTO user)
         {
             var key = Encoding.UTF8.GetBytes(_secret);
             var symmetricKey = new SymmetricSecurityKey(key);
@@ -100,7 +115,18 @@ namespace backend_proyecto.Services
             );
 
             var claims = new ClaimsIdentity();
+
             claims.AddClaim(new Claim("id", user.Id.ToString()));
+
+            if (await _professorRepo.ExistsByUserId(user.Id))
+            {
+                claims.AddClaim(new Claim(ClaimTypes.Role, "Professor"));
+            }
+
+            if (await _professorRepo.ExistsByUserId(user.Id))
+            {
+                claims.AddClaim(new Claim(ClaimTypes.Role, "Professor"));
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {

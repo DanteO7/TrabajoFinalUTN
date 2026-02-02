@@ -148,22 +148,22 @@ namespace backend_proyecto.Migrations
                 name: "Students",
                 columns: table => new
                 {
-                    IdUser = table.Column<int>(type: "int", nullable: false),
-                    IdPlan = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
                     MonthlyFeeStatus = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.IdUser);
+                    table.PrimaryKey("PK_Students", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_Students_Plans_IdPlan",
-                        column: x => x.IdPlan,
+                        name: "FK_Students_Plans_PlanId",
+                        column: x => x.PlanId,
                         principalTable: "Plans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Students_User_IdUser",
-                        column: x => x.IdUser,
+                        name: "FK_Students_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -197,11 +197,6 @@ namespace backend_proyecto.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.InsertData(
-                table: "User",
-                columns: new[] { "Id", "Email", "Name", "Password", "PhoneNumber", "Surname" },
-                values: new object[] { 1, "user@example.com", "Admin", "stringst", "1234567890", "User" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_ActivityId",
                 table: "Classes",
@@ -233,9 +228,9 @@ namespace backend_proyecto.Migrations
                 column: "StudentUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_IdPlan",
+                name: "IX_Students_PlanId",
                 table: "Students",
-                column: "IdPlan");
+                column: "PlanId");
         }
 
         /// <inheritdoc />

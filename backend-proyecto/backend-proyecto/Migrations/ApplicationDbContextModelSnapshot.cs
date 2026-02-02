@@ -191,19 +191,19 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
                 {
-                    b.Property<int>("IdUser")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdPlan")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<string>("MonthlyFeeStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("IdUser");
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("IdPlan");
+                    b.HasKey("UserId");
+
+                    b.HasIndex("PlanId");
 
                     b.ToTable("Students");
                 });
@@ -244,17 +244,6 @@ namespace backend_proyecto.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "user@example.com",
-                            Name = "Admin",
-                            Password = "stringst",
-                            PhoneNumber = "1234567890",
-                            Surname = "User"
-                        });
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Class", b =>
@@ -329,13 +318,13 @@ namespace backend_proyecto.Migrations
                 {
                     b.HasOne("backend_proyecto.Models.Plan", "Plan")
                         .WithMany()
-                        .HasForeignKey("IdPlan")
+                        .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("IdUser")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

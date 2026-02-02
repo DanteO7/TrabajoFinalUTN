@@ -80,7 +80,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("health")]
-        [Authorize]
+        [Authorize(Roles ="Professor, Student")]
         public bool Health()
         {
             return true;

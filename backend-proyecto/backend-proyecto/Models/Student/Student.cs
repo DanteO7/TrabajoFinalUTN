@@ -8,11 +8,11 @@ namespace backend_proyecto.Models
     {
         [Key]
         [ForeignKey(nameof(User))]
-        public int IdUser { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; } = null!;
 
         [ForeignKey(nameof(Plan))]
-        public int IdPlan { get; set; }
+        public int PlanId { get; set; }
         public Plan Plan { get; set; } = null!;
 
         [Required]
