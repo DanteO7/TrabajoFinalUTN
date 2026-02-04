@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
@@ -82,12 +83,12 @@ namespace backend_proyecto.Services
 
             if (await _professorRepo.ExistsByUserId(user.Id))
             {
-                claims.Add(new Claim(ClaimTypes.Role, "Professor"));
+                claims.Add(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
             }
 
             if (await _studentRepo.ExistsByUserId(user.Id))
             {
-                claims.Add(new Claim(ClaimTypes.Role, "Student"));
+                claims.Add(new Claim(ClaimTypes.Role, Roles.STUDENT));
             }
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -120,12 +121,12 @@ namespace backend_proyecto.Services
 
             if (await _professorRepo.ExistsByUserId(user.Id))
             {
-                claims.AddClaim(new Claim(ClaimTypes.Role, "Professor"));
+                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
             }
 
-            if (await _professorRepo.ExistsByUserId(user.Id))
+            if (await _studentRepo.ExistsByUserId(user.Id))
             {
-                claims.AddClaim(new Claim(ClaimTypes.Role, "Professor"));
+                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.STUDENT));
             }
 
             var tokenDescriptor = new SecurityTokenDescriptor()

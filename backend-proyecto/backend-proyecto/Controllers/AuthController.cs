@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using backend_proyecto.Utils.Errors;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
+using backend_proyecto.Enums;
 
 namespace backend_proyecto.Controllers
 {
@@ -80,7 +81,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("health")]
-        [Authorize(Roles ="Professor, Student")]
+        [Authorize(Roles =$"{Roles.PROFESSOR}, {Roles.STUDENT}")]
         public bool Health()
         {
             return true;
