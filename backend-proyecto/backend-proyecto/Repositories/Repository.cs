@@ -1,4 +1,5 @@
 ﻿using backend_proyecto.Config;
+using backend_proyecto.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -12,6 +13,7 @@ namespace backend_proyecto.Repositories
         Task UpdateOneAsync(T entity);
         Task DeleteOneAsync(T entity);
         Task SaveAsync();
+        IQueryable<T> Query();
     }
     public class Repository<T> : IRepository<T> where T : class
     {
@@ -63,6 +65,11 @@ namespace backend_proyecto.Repositories
         public async Task SaveAsync()
         {
             await _db.SaveChangesAsync();
+        }
+
+        public IQueryable<T> Query()
+        {
+            return dbSet.AsQueryable();
         }
     }
 }
