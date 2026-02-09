@@ -10,13 +10,14 @@ namespace backend_proyecto.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(Activity))]
         public int ActivityId { get; set; }
         public Activity Activity { get; set; } = null!;
 
-        [ForeignKey(nameof(ProfessorUser))]
         public int ProfessorUserId { get; set; }
         public User ProfessorUser { get; set; } = null!;
+
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }

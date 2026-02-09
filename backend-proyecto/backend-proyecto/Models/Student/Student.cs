@@ -6,12 +6,12 @@ namespace backend_proyecto.Models
 {
     public class Student
     {
-        [Key]
-        [ForeignKey(nameof(User))]
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
-        [ForeignKey(nameof(Plan))]
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
+
         public int PlanId { get; set; }
         public Plan Plan { get; set; } = null!;
 

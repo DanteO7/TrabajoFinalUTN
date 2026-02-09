@@ -1,22 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
+﻿
 namespace backend_proyecto.Models
 {
-    public class Plan
+    public interface Plan
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        public string Name { get; set; } = null!;
-
-        [Required]
-        public int ClassesInWeek { get; set; }
-
-        [Required]
+        public string Name { get; set; }
         public decimal Price { get; set; }
+
+        public int? MaxStudents { get; set; }
+        public int? MaxProfessors { get; set; }
+
+        public int? TenantId { get; set; }
+        public Tenant? Tenant { get; set; } 
+        public int? ClassesPerMonth { get; set; }
     }
 }

@@ -10,13 +10,15 @@ namespace backend_proyecto.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(Class))]
         public int ClassId { get; set; }
         public Class Class { get; set; } = null!;
 
-        [ForeignKey(nameof(StudentUser))]
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
+
         public int StudentUserId { get; set; }
         public User StudentUser { get; set; } = null!;
+
         public DateTime ReservationDate { get; set; }
 
         [Required]

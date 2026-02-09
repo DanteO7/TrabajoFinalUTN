@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
 {
-    public class Activity
+    public class TenantPlan
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,8 +13,13 @@ namespace backend_proyecto.Models
         [MaxLength(50)]
         public string Name { get; set; } = null!;
 
-        [ForeignKey(nameof(Tenant))]
-        public int TenantId { get; set; }
-        public Tenant Tenant { get; set; } = null!;
+        [Required]
+        public decimal Price { get; set; }
+
+        [Required]
+        public int MaxStudents { get; set; }
+        
+        [Required]
+        public int MaxProfessors { get; set; }
     }
 }

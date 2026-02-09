@@ -35,7 +35,12 @@ namespace backend_proyecto.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Activities");
                 });
@@ -63,11 +68,16 @@ namespace backend_proyecto.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityId");
 
                     b.HasIndex("ProfessorUserId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Classes");
                 });
@@ -97,11 +107,16 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("StudentUserId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PlanId");
 
                     b.HasIndex("StudentUserId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Payments");
                 });
@@ -126,7 +141,12 @@ namespace backend_proyecto.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Plans");
                 });
@@ -136,7 +156,12 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId");
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "TenantId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Professors");
                 });
@@ -162,11 +187,16 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("StudentUserId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
 
                     b.HasIndex("StudentUserId");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Reservations");
                 });
@@ -184,7 +214,12 @@ namespace backend_proyecto.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Specialities");
                 });
@@ -194,6 +229,9 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
                     b.Property<string>("MonthlyFeeStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -201,11 +239,42 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId", "TenantId");
 
                     b.HasIndex("PlanId");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MonthlyFeeStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OwnerUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerUserId");
+
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.User", b =>
@@ -246,6 +315,17 @@ namespace backend_proyecto.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("backend_proyecto.Models.Activity", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("backend_proyecto.Models.Class", b =>
                 {
                     b.HasOne("backend_proyecto.Models.Activity", "Activity")
@@ -257,12 +337,20 @@ namespace backend_proyecto.Migrations
                     b.HasOne("backend_proyecto.Models.User", "ProfessorUser")
                         .WithMany()
                         .HasForeignKey("ProfessorUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Activity");
 
                     b.Navigation("ProfessorUser");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
@@ -276,21 +364,48 @@ namespace backend_proyecto.Migrations
                     b.HasOne("backend_proyecto.Models.User", "StudentUser")
                         .WithMany()
                         .HasForeignKey("StudentUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Plan");
 
                     b.Navigation("StudentUser");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Plan", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
                 {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Tenant");
 
                     b.Navigation("User");
                 });
@@ -300,7 +415,7 @@ namespace backend_proyecto.Migrations
                     b.HasOne("backend_proyecto.Models.Class", "Class")
                         .WithMany()
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("backend_proyecto.Models.User", "StudentUser")
@@ -309,9 +424,28 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Class");
 
                     b.Navigation("StudentUser");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Speciality", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
@@ -322,15 +456,34 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Plan");
 
+                    b.Navigation("Tenant");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Tenant", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.User", "OwnerUser")
+                        .WithMany()
+                        .HasForeignKey("OwnerUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OwnerUser");
                 });
 #pragma warning restore 612, 618
         }

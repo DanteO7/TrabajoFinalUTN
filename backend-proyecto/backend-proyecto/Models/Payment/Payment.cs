@@ -1,5 +1,4 @@
-﻿using backend_proyecto.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
@@ -10,13 +9,14 @@ namespace backend_proyecto.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(StudentUser))]
-        public int StudentUserId { get; set; }
-        public User StudentUser { get; set; } = null!;
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
 
-        [ForeignKey(nameof(Plan))]
         public int PlanId { get; set; }
         public Plan Plan { get; set; } = null!;
+
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
 
         public DateTime PaymentDate { get; set; }
 

@@ -48,6 +48,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 });
 
 // Services
+builder.Services.AddScoped<TenantServices>();
 builder.Services.AddScoped<AuthServices>();
 builder.Services.AddScoped<IEncoderServices,EncoderServices>();
 builder.Services.AddScoped<UserServices>();
@@ -58,6 +59,7 @@ builder.Services.AddScoped<ClassServices>();
 builder.Services.AddScoped<ActivityServices>();
 
 // Repositories
+builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();

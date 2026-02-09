@@ -3,11 +3,11 @@ using backend_proyecto.Models;
 
 namespace backend_proyecto.Repositories
 {
-    public interface IPlanRepository : IRepository<StudentPlan> { }
-    public class PlanRepository : Repository<StudentPlan>, IPlanRepository
+    public interface ITenantRepository : IRepository<Tenant> { }
+    public class TenantRepository : Repository<Tenant>, ITenantRepository
     {
         private readonly ApplicationDbContext _db;
-        public PlanRepository(ApplicationDbContext db) : base(db)
+        public TenantRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }

@@ -12,5 +12,9 @@ namespace backend_proyecto.Models
         [Required]
         [MaxLength(50)]
         public string Name { get; set; } = null!;
+
+        [ForeignKey(nameof(Tenant))]
+        public int TenantId { get; set; }
+        public Tenant Tenant { get; set; } = null!;
     }
 }
