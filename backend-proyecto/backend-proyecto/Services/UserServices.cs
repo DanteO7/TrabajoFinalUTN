@@ -16,18 +16,14 @@ namespace backend_proyecto.Services
         private readonly IUserRepository _repo;
         private readonly IMapper _mapper;
         private readonly IEncoderServices _encoderServices;
-        private readonly IStudentRepository _studentRepository;
-        private readonly IProfessorRepository _professorRepository;
         private readonly ApplicationDbContext _db;
 
 
-        public UserServices(IUserRepository repo, IMapper mapper, IEncoderServices encoderServices, IStudentRepository studentRepository, IProfessorRepository professorRepository, ApplicationDbContext db)
+        public UserServices(IUserRepository repo, IMapper mapper, IEncoderServices encoderServices, ApplicationDbContext db)
         {
             _repo = repo;
             _mapper = mapper;
             _encoderServices = encoderServices;
-            _studentRepository = studentRepository;
-            _professorRepository = professorRepository;
             _db = db;
         }
 
@@ -59,17 +55,17 @@ namespace backend_proyecto.Services
 
         public async Task<UserWithoutPassDTO?> GetOneById(int id)
         {
-            var user = await _repo.GetOneAsync(p => p.Id == id);
+            var user = await _repo.GetOneAsync(u => u.Id == id);
             if (user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = {id}");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
             return _mapper.Map<UserWithoutPassDTO>(user);
         }
 
         public async Task<User?> GetOneByEmail(string email)
         {
-            var user = await _repo.GetOneAsync(p => p.Email == email);
+            var user = await _repo.GetOneAsync(u => u.Email == email);
             return user;
         }
 
@@ -83,20 +79,20 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
-            var user = await _repo.GetOneAsync(p => p.Id == id);
+            var user = await _repo.GetOneAsync(u => u.Id == id);
             if(user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = {id}");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
             await _repo.DeleteOneAsync(user);
         }
 
         public async Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser)
         {
-            var user = await _repo.GetOneAsync(p => p.Id == id);
+            var user = await _repo.GetOneAsync(u => u.Id == id);
             if (user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = {id}");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
             _mapper.Map(updatedUser, user);
             await _repo.UpdateOneAsync(user);

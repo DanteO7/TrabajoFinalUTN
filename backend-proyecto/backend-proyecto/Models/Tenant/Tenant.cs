@@ -16,8 +16,9 @@ namespace backend_proyecto.Models
         [Required]
         public bool IsActive { get; set; }
 
-        [Required]
-        public string Plan { get; set; } = null!;
+        [ForeignKey(nameof(TenantPlan))]
+        public int TenantPlanId { get; set; }
+        public TenantPlan TenantPlan { get; set; } = null!;
 
         [Required]
         public string MonthlyFeeStatus { get; set; } = null!;
