@@ -1,6 +1,6 @@
 ﻿namespace backend_proyecto.Services
 {
-    public class PlanServices
+    public class StudentPlanServices
     {
     }
 }
