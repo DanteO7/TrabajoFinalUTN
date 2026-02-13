@@ -30,7 +30,7 @@ namespace backend_proyecto.Config
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(p => p.Price)
-                      .HasPrecision(10, 2);
+                      .HasPrecision(18, 2);
             });
 
             modelBuilder.Entity<Student>(entity =>
@@ -47,9 +47,9 @@ namespace backend_proyecto.Config
                       .HasForeignKey(s => s.TenantId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(s => s.Plan)
+                entity.HasOne(s => s.StudentPlan)
                       .WithMany()
-                      .HasForeignKey(s => s.PlanId);
+                      .HasForeignKey(s => s.StudentPlanId);
             });
 
             modelBuilder.Entity<Professor>(entity =>
@@ -98,7 +98,7 @@ namespace backend_proyecto.Config
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(p => p.Amount)
-                      .HasPrecision(10, 2);
+                      .HasPrecision(18, 2);
             });
 
             modelBuilder.Entity<Reservation>(entity =>
@@ -117,6 +117,12 @@ namespace backend_proyecto.Config
                       .WithMany()
                       .HasForeignKey(r=> r.ClassId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<TenantPlan>(entity =>
+            {
+                entity.Property(p => p.Price)
+                      .HasPrecision(18, 2);
             });
 
 

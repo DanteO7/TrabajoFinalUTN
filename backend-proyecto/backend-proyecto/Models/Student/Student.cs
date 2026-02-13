@@ -12,8 +12,8 @@ namespace backend_proyecto.Models
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
 
-        public int PlanId { get; set; }
-        public Plan Plan { get; set; } = null!;
+        public int StudentPlanId { get; set; }
+        public StudentPlan StudentPlan { get; set; } = null!;
 
         [Required]
         public string MonthlyFeeStatus { get; set; } = null!;

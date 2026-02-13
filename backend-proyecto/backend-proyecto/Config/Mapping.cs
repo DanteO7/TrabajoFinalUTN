@@ -12,11 +12,15 @@ namespace backend_proyecto.Config
             CreateMap<int?, int>().ConvertUsing((src, dest) => src ?? dest);
             CreateMap<bool?, bool>().ConvertUsing((src, dest) => src ?? dest);
             CreateMap<string?, string>().ConvertUsing((src, dest) => src ?? dest);
+            CreateMap<decimal?, decimal>().ConvertUsing((src, dest) => src ?? dest);
 
             // user
             CreateMap<User, UserWithoutPassDTO>();
             CreateMap<RegisterDTO, User>();
             CreateMap<UpdateUserDTO, User>();
+
+            // tenantPlan
+            CreateMap<UpdateTenantPlanDTO, TenantPlan>();
         }
     }
 }

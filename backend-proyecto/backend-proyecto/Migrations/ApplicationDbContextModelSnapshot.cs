@@ -91,8 +91,8 @@ namespace backend_proyecto.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
@@ -104,51 +104,23 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentUserId")
-                        .HasColumnType("int");
+                    b.Property<string>("PlanType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TenantId")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("StudentUserId");
-
                     b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Plan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ClassesInWeek")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.ToTable("Plans");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
@@ -236,16 +208,46 @@ namespace backend_proyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PlanId")
+                    b.Property<int>("StudentPlanId")
                         .HasColumnType("int");
 
                     b.HasKey("UserId", "TenantId");
 
-                    b.HasIndex("PlanId");
+                    b.HasIndex("StudentPlanId");
 
                     b.HasIndex("TenantId");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.StudentPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassesPerMonth")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("StudentPlans");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Tenant", b =>
@@ -266,15 +268,44 @@ namespace backend_proyecto.Migrations
                     b.Property<int>("OwnerUserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Plan")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TenantPlanId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerUserId");
 
+                    b.HasIndex("TenantPlanId");
+
                     b.ToTable("Tenants");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.TenantPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MaxProfessors")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxStudents")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TenantPlans");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.User", b =>
@@ -355,40 +386,21 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.Plan", "Plan")
-                        .WithMany()
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend_proyecto.Models.User", "StudentUser")
-                        .WithMany()
-                        .HasForeignKey("StudentUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Plan");
-
-                    b.Navigation("StudentUser");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Plan", b =>
-                {
-                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                    b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Tenant");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
@@ -450,9 +462,9 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
                 {
-                    b.HasOne("backend_proyecto.Models.Plan", "Plan")
+                    b.HasOne("backend_proyecto.Models.StudentPlan", "StudentPlan")
                         .WithMany()
-                        .HasForeignKey("PlanId")
+                        .HasForeignKey("StudentPlanId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -468,11 +480,22 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Plan");
+                    b.Navigation("StudentPlan");
 
                     b.Navigation("Tenant");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.StudentPlan", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Tenant", b =>
@@ -483,7 +506,15 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("backend_proyecto.Models.TenantPlan", "TenantPlan")
+                        .WithMany()
+                        .HasForeignKey("TenantPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("OwnerUser");
+
+                    b.Navigation("TenantPlan");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,7 +9,7 @@ using System.Net;
 
 namespace backend_proyecto.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tenant")]
     [ApiController]
     public class TenantController : ControllerBase
     {

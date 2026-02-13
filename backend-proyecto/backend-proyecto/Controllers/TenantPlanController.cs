@@ -1,39 +1,34 @@
 ﻿using backend_proyecto.Enums;
+using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace backend_proyecto.Controllers
 {
-    [Route("api/user")]
+    [Route("api/tenantPlan")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class TenantPlanController : ControllerBase
     {
-        private readonly UserServices _userServices;
-
-        public UserController(UserServices userServices)
+        private readonly TenantPlanServices _tenantPlanServices;
+        public TenantPlanController(TenantPlanServices tenantPlanServices)
         {
-            _userServices = userServices;
+            _tenantPlanServices = tenantPlanServices;
         }
 
         [HttpGet]
-        [Authorize(Roles =$"{Roles.PROFESSOR}")]
-        [ProducesResponseType(typeof(List<UserWithoutPassDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(List<TenantPlan>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<UserWithoutPassDTO>>> GetAll([FromQuery] string? search, [FromQuery] bool? isProfessor, [FromQuery] bool? isStudent)
+        public async Task<ActionResult<List<TenantPlan>>> GetAll()
         {
             try
             {
-                var users = await _userServices.GetAll(search, isProfessor, isStudent);
-                return Ok(users);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
+                var tenantsPlan = await _tenantPlanServices.GetAll();
+                return Ok(tenantsPlan);
             }
             catch (Exception ex)
             {
@@ -41,30 +36,24 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
-        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [HttpPost]
+        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [ProducesResponseType(typeof(TenantPlan), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserWithoutPassDTO>> GetOneById(int id)
+        public async Task<ActionResult<TenantPlan>> CreateOne(string name, decimal price, int maxStudents, int maxProfessors)
         {
             try
             {
-                var user = await _userServices.GetOneById(id);
-                return Ok(user);
+                var tenantPlan = await _tenantPlanServices.CreateOne(name, price, maxStudents, maxProfessors);
+                return Created("Created", tenantPlan);
             }
-            catch(HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -72,7 +61,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                await _userServices.DeleteOne(id);
+                await _tenantPlanServices.DeleteOne(id);
                 return Ok();
             }
             catch (HttpResponseError ex)
@@ -86,16 +75,15 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.STUDENT}")]
-        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserWithoutPassDTO>> UpdateOneById(int id, [FromBody] UpdateUserDTO updatedUser)
+        public async Task<ActionResult> UpdateOneById(int id, [FromBody] UpdateTenantPlanDTO updateTenantPlan)
         {
             try
             {
-                var user = await _userServices.UpdateOne(id, updatedUser);
-                return Ok(user);
+                await _tenantPlanServices.UpdateOne(id, updateTenantPlan);
+                return Ok();
             }
             catch (HttpResponseError ex)
             {
