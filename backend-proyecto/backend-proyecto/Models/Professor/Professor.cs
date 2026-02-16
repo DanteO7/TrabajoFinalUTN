@@ -9,5 +9,8 @@ namespace backend_proyecto.Models
         public User User { get; set; } = null!;
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
+
+        [Required]
+        public bool IsActive { get; set; }
     }
 }

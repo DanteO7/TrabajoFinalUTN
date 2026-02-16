@@ -78,7 +78,6 @@ namespace backend_proyecto.Services
             if(tenantPlanId == tenant.TenantPlanId)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El plan no puede ser el mismo que ya tiene, PlanId = '{tenantPlanId}'");
-
             }
 
             tenant.TenantPlanId = tenantPlanId;

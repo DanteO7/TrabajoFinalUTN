@@ -4,19 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_proyecto.Repositories
 {
-    public interface IStudentRepository
+    public interface IStudentRepository : IRepository<Student>
     {
         Task<bool> ExistsByUserId(int userId);
     }
-    public class StudentRepository : IStudentRepository
+    public class StudentRepository : Repository<Student>, IStudentRepository
     {
         private readonly ApplicationDbContext _db;
-        internal DbSet<Student> dbSet { get; set; } = null!;
 
-        public StudentRepository(ApplicationDbContext db)
+        public StudentRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
-            dbSet = _db.Set<Student>();
         }
         public async Task<bool> ExistsByUserId(int userId)
         {
