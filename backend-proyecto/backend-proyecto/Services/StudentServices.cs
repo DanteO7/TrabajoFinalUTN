@@ -1,7 +1,10 @@
-﻿using backend_proyecto.Enums;
+﻿using AutoMapper;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
+using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -12,58 +15,59 @@ namespace backend_proyecto.Services
         private readonly IUserRepository _userRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IStudentPlanRepository _studentPlanRepository;
-        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository)
+        private readonly IMapper _mapper;
+        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
             _studentPlanRepository = studentPlanRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Student> AssignOne(int userId, int tenantId, int studentPlanId)
+        public async Task<Student> AssignOne(AssignStudentDTO assignStudentDTO)
         {
-            var user = await _userRepository.GetOneAsync(u => u.Id == userId);
+            var user = await _userRepository.GetOneAsync(u => u.Id == assignStudentDTO.UserId);
             if (user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{userId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{assignStudentDTO.UserId}'");
             }
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == assignStudentDTO.TenantId);
             if (tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{assignStudentDTO.TenantId}'");
             }
 
-            var studentPlan = await _studentPlanRepository.GetOneAsync(s => s.Id == studentPlanId);
+            var studentPlan = await _studentPlanRepository.GetOneAsync(s => s.Id == assignStudentDTO.StudentPlanId);
             if (studentPlan == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{studentPlanId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{assignStudentDTO.StudentPlanId}'");
             }
 
-            var student = new Student
+            var existingStudent = await _studentRepository.GetOneAsync(s => s.UserId == assignStudentDTO.UserId && s.TenantId == assignStudentDTO.TenantId);
+            if (existingStudent != null)
             {
-                UserId = userId,
-                User = user,
-                TenantId = tenantId,
-                Tenant = tenant,
-                StudentPlanId = studentPlanId,
-                StudentPlan = studentPlan,
-                MonthlyFeeStatus = MonthlyFeeStatus.PENDING
-            };
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El usuario '{existingStudent.UserId}' ya está asignado a este tenant = '{assignStudentDTO.TenantId}'");
+            }
+
+            var student = _mapper.Map<Student>(assignStudentDTO);
+            student.MonthlyFeeStatus = MonthlyFeeStatus.PENDING;
 
             await _studentRepository.CreateOneAsync(student);
             return student;
         }
 
-        public async Task<List<Student>> GetAllByTenantId(int tenantId)
+        public async Task<List<Student>> GetAll(int? tenantId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
-            if (tenant == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
-            }
+            IQueryable<Student> query = _studentRepository.Query();
 
-            return await _studentRepository.GetAllAsync(s => s.TenantId == tenantId);
+            if(tenantId != null)
+            {
+                query = query.Where(s => s.TenantId == tenantId);
+            }
+            var students = await query.ToListAsync();
+            return students;
         }
 
         public async Task<Student> GetOneById(int id)
@@ -87,8 +91,9 @@ namespace backend_proyecto.Services
             await _studentRepository.DeleteOneAsync(student);
         }
 
-        public async Task<Student> ChangePlan(int id, int studentPlanId)
+        public async Task<Student> ChangePlan(int id, ChangePlanStudentDTO changePlanStudentDTO)
         {
+            var studentPlanId = changePlanStudentDTO.StudentPlanId;
             var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
             if (student == null)
             {
@@ -113,8 +118,9 @@ namespace backend_proyecto.Services
             return student;
         }
 
-        public async Task<Student> ChangeStatus(int id, string status)
+        public async Task<Student> ChangeStatus(int id, ChangeStatusStudentDTO changeStatusStudentDTO)
         {
+            var status = changeStatusStudentDTO.MonthlyFeeStatus;
             var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
             if (student == null)
             {

@@ -10,7 +10,7 @@ using System.Net;
 
 namespace backend_proyecto.Controllers
 {
-    [Route("api/tenantPlan")]
+    [Route("api/tenantsPlan")]
     [ApiController]
     public class TenantPlanController : ControllerBase
     {
@@ -40,11 +40,11 @@ namespace backend_proyecto.Controllers
         [Authorize(Roles = $"{Roles.ADMIN}")]
         [ProducesResponseType(typeof(TenantPlan), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<TenantPlan>> CreateOne(string name, decimal price, int maxStudents, int maxProfessors)
+        public async Task<ActionResult<TenantPlan>> CreateOne([FromBody] CreateTenantPlanDTO createTenantPlanDTO)
         {
             try
             {
-                var tenantPlan = await _tenantPlanServices.CreateOne(name, price, maxStudents, maxProfessors);
+                var tenantPlan = await _tenantPlanServices.CreateOne(createTenantPlanDTO);
                 return Created("Created", tenantPlan);
             }
             catch (Exception ex)

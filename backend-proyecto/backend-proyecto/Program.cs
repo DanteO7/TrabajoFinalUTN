@@ -58,6 +58,8 @@ builder.Services.AddScoped<TenantPlanServices>();
 builder.Services.AddScoped<PaymentServices>();
 builder.Services.AddScoped<ClassServices>();
 builder.Services.AddScoped<ActivityServices>();
+builder.Services.AddScoped<StudentServices>();
+builder.Services.AddScoped<ProfessorServices>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();

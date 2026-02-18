@@ -23,15 +23,9 @@ namespace backend_proyecto.Services
             return await _tenantPlanRepository.GetAllAsync();
         }
 
-        public async Task<TenantPlan> CreateOne(string name, decimal price, int maxStudents, int maxProfessor)
+        public async Task<TenantPlan> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
         {
-            var tenantPlan = new TenantPlan
-            {
-                Name = name,
-                Price = price,
-                MaxStudents = maxStudents,
-                MaxProfessors = maxProfessor
-            };
+            var tenantPlan = _mapper.Map<TenantPlan>(createTenantPlanDTO);
             await _tenantPlanRepository.CreateOneAsync(tenantPlan);
             return tenantPlan;
         }

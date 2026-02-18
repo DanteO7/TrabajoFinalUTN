@@ -21,6 +21,13 @@ namespace backend_proyecto.Config
 
             // tenantPlan
             CreateMap<UpdateTenantPlanDTO, TenantPlan>();
+            CreateMap<CreateTenantPlanDTO, TenantPlan>();
+
+            // student
+            CreateMap<AssignStudentDTO, Student>();
+
+            // professor
+            CreateMap<AssignProfessorDTO, Professor>();
         }
     }
 }

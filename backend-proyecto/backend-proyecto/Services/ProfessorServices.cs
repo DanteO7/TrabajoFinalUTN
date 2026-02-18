@@ -1,6 +1,10 @@
-﻿using backend_proyecto.Models;
+﻿using AutoMapper;
+using backend_proyecto.Enums;
+using backend_proyecto.Models;
+using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -10,49 +14,46 @@ namespace backend_proyecto.Services
         private readonly IProfessorRepository _professorRepository;
         private readonly IUserRepository _userRepository;
         private readonly ITenantRepository _tenantRepository;
-        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository)
+        private readonly IMapper _mapper;
+        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IMapper mapper)
         {
             _professorRepository = professorRepository;
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Professor> AssignOne(int userId, int tenantId)
+        public async Task<Professor> AssignOne(AssignProfessorDTO assignProfessorDTO)
         {
-            var user = await _userRepository.GetOneAsync(u => u.Id == userId);
+            var user = await _userRepository.GetOneAsync(u => u.Id == assignProfessorDTO.UserId);
             if (user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{userId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{assignProfessorDTO.UserId}'");
             }
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == assignProfessorDTO.TenantId);
             if (tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{assignProfessorDTO.TenantId}'");
             }
 
-            var professor = new Professor
-            {
-                UserId = userId,
-                User = user,
-                TenantId = tenantId,
-                Tenant = tenant,
-                IsActive = true
-            };
+            var professor = _mapper.Map<Professor>(assignProfessorDTO);
+            professor.IsActive = false;
 
             await _professorRepository.CreateOneAsync(professor);
             return professor;
         }
 
-        public async Task<List<Professor>> GetAllByTenantId (int tenantId)
+        public async Task<List<Professor>> GetAll (int? tenantId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
-            if (tenant == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
-            }
+            IQueryable<Professor> query = _professorRepository.Query();
 
-            return await _professorRepository.GetAllAsync(p => p.TenantId == tenantId);
+            if (tenantId != null)
+            {
+                query = query.Where(p => p.TenantId == tenantId);
+            }
+            var professors = await query.ToListAsync();
+            return professors;
         }
 
         public async Task<Professor> GetOneById(int id)
@@ -76,7 +77,7 @@ namespace backend_proyecto.Services
             await _professorRepository.DeleteOneAsync(professor);
         }
 
-        public async Task<Professor> ChangeStatus(int id)
+        public async Task<Professor> ChangeActive(int id)
         {
             var professor = await _professorRepository.GetOneAsync(p => p.UserId == id);
             if (professor == null)

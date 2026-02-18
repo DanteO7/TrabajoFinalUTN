@@ -1,35 +1,37 @@
 ﻿using backend_proyecto.Enums;
+using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace backend_proyecto.Controllers
 {
-    [Route("api/users")]
+    [Route("api/professors")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class ProfessorController : ControllerBase
     {
-        private readonly UserServices _userServices;
-
-        public UserController(UserServices userServices)
+        private readonly ProfessorServices _professorServices;
+        public ProfessorController(ProfessorServices professorServices)
         {
-            _userServices = userServices;
+            _professorServices = professorServices;
         }
 
-        [HttpGet]
-        [Authorize(Roles =$"{Roles.PROFESSOR}")]
-        [ProducesResponseType(typeof(List<UserWithoutPassDTO>), StatusCodes.Status200OK)]
+        [HttpPost("assign")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [ProducesResponseType(typeof(Professor), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<UserWithoutPassDTO>>> GetAll([FromQuery] string? search, [FromQuery] bool? isProfessor, [FromQuery] bool? isStudent)
+        public async Task<ActionResult<Professor>> AssignOne([FromBody] AssignProfessorDTO assignProfessorDTO)
         {
             try
             {
-                var users = await _userServices.GetAll(search, isProfessor, isStudent);
-                return Ok(users);
+                var professor = await _professorServices.AssignOne(assignProfessorDTO);
+                return Created("Assigned", professor);
             }
             catch (HttpResponseError ex)
             {
@@ -41,23 +43,40 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
         [Authorize(Roles = $"{Roles.PROFESSOR}")]
-        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserWithoutPassDTO>> GetOneById(int id)
+        public async Task<ActionResult<List<Professor>>> GetAllByTenantId([FromQuery] int? tenantId)
         {
             try
             {
-                var user = await _userServices.GetOneById(id);
-                return Ok(user);
+                var professors = await _professorServices.GetAll(tenantId);
+                return Ok(professors);
             }
-            catch(HttpResponseError ex)
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<Student>>> GetOneById(int id)
+        {
+            try
+            {
+                var student = await _professorServices.GetOneById(id);
+                return Ok(student);
+            }
+            catch (HttpResponseError ex)
             {
                 return StatusCode((int)ex.StatusCode, ex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
@@ -72,7 +91,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                await _userServices.DeleteOne(id);
+                await _professorServices.DeleteOne(id);
                 return Ok();
             }
             catch (HttpResponseError ex)
@@ -85,17 +104,17 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.STUDENT}")]
-        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [HttpPatch("{id}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserWithoutPassDTO>> UpdateOneById(int id, [FromBody] UpdateUserDTO updatedUser)
+        public async Task<ActionResult> ChangeActive(int id)
         {
             try
             {
-                var user = await _userServices.UpdateOne(id, updatedUser);
-                return Ok(user);
+                await _professorServices.ChangeActive(id);
+                return Ok();
             }
             catch (HttpResponseError ex)
             {
