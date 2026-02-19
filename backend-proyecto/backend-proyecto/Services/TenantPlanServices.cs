@@ -25,6 +25,22 @@ namespace backend_proyecto.Services
 
         public async Task<TenantPlan> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
         {
+            if(createTenantPlanDTO.Name.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
+            }
+            if (createTenantPlanDTO.Price <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El precio no puede ser menor o igual a 0");
+            }
+            if(createTenantPlanDTO.MaxStudents <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El maximo de estudiantes no puede ser menor o igual a 0");
+            }
+            if (createTenantPlanDTO.MaxProfessors <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El maximo de profesores no puede ser menor o igual a 0");
+            }
             var tenantPlan = _mapper.Map<TenantPlan>(createTenantPlanDTO);
             await _tenantPlanRepository.CreateOneAsync(tenantPlan);
             return tenantPlan;
@@ -46,6 +62,22 @@ namespace backend_proyecto.Services
             if (tenantPlan == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan tenant con el Id = '{id}'");
+            }
+            if (updateTenantPlan.Price <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El precio no puede ser menor o igual a 0");
+            }
+            if (updateTenantPlan.MaxStudents <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El maximo de estudiantes no puede ser menor o igual a 0");
+            }
+            if (updateTenantPlan.MaxProfessors <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El maximo de profesores no puede ser menor o igual a 0");
+            }
+            if (updateTenantPlan.Name != null && updateTenantPlan.Name.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
             }
 
             _mapper.Map(updateTenantPlan, tenantPlan);
