@@ -86,16 +86,17 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}")]
         [ProducesResponseType(typeof(StudentPlan), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentPlan>> UpdateOne([FromBody] UpdateStudentPlanDTO updateStudentPlanDTO)
+        public async Task<ActionResult<StudentPlan>> UpdateOne(int id, [FromBody] UpdateStudentPlanDTO updateStudentPlanDTO)
         {
             try
             {
-                var studentPlan = await _studentPlanServices.UpdateOne(updateStudentPlanDTO);
+                var studentPlan = await _studentPlanServices.UpdateOne(id, updateStudentPlanDTO);
                 return Ok(studentPlan);
             }
             catch (HttpResponseError ex)

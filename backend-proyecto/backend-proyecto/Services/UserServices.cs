@@ -71,6 +71,31 @@ namespace backend_proyecto.Services
 
         public async Task<UserWithoutPassDTO> CreateOne(RegisterDTO registerDTO)
         {
+            if (registerDTO.Name.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del usuario no puede tener mas de 50 caracteres");
+            }
+            if (registerDTO.Surname.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El apellido del usuario no puede tener mas de 50 caracteres");
+            }
+            if (registerDTO.Email.Length > 100)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El email del usuario no puede tener mas de 100 caracteres");
+            }
+            if (registerDTO.PhoneNumber.Length > 20)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El numero de teléfono del usuario no puede tener mas de 20 caracteres");
+            }
+            if (registerDTO.Password.Length < 8 || registerDTO.Password.Length > 255)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La contraseña del usuario tiene que tener entre 8 y 255 caracteres");
+            }
+            if (registerDTO.ConfirmPassword.Length < 8 || registerDTO.ConfirmPassword.Length > 255)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La confirmación de la contraseña del usuario tiene que tener entre 8 y 255 caracteres");
+            }
+
             var user = _mapper.Map<User>(registerDTO);
             user.Password = _encoderServices.Encode(user.Password);
             await _repo.CreateOneAsync(user);
@@ -89,6 +114,14 @@ namespace backend_proyecto.Services
 
         public async Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser)
         {
+            if (updatedUser.Name != null && updatedUser.Name.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del usuario no puede tener mas de 50 caracteres");
+            }
+            if (updatedUser.Surname != null &&  updatedUser.Surname.Length > 50)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El apellido del usuario no puede tener mas de 50 caracteres");
+            }
             var user = await _repo.GetOneAsync(u => u.Id == id);
             if (user == null)
             {

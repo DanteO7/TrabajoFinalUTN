@@ -25,9 +25,9 @@ namespace backend_proyecto.Services
 
         public async Task<TenantPlan> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
         {
-            if(createTenantPlanDTO.Name.Length > 50)
+            if(createTenantPlanDTO.Name != null && createTenantPlanDTO.Name.Length > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
             }
             if (createTenantPlanDTO.Price <= 0)
             {

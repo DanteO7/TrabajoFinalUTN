@@ -37,9 +37,9 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createStudentPlanDTO.TenantId}'");
             }
-            if (createStudentPlanDTO.Name.Length > 50)
+            if (createStudentPlanDTO.Name != null && createStudentPlanDTO.Name.Length > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
             }
             if (createStudentPlanDTO.Price <= 0)
             {
@@ -66,8 +66,13 @@ namespace backend_proyecto.Services
             await _studentPlanRepository.DeleteOneAsync(studentPlan);
         }
 
-        public async Task<StudentPlan> UpdateOne(UpdateStudentPlanDTO updateStudentPlanDTO)
+        public async Task<StudentPlan> UpdateOne(int id, UpdateStudentPlanDTO updateStudentPlanDTO)
         {
+            var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == id);
+            if(studentPlan == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de estudiante con el Id = '{id}'");
+            }
             if (updateStudentPlanDTO.Price <= 0)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El precio no puede ser menor o igual a 0");
@@ -81,7 +86,7 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
             }
 
-            var studentPlan = _mapper.Map<StudentPlan>(updateStudentPlanDTO);
+            _mapper.Map(updateStudentPlanDTO, studentPlan);
             await _studentPlanRepository.UpdateOneAsync(studentPlan);
             return studentPlan;
         }

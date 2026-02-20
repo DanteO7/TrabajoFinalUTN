@@ -32,6 +32,10 @@ namespace backend_proyecto.Config
 
             // professor
             CreateMap<AssignProfessorDTO, Professor>();
+
+            // speciality
+            CreateMap<CreateSpecialityDTO, Speciality>();
+            CreateMap<UpdateSpecialityDTO, Speciality>();
         }
     }
 }

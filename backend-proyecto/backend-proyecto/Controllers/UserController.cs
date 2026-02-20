@@ -88,6 +88,7 @@ namespace backend_proyecto.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.STUDENT}")]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserWithoutPassDTO>> UpdateOneById(int id, [FromBody] UpdateUserDTO updatedUser)
