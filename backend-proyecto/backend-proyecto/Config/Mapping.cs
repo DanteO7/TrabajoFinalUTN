@@ -36,6 +36,10 @@ namespace backend_proyecto.Config
             // speciality
             CreateMap<CreateSpecialityDTO, Speciality>();
             CreateMap<UpdateSpecialityDTO, Speciality>();
+
+            // activity
+            CreateMap<CreateActivityDTO, Activity>();
+            CreateMap<UpdateActivityDTO, Activity>();
         }
     }
 }

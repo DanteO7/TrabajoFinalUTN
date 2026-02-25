@@ -22,7 +22,7 @@ namespace backend_proyecto.Services
 
         public async Task<List<StudentPlan>> GetAllByTenantId(int tenantId)
         {
-            var tenant = _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if(tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
@@ -32,7 +32,7 @@ namespace backend_proyecto.Services
 
         public async Task<StudentPlan> CreateOne(CreateStudentPlanDTO createStudentPlanDTO)
         {
-            var tenant = _tenantRepository.GetOneAsync(t => t.Id == createStudentPlanDTO.TenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createStudentPlanDTO.TenantId);
             if(tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createStudentPlanDTO.TenantId}'");
