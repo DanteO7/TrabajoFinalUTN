@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using backend_proyecto.Models;
+﻿using backend_proyecto.Models;
+using backend_proyecto.Models.Specialty;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend_proyecto.Config
 {
@@ -124,6 +125,20 @@ namespace backend_proyecto.Config
                 entity.Property(p => p.Price)
                       .HasPrecision(18, 2);
             });
+
+            modelBuilder.Entity<ProfessorSpeciality>(entity =>
+            {
+                entity.HasKey(ps => new { ps.ProfessorId, ps.SpecialityId });
+
+                entity.HasOne(ps => ps.Professor)
+                      .WithMany(p => p.ProfessorSpecialities)
+                      .HasForeignKey(ps => ps.ProfessorId);
+
+                entity.HasOne(ps => ps.Speciality)
+                      .WithMany(s => s.ProfessorSpecialities)
+                      .HasForeignKey(ps => ps.SpecialityId);
+            });
+                        
 
 
             //modelBuilder.Entity<User>().HasData(

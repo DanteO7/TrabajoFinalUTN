@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using backend_proyecto.Models.Specialty;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
@@ -12,5 +13,6 @@ namespace backend_proyecto.Models
 
         [Required]
         public bool IsActive { get; set; }
+        public ICollection<ProfessorSpeciality> ProfessorSpecialities { get; set; } = new List<ProfessorSpeciality>();
     }
 }
