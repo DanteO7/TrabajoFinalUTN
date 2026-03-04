@@ -40,6 +40,10 @@ namespace backend_proyecto.Config
             // activity
             CreateMap<CreateActivityDTO, Activity>();
             CreateMap<UpdateActivityDTO, Activity>();
+
+            // payment
+            CreateMap<CreatePaymentDTO, Payment>();
+            CreateMap<UpdateActivityDTO, Payment>();
         }
     }
 }

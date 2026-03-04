@@ -36,7 +36,7 @@ namespace backend_proyecto.Config
 
             modelBuilder.Entity<Student>(entity =>
             {
-                entity.HasKey(s => new { s.UserId, s.TenantId });
+                entity.HasKey(s => s.Id);
 
                 entity.HasOne(s => s.User)
                       .WithMany()
@@ -55,7 +55,7 @@ namespace backend_proyecto.Config
 
             modelBuilder.Entity<Professor>(entity =>
             {
-                entity.HasKey(p => new { p.UserId, p.TenantId });
+                entity.HasKey(p => p.Id);
 
                 entity.HasOne(p => p.User)
                       .WithMany()
@@ -138,7 +138,6 @@ namespace backend_proyecto.Config
                       .WithMany(s => s.ProfessorSpecialities)
                       .HasForeignKey(ps => ps.SpecialityId);
             });
-                        
 
 
             //modelBuilder.Entity<User>().HasData(
