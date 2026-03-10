@@ -16,8 +16,8 @@ namespace backend_proyecto.Models
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
 
-        public int StudentUserId { get; set; }
-        public User StudentUser { get; set; } = null!;
+        public int StudentId { get; set; }
+        public Student Student { get; set; } = null!;
 
         public DateTime ReservationDate { get; set; }
 

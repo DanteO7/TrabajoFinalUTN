@@ -13,6 +13,8 @@ namespace backend_proyecto.Config
             CreateMap<bool?, bool>().ConvertUsing((src, dest) => src ?? dest);
             CreateMap<string?, string>().ConvertUsing((src, dest) => src ?? dest);
             CreateMap<decimal?, decimal>().ConvertUsing((src, dest) => src ?? dest);
+            CreateMap<DateTime?, DateTime>().ConvertUsing((src, dest) => src ?? dest);
+            CreateMap<TimeOnly?, TimeOnly>().ConvertUsing((src, dest) => src ?? dest);
 
             // user
             CreateMap<User, UserWithoutPassDTO>();
@@ -44,6 +46,13 @@ namespace backend_proyecto.Config
             // payment
             CreateMap<CreatePaymentDTO, Payment>();
             CreateMap<UpdateActivityDTO, Payment>();
+
+            // class
+            CreateMap<CreateClassDTO, Class>();
+            CreateMap<UpdateClassDTO, Class>();
+
+            // reservation
+            CreateMap<CreateReservationDTO, Reservation>();
         }
     }
 }

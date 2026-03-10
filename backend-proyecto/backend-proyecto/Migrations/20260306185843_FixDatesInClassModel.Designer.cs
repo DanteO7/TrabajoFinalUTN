@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend_proyecto.Config;
 
@@ -11,9 +12,11 @@ using backend_proyecto.Config;
 namespace backend_proyecto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306185843_FixDatesInClassModel")]
+    partial class FixDatesInClassModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,7 +173,7 @@ namespace backend_proyecto.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int>("StudentUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("TenantId")
@@ -180,7 +183,7 @@ namespace backend_proyecto.Migrations
 
                     b.HasIndex("ClassId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("StudentUserId");
 
                     b.HasIndex("TenantId");
 
@@ -467,9 +470,9 @@ namespace backend_proyecto.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("backend_proyecto.Models.Student", "Student")
+                    b.HasOne("backend_proyecto.Models.User", "StudentUser")
                         .WithMany()
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("StudentUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -481,7 +484,7 @@ namespace backend_proyecto.Migrations
 
                     b.Navigation("Class");
 
-                    b.Navigation("Student");
+                    b.Navigation("StudentUser");
 
                     b.Navigation("Tenant");
                 });

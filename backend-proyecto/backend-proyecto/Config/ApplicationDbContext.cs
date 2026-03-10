@@ -75,9 +75,9 @@ namespace backend_proyecto.Config
                       .HasForeignKey(c => c.TenantId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(c => c.ProfessorUser)
+                entity.HasOne(c => c.Professor)
                       .WithMany()
-                      .HasForeignKey(c => c.ProfessorUserId)
+                      .HasForeignKey(c => c.ProfessorId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(c => c.Activity)
@@ -109,9 +109,9 @@ namespace backend_proyecto.Config
                       .HasForeignKey(r => r.TenantId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(r => r.StudentUser)
+                entity.HasOne(r => r.Student)
                       .WithMany()
-                      .HasForeignKey(p => p.StudentUserId)
+                      .HasForeignKey(p => p.StudentId)
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(r=> r.Class)

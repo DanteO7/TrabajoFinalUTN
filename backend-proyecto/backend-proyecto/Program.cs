@@ -60,6 +60,7 @@ builder.Services.AddScoped<ClassServices>();
 builder.Services.AddScoped<ActivityServices>();
 builder.Services.AddScoped<StudentServices>();
 builder.Services.AddScoped<ProfessorServices>();
+builder.Services.AddScoped<ReservationServices>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
@@ -72,6 +73,7 @@ builder.Services.AddScoped<ITenantPlanRepository, TenantPlanRepository>();
 builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));
