@@ -5,7 +5,6 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace backend_proyecto.Services
 {
@@ -15,12 +14,16 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
         private readonly IStudentRepository _studentRepository;
-        public ReservationServices(IReservationRepository reservationRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository)
+        private readonly IClassRepository _classRepository;
+        private readonly IStudentPlanRepository _studentPlanRepository;
+        public ReservationServices(IReservationRepository reservationRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository, IClassRepository classRepository, IStudentPlanRepository studentPlanRepository)
         {
             _reservationRepository = reservationRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
             _studentRepository = studentRepository;
+            _classRepository = classRepository;
+            _studentPlanRepository = studentPlanRepository;
         }
 
         public async Task<List<Reservation>> GetAllByDate(int tenantId, DateTime date)
@@ -45,6 +48,67 @@ namespace backend_proyecto.Services
 
         public async Task<Reservation> CreateOne(CreateReservationDTO createReservationDTO)
         {
+            var student = await _studentRepository.GetOneAsync(s => s.Id == createReservationDTO.StudentId);
+            if (student == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{createReservationDTO.StudentId}'");
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createReservationDTO.TenantId);
+            if (tenant == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createReservationDTO.TenantId}'");
+            }
+
+            var classEntity = await _classRepository.GetOneAsync(c => c.Id == createReservationDTO.ClassId);
+            if (classEntity == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una clase con el Id = '{createReservationDTO.ClassId}'");
+            }
+
+            if (student.TenantId != createReservationDTO.TenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El estudiante no pertenece al tenant especificado");
+            }
+
+            var existingReservation = await _reservationRepository.GetOneAsync(r =>
+                r.ClassId == createReservationDTO.ClassId &&
+                r.StudentId == createReservationDTO.StudentId);
+
+            if (existingReservation != null)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El estudiante ya tiene una reserva para esta clase");
+            }
+
+            var reservations = await _reservationRepository.GetAllAsync(r =>r.ClassId == createReservationDTO.ClassId);
+            if (reservations.Count() >= classEntity.MaxCapacity)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,$"La clase no tiene cupos disponibles");
+            }
+
+            if (createReservationDTO.ReservationDate < DateTime.Now)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede crear una reserva con fecha pasada");
+            }
+
+            var status = createReservationDTO.ReservationStatus;
+
+            if (status != "CONFIRMED" && status != "CANCELLED" && status != "PENDING")
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Estado de reserva inválido: '{status}'");
+            }
+
+            var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == student.StudentPlanId);
+            if (studentPlan != null)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "El estudiante no tiene un plan activo");
+            }
+
+            if(student.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "El estudiante no tiene la cuota al día");
+            }
+
             var reservation = _mapper.Map<Reservation>(createReservationDTO);
             await _reservationRepository.CreateOneAsync(reservation);
             return reservation;

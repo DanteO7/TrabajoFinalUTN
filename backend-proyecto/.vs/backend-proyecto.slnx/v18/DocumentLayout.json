@@ -1,12 +1,54 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\reservationservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\reservationservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\models\\reservation\\dto\\createreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\models\\reservation\\dto\\createreservationdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CreateReservationDTO.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Reservation\\DTO\\CreateReservationDTO.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Models\\Reservation\\DTO\\CreateReservationDTO.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Models\\Reservation\\DTO\\CreateReservationDTO.cs",
+              "RelativeToolTip": "backend-proyecto\\Models\\Reservation\\DTO\\CreateReservationDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-11T18:04:12.235Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ReservationServices.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\ReservationServices.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Services\\ReservationServices.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\ReservationServices.cs",
+              "RelativeToolTip": "backend-proyecto\\Services\\ReservationServices.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAADwvy8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-11T17:50:54.315Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
