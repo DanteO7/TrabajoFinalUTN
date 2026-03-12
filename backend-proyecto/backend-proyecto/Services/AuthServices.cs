@@ -23,8 +23,10 @@ namespace backend_proyecto.Services
         private readonly IProfessorRepository _professorRepo;
         private readonly IStudentRepository _studentRepo;
         internal readonly string _secret;
+        private readonly IAdminRepository _adminRepository;
+        private readonly ITenantRepository _tenantRepository;
 
-        public AuthServices(UserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo)
+        public AuthServices(UserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;
@@ -33,6 +35,8 @@ namespace backend_proyecto.Services
             _professorRepo = professorRepo;
             _studentRepo = studentRepo;
             _secret = _config.GetSection("Secrets:JWT")?.Value?.ToString() ?? string.Empty;
+            _adminRepository = adminRepository;
+            _tenantRepository = tenantRepository;
         }
 
         public async Task<UserWithoutPassDTO> Register(RegisterDTO register)
@@ -89,6 +93,16 @@ namespace backend_proyecto.Services
             if (await _studentRepo.ExistsByUserId(user.Id))
             {
                 claims.Add(new Claim(ClaimTypes.Role, Roles.STUDENT));
+            }
+
+            if (await _adminRepository.ExistsByUserId(user.Id))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, Roles.ADMIN));
+            }
+
+            if (await _tenantRepository.ExistsByUserId(user.Id))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, Roles.TENANT));
             }
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

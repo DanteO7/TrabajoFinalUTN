@@ -92,7 +92,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Token": [ ]
+          }
+        ]
       }
     },
     "/api/activities": {
@@ -3638,7 +3643,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Token": [ ]
+          }
+        ]
       }
     },
     "/api/studentsPlan": {
@@ -4787,7 +4797,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Token": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
@@ -4825,7 +4840,24 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantPlan"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantPlan"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantPlan"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -4887,7 +4919,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "Token": [ ]
+          }
+        ]
       }
     },
     "/api/users": {

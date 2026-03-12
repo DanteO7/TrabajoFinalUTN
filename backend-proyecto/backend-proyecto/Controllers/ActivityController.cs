@@ -22,6 +22,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.TENANT}, {Roles.ADMIN}")]
         [ProducesResponseType(typeof(List<ActivityModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -43,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(ActivityModel), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -66,7 +67,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -88,7 +89,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
         [ProducesResponseType(typeof(ActivityModel), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

@@ -139,6 +139,16 @@ namespace backend_proyecto.Config
                       .HasForeignKey(ps => ps.SpecialityId);
             });
 
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+
+                entity.HasOne(p => p.User)
+                      .WithMany()
+                      .HasForeignKey(p => p.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
 
             //modelBuilder.Entity<User>().HasData(
             //    new User

@@ -4,20 +4,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend_proyecto.Repositories
 {
-    public interface ITenantRepository : IRepository<Tenant>
+    public interface IAdminRepository : IRepository<Admin>
     {
         Task<bool> ExistsByUserId(int userId);
     }
-    public class TenantRepository : Repository<Tenant>, ITenantRepository
+    public class AdminRepository : Repository<Admin>, IAdminRepository
     {
         private readonly ApplicationDbContext _db;
-        public TenantRepository(ApplicationDbContext db) : base(db)
+
+        public AdminRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
         public async Task<bool> ExistsByUserId(int userId)
         {
-            return await dbSet.AnyAsync(s => s.OwnerUserId == userId);
+            return await dbSet.AnyAsync(s => s.UserId == userId);
         }
     }
 }

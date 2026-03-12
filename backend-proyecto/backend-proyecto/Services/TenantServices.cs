@@ -21,7 +21,7 @@ namespace backend_proyecto.Services
 
         public async Task<List<Tenant>> GetAll()
         {
-            return await _tenantRepository.GetAllAsync();
+            return await _tenantRepository.GetAllAsync(null, t => t.OwnerUser, t => t.TenantPlan);
         }
 
         public async Task<Tenant> CreateOne(CreateTenantDTO createTenantDTO)

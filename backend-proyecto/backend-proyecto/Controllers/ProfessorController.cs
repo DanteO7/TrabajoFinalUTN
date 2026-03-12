@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost("assign")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
         [ProducesResponseType(typeof(Professor), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -44,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<Professor>>> GetAllByTenantId([FromQuery] int? tenantId)
@@ -61,7 +61,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -83,7 +83,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -105,7 +105,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -127,7 +127,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost("{professorId}/especialities/{specialityId}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -150,7 +150,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{professorId}/especialities/{specialityId}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

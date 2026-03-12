@@ -74,6 +74,7 @@ builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));

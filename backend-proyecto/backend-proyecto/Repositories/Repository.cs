@@ -7,7 +7,7 @@ namespace backend_proyecto.Repositories
 {
     public interface IRepository<T> where T : class
     {
-        Task<List<T>> GetAllAsync(Expression<Func<T,bool>>? filter = null);
+        Task<List<T>> GetAllAsync(Expression<Func<T,bool>>? filter = null, params Expression<Func<T, object>>[] includes);
         Task<T?>GetOneAsync(Expression<Func<T,bool>>? filter = null);
         Task CreateOneAsync(T entity);
         Task UpdateOneAsync(T entity);
@@ -36,13 +36,16 @@ namespace backend_proyecto.Repositories
             await SaveAsync();
         }
 
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = dbSet;
-            if(filter != null)
-            {
+
+            if (filter != null)
                 query = query.Where(filter);
-            }
+
+            foreach (var include in includes)
+                query = query.Include(include);
+
             return await query.ToListAsync();
         }
 

@@ -59,6 +59,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = $"{Roles.ADMIN}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -67,7 +68,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _tenantPlanServices.DeleteOne(id);
-                return Ok();
+                return Ok("Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -80,7 +81,8 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [ProducesResponseType(typeof(TenantPlan), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -88,8 +90,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                await _tenantPlanServices.UpdateOne(id, updateTenantPlan);
-                return Ok();
+                var tenantPlan = await _tenantPlanServices.UpdateOne(id, updateTenantPlan);
+                return Ok(tenantPlan);
             }
             catch (HttpResponseError ex)
             {
