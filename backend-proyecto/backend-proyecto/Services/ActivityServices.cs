@@ -19,27 +19,28 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
         
-        public async Task<List<Activity>> GetAllByTenantId(int tenantId)
+        public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
-            return await _activityRepository.GetAllAsync(p => p.TenantId == tenantId);
+            var activities = await _activityRepository.GetAllAsync(a => a.TenantId == tenantId, a => a.Tenant);
+            return _mapper.Map<List<ResponseActivityDTO>>(activities);
         }
 
-        public async Task<Activity> GetOne(int id)
+        public async Task<ResponseActivityDTO> GetOne(int id)
         {
-            var activity = await _activityRepository.GetOneAsync(t => t.Id == id);
+            var activity = await _activityRepository.GetOneAsync(a => a.Id == id, a => a.Tenant);
             if (activity == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{id}'");
             }
-            return activity;
+            return _mapper.Map<ResponseActivityDTO>(activity);
         }
 
-        public async Task<Activity> CreateOne(CreateActivityDTO createActivityDTO)
+        public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createActivityDTO.TenantId);
             if (tenant == null)
@@ -48,16 +49,21 @@ namespace backend_proyecto.Services
             }
             if (createActivityDTO.Name != null && createActivityDTO.Name.Length > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la actividad no puede ser nulo o tener mas de 50 caracteres");
             }
+            if (createActivityDTO.Name != null && await _activityRepository.ExistsByName(createActivityDTO.Name))
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una actividad con ese nombre");
+            }
+
             var activity = _mapper.Map<Activity>(createActivityDTO);
             await _activityRepository.CreateOneAsync(activity);
-            return activity;
+            return _mapper.Map<ResponseActivityDTO>(activity);
         }
 
         public async Task DeleteOne(int id)
         {
-            var activity = await _activityRepository.GetOneAsync(p => p.Id == id);
+            var activity = await _activityRepository.GetOneAsync(a => a.Id == id);
             if (activity == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{id}'");
@@ -66,9 +72,9 @@ namespace backend_proyecto.Services
             await _activityRepository.DeleteOneAsync(activity);
         }
 
-        public async Task<Activity> UpdateOne(int id, UpdateActivityDTO updateActivityDTO)
+        public async Task<ResponseActivityDTO> UpdateOne(int id, UpdateActivityDTO updateActivityDTO)
         {
-            var activity = await _activityRepository.GetOneAsync(p => p.Id == id);
+            var activity = await _activityRepository.GetOneAsync(a => a.Id == id, a => a.Tenant);
             if (activity == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{id}'");
@@ -80,7 +86,7 @@ namespace backend_proyecto.Services
 
             _mapper.Map(updateActivityDTO, activity);
             await _activityRepository.UpdateOneAsync(activity);
-            return activity;
+            return _mapper.Map<ResponseActivityDTO>(activity);
         }
     }
 }

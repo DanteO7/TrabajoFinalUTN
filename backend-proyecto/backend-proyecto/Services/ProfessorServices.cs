@@ -3,7 +3,6 @@ using backend_proyecto.Config;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
-using backend_proyecto.Models.Specialty;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +28,7 @@ namespace backend_proyecto.Services
             _context = context;
         }
 
-        public async Task<Professor> AssignOne(AssignProfessorDTO assignProfessorDTO)
+        public async Task<ResponseProfessorDTO> AssignOne(AssignProfessorDTO assignProfessorDTO)
         {
             var user = await _userRepository.GetOneAsync(u => u.Id == assignProfessorDTO.UserId);
             if (user == null)
@@ -47,35 +46,44 @@ namespace backend_proyecto.Services
             professor.IsActive = false;
 
             await _professorRepository.CreateOneAsync(professor);
-            return professor;
+            return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
-        public async Task<List<Professor>> GetAll (int? tenantId)
+        public async Task<List<ResponseProfessorDTO>> GetAll (int? tenantId)
         {
-            IQueryable<Professor> query = _professorRepository.Query();
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            if(tenantId != null && tenant == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+
+            }
+            IQueryable<Professor> query = _professorRepository.Query()
+                .Include(p => p.User)
+                .Include(p => p.ProfessorSpecialities)
+                    .ThenInclude(ps => ps.Speciality);
 
             if (tenantId != null)
             {
                 query = query.Where(p => p.TenantId == tenantId);
             }
             var professors = await query.ToListAsync();
-            return professors;
+            return _mapper.Map<List<ResponseProfessorDTO>>(professors);
         }
 
-        public async Task<Professor> GetOneById(int id)
+        public async Task<ResponseProfessorDTO> GetOneById(int id)
         {
-            var professor = await _professorRepository.GetOneAsync(u => u.UserId == id);
+            var professor = await _professorRepository.GetOneAsync(p => p.Id == id, p => p.User);
             if (professor == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
 
-            return professor;
+            return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
         public async Task DeleteOne(int id)
         {
-            var professor = await _professorRepository.GetOneAsync(p => p.UserId == id);
+            var professor = await _professorRepository.GetOneAsync(p => p.Id == id);
             if (professor == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
@@ -83,9 +91,9 @@ namespace backend_proyecto.Services
             await _professorRepository.DeleteOneAsync(professor);
         }
 
-        public async Task<Professor> ChangeActive(int id)
+        public async Task<ResponseProfessorDTO> ChangeActive(int id)
         {
-            var professor = await _professorRepository.GetOneAsync(p => p.UserId == id);
+            var professor = await _professorRepository.GetOneAsync(p => p.Id == id, p => p.User);
             if (professor == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
@@ -93,12 +101,12 @@ namespace backend_proyecto.Services
 
             professor.IsActive = !professor.IsActive;
             await _professorRepository.UpdateOneAsync(professor);
-            return professor;
+            return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
-        public async Task AssignSpeciality(int professorId, int specialityId)
+        public async Task<ResponseProfessorDTO> AssignSpeciality(int professorId, int specialityId)
         {
-            var professor = await _professorRepository.GetOneAsync(p => p.UserId == professorId);
+            var professor = await _professorRepository.GetOneAsync(p => p.Id == professorId, p => p.User);
             if (professor == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{professorId}'");
@@ -110,7 +118,7 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una especialidad con el Id = '{specialityId}'");
             }
 
-            var exist = professor.ProfessorSpecialities.Any(ps => ps.SpecialityId == specialityId);
+            var exist = await _professorRepository.HasSpeciality(professorId, specialityId);
             if (exist)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"La especialidad con el Id = '{specialityId}' ya está asignada a el profesor con Id = '{professorId}'");
@@ -122,11 +130,18 @@ namespace backend_proyecto.Services
                 SpecialityId = specialityId,
             });
             await _professorRepository.UpdateOneAsync(professor);
+
+            professor = await _professorRepository.Query()
+                .Include(p => p.User)
+                .Include(p => p.ProfessorSpecialities)
+                    .ThenInclude(ps => ps.Speciality)
+                .FirstAsync(p => p.Id == professorId);
+            return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
-        public async Task RemoveSpeciality(int professorId, int specialityId)
+        public async Task<ResponseProfessorDTO> RemoveSpeciality(int professorId, int specialityId)
         {
-            var professor = await _professorRepository.GetOneAsync(p => p.UserId == professorId);
+            var professor = await _professorRepository.GetOneAsync(p => p.Id == professorId, p => p.User, p => p.Tenant);
             if (professor == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{professorId}'");
@@ -149,6 +164,15 @@ namespace backend_proyecto.Services
 
             professor.ProfessorSpecialities.Remove(relation);
             await _professorRepository.UpdateOneAsync(professor);
+
+            professor = await _professorRepository
+                .Query()
+                .Include(p => p.User)
+                .Include(p => p.ProfessorSpecialities)
+                    .ThenInclude(ps => ps.Speciality)
+                .FirstAsync(p => p.Id == professorId);
+
+            return _mapper.Map<ResponseProfessorDTO>(professor);
         }
     }
 }

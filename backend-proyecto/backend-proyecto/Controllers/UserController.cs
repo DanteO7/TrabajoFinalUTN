@@ -73,7 +73,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _userServices.DeleteOne(id);
-                return Ok();
+                return Ok("User Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {

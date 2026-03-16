@@ -18,12 +18,13 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
 
-        public async Task<List<TenantPlan>> GetAll()
+        public async Task<List<ResponseTenantPlanDTO>> GetAll()
         {
-            return await _tenantPlanRepository.GetAllAsync();
+            var tenantPlans = await _tenantPlanRepository.GetAllAsync();
+            return _mapper.Map<List<ResponseTenantPlanDTO>>(tenantPlans);
         }
 
-        public async Task<TenantPlan> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
+        public async Task<ResponseTenantPlanDTO> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
         {
             if(createTenantPlanDTO.Name != null && createTenantPlanDTO.Name.Length > 50)
             {
@@ -43,7 +44,7 @@ namespace backend_proyecto.Services
             }
             var tenantPlan = _mapper.Map<TenantPlan>(createTenantPlanDTO);
             await _tenantPlanRepository.CreateOneAsync(tenantPlan);
-            return tenantPlan;
+            return _mapper.Map<ResponseTenantPlanDTO>(tenantPlan);
         }
 
         public async Task DeleteOne(int id)
@@ -56,7 +57,7 @@ namespace backend_proyecto.Services
             await _tenantPlanRepository.DeleteOneAsync(tenantPlan);
         }
 
-        public async Task<TenantPlan> UpdateOne(int id, UpdateTenantPlanDTO updateTenantPlan)
+        public async Task<ResponseTenantPlanDTO> UpdateOne(int id, UpdateTenantPlanDTO updateTenantPlan)
         {
             var tenantPlan = await _tenantPlanRepository.GetOneAsync(p => p.Id == id);
             if (tenantPlan == null)
@@ -82,7 +83,7 @@ namespace backend_proyecto.Services
 
             _mapper.Map(updateTenantPlan, tenantPlan);
             await _tenantPlanRepository.UpdateOneAsync(tenantPlan);
-            return tenantPlan;
+            return _mapper.Map<ResponseTenantPlanDTO>(tenantPlan);
         }
     }
 }

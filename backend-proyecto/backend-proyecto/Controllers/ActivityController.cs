@@ -1,12 +1,9 @@
 ﻿using backend_proyecto.Enums;
-using ActivityModel = backend_proyecto.Models.Activity;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Net;
 
 namespace backend_proyecto.Controllers
@@ -23,10 +20,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{tenantId}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(List<ActivityModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseActivityDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ActivityModel>>> GetAllByTenantId(int tenantId)
+        public async Task<ActionResult<List<ResponseActivityDTO>>> GetAllByTenantId(int tenantId)
         {
             try
             {
@@ -45,11 +42,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(ActivityModel), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseActivityDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ActivityModel>> CreateOne([FromBody] CreateActivityDTO createActivityDTO)
+        public async Task<ActionResult<ResponseActivityDTO>> CreateOne([FromBody] CreateActivityDTO createActivityDTO)
         {
             try
             {
@@ -76,7 +73,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _activityServices.DeleteOne(id);
-                return Ok();
+                return Ok("Activity Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -90,11 +87,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(ActivityModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseActivityDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ActivityModel>> UpdateOne(int id, [FromBody] UpdateActivityDTO updateActivityDTO)
+        public async Task<ActionResult<ResponseActivityDTO>> UpdateOne(int id, [FromBody] UpdateActivityDTO updateActivityDTO)
         {
             try
             {

@@ -22,10 +22,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{userId}")]
         [Authorize(Roles = $"{Roles.STUDENT}, {Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<Payment>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponsePaymentDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Payment>>> GetAllByUserId(int userId)
+        public async Task<ActionResult<List<ResponsePaymentDTO>>> GetAllByUserId(int userId)
         {
             try
             {
@@ -44,11 +44,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Payment), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponsePaymentDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Payment>> CreateOne([FromBody] CreatePaymentDTO createPaymentDTO)
+        public async Task<ActionResult<ResponsePaymentDTO>> CreateOne([FromBody] CreatePaymentDTO createPaymentDTO)
         {
             try
             {
@@ -70,12 +70,12 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Payment>> DeleteOne(int id)
+        public async Task<ActionResult> DeleteOne(int id)
         {
             try
             {
                 await _paymentServices.DeleteOne(id);
-                return Ok();
+                return Ok("Payment Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -89,11 +89,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponsePaymentDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Payment>> UpdateOne(int id, [FromBody] UpdatePaymentDTO updatePaymentDTO)
+        public async Task<ActionResult<ResponsePaymentDTO>> UpdateOne(int id, [FromBody] UpdatePaymentDTO updatePaymentDTO)
         {
             try
             {

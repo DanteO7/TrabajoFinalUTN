@@ -22,10 +22,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{tenantId}/{date}")]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.PROFESSOR}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<Reservation>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Class>>> GetByDate(int tenantId, DateTime date)
+        public async Task<ActionResult<List<ResponseReservationDTO>>> GetByDate(int tenantId, DateTime date)
         {
             try
             {
@@ -44,10 +44,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{studentId}")]
         [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.PROFESSOR}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<Reservation>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Class>>> GetByStuentId(int studentId)
+        public async Task<ActionResult<List<ResponseReservationDTO>>> GetByStuentId(int studentId)
         {
             try
             {
@@ -66,11 +66,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.PROFESSOR}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Reservation), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Class>> CreateOne([FromBody] CreateReservationDTO createReservationDTO)
+        public async Task<ActionResult<ResponseReservationDTO>> CreateOne([FromBody] CreateReservationDTO createReservationDTO)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _reservationServices.DeleteOne(id);
-                return Ok();
+                return Ok("Reservation Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -111,11 +111,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPatch("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Reservation), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> ChangeStatus(int id, [FromBody] ChangeStatusReservationDTO changeStatusReservationDTO)
+        public async Task<ActionResult<ResponseReservationDTO>> ChangeStatus(int id, [FromBody] ChangeStatusReservationDTO changeStatusReservationDTO)
         {
             try
             {

@@ -7,6 +7,7 @@ namespace backend_proyecto.Repositories
     public interface IProfessorRepository : IRepository<Professor>
     {
         Task<bool> ExistsByUserId(int userId);
+        Task<bool> HasSpeciality(int professorId, int specialityId);
     }
     public class ProfessorRepository : Repository<Professor>, IProfessorRepository
     {
@@ -19,6 +20,10 @@ namespace backend_proyecto.Repositories
         public async Task<bool> ExistsByUserId(int userId)
         {
             return await dbSet.AnyAsync(p => p.UserId == userId);
+        }
+        public async Task<bool> HasSpeciality(int professorId, int specialityId)
+        {
+            return await _db.ProfessorSpecialities.AnyAsync(ps => ps.ProfessorId == professorId && ps.SpecialityId == specialityId);
         }
     }
 }

@@ -25,5 +25,6 @@ namespace backend_proyecto.Models
 
         [Required]
         public int MaxCapacity { get; set; }
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

@@ -15,8 +15,5 @@ namespace backend_proyecto.Models.DTOs
 
         [Required]
         public DateTime ReservationDate { get; set; }
-
-        [Required]
-        public string ReservationStatus { get; set; } = null!;
     }
 }

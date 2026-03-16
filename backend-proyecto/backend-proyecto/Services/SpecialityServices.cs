@@ -19,7 +19,7 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
         
-        public async Task<List<Speciality>> GetAllByTenantId(int tenantId)
+        public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int tenantId)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id  == tenantId);
             if(tenant == null)
@@ -27,11 +27,11 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
 
-            var specialities = await _specialityRepository.GetAllAsync(s => s.TenantId == tenantId);
-            return specialities;
+            var specialities = await _specialityRepository.GetAllAsync(s => s.TenantId == tenantId, s => s.Tenant);
+            return _mapper.Map<List<ResponseSpecialityDTO>>(specialities);
         }
 
-        public async Task<Speciality> CreateOne(CreateSpecialityDTO createSpecialityDTO)
+        public async Task<ResponseSpecialityDTO> CreateOne(CreateSpecialityDTO createSpecialityDTO)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createSpecialityDTO.TenantId);
             if (tenant == null)
@@ -42,10 +42,14 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
             }
+            if(createSpecialityDTO.Name != null && await _specialityRepository.ExistsByName(createSpecialityDTO.Name))
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una especialidad con ese nombre");
+            }
 
             var speciality = _mapper.Map<Speciality>(createSpecialityDTO);
             await _specialityRepository.CreateOneAsync(speciality);
-            return speciality;
+            return _mapper.Map<ResponseSpecialityDTO>(speciality);
         }
 
         public async Task DeleteOne(int id)
@@ -59,21 +63,27 @@ namespace backend_proyecto.Services
             await _specialityRepository.DeleteOneAsync(speciality);
         }
 
-        public async Task<Speciality> UpdateOne(int id, UpdateSpecialityDTO updateSpecialityDTO)
+        public async Task<ResponseSpecialityDTO> UpdateOne(int id, UpdateSpecialityDTO updateSpecialityDTO)
         {
-            var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id);
+            var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id, s => s.Tenant);
             if (speciality == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una especialidad con el Id = '{id}'");
             }
+
             if (updateSpecialityDTO.Name != null && updateSpecialityDTO.Name.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
             }
 
+            if (updateSpecialityDTO.Name == speciality.Name)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser igual al anterior");
+            }
+
             _mapper.Map(updateSpecialityDTO, speciality);
             await _specialityRepository.UpdateOneAsync(speciality);
-            return speciality;
+            return _mapper.Map<ResponseSpecialityDTO>(speciality);
         }
     }
 }

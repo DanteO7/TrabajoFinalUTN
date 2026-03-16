@@ -240,7 +240,7 @@ namespace backend_proyecto.Migrations
 
                     b.HasIndex("SpecialityId");
 
-                    b.ToTable("ProfessorSpeciality");
+                    b.ToTable("ProfessorSpecialities");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Student", b =>
@@ -535,7 +535,7 @@ namespace backend_proyecto.Migrations
                         .IsRequired();
 
                     b.HasOne("backend_proyecto.Models.Speciality", "Speciality")
-                        .WithMany("ProfessorSpecialities")
+                        .WithMany()
                         .HasForeignKey("SpecialityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -603,11 +603,6 @@ namespace backend_proyecto.Migrations
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
-                {
-                    b.Navigation("ProfessorSpecialities");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Speciality", b =>
                 {
                     b.Navigation("ProfessorSpecialities");
                 });

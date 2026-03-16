@@ -25,16 +25,17 @@ namespace backend_proyecto.Services
             _tenantPlanRepository = tenantPlanRepository;
             _tenantRepository = tenantRepository;
         }
-        public async Task<List<Payment>> GetAllByIdUser(int userId)
+        public async Task<List<ResponsePaymentDTO>> GetAllByIdUser(int userId)
         {
             var user = await _userRepository.GetOneAsync(u => u.Id == userId);
             if(user == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{userId}'");
             }
-            return await _paymentRepository.GetAllAsync(p =>  p.UserId == userId);
+            var payments = await _paymentRepository.GetAllAsync(p =>  p.UserId == userId, p => p.User);
+            return _mapper.Map<List<ResponsePaymentDTO>>(payments);
         }
-        public async Task<Payment> CreateOne(CreatePaymentDTO createPaymentDTO)
+        public async Task<ResponsePaymentDTO> CreateOne(CreatePaymentDTO createPaymentDTO)
         {
             var user = await _userRepository.GetOneAsync(u => u.Id == createPaymentDTO.UserId);
             if (user == null)
@@ -79,12 +80,12 @@ namespace backend_proyecto.Services
 
             var payment = _mapper.Map<Payment>(createPaymentDTO);
             await _paymentRepository.CreateOneAsync(payment);
-            return payment;
+            return _mapper.Map<ResponsePaymentDTO>(payment);
         }
 
         public async Task DeleteOne(int id)
         {
-            var payment = await _paymentRepository.GetOneAsync(u => u.Id == id);
+            var payment = await _paymentRepository.GetOneAsync(p => p.Id == id);
             if (payment == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un pago con el Id = '{id}'");
@@ -92,9 +93,9 @@ namespace backend_proyecto.Services
             await _paymentRepository.DeleteOneAsync(payment);
         }
 
-        public async Task<Payment> UpdateOne(int id, UpdatePaymentDTO updatePaymentDTO)
+        public async Task<ResponsePaymentDTO> UpdateOne(int id, UpdatePaymentDTO updatePaymentDTO)
         {
-            var payment = await _paymentRepository.GetOneAsync(u => u.Id == id);
+            var payment = await _paymentRepository.GetOneAsync(u => u.Id == id, p => p.User);
             if (payment == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un pago con el Id = '{id}'");
@@ -161,7 +162,7 @@ namespace backend_proyecto.Services
 
             _mapper.Map(updatePaymentDTO, payment);
             await _paymentRepository.UpdateOneAsync(payment);
-            return payment;
+            return _mapper.Map<ResponsePaymentDTO>(payment);
         }
     }
 }

@@ -15,7 +15,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Activity",
+        "Type": "backend_proyecto.Models.DTOs.ResponseActivityDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -113,7 +113,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Activity",
+        "Type": "backend_proyecto.Models.DTOs.ResponseActivityDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -166,7 +166,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Activity, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseActivityDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -348,7 +348,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Class",
+        "Type": "backend_proyecto.Models.DTOs.ResponseClassDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -446,7 +446,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Class",
+        "Type": "backend_proyecto.Models.DTOs.ResponseClassDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -504,7 +504,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Class, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseClassDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -548,7 +548,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Payment",
+        "Type": "backend_proyecto.Models.DTOs.ResponsePaymentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -601,12 +601,8 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Payment",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
+        "Type": "System.Void",
+        "MediaTypes": [],
         "StatusCode": 200
       },
       {
@@ -650,7 +646,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Payment",
+        "Type": "backend_proyecto.Models.DTOs.ResponsePaymentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -703,7 +699,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Payment, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponsePaymentDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -747,13 +743,22 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Professor",
+        "Type": "backend_proyecto.Models.DTOs.ResponseProfessorDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "backend_proyecto.Utils.Errors.HttpMessage",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
       },
       {
         "Type": "backend_proyecto.Utils.Errors.HttpMessage",
@@ -782,7 +787,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Professor",
+        "Type": "backend_proyecto.Models.DTOs.ResponseProfessorDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -915,8 +920,12 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Void",
-        "MediaTypes": [],
+        "Type": "backend_proyecto.Models.DTOs.ResponseProfessorDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
         "StatusCode": 201
       },
       {
@@ -969,8 +978,12 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Void",
-        "MediaTypes": [],
+        "Type": "backend_proyecto.Models.DTOs.ResponseProfessorDTO",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
         "StatusCode": 200
       },
       {
@@ -1018,7 +1031,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Professor",
+        "Type": "backend_proyecto.Models.DTOs.ResponseProfessorDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1071,13 +1084,13 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Reservation",
+        "Type": "backend_proyecto.Models.DTOs.ResponseReservationDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 201
       },
       {
         "Type": "backend_proyecto.Utils.Errors.HttpMessage",
@@ -1169,7 +1182,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Reservation",
+        "Type": "backend_proyecto.Models.DTOs.ResponseReservationDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1222,7 +1235,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Reservation, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseReservationDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1271,7 +1284,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Reservation, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseReservationDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1315,7 +1328,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseSpecialityDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1368,12 +1381,8 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
+        "Type": "System.Void",
+        "MediaTypes": [],
         "StatusCode": 200
       },
       {
@@ -1417,7 +1426,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseSpecialityDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1470,7 +1479,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseSpecialityDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1514,13 +1523,22 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "backend_proyecto.Utils.Errors.HttpMessage",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
       },
       {
         "Type": "backend_proyecto.Utils.Errors.HttpMessage",
@@ -1549,7 +1567,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1638,7 +1656,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1696,7 +1714,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1749,7 +1767,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Student",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1802,7 +1820,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.StudentPlan",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentPlanDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1900,7 +1918,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.StudentPlan",
+        "Type": "backend_proyecto.Models.DTOs.ResponseStudentPlanDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1953,7 +1971,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.StudentPlan, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseStudentPlanDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1991,7 +2009,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.Tenant, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseTenantDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2035,7 +2053,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Tenant",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2133,7 +2151,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Tenant",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2191,7 +2209,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Tenant",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2249,7 +2267,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.Tenant",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2296,7 +2314,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.TenantPlan, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[backend_proyecto.Models.DTOs.ResponseTenantPlanDTO, backend-proyecto, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2331,7 +2349,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.TenantPlan",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantPlanDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -2420,7 +2438,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.TenantPlan",
+        "Type": "backend_proyecto.Models.DTOs.ResponseTenantPlanDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",

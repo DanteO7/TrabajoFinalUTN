@@ -22,11 +22,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost("assign")]
         [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Professor), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Professor>> AssignOne([FromBody] AssignProfessorDTO assignProfessorDTO)
+        public async Task<ActionResult<ResponseProfessorDTO>> AssignOne([FromBody] AssignProfessorDTO assignProfessorDTO)
         {
             try
             {
@@ -45,7 +45,8 @@ namespace backend_proyecto.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<Professor>>> GetAllByTenantId([FromQuery] int? tenantId)
         {
@@ -53,6 +54,10 @@ namespace backend_proyecto.Controllers
             {
                 var professors = await _professorServices.GetAll(tenantId);
                 return Ok(professors);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
             }
             catch (Exception ex)
             {
@@ -62,15 +67,15 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Professor), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Student>>> GetOneById(int id)
+        public async Task<ActionResult<List<ResponseProfessorDTO>>> GetOneById(int id)
         {
             try
             {
-                var student = await _professorServices.GetOneById(id);
-                return Ok(student);
+                var professor = await _professorServices.GetOneById(id);
+                return Ok(professor);
             }
             catch (HttpResponseError ex)
             {
@@ -92,7 +97,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _professorServices.DeleteOne(id);
-                return Ok();
+                return Ok("Professor Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -128,16 +133,16 @@ namespace backend_proyecto.Controllers
 
         [HttpPost("{professorId}/especialities/{specialityId}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> AssinSpeciality(int professorId, int specialityId)
+        public async Task<ActionResult<ResponseProfessorDTO>> AssinSpeciality(int professorId, int specialityId)
         {
             try
             {
-                await _professorServices.AssignSpeciality(professorId, specialityId);
-                return Created();
+                var professor = await _professorServices.AssignSpeciality(professorId, specialityId);
+                return Created("Speciality assigned", professor);
             }
             catch (HttpResponseError ex)
             {
@@ -151,16 +156,16 @@ namespace backend_proyecto.Controllers
 
         [HttpDelete("{professorId}/especialities/{specialityId}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> RemoveSpeciality(int professorId, int specialityId)
+        public async Task<ActionResult<ResponseProfessorDTO>> RemoveSpeciality(int professorId, int specialityId)
         {
             try
             {
-                await _professorServices.RemoveSpeciality(professorId, specialityId);
-                return Ok();
+                var professor = await _professorServices.RemoveSpeciality(professorId, specialityId);
+                return Ok(professor);
             }
             catch (HttpResponseError ex)
             {

@@ -142,3 +142,8 @@ C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backe
 C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net8.0\backend-proyecto.genruntimeconfig.cache
 C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net8.0\ref\backend-proyecto.dll
 C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll

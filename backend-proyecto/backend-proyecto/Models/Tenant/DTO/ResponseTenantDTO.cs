@@ -1,0 +1,13 @@
+﻿namespace backend_proyecto.Models.DTOs
+{
+    public class ResponseTenantDTO
+    {
+        public int Id { get; set; }
+        public int OwnerUserId { get; set; }
+        public UserWithoutPassDTO OwnerUser { get; set; } = null!;
+        public bool IsActive { get; set; }
+        public int TenantPlanId { get; set; }
+        public ResponseTenantPlanDTO TenantPlan { get; set; } = null!;
+        public string MonthlyFeeStatus { get; set; } = null!;
+    }
+}

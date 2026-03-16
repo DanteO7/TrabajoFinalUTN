@@ -1,4 +1,5 @@
-﻿using backend_proyecto.Enums;
+﻿using AutoMapper;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
@@ -12,19 +13,22 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IUserRepository _userRepository;
         private readonly ITenantPlanRepository _tenantPlanRepository;
-        public TenantServices(ITenantRepository tenantRepository, IUserRepository userRepository, ITenantPlanRepository tenantPlanRepository)
+        private readonly IMapper _mapper;
+        public TenantServices(ITenantRepository tenantRepository, IUserRepository userRepository, ITenantPlanRepository tenantPlanRepository, IMapper mapper)
         {
             _tenantRepository = tenantRepository;
             _userRepository = userRepository;
             _tenantPlanRepository = tenantPlanRepository;
+            _mapper = mapper;
         }
 
-        public async Task<List<Tenant>> GetAll()
+        public async Task<List<ResponseTenantDTO>> GetAll()
         {
-            return await _tenantRepository.GetAllAsync(null, t => t.OwnerUser, t => t.TenantPlan);
+            var tenants = await _tenantRepository.GetAllAsync(null, t => t.OwnerUser, t => t.TenantPlan);
+            return _mapper.Map<List<ResponseTenantDTO>>(tenants);
         }
 
-        public async Task<Tenant> CreateOne(CreateTenantDTO createTenantDTO)
+        public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO)
         {
             var user = await _userRepository.GetOneAsync(p => p.Id == createTenantDTO.OwnerUserId);
             if(user == null)
@@ -49,7 +53,7 @@ namespace backend_proyecto.Services
             };
 
             await _tenantRepository.CreateOneAsync(tenant);
-            return tenant;
+            return _mapper.Map<ResponseTenantDTO>(tenant);
         }
 
         public async Task DeleteOne(int id)
@@ -62,9 +66,9 @@ namespace backend_proyecto.Services
             await _tenantRepository.DeleteOneAsync(tenant);
         }
 
-        public async Task<Tenant> ChangePlan(int id, ChangePlanTenantDTO changePlanTenantDTO)
+        public async Task<ResponseTenantDTO> ChangePlan(int id, ChangePlanTenantDTO changePlanTenantDTO)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Tenant con el Id = '{id}'");
@@ -83,12 +87,12 @@ namespace backend_proyecto.Services
 
             tenant.TenantPlanId = changePlanTenantDTO.TenantPlanId;
             await _tenantRepository.UpdateOneAsync(tenant);
-            return tenant;
+            return _mapper.Map<ResponseTenantDTO>(tenant);
         }
 
-        public async Task<Tenant> ChangeActive(int id, ChangeActiveTenantDTO changeStatusTenantDTO)
+        public async Task<ResponseTenantDTO> ChangeActive(int id, ChangeActiveTenantDTO changeStatusTenantDTO)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Tenant con el Id = '{id}'");
@@ -101,13 +105,13 @@ namespace backend_proyecto.Services
 
             tenant.IsActive = changeStatusTenantDTO.IsActive;
             await _tenantRepository.UpdateOneAsync(tenant);
-            return tenant;
+            return _mapper.Map<ResponseTenantDTO>(tenant);
         }
 
-        public async Task<Tenant> ChangeStatus(int id, ChangeStatusTenantDTO changeStatusTenantDTO)
+        public async Task<ResponseTenantDTO> ChangeStatus(int id, ChangeStatusTenantDTO changeStatusTenantDTO)
         {
             var status = changeStatusTenantDTO.MonthlyFeeStatus;
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{id}'");
@@ -125,7 +129,7 @@ namespace backend_proyecto.Services
 
             tenant.MonthlyFeeStatus = status;
             await _tenantRepository.UpdateOneAsync(tenant);
-            return tenant;
+            return _mapper.Map<ResponseTenantDTO>(tenant);
         }
     }
 }

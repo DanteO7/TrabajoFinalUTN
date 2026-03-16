@@ -20,17 +20,18 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
 
-        public async Task<List<StudentPlan>> GetAllByTenantId(int tenantId)
+        public async Task<List<ResponseStudentPlanDTO>> GetAllByTenantId(int tenantId)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if(tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
-            return await _studentPlanRepository.GetAllAsync(p => p.TenantId == tenantId);
+            var studentPlans = await _studentPlanRepository.GetAllAsync(p => p.TenantId == tenantId);
+            return _mapper.Map<List<ResponseStudentPlanDTO>>(studentPlans);
         }
 
-        public async Task<StudentPlan> CreateOne(CreateStudentPlanDTO createStudentPlanDTO)
+        public async Task<ResponseStudentPlanDTO> CreateOne(CreateStudentPlanDTO createStudentPlanDTO)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createStudentPlanDTO.TenantId);
             if(tenant == null)
@@ -52,7 +53,7 @@ namespace backend_proyecto.Services
 
             var studentPlan = _mapper.Map<StudentPlan>(createStudentPlanDTO);
             await _studentPlanRepository.CreateOneAsync(studentPlan);
-            return studentPlan;
+            return _mapper.Map<ResponseStudentPlanDTO>(studentPlan);
         }
 
         public async Task DeleteOne(int id)
@@ -66,7 +67,7 @@ namespace backend_proyecto.Services
             await _studentPlanRepository.DeleteOneAsync(studentPlan);
         }
 
-        public async Task<StudentPlan> UpdateOne(int id, UpdateStudentPlanDTO updateStudentPlanDTO)
+        public async Task<ResponseStudentPlanDTO> UpdateOne(int id, UpdateStudentPlanDTO updateStudentPlanDTO)
         {
             var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == id);
             if(studentPlan == null)
@@ -88,7 +89,7 @@ namespace backend_proyecto.Services
 
             _mapper.Map(updateStudentPlanDTO, studentPlan);
             await _studentPlanRepository.UpdateOneAsync(studentPlan);
-            return studentPlan;
+            return _mapper.Map<ResponseStudentPlanDTO>(studentPlan);
         }
     }
 }

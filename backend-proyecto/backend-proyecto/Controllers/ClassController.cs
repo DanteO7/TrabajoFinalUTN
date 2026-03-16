@@ -22,10 +22,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{tenantId}/{date}")]
         [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.PROFESSOR}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<Class>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseClassDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Class>>> GetByDate(int tenantId, DateTime date)
+        public async Task<ActionResult<List<ResponseClassDTO>>> GetByDate(int tenantId, DateTime date)
         {
             try
             {
@@ -44,11 +44,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Class), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseClassDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Class>> CreateOne([FromBody] CreateClassDTO createClassDTO)
+        public async Task<ActionResult<ResponseClassDTO>> CreateOne([FromBody] CreateClassDTO createClassDTO)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _classServices.DeleteOne(id);
-                return Ok();
+                return Ok("Class Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -89,11 +89,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Class), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseClassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateOne(int id, [FromBody] UpdateClassDTO updateClassDTO)
+        public async Task<ActionResult<ResponseClassDTO>> UpdateOne(int id, [FromBody] UpdateClassDTO updateClassDTO)
         {
             try
             {

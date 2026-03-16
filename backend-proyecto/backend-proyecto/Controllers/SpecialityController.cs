@@ -22,10 +22,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{tenantId}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Student), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseSpecialityDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Speciality>>> GetAllByTenantId(int tenantId)
+        public async Task<ActionResult<List<ResponseSpecialityDTO>>> GetAllByTenantId(int tenantId)
         {
             try
             {
@@ -44,11 +44,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Student), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseSpecialityDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Speciality>> CreateOne([FromBody] CreateSpecialityDTO createSpecialityDTO)
+        public async Task<ActionResult<ResponseSpecialityDTO>> CreateOne([FromBody] CreateSpecialityDTO createSpecialityDTO)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace backend_proyecto.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Student), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteOne(int id)
@@ -75,7 +75,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _specialityServices.DeleteOne(id);
-                return Ok();
+                return Ok("Speciality Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -89,11 +89,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(Student), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseSpecialityDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Speciality>> UpdateOne(int id,[FromBody] UpdateSpecialityDTO updateSpecialityDTO)
+        public async Task<ActionResult<ResponseSpecialityDTO>> UpdateOne(int id,[FromBody] UpdateSpecialityDTO updateSpecialityDTO)
         {
             try
             {

@@ -25,7 +25,7 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
 
-        public async Task<Student> AssignOne(AssignStudentDTO assignStudentDTO)
+        public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
         {
             var user = await _userRepository.GetOneAsync(u => u.Id == assignStudentDTO.UserId);
             if (user == null)
@@ -55,49 +55,56 @@ namespace backend_proyecto.Services
             student.MonthlyFeeStatus = MonthlyFeeStatus.PENDING;
 
             await _studentRepository.CreateOneAsync(student);
-            return student;
+            return _mapper.Map<ResponseStudentDTO>(student);
         }
 
-        public async Task<List<Student>> GetAll(int? tenantId)
+        public async Task<List<ResponseStudentDTO>> GetAll(int? tenantId)
         {
-            IQueryable<Student> query = _studentRepository.Query();
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            if (tenantId != null && tenant == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+
+            }
+            IQueryable<Student> query = _studentRepository.Query()
+                .Include(s => s.StudentPlan)
+                .Include(s => s.User);
 
             if(tenantId != null)
             {
                 query = query.Where(s => s.TenantId == tenantId);
             }
             var students = await query.ToListAsync();
-            return students;
+            return _mapper.Map<List<ResponseStudentDTO>>(students);
         }
 
-        public async Task<Student> GetOneById(int id)
+        public async Task<ResponseStudentDTO> GetOneById(int id)
         {
-            var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
+            var student = await _studentRepository.GetOneAsync(s => s.Id == id, s => s.StudentPlan, s => s.User);
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
             }
-
-            return student;
+            return _mapper.Map<ResponseStudentDTO>(student);
         }
 
         public async Task DeleteOne(int id)
         {
-            var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
+            var student = await _studentRepository.GetOneAsync(s => s.Id == id);
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
             }
             await _studentRepository.DeleteOneAsync(student);
         }
 
-        public async Task<Student> ChangePlan(int id, ChangePlanStudentDTO changePlanStudentDTO)
+        public async Task<ResponseStudentDTO> ChangePlan(int id, ChangePlanStudentDTO changePlanStudentDTO)
         {
             var studentPlanId = changePlanStudentDTO.StudentPlanId;
-            var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
+            var student = await _studentRepository.GetOneAsync(s => s.Id == id, s => s.StudentPlan, s => s.User);
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
             }
 
             var studentPlan = await _studentPlanRepository.GetOneAsync(s => s.Id == studentPlanId);
@@ -115,16 +122,16 @@ namespace backend_proyecto.Services
             student.StudentPlan = studentPlan;
 
             await _studentRepository.UpdateOneAsync(student);
-            return student;
+            return _mapper.Map<ResponseStudentDTO>(student);
         }
 
-        public async Task<Student> ChangeStatus(int id, ChangeStatusStudentDTO changeStatusStudentDTO)
+        public async Task<ResponseStudentDTO> ChangeStatus(int id, ChangeStatusStudentDTO changeStatusStudentDTO)
         {
             var status = changeStatusStudentDTO.MonthlyFeeStatus;
-            var student = await _studentRepository.GetOneAsync(s => s.UserId == id);
+            var student = await _studentRepository.GetOneAsync(s => s.Id == id, s => s.StudentPlan, s => s.User);
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
             }
 
             if(status != MonthlyFeeStatus.PAID && status != MonthlyFeeStatus.PENDING && status != MonthlyFeeStatus.OVERDUE)
@@ -139,7 +146,7 @@ namespace backend_proyecto.Services
 
             student.MonthlyFeeStatus = status;
             await _studentRepository.UpdateOneAsync(student);
-            return student;
+            return _mapper.Map<ResponseStudentDTO>(student);
         }
     }
 }

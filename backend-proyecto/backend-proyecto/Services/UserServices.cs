@@ -31,7 +31,7 @@ namespace backend_proyecto.Services
         {
             IQueryable<User> query = _repo.Query();
 
-            if (!search.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(search))
             {
                 var normalized = search.Trim().ToLower();
 

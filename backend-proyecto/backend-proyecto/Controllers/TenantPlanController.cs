@@ -21,9 +21,9 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(List<TenantPlan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseTenantPlanDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<TenantPlan>>> GetAll()
+        public async Task<ActionResult<List<ResponseTenantPlanDTO>>> GetAll()
         {
             try
             {
@@ -38,10 +38,10 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(TenantPlan), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseTenantPlanDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<TenantPlan>> CreateOne([FromBody] CreateTenantPlanDTO createTenantPlanDTO)
+        public async Task<ActionResult<ResponseTenantPlanDTO>> CreateOne([FromBody] CreateTenantPlanDTO createTenantPlanDTO)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _tenantPlanServices.DeleteOne(id);
-                return Ok("Successfully Deleted");
+                return Ok("Tenant Plan Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -82,11 +82,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(TenantPlan), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseTenantPlanDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> UpdateOneById(int id, [FromBody] UpdateTenantPlanDTO updateTenantPlan)
+        public async Task<ActionResult<ResponseTenantPlanDTO>> UpdateOneById(int id, [FromBody] UpdateTenantPlanDTO updateTenantPlan)
         {
             try
             {

@@ -1,5 +1,4 @@
 ﻿using backend_proyecto.Models;
-using backend_proyecto.Models.Specialty;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend_proyecto.Config
@@ -13,6 +12,7 @@ namespace backend_proyecto.Config
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Professor> Professors { get; set; } = null!;
         public DbSet<Speciality> Specialities { get; set; } = null!;
+        public DbSet<ProfessorSpeciality> ProfessorSpecialities { get; set; }
         public DbSet<Activity> Activities { get; set; } = null!;
         public DbSet<StudentPlan> StudentPlans { get; set; } = null!;
         public DbSet<TenantPlan> TenantPlans { get; set; } = null!;
@@ -115,7 +115,7 @@ namespace backend_proyecto.Config
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(r=> r.Class)
-                      .WithMany()
+                      .WithMany(c => c.Reservations)
                       .HasForeignKey(r=> r.ClassId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
@@ -135,7 +135,7 @@ namespace backend_proyecto.Config
                       .HasForeignKey(ps => ps.ProfessorId);
 
                 entity.HasOne(ps => ps.Speciality)
-                      .WithMany(s => s.ProfessorSpecialities)
+                      .WithMany()
                       .HasForeignKey(ps => ps.SpecialityId);
             });
 

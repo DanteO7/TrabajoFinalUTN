@@ -30,7 +30,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Activity"
+                    "$ref": "#/components/schemas/ResponseActivityDTO"
                   }
                 }
               },
@@ -38,7 +38,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Activity"
+                    "$ref": "#/components/schemas/ResponseActivityDTO"
                   }
                 }
               },
@@ -46,7 +46,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Activity"
+                    "$ref": "#/components/schemas/ResponseActivityDTO"
                   }
                 }
               }
@@ -130,17 +130,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               }
             }
@@ -320,17 +320,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Activity"
+                  "$ref": "#/components/schemas/ResponseActivityDTO"
                 }
               }
             }
@@ -686,7 +686,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Class"
+                    "$ref": "#/components/schemas/ResponseClassDTO"
                   }
                 }
               },
@@ -694,7 +694,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Class"
+                    "$ref": "#/components/schemas/ResponseClassDTO"
                   }
                 }
               },
@@ -702,7 +702,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Class"
+                    "$ref": "#/components/schemas/ResponseClassDTO"
                   }
                 }
               }
@@ -786,17 +786,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               }
             }
@@ -976,17 +976,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Class"
+                  "$ref": "#/components/schemas/ResponseClassDTO"
                 }
               }
             }
@@ -1083,7 +1083,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Payment"
+                    "$ref": "#/components/schemas/ResponsePaymentDTO"
                   }
                 }
               },
@@ -1091,7 +1091,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Payment"
+                    "$ref": "#/components/schemas/ResponsePaymentDTO"
                   }
                 }
               },
@@ -1099,7 +1099,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Payment"
+                    "$ref": "#/components/schemas/ResponsePaymentDTO"
                   }
                 }
               }
@@ -1183,17 +1183,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               }
             }
@@ -1284,24 +1284,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Payment"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Payment"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Payment"
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -1390,17 +1373,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Payment"
+                  "$ref": "#/components/schemas/ResponsePaymentDTO"
                 }
               }
             }
@@ -1503,17 +1486,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               }
             }
@@ -1607,17 +1590,37 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
                 }
               }
             }
@@ -1672,17 +1675,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Professor"
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
                 }
               }
             }
@@ -1911,7 +1914,24 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -2006,7 +2026,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProfessorDTO"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -2109,7 +2146,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               },
@@ -2117,7 +2154,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               },
@@ -2125,7 +2162,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               }
@@ -2203,7 +2240,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               },
@@ -2211,7 +2248,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               },
@@ -2219,7 +2256,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Reservation"
+                    "$ref": "#/components/schemas/ResponseReservationDTO"
                   }
                 }
               }
@@ -2298,22 +2335,22 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success",
+          "201": {
+            "description": "Created",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               }
             }
@@ -2493,17 +2530,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Reservation"
+                  "$ref": "#/components/schemas/ResponseReservationDTO"
                 }
               }
             }
@@ -2598,17 +2635,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               }
             }
@@ -2691,17 +2728,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               }
             }
@@ -2792,24 +2829,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Student"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Student"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Student"
-                }
-              }
-            }
+            "description": "Success"
           },
           "404": {
             "description": "Not Found",
@@ -2898,17 +2918,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseSpecialityDTO"
                 }
               }
             }
@@ -3011,17 +3031,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               }
             }
@@ -3115,17 +3135,37 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpMessage"
                 }
               }
             }
@@ -3180,17 +3220,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               }
             }
@@ -3350,17 +3390,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               }
             }
@@ -3474,17 +3514,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Student"
+                  "$ref": "#/components/schemas/ResponseStudentDTO"
                 }
               }
             }
@@ -3581,7 +3621,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StudentPlan"
+                    "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                   }
                 }
               },
@@ -3589,7 +3629,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StudentPlan"
+                    "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                   }
                 }
               },
@@ -3597,7 +3637,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/StudentPlan"
+                    "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                   }
                 }
               }
@@ -3681,17 +3721,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               }
             }
@@ -3871,17 +3911,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StudentPlan"
+                  "$ref": "#/components/schemas/ResponseStudentPlanDTO"
                 }
               }
             }
@@ -3967,7 +4007,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Tenant"
+                    "$ref": "#/components/schemas/ResponseTenantDTO"
                   }
                 }
               },
@@ -3975,7 +4015,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Tenant"
+                    "$ref": "#/components/schemas/ResponseTenantDTO"
                   }
                 }
               },
@@ -3983,7 +4023,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Tenant"
+                    "$ref": "#/components/schemas/ResponseTenantDTO"
                   }
                 }
               }
@@ -4065,17 +4105,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               }
             }
@@ -4257,17 +4297,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               }
             }
@@ -4381,17 +4421,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               }
             }
@@ -4505,17 +4545,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Tenant"
+                  "$ref": "#/components/schemas/ResponseTenantDTO"
                 }
               }
             }
@@ -4601,7 +4641,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TenantPlan"
+                    "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                   }
                 }
               },
@@ -4609,7 +4649,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TenantPlan"
+                    "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                   }
                 }
               },
@@ -4617,7 +4657,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/TenantPlan"
+                    "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                   }
                 }
               }
@@ -4674,17 +4714,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               }
             }
@@ -4844,17 +4884,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TenantPlan"
+                  "$ref": "#/components/schemas/ResponseTenantPlanDTO"
                 }
               }
             }
@@ -5309,31 +5349,6 @@
   },
   "components": {
     "schemas": {
-      "Activity": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
-          },
-          "tenantId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
-          }
-        },
-        "additionalProperties": false
-      },
       "AssignProfessorDTO": {
         "required": [
           "tenantId",
@@ -5452,56 +5467,6 @@
         },
         "additionalProperties": false
       },
-      "Class": {
-        "required": [
-          "maxCapacity"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "activityId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "activity": {
-            "$ref": "#/components/schemas/Activity"
-          },
-          "professorId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "professor": {
-            "$ref": "#/components/schemas/Professor"
-          },
-          "tenantId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
-          },
-          "date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "startTime": {
-            "type": "string",
-            "format": "time"
-          },
-          "endTime": {
-            "type": "string",
-            "format": "time"
-          },
-          "maxCapacity": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "CreateActivityDTO": {
         "required": [
           "name",
@@ -5610,7 +5575,6 @@
         "required": [
           "classId",
           "reservationDate",
-          "reservationStatus",
           "studentId",
           "tenantId"
         ],
@@ -5631,10 +5595,6 @@
           "reservationDate": {
             "type": "string",
             "format": "date-time"
-          },
-          "reservationStatus": {
-            "minLength": 1,
-            "type": "string"
           }
         },
         "additionalProperties": false
@@ -5778,54 +5738,6 @@
         },
         "additionalProperties": false
       },
-      "Payment": {
-        "required": [
-          "amount",
-          "paymentMethod"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "planId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "planType": {
-            "type": "string",
-            "nullable": true
-          },
-          "tenantId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
-          },
-          "paymentDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "amount": {
-            "type": "number",
-            "format": "double"
-          },
-          "paymentMethod": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "Professor": {
         "required": [
           "isActive"
@@ -5928,10 +5840,163 @@
         },
         "additionalProperties": false
       },
-      "Reservation": {
-        "required": [
-          "reservationStatus"
-        ],
+      "ResponseActivityDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseClassDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activityId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activity": {
+            "$ref": "#/components/schemas/ResponseActivityDTO"
+          },
+          "professorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "professor": {
+            "$ref": "#/components/schemas/ResponseProfessorDTO"
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "maxCapacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reservationsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availableSpots": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponsePaymentDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserWithoutPassDTO"
+          },
+          "planId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "planType": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paymentDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseProfessorDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserWithoutPassDTO"
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "specialities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResponseProfessorSpecialityDTO"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseProfessorSpecialityDTO": {
+        "type": "object",
+        "properties": {
+          "specialityId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseReservationDTO": {
         "type": "object",
         "properties": {
           "id": {
@@ -5943,29 +6008,162 @@
             "format": "int32"
           },
           "class": {
-            "$ref": "#/components/schemas/Class"
+            "$ref": "#/components/schemas/ResponseClassDTO"
           },
           "tenantId": {
             "type": "integer",
             "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
           },
           "studentId": {
             "type": "integer",
             "format": "int32"
           },
           "student": {
-            "$ref": "#/components/schemas/Student"
+            "$ref": "#/components/schemas/ResponseStudentDTO"
           },
           "reservationDate": {
             "type": "string",
             "format": "date-time"
           },
           "reservationStatus": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseSpecialityDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tenant": {
+            "$ref": "#/components/schemas/ResponseTenantDTO"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseStudentDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserWithoutPassDTO"
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "studentPlanId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "studentPlan": {
+            "$ref": "#/components/schemas/ResponseStudentPlanDTO"
+          },
+          "monthlyFeeStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseStudentPlanDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tenantId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "classesPerMonth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseTenantDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ownerUserId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ownerUser": {
+            "$ref": "#/components/schemas/UserWithoutPassDTO"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "tenantPlanId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tenantPlan": {
+            "$ref": "#/components/schemas/ResponseTenantPlanDTO"
+          },
+          "monthlyFeeStatus": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResponseTenantPlanDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "maxStudents": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxProfessors": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -5991,86 +6189,6 @@
           },
           "tenant": {
             "$ref": "#/components/schemas/Tenant"
-          },
-          "professorSpecialities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProfessorSpeciality"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "Student": {
-        "required": [
-          "monthlyFeeStatus"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
-          "tenantId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
-          },
-          "studentPlanId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "studentPlan": {
-            "$ref": "#/components/schemas/StudentPlan"
-          },
-          "monthlyFeeStatus": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "StudentPlan": {
-        "required": [
-          "classesPerMonth",
-          "name",
-          "price"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenantId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "tenant": {
-            "$ref": "#/components/schemas/Tenant"
-          },
-          "name": {
-            "maxLength": 50,
-            "minLength": 1,
-            "type": "string"
-          },
-          "classesPerMonth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "price": {
-            "type": "number",
-            "format": "double"
           }
         },
         "additionalProperties": false

@@ -7,7 +7,7 @@ namespace backend_proyecto.Repositories
 {
     public interface IClassRepository : IRepository<Class>
     {
-        Task<bool> ExistsScheduleConflict(CreateClassDTO createClassDTO);
+        Task<bool> ExistsScheduleConflict(CreateClassDTO dto, int? classIdToIgnore);
     }
     public class ClassRepository : Repository<Class>, IClassRepository
     {
@@ -16,13 +16,14 @@ namespace backend_proyecto.Repositories
         {
             _db = db;
         }
-        public async Task<bool> ExistsScheduleConflict(CreateClassDTO createClassDTO)
+        public async Task<bool> ExistsScheduleConflict(CreateClassDTO dto, int? classIdToIgnore = null)
         {
-            return await dbSet.AnyAsync(c =>
-            c.ProfessorId == createClassDTO.ProfessorId &&
-            c.Date.Date == createClassDTO.Date.Date &&
-            createClassDTO.StartTime < c.EndTime &&
-            createClassDTO.EndTime > c.StartTime
+            return await _db.Classes.AnyAsync(c =>
+                c.ProfessorId == dto.ProfessorId &&
+                c.Date.Date == dto.Date.Date &&
+                dto.StartTime < c.EndTime &&
+                dto.EndTime > c.StartTime &&
+                (classIdToIgnore == null || c.Id != classIdToIgnore)
             );
         }
     }

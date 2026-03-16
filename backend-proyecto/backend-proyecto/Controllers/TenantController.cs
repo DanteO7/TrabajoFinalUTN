@@ -21,10 +21,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(List<Tenant>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseTenantDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<UserWithoutPassDTO>>> GetAll()
+        public async Task<ActionResult<List<ResponseTenantDTO>>> GetAll()
         {
             try
             {
@@ -43,11 +43,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Tenant), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Tenant>> CreateOne([FromBody] CreateTenantDTO createTenantDTO)
+        public async Task<ActionResult<ResponseTenantDTO>> CreateOne([FromBody] CreateTenantDTO createTenantDTO)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _tenantServices.DeleteOne(id);
-                return Ok();
+                return Ok("Tenant Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -88,11 +88,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPatch("{id}/plan")]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Tenant), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Tenant>> ChangePlan(int id, [FromBody] ChangePlanTenantDTO changePlanTenantDTO)
+        public async Task<ActionResult<ResponseTenantDTO>> ChangePlan(int id, [FromBody] ChangePlanTenantDTO changePlanTenantDTO)
         {
             try
             {
@@ -111,11 +111,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPatch("{id}/active")]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Tenant), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Tenant>> ChangeActive(int id, [FromBody] ChangeActiveTenantDTO changeActiveTenantDTO)
+        public async Task<ActionResult<ResponseTenantDTO>> ChangeActive(int id, [FromBody] ChangeActiveTenantDTO changeActiveTenantDTO)
         {
             try
             {
@@ -134,11 +134,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPatch("{id}/status")]
         [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Tenant), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Tenant>> ChangeStatus(int id, [FromBody] ChangeStatusTenantDTO changeStatusTenantDTO)
+        public async Task<ActionResult<ResponseTenantDTO>> ChangeStatus(int id, [FromBody] ChangeStatusTenantDTO changeStatusTenantDTO)
         {
             try
             {

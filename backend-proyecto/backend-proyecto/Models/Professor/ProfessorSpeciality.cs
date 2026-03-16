@@ -1,4 +1,4 @@
-﻿namespace backend_proyecto.Models.Specialty
+﻿namespace backend_proyecto.Models
 {
     public class ProfessorSpeciality
     {

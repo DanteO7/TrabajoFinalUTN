@@ -26,27 +26,29 @@ namespace backend_proyecto.Services
             _studentPlanRepository = studentPlanRepository;
         }
 
-        public async Task<List<Reservation>> GetAllByDate(int tenantId, DateTime date)
+        public async Task<List<ResponseReservationDTO>> GetAllByDate(int tenantId, DateTime date)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
-            return await _reservationRepository.GetAllAsync(r => r.TenantId == tenantId && r.ReservationDate.Date == date.Date);
+            var reservations = await _reservationRepository.GetAllAsync(r => r.TenantId == tenantId && r.ReservationDate.Date == date.Date, r => r.Class, r => r.Student);
+            return _mapper.Map<List<ResponseReservationDTO>>(reservations);
         }
 
-        public async Task<List<Reservation>> GetAllByStudent(int studentId)
+        public async Task<List<ResponseReservationDTO>> GetAllByStudent(int studentId)
         {
             var student = await _studentRepository.GetOneAsync(s => s.Id == studentId);
             if (student == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{studentId}'");
             }
-            return await _reservationRepository.GetAllAsync(r => r.StudentId == studentId);
+            var reservations = await _reservationRepository.GetAllAsync(r => r.StudentId == studentId, r => r.Class, r => r.Student);
+            return _mapper.Map<List<ResponseReservationDTO>>(reservations);
         }
 
-        public async Task<Reservation> CreateOne(CreateReservationDTO createReservationDTO)
+        public async Task<ResponseReservationDTO> CreateOne(CreateReservationDTO createReservationDTO)
         {
             var student = await _studentRepository.GetOneAsync(s => s.Id == createReservationDTO.StudentId);
             if (student == null)
@@ -91,15 +93,8 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede crear una reserva con fecha pasada");
             }
 
-            var status = createReservationDTO.ReservationStatus;
-
-            if (status != "CONFIRMED" && status != "CANCELLED" && status != "PENDING")
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Estado de reserva inválido: '{status}'");
-            }
-
             var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == student.StudentPlanId);
-            if (studentPlan != null)
+            if (studentPlan == null)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "El estudiante no tiene un plan activo");
             }
@@ -110,8 +105,9 @@ namespace backend_proyecto.Services
             }
 
             var reservation = _mapper.Map<Reservation>(createReservationDTO);
+            reservation.ReservationStatus = ReservationStatus.PENDING;
             await _reservationRepository.CreateOneAsync(reservation);
-            return reservation;
+            return _mapper.Map<ResponseReservationDTO>(reservation);
         }
 
         public async Task DeleteOne(int id)
@@ -124,9 +120,9 @@ namespace backend_proyecto.Services
             await _reservationRepository.DeleteOneAsync(reservation);
         }
 
-        public async Task<Reservation> ChangeStatus(int id, ChangeStatusReservationDTO changeStatusReservationDTO)
+        public async Task<ResponseReservationDTO> ChangeStatus(int id, ChangeStatusReservationDTO changeStatusReservationDTO)
         {
-            var reservation = await _reservationRepository.GetOneAsync(r => r.Id == id);
+            var reservation = await _reservationRepository.GetOneAsync(r => r.Id == id, r => r.Class, r => r.Student);
             if (reservation == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una reserva con el Id = '{id}'");
@@ -145,7 +141,7 @@ namespace backend_proyecto.Services
 
             reservation.ReservationStatus = status;
             await _reservationRepository.UpdateOneAsync(reservation);
-            return reservation;
+            return _mapper.Map<ResponseReservationDTO>(reservation);
         }
     }
 }

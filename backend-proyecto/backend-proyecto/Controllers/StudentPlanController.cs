@@ -22,10 +22,10 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{tenantId}")]
         [Authorize(Roles = $"{Roles.STUDENT}, {Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<StudentPlan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseStudentPlanDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<StudentPlan>>> GetAllByTenantId(int tenantId)
+        public async Task<ActionResult<List<ResponseStudentPlanDTO>>> GetAllByTenantId(int tenantId)
         {
             try
             {
@@ -44,11 +44,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPost]
         [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(StudentPlan), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseStudentPlanDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentPlan>> CreateOne([FromBody] CreateStudentPlanDTO createStudentPlanDTO)
+        public async Task<ActionResult<ResponseStudentPlanDTO>> CreateOne([FromBody] CreateStudentPlanDTO createStudentPlanDTO)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 await _studentPlanServices.DeleteOne(id);
-                return Ok();
+                return Ok("Student Plan Successfully Deleted");
             }
             catch (HttpResponseError ex)
             {
@@ -89,11 +89,11 @@ namespace backend_proyecto.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(StudentPlan), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseStudentPlanDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<StudentPlan>> UpdateOne(int id, [FromBody] UpdateStudentPlanDTO updateStudentPlanDTO)
+        public async Task<ActionResult<ResponseStudentPlanDTO>> UpdateOne(int id, [FromBody] UpdateStudentPlanDTO updateStudentPlanDTO)
         {
             try
             {

@@ -1,5 +1,4 @@
-﻿using backend_proyecto.Models.Specialty;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend_proyecto.Models
@@ -17,6 +16,5 @@ namespace backend_proyecto.Models
         [ForeignKey(nameof(Tenant))]
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
-        public ICollection<ProfessorSpeciality> ProfessorSpecialities { get; set; } = new List<ProfessorSpeciality>();
     }
 }

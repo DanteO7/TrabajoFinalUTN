@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\repositories\\repository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\controllers\\classcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\controllers\\classcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\tenantservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\tenantservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\config\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\config\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|c:\\users\\dante\\onedrive\\escritorio\\facultad\\proyectofinal\\backend-proyecto\\backend-proyecto\\services\\classservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{017E62CD-CB75-65DA-64BA-B1A2BA5FB209}|backend-proyecto\\backend-proyecto.csproj|solutionrelative:backend-proyecto\\services\\classservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +27,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Repository.cs",
-              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs",
-              "RelativeDocumentMoniker": "backend-proyecto\\Repositories\\Repository.cs",
-              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Repositories\\Repository.cs",
-              "RelativeToolTip": "backend-proyecto\\Repositories\\Repository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAZAAAAAAAAAA==",
+              "Title": "ClassController.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Controllers\\ClassController.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Controllers\\ClassController.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Controllers\\ClassController.cs",
+              "RelativeToolTip": "backend-proyecto\\Controllers\\ClassController.cs",
+              "ViewState": "AgIAAEcAAAAAAAAAAAAwwC4AAABUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T22:36:33.724Z",
+              "WhenOpened": "2026-03-16T21:34:46.18Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "TenantServices.cs",
-              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\TenantServices.cs",
-              "RelativeDocumentMoniker": "backend-proyecto\\Services\\TenantServices.cs",
-              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\TenantServices.cs",
-              "RelativeToolTip": "backend-proyecto\\Services\\TenantServices.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "RelativeToolTip": "backend-proyecto\\Config\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAFcAAAAAAAAAAAAiwHUAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T22:34:24.945Z",
+              "WhenOpened": "2026-03-16T21:33:38.463Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ClassServices.cs",
+              "DocumentMoniker": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\ClassServices.cs",
+              "RelativeDocumentMoniker": "backend-proyecto\\Services\\ClassServices.cs",
+              "ToolTip": "C:\\Users\\dante\\OneDrive\\Escritorio\\Facultad\\ProyectoFinal\\backend-proyecto\\backend-proyecto\\Services\\ClassServices.cs",
+              "RelativeToolTip": "backend-proyecto\\Services\\ClassServices.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAAwwFUAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-16T20:28:04.991Z",
               "EditorCaption": ""
             }
           ]
