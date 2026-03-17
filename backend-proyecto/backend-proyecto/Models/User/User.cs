@@ -24,7 +24,7 @@ namespace backend_proyecto.Models
 
         [Phone]
         [MaxLength(20)]
-        public string PhoneNumber { get; set; } = null!;
+        public string? PhoneNumber { get; set; }
 
         [Required]
         [MinLength(8)]

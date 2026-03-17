@@ -69,7 +69,7 @@ namespace backend_proyecto.Services
             return new LoginResponseDTO
             {
                 Token = token,
-                user = _mapper.Map<UserWithoutPassDTO>(user)
+                User = _mapper.Map<UserWithoutPassDTO>(user)
             };
         }
 

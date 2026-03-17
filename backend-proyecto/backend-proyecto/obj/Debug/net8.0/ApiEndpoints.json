@@ -354,7 +354,7 @@
           "application/json",
           "text/json"
         ],
-        "StatusCode": 200
+        "StatusCode": 201
       },
       {
         "Type": "backend_proyecto.Utils.Errors.HttpMessage",

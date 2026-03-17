@@ -83,7 +83,7 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El email del usuario no puede tener mas de 100 caracteres");
             }
-            if (registerDTO.PhoneNumber.Length > 20)
+            if (registerDTO.PhoneNumber != null && registerDTO.PhoneNumber.Length > 20)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El numero de teléfono del usuario no puede tener mas de 20 caracteres");
             }

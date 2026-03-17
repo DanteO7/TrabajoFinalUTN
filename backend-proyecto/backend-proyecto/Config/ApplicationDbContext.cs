@@ -84,6 +84,12 @@ namespace backend_proyecto.Config
                       .WithMany()
                       .HasForeignKey(c => c.ActivityId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(c => c.StartTime)
+                      .HasColumnType("time");
+
+                entity.Property(c => c.EndTime)
+                      .HasColumnType("time");
             });
 
             modelBuilder.Entity<Payment>(entity =>

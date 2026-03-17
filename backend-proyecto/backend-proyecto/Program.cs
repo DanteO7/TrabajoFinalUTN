@@ -44,7 +44,10 @@ builder.Services.AddSwaggerGen(options =>
 // DbContext configuration
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 {
-    opts.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"));
+    opts.UseNpgsql(
+        builder.Configuration.GetConnectionString("DevConnection"),
+        o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+    );
 });
 
 // Services
