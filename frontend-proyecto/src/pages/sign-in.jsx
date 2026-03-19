@@ -1,0 +1,106 @@
+import { Link, useLocation } from "wouter";
+import FormInput from "../components/form-input";
+import { useForm } from "react-hook-form";
+import { useAuthStore } from "../store/auth-store";
+import { signIn } from "../services/auth";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { signInSchema } from "../schema/auth-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+export default function SignIn() {
+  const { login } = useAuthStore();
+  const [, setLocation] = useLocation();
+  const [backendError, setBackendError] = useState();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(signInSchema),
+    mode: "onTouched",
+  });
+
+  const mutation = useMutation({
+    mutationKey: ["signin"],
+    mutationFn: signIn,
+    onSuccess: (data) => {
+      login(data);
+      setLocation("/");
+    },
+    onError: (error) => {
+      const msg =
+        error?.response?.data?.message || "Ocurrió un error al registrarte";
+
+      setBackendError(msg);
+    },
+  });
+
+  const onSubmit = (credentials) => {
+    console.log("submit", credentials);
+    mutation.mutate(credentials);
+  };
+
+  return (
+    <div className="bg-[#ede9ee] flex items-center h-screen">
+      <div className="text-black p-5 m-auto w-11/12 md:w-1/2 lg:w-1/3">
+        <form
+          className="flex max-w flex-col gap-3.5"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <h2 className="text-center text-2xl font-bold">Turno Fácil</h2>
+          <p className="text-center text-gray-700">Iniciar sesión</p>
+          {backendError && (
+            <p className="text-red-600 font-semibold text-center mb-2">
+              {backendError}
+            </p>
+          )}
+          <div>
+            <FormInput
+              id="email"
+              type="email"
+              placeholder="tu@email.com"
+              register={register("email")}
+              error={errors.email}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
+          <div>
+            <FormInput
+              id="password"
+              type="password"
+              placeholder="Contraseña"
+              register={register("password")}
+              error={errors.password}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting || mutation.isPending}
+            className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+          >
+            {mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
+          </button>
+          <button className="flex justify-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300">
+            <img className="w-6" src="/google.png" alt="Icono de Google" />
+            <p className="text-center">Inicia sesión con Google</p>
+          </button>
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-gray-300"></div>
+            <span className="text-gray-500 text-sm">o</span>
+            <div className="flex-1 h-px bg-gray-300"></div>
+          </div>
+          <Link
+            href="/sign-up"
+            className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+          >
+            <p className="text-center">Registrate</p>
+          </Link>
+        </form>
+      </div>
+    </div>
+  );
+}
