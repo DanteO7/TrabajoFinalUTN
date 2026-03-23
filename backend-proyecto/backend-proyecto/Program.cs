@@ -117,7 +117,7 @@ app.UseCors(opts =>
     opts.AllowAnyHeader()
          .AllowAnyMethod()
          .AllowCredentials()
-         .WithOrigins("https://localhost:7097");
+         .WithOrigins("http://localhost:5173");
 });
 
 // Configure the HTTP request pipeline.

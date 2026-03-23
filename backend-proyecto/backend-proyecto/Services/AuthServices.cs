@@ -6,6 +6,7 @@ using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -39,14 +40,29 @@ namespace backend_proyecto.Services
             _tenantRepository = tenantRepository;
         }
 
-        public async Task<UserWithoutPassDTO> Register(RegisterDTO register)
+        public async Task<LoginResponseDTO> Register(RegisterDTO register, HttpContext context)
         {
-            var user = await _userServices.GetOneByEmail(register.Email);
-            if (user != null)
+            var existingUser = await _userServices.GetOneByEmail(register.Email);
+
+            if (existingUser != null)
             {
-                throw new Exception($"El usuario con este mail '{register.Email}' ya existe.");
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El usuario con este mail '{register.Email}' ya existe.");
             }
-            return await _userServices.CreateOne(register);
+
+            var createdUser = await _userServices.CreateOne(register);
+
+            var userDto = _mapper.Map<UserWithoutPassDTO>(createdUser);
+
+            await SetCookie(createdUser, context);
+
+            var token = await GenerateJwt(userDto);
+
+            return new LoginResponseDTO
+            {
+                Token = token,
+                User = userDto
+            };
         }
 
         public async Task<LoginResponseDTO> Login(LoginDTO login, HttpContext context)

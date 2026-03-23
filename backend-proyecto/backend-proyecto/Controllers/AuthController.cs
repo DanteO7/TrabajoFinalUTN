@@ -1,11 +1,12 @@
-﻿using backend_proyecto.Models;
+﻿using backend_proyecto.Enums;
+using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
-using Microsoft.AspNetCore.Mvc;
 using backend_proyecto.Utils.Errors;
-using System.Net;
 using Microsoft.AspNetCore.Authorization;
-using backend_proyecto.Enums;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace backend_proyecto.Controllers
 {
@@ -20,16 +21,16 @@ namespace backend_proyecto.Controllers
         }
         
         [HttpPost("register")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(LoginResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
 
-        public async Task<ActionResult<User>> Register([FromBody] RegisterDTO registerDTO)
+        public async Task<ActionResult<LoginResponseDTO>> Register([FromBody] RegisterDTO registerDTO)
         {
             try
             {
-                var createdUser = await _authServices.Register(registerDTO);
-                return Created("Register", createdUser);
+                var createdUser = await _authServices.Register(registerDTO, HttpContext);
+                return Ok(createdUser);
             }
             catch(HttpResponseError ex)
             {

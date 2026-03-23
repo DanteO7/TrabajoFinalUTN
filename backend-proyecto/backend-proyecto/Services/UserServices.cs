@@ -69,7 +69,7 @@ namespace backend_proyecto.Services
             return user;
         }
 
-        public async Task<UserWithoutPassDTO> CreateOne(RegisterDTO registerDTO)
+        public async Task<User> CreateOne(RegisterDTO registerDTO)
         {
             if (registerDTO.Name.Length > 50)
             {
@@ -99,7 +99,7 @@ namespace backend_proyecto.Services
             var user = _mapper.Map<User>(registerDTO);
             user.Password = _encoderServices.Encode(user.Password);
             await _repo.CreateOneAsync(user);
-            return _mapper.Map<UserWithoutPassDTO>(user);
+            return user;
         }
 
         public async Task DeleteOne(int id)

@@ -304,13 +304,13 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "backend_proyecto.Models.User",
+        "Type": "backend_proyecto.Models.DTOs.LoginResponseDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
           "text/json"
         ],
-        "StatusCode": 201
+        "StatusCode": 200
       },
       {
         "Type": "backend_proyecto.Utils.Errors.HttpMessage",
