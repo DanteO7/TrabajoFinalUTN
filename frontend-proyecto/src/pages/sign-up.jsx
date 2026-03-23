@@ -1,16 +1,17 @@
-import { Link, useLocation } from "wouter";
-import FormInput from "../components/form-input";
-import { useForm } from "react-hook-form";
-import { useAuthStore } from "../store/auth-store";
-import { signIn } from "../services/auth";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { signInSchema } from "../schema/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { signUpSchema } from "../schema/auth-schema";
+import { useMutation } from "@tanstack/react-query";
+import { signUp } from "../services/auth";
+import { useAuthStore } from "../store/auth-store";
+import { Link, useLocation } from "wouter";
+import { useState } from "react";
+import FormInput from "../components/form-input";
 
-export default function SignIn() {
+export default function SignUp() {
   const { login } = useAuthStore();
   const [, setLocation] = useLocation();
+
   const [backendError, setBackendError] = useState();
 
   const {
@@ -18,13 +19,13 @@ export default function SignIn() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolver(signUpSchema),
     mode: "onTouched",
   });
 
   const mutation = useMutation({
-    mutationKey: ["signin"],
-    mutationFn: signIn,
+    mutationKey: ["signup"],
+    mutationFn: signUp,
     onSuccess: (data) => {
       login(data);
       setLocation("/");
@@ -42,21 +43,40 @@ export default function SignIn() {
     console.log("submit", credentials);
     mutation.mutate(credentials);
   };
-
   return (
-    <div className="bg-[#ede9ee] pt-10 h-screen text-[14px]">
-      <div className="text-black p-5 m-auto w-11/12 md:w-1/2 lg:w-1/4">
+    <div className="bg-[#ede9ee] pt-10 h-full text-[14px]">
+      <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-1/4">
         <form
           className="flex max-w flex-col gap-3.5"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold">Turno Fácil</h2>
-          <p className="text-center text-gray-700">Iniciar sesión</p>
+          <p className="text-center text-gray-700">Registrarse</p>
           {backendError && (
             <p className="text-red-600 font-semibold text-center mb-2">
               {backendError}
             </p>
           )}
+          <div>
+            <FormInput
+              id="name"
+              type="text"
+              placeholder="Nombre"
+              register={register("name")}
+              error={errors.name}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
+          <div>
+            <FormInput
+              id="surname"
+              type="text"
+              placeholder="Apellido"
+              register={register("surname")}
+              error={errors.surname}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
           <div>
             <FormInput
               id="email"
@@ -77,31 +97,41 @@ export default function SignIn() {
               disabled={isSubmitting || mutation.isPending}
             />
           </div>
+          <div>
+            <FormInput
+              id="confirmPassword"
+              type="password"
+              placeholder="Repite la Contraseña"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
 
           <button
             type="submit"
             disabled={isSubmitting || mutation.isPending}
             className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
-            {mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
+            {mutation.isPending ? "Registrando..." : "Crear Cuenta"}
           </button>
           <button
             type="button"
             className="flex justify-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
             <img className="w-6" src="/google.png" alt="Icono de Google" />
-            <p className="text-center">Inicia sesión con Google</p>
+            <p className="text-center">Registrate con Google</p>
           </button>
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500 text-sm">si no tenes cuenta</span>
+            <span className="text-gray-500 text-sm">si ya tienes cuenta</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
           <Link
-            href="/sign-up"
+            href="/sign-in"
             className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
-            <p className="text-center">Registrate</p>
+            <p className="text-center">Inicia sesión</p>
           </Link>
         </form>
       </div>

@@ -1,6 +1,6 @@
 import { request } from "./api";
 
-export const register = (data) => request("post", "/auth/register", data);
+export const signUp = (data) => request("post", "/auth/register", data);
 
 export const signIn = (data) => request("post", "/auth/login", data);
 
