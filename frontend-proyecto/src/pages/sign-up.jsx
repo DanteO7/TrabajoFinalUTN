@@ -44,14 +44,15 @@ export default function SignUp() {
     mutation.mutate(credentials);
   };
   return (
-    <div className="bg-[#ede9ee] pt-10 h-full text-[14px]">
-      <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-1/4">
+    <div className="bg-[#ede9ee] pt-10 h-full text-[12px]">
+      <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-[23%]">
         <form
+          noValidate
           className="flex max-w flex-col gap-3.5"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold">Turno Fácil</h2>
-          <p className="text-center text-gray-700">Registrarse</p>
+          <p className="text-center text-gray-700 text-[16px]">Registrarse</p>
           {backendError && (
             <p className="text-red-600 font-semibold text-center mb-2">
               {backendError}
@@ -117,7 +118,7 @@ export default function SignUp() {
           </button>
           <button
             type="button"
-            className="flex justify-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+            className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-200 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
             <img className="w-6" src="/google.png" alt="Icono de Google" />
             <p className="text-center">Registrate con Google</p>

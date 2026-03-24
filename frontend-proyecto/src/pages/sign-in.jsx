@@ -44,14 +44,17 @@ export default function SignIn() {
   };
 
   return (
-    <div className="bg-[#ede9ee] pt-10 h-screen text-[14px]">
+    <div className="bg-[#ede9ee] pt-10 h-screen text-[12px]">
       <div className="text-black p-5 m-auto w-11/12 md:w-1/2 lg:w-1/4">
         <form
+          noValidate
           className="flex max-w flex-col gap-3.5"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold">Turno Fácil</h2>
-          <p className="text-center text-gray-700">Iniciar sesión</p>
+          <p className="text-center text-gray-700 text-[16px]">
+            Iniciar sesión
+          </p>
           {backendError && (
             <p className="text-red-600 font-semibold text-center mb-2">
               {backendError}
