@@ -70,6 +70,7 @@ namespace backend_proyecto.Config
 
             // tenant
             CreateMap<Tenant, ResponseTenantDTO>();
+            CreateMap<UpdateTenantDTO, Tenant>();
 
             // professorSpeciality
             CreateMap<ProfessorSpeciality, ResponseProfessorSpecialityDTO>()

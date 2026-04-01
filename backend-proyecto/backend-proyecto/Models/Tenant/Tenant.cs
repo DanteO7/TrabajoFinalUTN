@@ -14,6 +14,10 @@ namespace backend_proyecto.Models
         public User OwnerUser { get; set; } = null!;
 
         [Required]
+        [MaxLength(50)]
+        public string Name { get; set; } = null!;
+
+        [Required]
         public bool IsActive { get; set; }
 
         [ForeignKey(nameof(TenantPlan))]

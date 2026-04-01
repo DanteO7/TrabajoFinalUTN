@@ -86,63 +86,17 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpPatch("{id}/plan")]
+        [HttpPut("{id}")]
         [Authorize(Roles = $"{Roles.ADMIN}")]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseTenantDTO>> ChangePlan(int id, [FromBody] ChangePlanTenantDTO changePlanTenantDTO)
+        public async Task<ActionResult<ResponseTenantDTO>> UpdateOneById(int id, [FromBody] UpdateTenantDTO dto)
         {
             try
             {
-                var tenant = await _tenantServices.ChangePlan(id, changePlanTenantDTO);
-                return Ok(tenant);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpPatch("{id}/active")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseTenantDTO>> ChangeActive(int id, [FromBody] ChangeActiveTenantDTO changeActiveTenantDTO)
-        {
-            try
-            {
-                var tenant = await _tenantServices.ChangeActive(id, changeActiveTenantDTO);
-                return Ok(tenant);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpPatch("{id}/status")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
-        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseTenantDTO>> ChangeStatus(int id, [FromBody] ChangeStatusTenantDTO changeStatusTenantDTO)
-        {
-            try
-            {
-                var tenant = await _tenantServices.ChangeStatus(id, changeStatusTenantDTO);
+                var tenant = await _tenantServices.UpdateOne(id, dto);
                 return Ok(tenant);
             }
             catch (HttpResponseError ex)

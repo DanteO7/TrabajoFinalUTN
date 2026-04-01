@@ -66,69 +66,75 @@ namespace backend_proyecto.Services
             await _tenantRepository.DeleteOneAsync(tenant);
         }
 
-        public async Task<ResponseTenantDTO> ChangePlan(int id, ChangePlanTenantDTO changePlanTenantDTO)
+        public async Task<ResponseTenantDTO> UpdateOne(int id, UpdateTenantDTO updateTenantDTO)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
-            if (tenant == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Tenant con el Id = '{id}'");
-            }
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == id,
+                t => t.OwnerUser,
+                t => t.TenantPlan
+            );
 
-            var plan = await _tenantPlanRepository.GetOneAsync(p => p.Id == changePlanTenantDTO.TenantPlanId);
-            if (plan == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe plan de Tenant con el Id = '{changePlanTenantDTO.TenantPlanId}'");
-            }
-
-            if(changePlanTenantDTO.TenantPlanId == tenant.TenantPlanId)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El plan no puede ser el mismo que ya tiene, PlanId = '{changePlanTenantDTO.TenantPlanId}'");
-            }
-
-            tenant.TenantPlanId = changePlanTenantDTO.TenantPlanId;
-            await _tenantRepository.UpdateOneAsync(tenant);
-            return _mapper.Map<ResponseTenantDTO>(tenant);
-        }
-
-        public async Task<ResponseTenantDTO> ChangeActive(int id, ChangeActiveTenantDTO changeStatusTenantDTO)
-        {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
-            if (tenant == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Tenant con el Id = '{id}'");
-            }
-
-            if (changeStatusTenantDTO.IsActive == tenant.IsActive)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El estadi no puede ser el mismo que ya tiene, estado = '{changeStatusTenantDTO.IsActive}'");
-            }
-
-            tenant.IsActive = changeStatusTenantDTO.IsActive;
-            await _tenantRepository.UpdateOneAsync(tenant);
-            return _mapper.Map<ResponseTenantDTO>(tenant);
-        }
-
-        public async Task<ResponseTenantDTO> ChangeStatus(int id, ChangeStatusTenantDTO changeStatusTenantDTO)
-        {
-            var status = changeStatusTenantDTO.MonthlyFeeStatus;
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id, t => t.OwnerUser, t => t.TenantPlan);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{id}'");
             }
 
-            if (status != MonthlyFeeStatus.PAID && status != MonthlyFeeStatus.PENDING && status != MonthlyFeeStatus.OVERDUE)
+            if (updateTenantDTO.Name != null)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No existe el estado de la couta del mes con el nombre = '{status}'");
+                if (updateTenantDTO.Name.Length > 50)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El nombre no puede tener más de 50 caracteres");
+                }
+
+                tenant.Name = updateTenantDTO.Name;
             }
 
-            if (status == tenant.MonthlyFeeStatus)
+            if (updateTenantDTO.IsActive.HasValue)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El estado de la couta del mes no puede ser el mismo = '{status}'");
+                if (updateTenantDTO.IsActive == tenant.IsActive)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El estado ya es el mismo");
+                }
+
+                tenant.IsActive = updateTenantDTO.IsActive.Value;
             }
 
-            tenant.MonthlyFeeStatus = status;
+            if (updateTenantDTO.TenantPlanId.HasValue)
+            {
+                var plan = await _tenantPlanRepository.GetOneAsync(p => p.Id == updateTenantDTO.TenantPlanId.Value);
+
+                if (plan == null)
+                {
+                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe plan con Id = '{updateTenantDTO.TenantPlanId}'");
+                }
+
+                if (updateTenantDTO.TenantPlanId == tenant.TenantPlanId)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El plan ya es el mismo");
+                }
+
+                tenant.TenantPlanId = updateTenantDTO.TenantPlanId.Value;
+            }
+
+            if (updateTenantDTO.MonthlyFeeStatus != null)
+            {
+                if (updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.PAID &&
+                    updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.PENDING &&
+                    updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.OVERDUE)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"Estado inválido: '{updateTenantDTO.MonthlyFeeStatus}'");
+                }
+
+                if (updateTenantDTO.MonthlyFeeStatus == tenant.MonthlyFeeStatus)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El estado ya es el mismo");
+                }
+
+                tenant.MonthlyFeeStatus = updateTenantDTO.MonthlyFeeStatus;
+            }
+
             await _tenantRepository.UpdateOneAsync(tenant);
+
             return _mapper.Map<ResponseTenantDTO>(tenant);
         }
     }

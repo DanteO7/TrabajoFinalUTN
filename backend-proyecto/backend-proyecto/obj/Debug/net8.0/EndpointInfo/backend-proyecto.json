@@ -4254,10 +4254,8 @@
             "Token": [ ]
           }
         ]
-      }
-    },
-    "/api/tenants/{id}/plan": {
-      "patch": {
+      },
+      "put": {
         "tags": [
           "Tenant"
         ],
@@ -4276,265 +4274,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePlanTenantDTO"
+                "$ref": "#/components/schemas/UpdateTenantDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePlanTenantDTO"
+                "$ref": "#/components/schemas/UpdateTenantDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePlanTenantDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Token": [ ]
-          }
-        ]
-      }
-    },
-    "/api/tenants/{id}/active": {
-      "patch": {
-        "tags": [
-          "Tenant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeActiveTenantDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeActiveTenantDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeActiveTenantDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseTenantDTO"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server Error",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpMessage"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Token": [ ]
-          }
-        ]
-      }
-    },
-    "/api/tenants/{id}/status": {
-      "patch": {
-        "tags": [
-          "Tenant"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeStatusTenantDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeStatusTenantDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeStatusTenantDTO"
+                "$ref": "#/components/schemas/UpdateTenantDTO"
               }
             }
           }
@@ -5390,18 +5140,6 @@
         },
         "additionalProperties": false
       },
-      "ChangeActiveTenantDTO": {
-        "required": [
-          "isActive"
-        ],
-        "type": "object",
-        "properties": {
-          "isActive": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
       "ChangePlanStudentDTO": {
         "required": [
           "studentPlanId"
@@ -5409,19 +5147,6 @@
         "type": "object",
         "properties": {
           "studentPlanId": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ChangePlanTenantDTO": {
-        "required": [
-          "tenantPlanId"
-        ],
-        "type": "object",
-        "properties": {
-          "tenantPlanId": {
             "type": "integer",
             "format": "int32"
           }
@@ -5442,19 +5167,6 @@
         "additionalProperties": false
       },
       "ChangeStatusStudentDTO": {
-        "required": [
-          "monthlyFeeStatus"
-        ],
-        "type": "object",
-        "properties": {
-          "monthlyFeeStatus": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ChangeStatusTenantDTO": {
         "required": [
           "monthlyFeeStatus"
         ],
@@ -5649,6 +5361,7 @@
       },
       "CreateTenantDTO": {
         "required": [
+          "name",
           "ownerUserId",
           "tenantPlanId"
         ],
@@ -5657,6 +5370,11 @@
           "ownerUserId": {
             "type": "integer",
             "format": "int32"
+          },
+          "name": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
           },
           "tenantPlanId": {
             "type": "integer",
@@ -6125,6 +5843,10 @@
           "ownerUser": {
             "$ref": "#/components/schemas/UserWithoutPassDTO"
           },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
           "isActive": {
             "type": "boolean"
           },
@@ -6196,7 +5918,8 @@
       "Tenant": {
         "required": [
           "isActive",
-          "monthlyFeeStatus"
+          "monthlyFeeStatus",
+          "name"
         ],
         "type": "object",
         "properties": {
@@ -6210,6 +5933,11 @@
           },
           "ownerUser": {
             "$ref": "#/components/schemas/User"
+          },
+          "name": {
+            "maxLength": 50,
+            "minLength": 1,
+            "type": "string"
           },
           "isActive": {
             "type": "boolean"
@@ -6372,6 +6100,30 @@
           "price": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateTenantDTO": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "tenantPlanId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "maxLength": 50,
+            "type": "string",
+            "nullable": true
+          },
+          "monthlyFeeStatus": {
+            "type": "string",
             "nullable": true
           }
         },
