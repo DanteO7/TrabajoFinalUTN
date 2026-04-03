@@ -47,6 +47,7 @@ namespace backend_proyecto.Services
             var tenant = new Tenant
             {
                 OwnerUserId = createTenantDTO.OwnerUserId,
+                Name = createTenantDTO.Name,
                 IsActive = true,
                 TenantPlanId = createTenantDTO.TenantPlanId,
                 MonthlyFeeStatus = MonthlyFeeStatus.PAID,

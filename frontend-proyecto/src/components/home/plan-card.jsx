@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-export default function PlanCard({ plan }) {
+export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
   return (
     <div className="border rounded-2xl flex flex-col items-center gap-3 p-6">
       <h4 className="text-2xl">{plan.name}</h4>
@@ -27,7 +27,13 @@ export default function PlanCard({ plan }) {
           Panel administrativo
         </li>
       </ul>
-      <button className="text-[#efefef] bg-[#333] rounded-[14px] px-5 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300">
+      <button
+        onClick={() => {
+          onSelectedPlan(plan);
+          onOpenModal(true);
+        }}
+        className="text-[#efefef] bg-[#333] rounded-[14px] px-5 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+      >
         Contratar
       </button>
     </div>

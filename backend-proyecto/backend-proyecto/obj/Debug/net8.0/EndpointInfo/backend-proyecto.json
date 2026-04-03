@@ -4180,12 +4180,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "Token": [ ]
-          }
-        ]
+        }
       }
     },
     "/api/tenants/{id}": {

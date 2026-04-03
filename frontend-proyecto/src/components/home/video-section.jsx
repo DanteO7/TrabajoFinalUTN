@@ -23,7 +23,6 @@ export default function VideoSection() {
   const [videoId, setVideoId] = useState(videos[0].id);
   const [showMore, setShowMore] = useState(false);
 
-  // 👇 referencia al video
   const videoRef = useRef(null);
 
   const handleChangeVideo = (id) => {
@@ -34,7 +33,7 @@ export default function VideoSection() {
         behavior: "smooth",
         block: "start",
       });
-    }, 50);
+    }, 100);
   };
 
   return (
@@ -45,7 +44,7 @@ export default function VideoSection() {
           Descubrí lo fácil que es gestionar tu negocio en pocos minutos.
         </p>
 
-        <div ref={videoRef} className="w-[90%] md:w-[80%]">
+        <div ref={videoRef} className="w-[90%] md:w-[80%] scroll-m-16">
           <div className="aspect-video w-full">
             <iframe
               className="w-full h-full rounded-xl shadow-lg"
@@ -58,7 +57,7 @@ export default function VideoSection() {
 
         <button
           onClick={() => setShowMore(!showMore)}
-          className="text-[#efefef] bg-[#333] rounded-[13px] px-4 py-2 border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+          className="cursor-pointer text-[#efefef] bg-[#333] rounded-[13px] px-4 py-2 border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
         >
           {showMore ? "Ocultar videos" : "Ver más"}
         </button>

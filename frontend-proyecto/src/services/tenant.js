@@ -1,8 +1,19 @@
 import { request } from "./api";
+import { useAuthStore } from "../store/auth-store";
 
 export const getTenants = () => request("get", "/tenants");
 
-export const createTenant = (data) => request("post", "/tenants", data);
+export const createTenant = (data) => {
+  const { user } = useAuthStore.getState();
+  console.log({
+    ownerUserId: user.id,
+    ...data,
+  });
+  return request("post", "/tenants", {
+    ownerUserId: user.id,
+    ...data,
+  });
+};
 
 export const deleteTenant = (id) => request("delete", `/tenants/${id}`);
 

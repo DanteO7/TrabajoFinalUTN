@@ -42,7 +42,6 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -60,7 +59,7 @@ namespace backend_proyecto.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                return StatusCode(500, ex.ToString());
             }
         }
 

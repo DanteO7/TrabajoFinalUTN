@@ -35,7 +35,7 @@ export default function TargetAudience() {
     const interval = setInterval(() => {
       setIndex((prev) => prev + 1);
       setTransition(true);
-    }, 3000);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, []);
