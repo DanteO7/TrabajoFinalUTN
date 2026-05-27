@@ -51,115 +51,69 @@ namespace backend_proyecto.Services
             }
 
             var createdUser = await _userServices.CreateOne(register);
-
             var userDto = _mapper.Map<UserWithoutPassDTO>(createdUser);
 
-            await SetCookie(createdUser, context);
 
             var token = await GenerateJwt(userDto);
+            SetCookie(token, context);
 
-            return new LoginResponseDTO
-            {
-                Token = token,
-                User = userDto
-            };
+            return new LoginResponseDTO { Token = token, User = userDto };
         }
 
         public async Task<LoginResponseDTO> Login(LoginDTO login, HttpContext context)
         {
             var user = await _userServices.GetOneByEmail(login.Email);
-            if(user == null)
-            {
+            if (user == null)
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid Credentials.");
-            }
-            var isMatched = _encoderServices.Verify(login.Password, user.Password);
-            if (!isMatched)
-            {
+
+            if (!_encoderServices.Verify(login.Password, user.Password))
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid Credentials.");
-            }
 
-            await SetCookie(user, context);
+            var userDto = _mapper.Map<UserWithoutPassDTO>(user);
+            var token = await GenerateJwt(userDto);
+            SetCookie(token, context);
 
-            string token = await GenerateJwt(_mapper.Map<UserWithoutPassDTO>(user));
-
-            return new LoginResponseDTO
-            {
-                Token = token,
-                User = _mapper.Map<UserWithoutPassDTO>(user)
-            };
+            return new LoginResponseDTO { Token = token, User = userDto };
         }
 
-        public async Task Logout(HttpContext context)
+        public Task Logout(HttpContext context)
         {
-            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            context.Response.Cookies.Delete("auth_token");
+            return Task.CompletedTask;
         }
 
-        public async Task SetCookie(User user, HttpContext context)
+        public void SetCookie(string token, HttpContext context)
         {
-            var claims = new List<Claim>
+            context.Response.Cookies.Append("auth_token", token, new CookieOptions
             {
-                new Claim("id", user.Id.ToString())
-            };
-
-            if (await _professorRepo.ExistsByUserId(user.Id))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
-            }
-
-            if (await _studentRepo.ExistsByUserId(user.Id))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, Roles.STUDENT));
-            }
-
-            if (await _adminRepository.ExistsByUserId(user.Id))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, Roles.ADMIN));
-            }
-
-            if (await _tenantRepository.ExistsByUserId(user.Id))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, Roles.TENANT));
-            }
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await context.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddDays(1),
-                }
-            );
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(1)
+            });
         }
 
         public async Task<string> GenerateJwt(UserWithoutPassDTO user)
         {
             var key = Encoding.UTF8.GetBytes(_secret);
-            var symmetricKey = new SymmetricSecurityKey(key);
-
             var credentials = new SigningCredentials(
-                symmetricKey,
+                new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
             );
 
             var claims = new ClaimsIdentity();
-
             claims.AddClaim(new Claim("id", user.Id.ToString()));
 
             if (await _professorRepo.ExistsByUserId(user.Id))
-            {
                 claims.AddClaim(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
-            }
-
             if (await _studentRepo.ExistsByUserId(user.Id))
-            {
                 claims.AddClaim(new Claim(ClaimTypes.Role, Roles.STUDENT));
-            }
+            if (await _adminRepository.ExistsByUserId(user.Id))
+                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.ADMIN));
+            if (await _tenantRepository.ExistsByUserId(user.Id))
+                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.TENANT));
 
-            var tokenDescriptor = new SecurityTokenDescriptor()
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
                 Expires = DateTime.UtcNow.AddDays(1),
@@ -167,9 +121,7 @@ namespace backend_proyecto.Services
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenConfig = tokenHandler.CreateToken(tokenDescriptor);
-            string token = tokenHandler.WriteToken(tokenConfig);
-            return token;
+            return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
         }
     }
 }

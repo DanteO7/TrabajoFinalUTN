@@ -8,6 +8,8 @@
 *.suo
 *.userosscache
 *.sln.docstates
+appsettings*.json
+
 
 # Logs y cache
 *.log

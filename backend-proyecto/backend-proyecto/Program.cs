@@ -45,7 +45,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 {
     opts.UseNpgsql(
-        builder.Configuration.GetConnectionString("DevConnection"),
+        builder.Configuration.GetConnectionString("DatabaseConnection"),
         o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
     );
 });
@@ -87,12 +87,8 @@ builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));
 // JWT
 var secret = builder.Configuration.GetSection("Secrets:JWT")?.Value?.ToString() ?? string.Empty;
 var key = Encoding.UTF8.GetBytes(secret);
-builder.Services.AddAuthentication(opts =>
-{
-    opts.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    opts.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-})
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opts =>
     {
         opts.SaveToken = true;
@@ -104,22 +100,31 @@ builder.Services.AddAuthentication(opts =>
             ValidateAudience = false,
             ValidateLifetime = true,
         };
-    }).AddCookie(opts =>
-    {
-        opts.Cookie.HttpOnly = true;
-        opts.Cookie.SameSite = SameSiteMode.None;
-        opts.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        opts.ExpireTimeSpan = TimeSpan.FromDays(1);
+        opts.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var token = context.Request.Cookies["auth_token"];
+                if (!string.IsNullOrEmpty(token))
+                    context.Token = token;
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var app = builder.Build();
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Frontend:AllowedOrigins")
+    .Get<string[]>()
+    ?? [];
 
 app.UseCors(opts =>
 {
     opts.AllowAnyHeader()
          .AllowAnyMethod()
          .AllowCredentials()
-         .WithOrigins("http://localhost:5173");
+         .WithOrigins(allowedOrigins);
 });
 
 // Configure the HTTP request pipeline.
