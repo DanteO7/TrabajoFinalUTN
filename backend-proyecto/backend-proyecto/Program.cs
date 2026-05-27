@@ -64,6 +64,8 @@ builder.Services.AddScoped<ActivityServices>();
 builder.Services.AddScoped<StudentServices>();
 builder.Services.AddScoped<ProfessorServices>();
 builder.Services.AddScoped<ReservationServices>();
+builder.Services.AddScoped<GroupServices>();
+builder.Services.AddScoped<PermissionService>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
