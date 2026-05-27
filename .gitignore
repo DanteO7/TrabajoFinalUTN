@@ -1,0 +1,21 @@
+# Build output
+**/bin/
+**/obj/
+
+# Visual Studio
+**/.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs y cache
+*.log
+*.cache
+
+# Secretos y configuración local
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Publicación
+**/publish/

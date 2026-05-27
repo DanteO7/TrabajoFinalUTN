@@ -1,9 +1,0 @@
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.csproj.AssemblyReference.cache
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\rpswa.dswa.cache.json
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.AssemblyInfoInputs.cache
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.AssemblyInfo.cs
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.csproj.CoreCompileInputs.cache
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\dante\OneDrive\Escritorio\Facultad\ProyectoFinal\backend-proyecto\backend-proyecto\obj\Debug\net10.0\backend-proyecto.sourcelink.json
