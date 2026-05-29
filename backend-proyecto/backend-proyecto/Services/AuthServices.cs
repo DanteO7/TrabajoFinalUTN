@@ -17,7 +17,7 @@ namespace backend_proyecto.Services
 {
     public class AuthServices
     {
-        private readonly UserServices _userServices;
+        private readonly IUserServices _userServices;
         private readonly IEncoderServices _encoderServices;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
@@ -27,7 +27,7 @@ namespace backend_proyecto.Services
         private readonly IAdminRepository _adminRepository;
         private readonly ITenantRepository _tenantRepository;
 
-        public AuthServices(UserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository)
+        public AuthServices(IUserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;

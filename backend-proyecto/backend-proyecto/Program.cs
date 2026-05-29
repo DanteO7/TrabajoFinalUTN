@@ -54,7 +54,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 builder.Services.AddScoped<TenantServices>();
 builder.Services.AddScoped<AuthServices>();
 builder.Services.AddScoped<IEncoderServices,EncoderServices>();
-builder.Services.AddScoped<UserServices>();
+builder.Services.AddScoped<IUserServices,UserServices>();
 builder.Services.AddScoped<SpecialityServices>();
 builder.Services.AddScoped<StudentPlanServices>();
 builder.Services.AddScoped<TenantPlanServices>();

@@ -5,13 +5,11 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq.Expressions;
 using System.Net;
 
 namespace backend_proyecto.Services
 {
-    public class UserServices
+    public class UserServices : IUserServices
     {
         private readonly IUserRepository _repo;
         private readonly IMapper _mapper;

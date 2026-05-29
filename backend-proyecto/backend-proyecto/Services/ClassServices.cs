@@ -99,89 +99,89 @@ namespace backend_proyecto.Services
             await _classRepository.DeleteOneAsync(classModel);
         }
 
-            public async Task<ResponseClassDTO> UpdateOne(int id, UpdateClassDTO updateClassDTO)
+        public async Task<ResponseClassDTO> UpdateOne(int id, UpdateClassDTO updateClassDTO)
+        {
+            var classEntity = await _classRepository.GetOneAsync(c => c.Id == id, c => c.Activity, c => c.Professor, c => c.Reservations);
+            if (classEntity == null)
             {
-                var classEntity = await _classRepository.GetOneAsync(c => c.Id == id, c => c.Activity, c => c.Professor, c => c.Reservations);
-                if (classEntity == null)
-                {
-                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una clase con el Id = '{id}'");
-                }
-
-                if (updateClassDTO.ActivityId != null)
-                {
-                    var activity = await _activityRepository.GetOneAsync(a => a.Id == updateClassDTO.ActivityId);
-                    if (activity == null)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{updateClassDTO.ActivityId}'");
-                    }
-                }
-
-                if (updateClassDTO.ProfessorId != null)
-                {
-                    var professor = await _professorRepository.GetOneAsync(p => p.Id == updateClassDTO.ProfessorId);
-                    if (professor == null)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un profesor con el Id = '{updateClassDTO.ProfessorId}'");
-                    }
-                }
-
-                if (updateClassDTO.TenantId != null)
-                {
-                    var tenant = await _tenantRepository.GetOneAsync(t => t.Id == updateClassDTO.TenantId);
-                    if (tenant == null)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{updateClassDTO.TenantId}'");
-                    }
-                }
-
-                if (updateClassDTO.Date != null)
-                {
-                    if (updateClassDTO.Date.Value.Date < DateTime.Now.Date)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede asignar una clase a un día anterior = '{updateClassDTO.Date.Value.Date}'");
-                    }
-                }
-
-                if (updateClassDTO.StartTime != null && updateClassDTO.EndTime != null)
-                {
-                    if (updateClassDTO.StartTime >= updateClassDTO.EndTime)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.BadRequest, $"La hora de inicio debe ser menor a la hora de fin = Hora inicio: '{updateClassDTO.StartTime}', Hora fin: '{updateClassDTO.EndTime}'");
-                    }
-                }
-
-                if (updateClassDTO.MaxCapacity != null && updateClassDTO.MaxCapacity <= 0)
-                {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no puede ser menor o igual a 0");
-                }
-
-                // Creo un CreateClassDTO para pasarselo al ExistsScheduleConflict
-                if (updateClassDTO.ProfessorId != null ||
-                    updateClassDTO.Date != null ||
-                    updateClassDTO.StartTime != null ||
-                    updateClassDTO.EndTime != null)
-                {
-                    var dtoForValidation = new CreateClassDTO
-                    {
-                        ProfessorId = updateClassDTO.ProfessorId ?? classEntity.ProfessorId,
-                        Date = updateClassDTO.Date ?? classEntity.Date,
-                        StartTime = updateClassDTO.StartTime ?? classEntity.StartTime,
-                        EndTime = updateClassDTO.EndTime ?? classEntity.EndTime,
-                        ActivityId = updateClassDTO.ActivityId ?? classEntity.ActivityId,
-                        TenantId = updateClassDTO.TenantId ?? classEntity.TenantId,
-                        MaxCapacity = updateClassDTO.MaxCapacity ?? classEntity.MaxCapacity
-                    };
-
-                var conflict = await _classRepository.ExistsScheduleConflict(dtoForValidation, id);
-                if (conflict)
-                    {
-                        throw new HttpResponseError(HttpStatusCode.BadRequest, $"El profesor ya tiene una clase en ese horario");
-                    }
-                }
-
-                _mapper.Map(updateClassDTO, classEntity);
-                await _classRepository.UpdateOneAsync(classEntity);
-                return _mapper.Map<ResponseClassDTO>(classEntity);
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una clase con el Id = '{id}'");
             }
+
+            if (updateClassDTO.ActivityId != null)
+            {
+                var activity = await _activityRepository.GetOneAsync(a => a.Id == updateClassDTO.ActivityId);
+                if (activity == null)
+                {
+                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{updateClassDTO.ActivityId}'");
+                }
+            }
+
+            if (updateClassDTO.ProfessorId != null)
+            {
+                var professor = await _professorRepository.GetOneAsync(p => p.Id == updateClassDTO.ProfessorId);
+                if (professor == null)
+                {
+                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un profesor con el Id = '{updateClassDTO.ProfessorId}'");
+                }
+            }
+
+            if (updateClassDTO.TenantId != null)
+            {
+                var tenant = await _tenantRepository.GetOneAsync(t => t.Id == updateClassDTO.TenantId);
+                if (tenant == null)
+                {
+                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{updateClassDTO.TenantId}'");
+                }
+            }
+
+            if (updateClassDTO.Date != null)
+            {
+                if (updateClassDTO.Date.Value.Date < DateTime.Now.Date)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede asignar una clase a un día anterior = '{updateClassDTO.Date.Value.Date}'");
+                }
+            }
+
+            if (updateClassDTO.StartTime != null && updateClassDTO.EndTime != null)
+            {
+                if (updateClassDTO.StartTime >= updateClassDTO.EndTime)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"La hora de inicio debe ser menor a la hora de fin = Hora inicio: '{updateClassDTO.StartTime}', Hora fin: '{updateClassDTO.EndTime}'");
+                }
+            }
+
+            if (updateClassDTO.MaxCapacity != null && updateClassDTO.MaxCapacity <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no puede ser menor o igual a 0");
+            }
+
+            // Creo un CreateClassDTO para pasarselo al ExistsScheduleConflict
+            if (updateClassDTO.ProfessorId != null ||
+                updateClassDTO.Date != null ||
+                updateClassDTO.StartTime != null ||
+                updateClassDTO.EndTime != null)
+            {
+                var dtoForValidation = new CreateClassDTO
+                {
+                    ProfessorId = updateClassDTO.ProfessorId ?? classEntity.ProfessorId,
+                    Date = updateClassDTO.Date ?? classEntity.Date,
+                    StartTime = updateClassDTO.StartTime ?? classEntity.StartTime,
+                    EndTime = updateClassDTO.EndTime ?? classEntity.EndTime,
+                    ActivityId = updateClassDTO.ActivityId ?? classEntity.ActivityId,
+                    TenantId = updateClassDTO.TenantId ?? classEntity.TenantId,
+                    MaxCapacity = updateClassDTO.MaxCapacity ?? classEntity.MaxCapacity
+                };
+
+            var conflict = await _classRepository.ExistsScheduleConflict(dtoForValidation, id);
+            if (conflict)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"El profesor ya tiene una clase en ese horario");
+                }
+            }
+
+            _mapper.Map(updateClassDTO, classEntity);
+            await _classRepository.UpdateOneAsync(classEntity);
+            return _mapper.Map<ResponseClassDTO>(classEntity);
+        }
     }
 }
