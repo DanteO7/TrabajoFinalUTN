@@ -2,9 +2,10 @@
 
 namespace backend_proyecto.Models.DTOs
 {
-    public class ChangePlanTenantDTO
+    public class SendRegisterCodeDTO
     {
         [Required]
-        public int TenantPlanId { get; set; }
+        [EmailAddress]
+        public string Email { get; set; } = null!;
     }
 }

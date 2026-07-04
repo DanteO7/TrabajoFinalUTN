@@ -41,6 +41,52 @@ namespace backend_proyecto.Controllers
             }
         }
 
+        [HttpGet("{id}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserWithoutPassDTO>> GetOneById(int id)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+
+                var tenant = await _tenantServices.GetById(id, userId);
+                return Ok(tenant);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet("owner/{ownerId}")]
+        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [ProducesResponseType(typeof(List<ResponseTenantDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<ResponseTenantDTO>>> GetAllByOwnerId(int ownerId)
+        {
+            try
+            {
+                var tenants = await _tenantServices.GetAllByOwnerId(ownerId);
+                return Ok(tenants);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
@@ -106,6 +152,20 @@ namespace backend_proyecto.Controllers
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        [HttpGet("my-tenants")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<ResponseMyTenantDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetMyTenants()
+        {
+            var userId = int.Parse(
+                User.FindFirst("id")!.Value 
+            );
+
+            var tenants = await _tenantServices.GetMyTenants(userId);
+
+            return Ok(tenants);
         }
     }
 }

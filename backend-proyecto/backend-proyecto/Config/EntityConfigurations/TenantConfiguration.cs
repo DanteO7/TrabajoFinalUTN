@@ -22,6 +22,18 @@ namespace backend_proyecto.Config.EntityConfigurations
                   .WithMany()
                   .HasForeignKey(t => t.TenantPlanId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(t => t.Professors)
+                  .WithOne(p => p.Tenant)
+                  .HasForeignKey(p => p.TenantId)
+                  .OnDelete(DeleteBehavior.Restrict); ;
+
+            entity.HasMany(t => t.Students)
+                  .WithOne(s => s.Tenant)
+                  .HasForeignKey(s => s.TenantId)
+                  .OnDelete(DeleteBehavior.Restrict); ;
+
+            entity.HasIndex(t => new { t.OwnerUserId, t.Name }).IsUnique();
         }
     }
 }

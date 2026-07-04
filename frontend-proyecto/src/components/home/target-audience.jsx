@@ -17,11 +17,11 @@ export default function TargetAudience() {
   useEffect(() => {
     const updateVisible = () => {
       if (window.innerWidth < 640) {
-        setVisible(1);
-      } else if (window.innerWidth < 1024) {
         setVisible(2);
+      } else if (window.innerWidth < 1024) {
+        setVisible(3);
       } else {
-        setVisible(4);
+        setVisible(5);
       }
     };
 
@@ -73,7 +73,7 @@ export default function TargetAudience() {
                 style={{ width: `${100 / visible}%` }}
                 className="shrink-0 flex flex-col items-center gap-3"
               >
-                <Icon size={50} className="text-[#333]" />
+                <Icon size={visible == 2 ? 40 : 50} className="text-[#333]" />
                 <p className="text-lg font-semibold">{item.label}</p>
               </div>
             );

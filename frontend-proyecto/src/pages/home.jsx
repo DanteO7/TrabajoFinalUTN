@@ -9,6 +9,8 @@ import TenantForm from "../components/home/tenant-form";
 import { useState } from "react";
 import { useAuthStore } from "../store/auth-store";
 import { useLocation } from "wouter";
+import MainLayout from "../layouts/main-layout";
+import ForbiddenModal from "../components/modals/forbidden-modal";
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore();
@@ -16,6 +18,7 @@ export default function Home() {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
 
   const handleOpenModal = () => {
     if (!isAuthenticated) {
@@ -26,26 +29,32 @@ export default function Home() {
   };
 
   return (
-    <>
-      <Header />
-      <Hero onOpenModal={handleOpenModal} />
-      <main className="bg-[#ede9ee] flex flex-col items-center gap-22 py-19 px-5">
-        <Features />
-        <TargetAudience />
-        <VideoSection />
-        <TenantPlans
-          onOpenModal={handleOpenModal}
-          onSelectedPlan={setSelectedPlan}
+    <MainLayout>
+      <Hero
+        onOpenModal={handleOpenModal}
+        openForbiddenModal={() => setOpenForbiddenModal(true)}
+      />
+      <Features />
+      <TargetAudience />
+      <VideoSection />
+      <TenantPlans
+        onOpenModal={handleOpenModal}
+        onSelectedPlan={setSelectedPlan}
+        openForbiddenModal={() => setOpenForbiddenModal(true)}
+      />
+      {openModal && (
+        <TenantForm
+          close={() => setOpenModal(false)}
+          setSelectedPlan={setSelectedPlan}
+          selectedPlan={selectedPlan}
         />
-        {openModal && (
-          <TenantForm
-            onClose={() => setOpenModal(false)}
-            setSelectedPlan={setSelectedPlan}
-            selectedPlan={selectedPlan}
-          />
-        )}
-      </main>
-      <Footer />
-    </>
+      )}
+      {openForbiddenModal && (
+        <ForbiddenModal
+          close={() => setOpenForbiddenModal(false)}
+          isSuccesOrError={true}
+        />
+      )}
+    </MainLayout>
   );
 }

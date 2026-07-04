@@ -23,6 +23,9 @@ namespace backend_proyecto.Config
         public DbSet<Permission> Permissions { get; set; } = null!;
         public DbSet<UserGroup> UserGroups { get; set; } = null!;
         public DbSet<GroupPermission> GroupPermissions { get; set; } = null!;
+        public DbSet<EmailVerification> EmailVerifications { get; set; }
+        public DbSet<PasswordReset> PasswordResets { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

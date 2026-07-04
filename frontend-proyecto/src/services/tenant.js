@@ -3,6 +3,8 @@ import { useAuthStore } from "../store/auth-store";
 
 export const getTenants = () => request("get", "/tenants");
 
+export const getTenantById = (id) => request("get", `/tenants/${id}`);
+
 export const createTenant = (data) => {
   const { user } = useAuthStore.getState();
   console.log({
@@ -25,3 +27,5 @@ export const updateTenantActive = (id, data) =>
 
 export const updateTenantStatus = (id, data) =>
   request("patch", `/tenants/${id}/status`, data);
+
+export const getMyTenants = () => request("get", "/tenants/my-tenants");

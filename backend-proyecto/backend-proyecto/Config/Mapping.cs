@@ -8,18 +8,24 @@ namespace backend_proyecto.Config
     {
         public Mapping()
         {
-            // Defaults
-            CreateMap<int?, int>().ConvertUsing((src, dest) => src ?? dest);
-            CreateMap<bool?, bool>().ConvertUsing((src, dest) => src ?? dest);
-            CreateMap<string?, string>().ConvertUsing((src, dest) => src ?? dest);
-            CreateMap<decimal?, decimal>().ConvertUsing((src, dest) => src ?? dest);
-            CreateMap<DateTime?, DateTime>().ConvertUsing((src, dest) => src ?? dest);
-            CreateMap<TimeOnly?, TimeOnly>().ConvertUsing((src, dest) => src ?? dest);
+            //// Defaults
+            //CreateMap<int?, int>().ConvertUsing((src, dest) => src ?? dest);
+            //CreateMap<bool?, bool>().ConvertUsing((src, dest) => src ?? dest);
+            //CreateMap<string?, string>().ConvertUsing((src, dest) => src ?? dest);
+            //CreateMap<decimal?, decimal>().ConvertUsing((src, dest) => src ?? dest);
+            //CreateMap<DateTime?, DateTime>().ConvertUsing((src, dest) => src ?? dest);
+            //CreateMap<TimeOnly?, TimeOnly>().ConvertUsing((src, dest) => src ?? dest);
 
             // user
             CreateMap<User, UserWithoutPassDTO>();
             CreateMap<RegisterDTO, User>();
-            CreateMap<UpdateUserDTO, User>();
+            CreateMap<UpdateUserDTO, User>()
+                .ForMember(d => d.Name,
+                    o => o.Condition(s => s.Name != null))
+                .ForMember(d => d.Surname,
+                    o => o.Condition(s => s.Surname != null))
+                .ForMember(d => d.PhoneNumber,
+                    o => o.Condition(s => s.PhoneNumber != null));
 
             // tenantPlan
             CreateMap<CreateTenantPlanDTO, TenantPlan>();

@@ -22,6 +22,40 @@ namespace backend_proyecto.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("EmailVerification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email");
+
+                    b.ToTable("EmailVerifications");
+                });
+
             modelBuilder.Entity("Group", b =>
                 {
                     b.Property<int>("Id")
@@ -434,6 +468,40 @@ namespace backend_proyecto.Migrations
                     b.ToTable("Classes");
                 });
 
+            modelBuilder.Entity("backend_proyecto.Models.PasswordReset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("Used")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email");
+
+                    b.ToTable("PasswordResets");
+                });
+
             modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -664,9 +732,10 @@ namespace backend_proyecto.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerUserId");
-
                     b.HasIndex("TenantPlanId");
+
+                    b.HasIndex("OwnerUserId", "Name")
+                        .IsUnique();
 
                     b.ToTable("Tenants");
                 });
@@ -856,7 +925,7 @@ namespace backend_proyecto.Migrations
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
                 {
                     b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
-                        .WithMany()
+                        .WithMany("Professors")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -938,7 +1007,7 @@ namespace backend_proyecto.Migrations
                         .IsRequired();
 
                     b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
-                        .WithMany()
+                        .WithMany("Students")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1006,6 +1075,13 @@ namespace backend_proyecto.Migrations
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
                 {
                     b.Navigation("ProfessorSpecialities");
+                });
+
+            modelBuilder.Entity("backend_proyecto.Models.Tenant", b =>
+                {
+                    b.Navigation("Professors");
+
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

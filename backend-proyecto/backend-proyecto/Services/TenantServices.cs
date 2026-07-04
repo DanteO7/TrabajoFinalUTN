@@ -28,6 +28,45 @@ namespace backend_proyecto.Services
             return _mapper.Map<List<ResponseTenantDTO>>(tenants);
         }
 
+        public async Task<ResponseTenantDTO> GetById(int id, int userId)
+        {
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == id,
+                t => t.OwnerUser,
+                t => t.TenantPlan
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No existe el tenant"
+                );
+            }
+
+            var hasAccess =
+                tenant.OwnerUserId == userId ||
+                tenant.Professors.Any(p => p.UserId == userId) ||
+                tenant.Students.Any(s => s.UserId == userId);
+
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No existe el tenant"
+                );
+            }
+
+            return _mapper.Map<ResponseTenantDTO>(tenant);
+        }
+
+        public async Task<List<ResponseTenantDTO>> GetAllByOwnerId(int ownerId)
+        {
+            var tenants = await _tenantRepository.GetAllAsync(t => t.OwnerUserId == ownerId, t => t.OwnerUser, t => t.TenantPlan);
+            return _mapper.Map<List<ResponseTenantDTO>>(tenants);
+        }
+
         public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO)
         {
             var user = await _userRepository.GetOneAsync(p => p.Id == createTenantDTO.OwnerUserId);
@@ -40,6 +79,16 @@ namespace backend_proyecto.Services
             if(plan == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe plan de Tenant con el Id = '{createTenantDTO.TenantPlanId}'");
+            }
+
+            var existingTenant = await _tenantRepository.GetOneAsync(t =>
+                t.OwnerUserId == createTenantDTO.OwnerUserId &&
+                t.Name == createTenantDTO.Name);
+
+            if (existingTenant != null)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"Ya existe un tenant con el nombre '{createTenantDTO.Name}' para este usuario");
             }
 
             // falta validar el pago
@@ -137,6 +186,12 @@ namespace backend_proyecto.Services
             await _tenantRepository.UpdateOneAsync(tenant);
 
             return _mapper.Map<ResponseTenantDTO>(tenant);
+        }
+        public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId)
+        {
+            var tenants = await _tenantRepository.GetMyTenants(userId);
+
+            return tenants;
         }
     }
 }

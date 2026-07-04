@@ -11,5 +11,7 @@ namespace backend_proyecto.Services
         Task<User> CreateOne(RegisterDTO registerDTO);
         Task DeleteOne(int id);
         Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser);
+        Task<UserWithoutPassDTO> ChangeEmail(int id, ChangeEmailDTO changeEmailDTO);
+        Task<UserWithoutPassDTO> ChangePassword(ChangePasswordDTO changePasswordDTO);
     }
 }

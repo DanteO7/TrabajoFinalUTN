@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using backend_proyecto.Config;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Humanizer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -26,8 +28,10 @@ namespace backend_proyecto.Services
         internal readonly string _secret;
         private readonly IAdminRepository _adminRepository;
         private readonly ITenantRepository _tenantRepository;
+        private readonly ApplicationDbContext _db;
 
-        public AuthServices(IUserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository)
+
+        public AuthServices(IUserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository, ApplicationDbContext db)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;
@@ -38,9 +42,10 @@ namespace backend_proyecto.Services
             _secret = _config.GetSection("Secrets:JWT")?.Value?.ToString() ?? string.Empty;
             _adminRepository = adminRepository;
             _tenantRepository = tenantRepository;
+            _db = db;
         }
 
-        public async Task<LoginResponseDTO> Register(RegisterDTO register, HttpContext context)
+        public async Task<AuthResponseDTO> Register(RegisterDTO register, HttpContext context)
         {
             var existingUser = await _userServices.GetOneByEmail(register.Email);
 
@@ -49,33 +54,76 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     $"El usuario con este mail '{register.Email}' ya existe.");
             }
+            var verification = await _db.EmailVerifications
+                .Where(v => v.Email == register.Email)
+                .OrderByDescending(v => v.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (verification == null)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"No existe una verificación para el mail = '{register.Email}'");
+
+            if (verification.Used)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El código ya fue utilizado");
+
+            if (verification.ExpiresAt < DateTime.UtcNow)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El código expiró");
+
+            if (verification.Code != register.VerificationCode)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"Código incorrecto");
 
             var createdUser = await _userServices.CreateOne(register);
             var userDto = _mapper.Map<UserWithoutPassDTO>(createdUser);
 
+            _db.EmailVerifications.Remove(verification);
+            await _db.SaveChangesAsync();
 
             var token = await GenerateJwt(userDto);
             SetCookie(token, context);
 
-            return new LoginResponseDTO { Token = token, User = userDto };
+            return await BuildAuthResponse(createdUser);
         }
 
-        public async Task<LoginResponseDTO> Login(LoginDTO login, HttpContext context)
+        public async Task<AuthResponseDTO> Login(LoginDTO login, HttpContext context)
         {
             var user = await _userServices.GetOneByEmail(login.Email);
             if (user == null)
-                throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid Credentials.");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "Credenciales invalidas.");
 
             if (!_encoderServices.Verify(login.Password, user.Password))
-                throw new HttpResponseError(HttpStatusCode.BadRequest, "Invalid Credentials.");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "Credenciales invalidas.");
 
             var userDto = _mapper.Map<UserWithoutPassDTO>(user);
             var token = await GenerateJwt(userDto);
             SetCookie(token, context);
 
-            return new LoginResponseDTO { Token = token, User = userDto };
+            return await BuildAuthResponse(user);
         }
+        private async Task<AuthResponseDTO> BuildAuthResponse(User user)
+        {
+            var roles = new List<string>();
+            if (await _professorRepo.ExistsByUserId(user.Id))
+                roles.Add(Roles.PROFESSOR);
+            if (await _studentRepo.ExistsByUserId(user.Id))
+                roles.Add(Roles.STUDENT);
+            if (await _adminRepository.ExistsByUserId(user.Id))
+                roles.Add(Roles.ADMIN);
+            if (await _tenantRepository.ExistsByUserId(user.Id))
+                roles.Add(Roles.TENANT);
 
+            return new AuthResponseDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Surname = user.Surname,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Roles = roles
+            };
+        }
         public Task Logout(HttpContext context)
         {
             context.Response.Cookies.Delete("auth_token");
@@ -88,7 +136,7 @@ namespace backend_proyecto.Services
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(1)
             });
         }

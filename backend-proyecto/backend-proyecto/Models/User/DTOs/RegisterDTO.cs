@@ -31,6 +31,8 @@ namespace backend_proyecto.Models.DTOs
         [MaxLength(255)]
         public string ConfirmPassword { get; set; } = null!;
 
-        
+        [Required]
+        [Length(6, 6)]
+        public string VerificationCode { get; set; } = null!;
     }
 }

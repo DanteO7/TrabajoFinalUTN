@@ -1,11 +1,23 @@
-import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
 const handler = (set) => ({
   isAuthenticated: false,
   user: null,
-  login: ({ token, user }) => set({ isAuthenticated: true, token, user }),
-  logout: () => set({ isAuthenticated: false, token: null, user: null }),
+  isLoading: true,
+
+  login: (user) =>
+    set({
+      isAuthenticated: true,
+      user,
+      isLoading: false,
+    }),
+
+  logout: () =>
+    set({
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+    }),
 });
 
-export const useAuthStore = create(persist(handler, { name: "auth-storage" }));
+export const useAuthStore = create(handler);

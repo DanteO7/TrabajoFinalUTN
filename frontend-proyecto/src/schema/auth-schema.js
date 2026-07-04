@@ -36,6 +36,10 @@ export const signUpSchema = z
         /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/,
         "La contraseña debe tener al menos 8 caracteres, incluir una mayusula, una minuscula y un numero",
       ),
+    verificationCode: z
+      .string()
+      .min(6, "El código debe tener al menos 6 caracteres")
+      .max(6, "El código no debe tener mas de 6 caracteres"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",

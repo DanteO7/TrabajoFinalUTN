@@ -2,20 +2,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signUpSchema } from "../schema/auth-schema";
 import { useMutation } from "@tanstack/react-query";
-import { signUp } from "../services/auth";
+import { sendRegisterCode, signUp } from "../services/auth";
 import { useAuthStore } from "../store/auth-store";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import FormInput from "../components/form-input";
+import ErrorModal from "../components/modals/error-modal";
 
 export default function SignUp() {
   const { login } = useAuthStore();
   const [, setLocation] = useLocation();
-
+  const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
+  const [codeSent, setCodeSent] = useState(false);
 
   const {
     register,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -31,18 +34,43 @@ export default function SignUp() {
       setLocation("/");
     },
     onError: (error) => {
-      const msg =
-        error?.response?.data?.message || "Ocurrió un error al registrarte";
-
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al registrarte";
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.title) msg = data.title;
       setBackendError(msg);
+      setErrorModal(true);
     },
   });
 
   const onSubmit = (credentials) => {
     setBackendError(null);
-    console.log("submit", credentials);
     mutation.mutate(credentials);
   };
+
+  const handleSendCode = async () => {
+    const email = getValues("email");
+
+    if (!email) {
+      setBackendError("Ingresa un email");
+      setErrorModal(true);
+      return;
+    }
+
+    try {
+      console.log(email);
+      sendRegisterCode({
+        email: getValues("email"),
+      });
+      setCodeSent(true);
+    } catch (error) {
+      setBackendError(`Error enviando código: ${error}`);
+      setErrorModal(true);
+    }
+  };
+
   return (
     <div className="bg-[#ede9ee] pt-10 h-full text-[12px]">
       <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-[23%]">
@@ -53,11 +81,6 @@ export default function SignUp() {
         >
           <h2 className="text-center text-2xl font-bold">Turno Fácil</h2>
           <p className="text-center text-gray-700 text-[16px]">Registrarse</p>
-          {backendError && (
-            <p className="text-red-600 font-semibold text-center mb-2">
-              {backendError}
-            </p>
-          )}
           <div>
             <FormInput
               id="name"
@@ -108,7 +131,21 @@ export default function SignUp() {
               disabled={isSubmitting || mutation.isPending}
             />
           </div>
+          {codeSent && (
+            <div>
+              <FormInput
+                id="verificationCode"
+                type="text"
+                placeholder="Código de verificación"
+                register={register("verificationCode")}
+                error={errors.verificationCode}
+              />
+            </div>
+          )}
 
+          <button type="button" onClick={handleSendCode}>
+            Enviar código
+          </button>
           <button
             type="submit"
             disabled={isSubmitting || mutation.isPending}
@@ -136,6 +173,13 @@ export default function SignUp() {
           </Link>
         </form>
       </div>
+      {errorModal && (
+        <ErrorModal
+          close={() => setErrorModal(false)}
+          message={backendError}
+          isSuccesOrError={true}
+        />
+      )}
     </div>
   );
 }

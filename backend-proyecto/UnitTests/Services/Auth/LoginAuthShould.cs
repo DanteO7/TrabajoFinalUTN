@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using backend_proyecto.Config;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Net;
@@ -23,7 +25,7 @@ namespace UnitTests.Services.Auth
         private readonly Mock<HttpContext> _httpContextMock;
         private readonly Mock<IResponseCookies> _cookiesMock;
         private readonly AuthServices _authServices;
-
+        private readonly ApplicationDbContext _db;
         public LoginAuthShould()
         {
             _userServicesMock = new Mock<IUserServices>();
@@ -36,6 +38,11 @@ namespace UnitTests.Services.Auth
             _tenantRepoMock = new Mock<ITenantRepository>();
             _httpContextMock = new Mock<HttpContext>();
             _cookiesMock = new Mock<IResponseCookies>();
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _db = new ApplicationDbContext(options);
 
             var configSectionMock = new Mock<IConfigurationSection>();
             configSectionMock.Setup(s => s.Value).Returns("super_secret_key_for_testing_1234567890");
@@ -58,7 +65,8 @@ namespace UnitTests.Services.Auth
                 _professorRepoMock.Object,
                 _studentRepoMock.Object,
                 _adminRepoMock.Object,
-                _tenantRepoMock.Object
+                _tenantRepoMock.Object,
+                _db
             );
         }
 
@@ -77,14 +85,6 @@ namespace UnitTests.Services.Auth
             Password = "hashed_password"
         };
 
-        private UserWithoutPassDTO ValidUserDto() => new UserWithoutPassDTO
-        {
-            Id = 1,
-            Name = "Juan",
-            Surname = "Perez",
-            Email = "juan@example.com"
-        };
-
         // =====================
         // CASO EXITOSO
         // =====================
@@ -95,7 +95,6 @@ namespace UnitTests.Services.Auth
             // Arrange
             var dto = ValidDto();
             var user = ValidUser();
-            var userDto = ValidUserDto();
 
             _userServicesMock
                 .Setup(s => s.GetOneByEmail(dto.Email))
@@ -105,17 +104,15 @@ namespace UnitTests.Services.Auth
                 .Setup(e => e.Verify(dto.Password, user.Password))
                 .Returns(true);
 
-            _mapperMock
-                .Setup(m => m.Map<UserWithoutPassDTO>(user))
-                .Returns(userDto);
-
             // Act
             var result = await _authServices.Login(dto, _httpContextMock.Object);
 
             // Assert
             Assert.NotNull(result);
-            Assert.NotNull(result.Token);
-            Assert.Equal(userDto.Email, result.User.Email);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(user.Name, result.Name);
+            Assert.NotNull(result.Roles);
+            Assert.IsType<AuthResponseDTO>(result);
 
             _cookiesMock.Verify(c => c.Append("auth_token", It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Once);
         }
@@ -143,6 +140,7 @@ namespace UnitTests.Services.Auth
             Assert.Equal("Invalid Credentials.", ex.Message);
 
             _encoderServicesMock.Verify(e => e.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+            _cookiesMock.Verify(c => c.Append(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Never);
         }
 
         // =====================

@@ -3,11 +3,12 @@ using backend_proyecto.Config;
 using backend_proyecto.Repositories;
 using backend_proyecto.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Resend;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,8 +54,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 // Services
 builder.Services.AddScoped<TenantServices>();
 builder.Services.AddScoped<AuthServices>();
-builder.Services.AddScoped<IEncoderServices,EncoderServices>();
-builder.Services.AddScoped<IUserServices,UserServices>();
+builder.Services.AddScoped<IEncoderServices, EncoderServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<SpecialityServices>();
 builder.Services.AddScoped<StudentPlanServices>();
 builder.Services.AddScoped<TenantPlanServices>();
@@ -66,6 +67,7 @@ builder.Services.AddScoped<ProfessorServices>();
 builder.Services.AddScoped<ReservationServices>();
 builder.Services.AddScoped<GroupServices>();
 builder.Services.AddScoped<PermissionService>();
+builder.Services.AddScoped<EmailServices>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
@@ -111,6 +113,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
+builder.Services.AddHttpClient<ResendClient>();
+
+builder.Services.Configure<ResendClientOptions>(options =>
+{
+    options.ApiToken = builder.Configuration.GetSection("Resend:ApiKey")?.Value?.ToString() ?? string.Empty;
+});
+
+builder.Services.AddTransient<IResend, ResendClient>();
 
 var app = builder.Build();
 

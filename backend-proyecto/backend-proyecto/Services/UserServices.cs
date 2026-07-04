@@ -5,6 +5,7 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -33,8 +34,8 @@ namespace backend_proyecto.Services
             {
                 var normalized = search.Trim().ToLower();
 
-                query = query.Where(u => u.Name.Trim().ToLower().Contains(normalized) || 
-                u.Surname.Trim().ToLower().Contains(normalized) || 
+                query = query.Where(u => u.Name.Trim().ToLower().Contains(normalized) ||
+                u.Surname.Trim().ToLower().Contains(normalized) ||
                 u.Email.Trim().ToLower().Contains(normalized));
             }
 
@@ -103,7 +104,7 @@ namespace backend_proyecto.Services
         public async Task DeleteOne(int id)
         {
             var user = await _repo.GetOneAsync(u => u.Id == id);
-            if(user == null)
+            if (user == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
@@ -116,18 +117,125 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del usuario no puede tener mas de 50 caracteres");
             }
-            if (updatedUser.Surname != null &&  updatedUser.Surname.Length > 50)
+            if (updatedUser.Surname != null && updatedUser.Surname.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El apellido del usuario no puede tener mas de 50 caracteres");
+            }
+            if (updatedUser.PhoneNumber != null && updatedUser.PhoneNumber.Length > 20)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El numero de teléfono del usuario no puede tener mas de 20 caracteres");
             }
             var user = await _repo.GetOneAsync(u => u.Id == id);
             if (user == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
-            _mapper.Map(updatedUser, user);
+
+            if (updatedUser.Name != null)
+                user.Name = updatedUser.Name;
+            if (updatedUser.Surname != null)
+                user.Surname = updatedUser.Surname;
+            if (updatedUser.PhoneNumber != null)
+                user.PhoneNumber = updatedUser.PhoneNumber;
             await _repo.UpdateOneAsync(user);
 
+            return _mapper.Map<UserWithoutPassDTO>(user);
+        }
+
+        public async Task<UserWithoutPassDTO> ChangeEmail(int id, ChangeEmailDTO changeEmailDTO)
+        {
+            var user = await _repo.GetOneAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+            }
+            if (changeEmailDTO.NewEmail.Length > 100)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nuevo email no puede tener mas de 100 caracteres");
+            }
+
+            var verification = await _db.EmailVerifications
+                .Where(v => v.Email == changeEmailDTO.NewEmail)
+                .OrderByDescending(v => v.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (verification == null)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"No existe una verificación para el mail = '{changeEmailDTO.NewEmail}'");
+
+            if (verification.Used)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El código ya fue utilizado");
+
+            if (verification.ExpiresAt < DateTime.UtcNow)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El código expiró");
+
+            if (verification.Code != changeEmailDTO.VerificationCode)
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"Código incorrecto");
+
+            if (changeEmailDTO.NewEmail != null)
+                user.Email = changeEmailDTO.NewEmail;
+
+            await _repo.UpdateOneAsync(user);
+
+            return _mapper.Map<UserWithoutPassDTO>(user);
+        }
+
+        public async Task<UserWithoutPassDTO> ChangePassword(ChangePasswordDTO changePasswordDTO)
+        {
+            var verification = await _db.PasswordResets
+                .Where(v => v.Token == changePasswordDTO.Token)
+                .OrderByDescending(v => v.CreatedAt)
+                .FirstOrDefaultAsync();
+
+            if (verification == null)
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Token inválido"
+                );
+
+            if (verification.Used)
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La recuperación ya fue utilizada"
+                );
+
+            if (verification.ExpiresAt < DateTime.UtcNow)
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El token expiró"
+                );
+
+            var user = await _repo.GetOneAsync(
+                u => u.Email == verification.Email
+            );
+
+            if (user == null)
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Usuario no encontrado"
+                );
+
+            if (changePasswordDTO.NewPassword.Length < 8)
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La contraseña debe tener mínimo 8 caracteres"
+                );
+
+            if (changePasswordDTO.NewPassword != changePasswordDTO.ConfirmNewPassword)
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Las contraseñas no coinciden"
+                );
+
+            user.Password = _encoderServices.Encode(
+                changePasswordDTO.NewPassword
+            );
+            verification.Used = true;
+
+            await _repo.UpdateOneAsync(user);
             return _mapper.Map<UserWithoutPassDTO>(user);
         }
     }

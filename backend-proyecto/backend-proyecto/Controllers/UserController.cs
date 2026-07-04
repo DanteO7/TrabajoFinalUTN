@@ -12,9 +12,9 @@ namespace backend_proyecto.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserServices _userServices;
+        private readonly IUserServices _userServices;
 
-        public UserController(UserServices userServices)
+        public UserController(IUserServices userServices)
         {
             _userServices = userServices;
         }
@@ -105,6 +105,66 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPatch("email/{id}")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.STUDENT}, {Roles.ADMIN}")]
+        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserWithoutPassDTO>> ChangeEmail(int id, [FromBody] ChangeEmailDTO changeEmailDTO)
+        {
+            try
+            {
+                var user = await _userServices.ChangeEmail(id, changeEmailDTO);
+                return Ok(user);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    ex.Message
+                );
+            }
+        }
+
+
+        [HttpPatch("password")]
+        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserWithoutPassDTO>> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            try
+            {
+                var user = await _userServices.ChangePassword(changePasswordDTO);
+                return Ok(user);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    ex.Message
+                );
             }
         }
     }

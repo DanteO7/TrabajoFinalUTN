@@ -1,8 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTenantPlans } from "../../services/tenant-plan";
 import PlanCard from "./plan-card";
+import { useAuthStore } from "../../store/auth-store";
 
-export default function TenantPlans({ onOpenModal, onSelectedPlan }) {
+export default function TenantPlans({
+  onOpenModal,
+  onSelectedPlan,
+  openForbiddenModal,
+}) {
+  const { isAuthenticated } = useAuthStore();
+
   const { data: tenantsPlan, isLoading } = useQuery({
     queryKey: ["tenantsPlan"],
     queryFn: getTenantPlans,
@@ -22,7 +29,7 @@ export default function TenantPlans({ onOpenModal, onSelectedPlan }) {
           <PlanCard
             key={plan.id}
             plan={plan}
-            onOpenModal={onOpenModal}
+            onOpenModal={isAuthenticated ? onOpenModal : openForbiddenModal}
             onSelectedPlan={onSelectedPlan}
           />
         ))}

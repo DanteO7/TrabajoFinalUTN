@@ -2,20 +2,26 @@ import { Link, useLocation } from "wouter";
 import FormInput from "../components/form-input";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "../store/auth-store";
-import { signIn } from "../services/auth";
+import { forgotPassword, signIn } from "../services/auth";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { signInSchema } from "../schema/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ErrorModal from "../components/modals/error-modal";
+import EmailSentModal from "../components/modals/email-sent-modal";
 
 export default function SignIn() {
   const { login } = useAuthStore();
   const [, setLocation] = useLocation();
   const [backendError, setBackendError] = useState();
+  const [errorModal, setErrorModal] = useState(false);
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    trigger,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(signInSchema),
@@ -30,17 +36,39 @@ export default function SignIn() {
       setLocation("/");
     },
     onError: (error) => {
-      const msg =
-        error?.response?.data?.message || "Ocurrió un error al registrarte";
-
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al iniciar sesión";
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.title) msg = data.title;
       setBackendError(msg);
+      setErrorModal(true);
     },
   });
 
   const onSubmit = (credentials) => {
     setBackendError(null);
-    console.log("submit", credentials);
     mutation.mutate(credentials);
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      const isValid = await trigger("email");
+
+      if (!isValid) return;
+
+      const email = getValues("email");
+
+      await forgotPassword({
+        email,
+      });
+
+      setOpenForgotPassword(true);
+    } catch (error) {
+      setBackendError(`Error enviando email: ${error.message}`);
+      setErrorModal(true);
+    }
   };
 
   return (
@@ -55,11 +83,6 @@ export default function SignIn() {
           <p className="text-center text-gray-700 text-[16px]">
             Iniciar sesión
           </p>
-          {backendError && (
-            <p className="text-red-600 font-semibold text-center mb-2">
-              {backendError}
-            </p>
-          )}
           <div>
             <FormInput
               id="email"
@@ -95,6 +118,12 @@ export default function SignIn() {
             <img className="w-6" src="/google.png" alt="Icono de Google" />
             <p className="text-center">Inicia sesión con Google</p>
           </button>
+          <span
+            onClick={handleForgotPassword}
+            className="text-[14px] text-gray-500 cursor-pointer underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </span>
           <div className="flex items-center gap-3 my-4">
             <div className="flex-1 h-px bg-gray-300"></div>
             <span className="text-gray-500 text-sm">si no tenes cuenta</span>
@@ -108,6 +137,20 @@ export default function SignIn() {
           </Link>
         </form>
       </div>
+      {errorModal && (
+        <ErrorModal
+          close={() => setErrorModal(false)}
+          message={backendError}
+          isSuccesOrError={true}
+        />
+      )}
+      {openForgotPassword && (
+        <EmailSentModal
+          close={() => setOpenForgotPassword(false)}
+          email={getValues("email")}
+          isSuccesOrError={true}
+        />
+      )}
     </div>
   );
 }

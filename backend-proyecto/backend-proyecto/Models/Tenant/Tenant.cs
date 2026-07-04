@@ -10,5 +10,7 @@
         public int TenantPlanId { get; set; }
         public TenantPlan TenantPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
+        public ICollection<Professor> Professors { get; set; } = new List<Professor>();
+        public ICollection<Student> Students { get; set; } = new List<Student>();
     }
 }

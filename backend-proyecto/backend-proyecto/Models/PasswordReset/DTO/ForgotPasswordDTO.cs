@@ -2,9 +2,10 @@
 
 namespace backend_proyecto.Models.DTOs
 {
-    public class ChangeActiveTenantDTO
+    public class ForgotPasswordDTO
     {
         [Required]
-        public bool IsActive { get; set; }
+        [EmailAddress]
+        public string Email { get; set; } = null!;
     }
 }

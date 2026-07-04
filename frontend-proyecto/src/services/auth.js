@@ -14,3 +14,11 @@ export const checkAuth = async () => {
     return false;
   }
 };
+
+export const me = () => request("get", "/auth/me");
+
+export const sendRegisterCode = (data) =>
+  request("post", "/auth/send-register-code", data);
+
+export const forgotPassword = (data) =>
+  request("post", "/auth/forgot-password", data);
