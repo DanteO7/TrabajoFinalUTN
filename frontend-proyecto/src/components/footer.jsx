@@ -1,10 +1,11 @@
 import { FooterDivider } from "flowbite-react";
 import { FaGithub, FaInstagram, FaWhatsapp, FaYoutube } from "react-icons/fa";
+import { Link } from "wouter";
 
 export default function Footer() {
   return (
     <footer className="p-6 mx-auto lg:px-[10%]">
-      <div className="flex justify-between items-center flex-col-reverse gap-3.5 md:flex-row">
+      <div className="flex justify-between items-center flex-col-reverse gap-4 lg:gap-12 md:flex-row">
         <div>
           <p className="m-2 text-center md:text-left ">
             Teléfono:(+54) 3400-532514 | Email: dante.orsetti@gmail.com
@@ -40,8 +41,18 @@ export default function Footer() {
         </div>
       </div>
       <FooterDivider />
-      <p className="text-center text-[0.8rem]">
-        Aviso Legal | Política de Privacidad
+      <p className="text-center text-[0.8rem] text-gray-700">
+        <Link href="aviso-legal" className="hover:text-gray-900">
+          Aviso Legal
+        </Link>{" "}
+        |{" "}
+        <Link href="politica-y-privacidad" className="hover:text-gray-900">
+          Política de Privacidad
+        </Link>{" "}
+        |{" "}
+        <Link href="terminos-y-condiciones" className="hover:text-gray-900">
+          Términos y Condiciones
+        </Link>
       </p>
     </footer>
   );

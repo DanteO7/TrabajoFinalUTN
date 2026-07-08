@@ -2,8 +2,15 @@ import React from "react";
 import Modal from "./modal";
 import { MdOutlineEmail } from "react-icons/md";
 import { X } from "lucide-react";
+import { useState } from "react";
 
-export default function EmailSentModal({ close, email, isSuccesOrError }) {
+export default function EmailSentModal({
+  close,
+  email,
+  isSuccesOrError,
+  sendAgain,
+  seconds,
+}) {
   return (
     <Modal open={true} onClose={close} isSuccesOrError={isSuccesOrError}>
       <button
@@ -24,10 +31,15 @@ export default function EmailSentModal({ close, email, isSuccesOrError }) {
         <div className="flex flex-col my-4 gap-2">
           <span>¿No te llegó?</span>
           <button
-            onClick={close}
-            className="text-xl bg-[#5f7de9] text-white rounded-4xl px-7 py-3 cursor-pointer hover:bg-[#5273e8] transition-all duration-200"
+            onClick={sendAgain}
+            disabled={seconds > 0}
+            className={`text-xl rounded-4xl px-7 py-3 transition-all duration-200 ${
+              seconds > 0
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : "bg-[#5f7de9] text-white hover:bg-[#5273e8] cursor-pointer"
+            }`}
           >
-            Enviar devuelta
+            {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar de vuelta"}
           </button>
         </div>
       </div>

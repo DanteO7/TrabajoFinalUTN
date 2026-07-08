@@ -14,6 +14,9 @@ import i18n from "./i18n";
 import ResetPassword from "./pages/reset-password";
 import YourSpace from "./pages/your-space";
 import Tenant from "./pages/tenant";
+import PrivacyPolicy from "./pages/privacy-policy";
+import Legal from "./pages/legal";
+import Terms from "./pages/terms";
 
 const queryClient = new QueryClient();
 
@@ -47,26 +50,35 @@ export default function App() {
           <Route path={"/"}>
             <Home />
           </Route>
-          <Route path={"/sign-in"}>
+          <Route path={"/iniciar-sesion"}>
             <SignIn />
           </Route>
-          <Route path={"/sign-up"}>
+          <Route path={"/registrarse"}>
             <SignUp />
           </Route>
-          <Route path={"/profile"}>
+          <Route path={"/perfil"}>
             <Profile />
           </Route>
-          <Route path={"/settings"}>
+          <Route path={"/ajustes"}>
             <Settings />
           </Route>
-          <Route path={"/reset-password"}>
+          <Route path={"/resetear-contraseña"}>
             <ResetPassword />
           </Route>
-          <Route path={"/your-space"}>
+          <Route path={"/tu-espacio"}>
             <YourSpace />
           </Route>
-          <Route path="/your-space/:id">
+          <Route path="/tu-espacio/:id">
             {(params) => <Tenant id={params.id} />}
+          </Route>
+          <Route path={"/aviso-legal"}>
+            <Legal />
+          </Route>
+          <Route path={"/politica-y-privacidad"}>
+            <PrivacyPolicy />
+          </Route>
+          <Route path={"/terminos-y-condiciones"}>
+            <Terms />
           </Route>
         </Switch>
       </Suspense>

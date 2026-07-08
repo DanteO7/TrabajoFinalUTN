@@ -31,7 +31,7 @@ export default function Header() {
               <Link href="/">Inicio</Link>
 
               <Link
-                href="your-space"
+                href="tu-espapcio"
                 className="cursor-pointer transition-all duration-200"
               >
                 Tu espacio
@@ -42,19 +42,19 @@ export default function Header() {
 
         <div className="flex gap-5 items-center">
           {isAuthenticated ? (
-            <Link href="profile">
+            <Link href="perfil">
               <IoPersonSharp size={22} />
             </Link>
           ) : (
             <Link
-              href="/sign-in"
+              href="iniciar-sesion"
               className="border rounded-xl px-2 py-1 text-[13px]"
             >
               Inicia sesión
             </Link>
           )}
 
-          <Link className="hidden lg:flex" href="settings">
+          <Link className="hidden lg:flex" href="ajustes">
             <IoMdSettings
               className="inline-block transition-transform duration-300 hover:scale-105 hover:rotate-70"
               size={22}
@@ -94,13 +94,13 @@ export default function Header() {
                 Inicio
               </Link>
               <Link
-                href="profile"
+                href="perfil"
                 className="cursor-pointer transition-all duration-200 "
               >
                 Perfil
               </Link>
               <Link
-                href="your-space"
+                href="tu-espacio"
                 className="cursor-pointer transition-all duration-200 "
               >
                 Tu espacio
@@ -108,7 +108,7 @@ export default function Header() {
               <li className="cursor-pointer transition-all duration-200 "></li>
             </ul>
           </nav>
-          <Link href="settings">
+          <Link href="ajustes">
             <IoMdSettings size={22} />
           </Link>
         </div>

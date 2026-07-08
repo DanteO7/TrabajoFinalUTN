@@ -15,7 +15,7 @@ export default function ForbiddenModal({ close, isSuccesOrError }) {
           Necesitas iniciar sesión para realizar esta acción
         </p>
         <Link
-          href="/sign-in"
+          href="iniciar-sesion"
           className="text-xl bg-[#a3a3a3] text-white rounded-4xl px-7 py-3 mt-5 cursor-pointer hover:bg-[#949494] transition-all duration-200"
         >
           Iniciar sesión

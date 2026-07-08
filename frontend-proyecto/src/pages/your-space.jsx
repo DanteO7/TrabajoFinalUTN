@@ -28,7 +28,7 @@ export default function YourSpace() {
             <p>xd</p>
           ) : (
             myTenants?.map((t) => (
-              <Link href={`your-space/${t.id}`}>
+              <Link href={`tu-espacio/${t.id}`}>
                 <MyTenantCard myTenant={t} key={t.id} />
               </Link>
             ))

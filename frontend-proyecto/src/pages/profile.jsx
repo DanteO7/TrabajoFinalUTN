@@ -171,7 +171,7 @@ export default function Profile() {
             <div className="flex flex-col mt-5 gap-3">
               <span>No tienes iniciada la sesion</span>
               <Link
-                href="/sign-in"
+                href="/iniciar-sesion"
                 className="border rounded-xl w-fit px-2 py-1"
               >
                 Inicia sesión

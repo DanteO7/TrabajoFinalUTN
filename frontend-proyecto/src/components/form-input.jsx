@@ -26,7 +26,7 @@ export default function FormInput({
 
       <div className="relative">
         <input
-          className={`rounded-[13px] px-3 py-2 w-full border-gray-200 border-[1.7px] bg-[#efefef] ${
+          className={`rounded-[13px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] ${
             error ? "border-red-500" : ""
           } ${isPassword ? "pr-10" : ""}`}
           id={id}

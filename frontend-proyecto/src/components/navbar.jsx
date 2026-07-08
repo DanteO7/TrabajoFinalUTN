@@ -16,10 +16,10 @@ export default function Navbar({ user }) {
 
       <nav>
         <ul className="flex flex-col gap-3">
-          <Link className={linkClass("/profile")} href="profile">
+          <Link className={linkClass("/profile")} href="perfil">
             Perfil
           </Link>
-          <Link className={linkClass("/settings")} href="settings">
+          <Link className={linkClass("/settings")} href="ajustes">
             Ajustes
           </Link>
         </ul>
