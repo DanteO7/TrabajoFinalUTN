@@ -17,6 +17,13 @@ import Tenant from "./pages/tenant";
 import PrivacyPolicy from "./pages/privacy-policy";
 import Legal from "./pages/legal";
 import Terms from "./pages/terms";
+import Students from "./pages/tenant/students";
+import Professors from "./pages/tenant/professors";
+import Classes from "./pages/tenant/classes";
+import Activities from "./pages/tenant/activities";
+import Specialities from "./pages/tenant/specialities";
+import Payments from "./pages/tenant/payments";
+import Groups from "./pages/tenant/groups";
 
 const queryClient = new QueryClient();
 
@@ -50,35 +57,73 @@ export default function App() {
           <Route path={"/"}>
             <Home />
           </Route>
+
           <Route path={"/iniciar-sesion"}>
             <SignIn />
           </Route>
+
           <Route path={"/registrarse"}>
             <SignUp />
           </Route>
+
           <Route path={"/perfil"}>
             <Profile />
           </Route>
+
           <Route path={"/ajustes"}>
             <Settings />
           </Route>
+
           <Route path={"/resetear-contraseña"}>
             <ResetPassword />
           </Route>
+
           <Route path={"/tu-espacio"}>
             <YourSpace />
           </Route>
+
           <Route path="/tu-espacio/:id">
             {(params) => <Tenant id={params.id} />}
           </Route>
+
           <Route path={"/aviso-legal"}>
             <Legal />
           </Route>
+
           <Route path={"/politica-y-privacidad"}>
             <PrivacyPolicy />
           </Route>
+
           <Route path={"/terminos-y-condiciones"}>
             <Terms />
+          </Route>
+
+          <Route path="/tu-espacio/:id/alumnos">
+            {(params) => <Students tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/profesores">
+            {(params) => <Professors tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/clases">
+            {(params) => <Classes tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/actividades">
+            {(params) => <Activities tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/especialidades">
+            {(params) => <Specialities tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/pagos">
+            {(params) => <Payments tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/grupos">
+            {(params) => <Groups tenantId={params.id} />}
           </Route>
         </Switch>
       </Suspense>

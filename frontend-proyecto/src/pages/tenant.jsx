@@ -1,5 +1,222 @@
-import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  FaUsers,
+  FaChalkboardTeacher,
+  FaCalendarAlt,
+  FaRunning,
+  FaMoneyBillWave,
+  FaUserShield,
+  FaBookOpen,
+} from "react-icons/fa";
+import { Link } from "wouter";
+import { getTenantById } from "../services/tenant";
+import MainLayout from "../layouts/main-layout";
+import { IoArrowBack } from "react-icons/io5";
+import { useLocation } from "wouter";
 
 export default function Tenant({ id }) {
-  return <div>Tenant{id}</div>;
+  const [, setLocation] = useLocation();
+
+  const { data: tenant, isLoading } = useQuery({
+    queryKey: ["tenantById", id],
+    queryFn: () => getTenantById(id),
+  });
+
+  const sections = {
+    Tenant: [
+      {
+        title: "Alumnos",
+        description: "Administrá todos los alumnos del espacio.",
+        icon: <FaUsers size={30} />,
+        href: "alumnos",
+      },
+      {
+        title: "Profesores",
+        description: "Visualizá y gestioná profesores.",
+        icon: <FaChalkboardTeacher size={30} />,
+        href: "profesores",
+      },
+      {
+        title: "Clases",
+        description: "Administrá las clases.",
+        icon: <FaCalendarAlt size={30} />,
+        href: "clases",
+      },
+      {
+        title: "Actividades",
+        description: "Gestioná actividades.",
+        icon: <FaRunning size={30} />,
+        href: "actividades",
+      },
+      {
+        title: "Especialidades",
+        description: "Configurá especialidades.",
+        icon: <FaBookOpen size={30} />,
+        href: "especialidades",
+      },
+      {
+        title: "Pagos",
+        description: "Consultá pagos.",
+        icon: <FaMoneyBillWave size={30} />,
+        href: "pagos",
+      },
+      {
+        title: "Grupos",
+        description: "Administrá roles y permisos.",
+        icon: <FaUserShield size={30} />,
+        href: "grupos",
+      },
+    ],
+
+    Professor: [
+      {
+        title: "Profesores",
+        description: "Ver profesores.",
+        icon: <FaChalkboardTeacher size={30} />,
+        href: "profesores",
+      },
+      {
+        title: "Clases",
+        description: "Tus clases.",
+        icon: <FaCalendarAlt size={30} />,
+        href: "clases",
+      },
+      {
+        title: "Actividades",
+        description: "Actividades disponibles.",
+        icon: <FaRunning size={30} />,
+        href: "actividades",
+      },
+      {
+        title: "Especialidades",
+        description: "Especialidades.",
+        icon: <FaBookOpen size={30} />,
+        href: "especialidades",
+      },
+      {
+        title: "Pagos",
+        description: "Tus pagos.",
+        icon: <FaMoneyBillWave size={30} />,
+        href: "pagos",
+      },
+    ],
+
+    Student: [
+      {
+        title: "Profesores",
+        description: "Conocé a tus profesores.",
+        icon: <FaChalkboardTeacher size={30} />,
+        href: "profesores",
+      },
+      {
+        title: "Clases",
+        description: "Tus clases.",
+        icon: <FaCalendarAlt size={30} />,
+        href: "clases",
+      },
+      {
+        title: "Actividades",
+        description: "Actividades disponibles.",
+        icon: <FaRunning size={30} />,
+        href: "actividades",
+      },
+      {
+        title: "Pagos",
+        description: "Consultá tus pagos.",
+        icon: <FaMoneyBillWave size={30} />,
+        href: "pagos",
+      },
+    ],
+  };
+
+  const roleConfig = {
+    Tenant: {
+      text: "Dueño",
+      className: "border-purple-600 text-purple-600",
+    },
+    Professor: {
+      text: "Profesor",
+      className: "border-blue-600 text-blue-600",
+    },
+    Student: {
+      text: "Alumno",
+      className: "border-yellow-600 text-yellow-600",
+    },
+  };
+
+  const role = roleConfig[tenant?.role];
+
+  const cards = sections[tenant?.role];
+
+  return (
+    <MainLayout>
+      <div className="w-full max-w-6xl mt-12">
+        <button
+          onClick={() => setLocation("/tu-espacio")}
+          className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6"
+        >
+          <IoArrowBack className="cursor-pointer" />
+          Tu espacio
+        </button>
+        {isLoading ? (
+          <p>xd</p>
+        ) : (
+          <div className="flex justify-between items-start flex-wrap gap-5">
+            <div>
+              <h1 className="text-4xl min-[900px]:text-5xl font-bold">
+                {tenant?.name}
+              </h1>
+
+              <p className="text-gray-500 mt-2">
+                Administrado por {tenant?.ownerUser.name}{" "}
+                {tenant?.ownerUser.surname}
+              </p>
+              <div className="flex my-2 gap-2 flex-wrap">
+                <span
+                  className={`rounded-full px-3 py-1 text-sm border
+                ${
+                  tenant?.isActive
+                    ? "border-green-600 text-green-600"
+                    : "border-red-600 text-red-600"
+                }`}
+                >
+                  {tenant?.isActive ? "Activo" : "Inactivo"}
+                </span>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-sm border ${role?.className}`}
+                >
+                  {role?.text}
+                </span>
+              </div>
+              <p className="text-gray-500 mt-1">
+                Desde acá podés administrar todas las áreas de tu negocio.
+              </p>
+            </div>
+
+            <div className="grid gap-6 mt-10 sm:grid-cols-2 xl:grid-cols-3">
+              {cards?.map((section) => (
+                <Link
+                  key={section.href}
+                  href={`/tu-espacio/${tenant?.id}/${section.href}`}
+                >
+                  <div className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4">
+                    <div className="text-[#FF8A90]">{section.icon}</div>
+
+                    <div>
+                      <h3 className="font-semibold text-xl">{section.title}</h3>
+
+                      <p className="text-gray-500 mt-2">
+                        {section.description}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </MainLayout>
+  );
 }

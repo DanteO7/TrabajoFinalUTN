@@ -4,9 +4,10 @@ export default function Hero({ onOpenModal, openForbiddenModal }) {
   const { isAuthenticated } = useAuthStore();
 
   return (
-    <section className="bg-red-300 w-dvw h-[calc(100vh-52px)]">
+    <section className="bg-gray-400 w-dvw h-[calc(100vh-52px)]">
       <div className="flex flex-col justify-center h-full p-8 gap-5 md:p-[10%] lg:pr-120 ">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl">TurnoFacil</h1>
+        <img src="/logo.png" alt="logo de turno facil" className="w-180" />
+
         <span className="md:text-2xl">
           La forma más simple de organizar tu negocio. Automatizá turnos,
           controlá cupos y gestioná alumnos y profesores desde cualquier

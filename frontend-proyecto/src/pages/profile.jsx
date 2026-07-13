@@ -89,7 +89,7 @@ export default function Profile() {
 
   return (
     <MainLayout>
-      <div className="mt-16 grid lg:grid-cols-[0.8fr_1fr] w-[80%] gap-10">
+      <div className="mt-16 grid lg:grid-cols-[0.8fr_1fr] w-[90%] min-[900px]:w-[80%] gap-10">
         <Navbar user={user} />
 
         <div className="w-full lg:max-w-120">
@@ -97,7 +97,7 @@ export default function Profile() {
           {isAuthenticated ? (
             <form
               noValidate
-              className="flex max-w flex-col gap-6 mt-4"
+              className="flex max-w flex-col gap-4 mt-4"
               onSubmit={handleSubmit(onSubmit)}
             >
               <FormInput

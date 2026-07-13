@@ -23,12 +23,12 @@ export default function YourSpace() {
             administrás y aquellos a los que fuiste invitado.
           </p>
         </div>
-        <div className="grid gap-6 justify-center min-[900px]:grid-cols-2 w-[60%]">
+        <div className="grid gap-6 justify-center min-[900px]:grid-cols-2 w-full min-[900px]:w-[65%] min-[1350px]:w-[50%]">
           {isLoading ? (
             <p>xd</p>
           ) : (
             myTenants?.map((t) => (
-              <Link href={`tu-espacio/${t.id}`}>
+              <Link key={t.id} href={`tu-espacio/${t.id}`}>
                 <MyTenantCard myTenant={t} key={t.id} />
               </Link>
             ))

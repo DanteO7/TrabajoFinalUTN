@@ -72,11 +72,13 @@ export default function SignIn() {
   };
 
   return (
-    <div className="bg-[#ede9ee] h-screen text-[10px] flex">
-      <div className="hidden min-[900px]:flex w-[60%] bg-gray-800 flex flex-col">
+    <div className="bg-[#ede9ee] h-screen text-[11px] flex">
+      <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-gray-800 flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
-          <p className=" text-gray-400 text-2xl">Iniciar sesión</p>
+          <p className=" text-gray-400 font-semibold text-2xl">
+            Iniciar sesión
+          </p>
           <h3 className="text-gray-300 text-xl mt-2">
             Gestioná todos tus negocios desde un solo lugar
           </h3>
@@ -91,7 +93,7 @@ export default function SignIn() {
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
             Turno Fácil
           </h2>
-          <p className="text-center text-gray-700 text-[16px]">
+          <p className="text-center font-semibold text-gray-700 text-[17px]">
             Iniciar sesión
           </p>
           <div>

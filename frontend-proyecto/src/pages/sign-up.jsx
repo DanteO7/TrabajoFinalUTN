@@ -86,7 +86,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="bg-[#ede9ee] min-h-screen text-[10px] flex">
+    <div className="bg-[#ede9ee] min-h-screen text-[11px] flex">
       <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-[23%]">
         <form
           noValidate
@@ -96,7 +96,9 @@ export default function SignUp() {
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
             Turno Fácil
           </h2>
-          <p className="text-center text-gray-700 text-[16px]">Registrarse</p>
+          <p className="text-center text-gray-700 font-semibold text-[17px]">
+            Registrarse
+          </p>
           <div>
             <FormInput
               id="name"
@@ -197,10 +199,10 @@ export default function SignUp() {
           </Link>
         </form>
       </div>
-      <div className="hidden min-[900px]:flex w-[60%] bg-gray-800">
+      <div className="hidden min-[900px]:flex w-[60%] bg-gray-800 pt-2">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
-          <p className="text-gray-400 text-2xl">Registrarse</p>
+          <p className="text-gray-400 font-semibold text-2xl">Registrarse</p>
           <h3 className="text-gray-300 text-xl mt-2">
             Gestioná todos tus negocios desde un solo lugar
           </h3>
