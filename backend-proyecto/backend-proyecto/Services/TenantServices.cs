@@ -29,37 +29,41 @@ namespace backend_proyecto.Services
         }
 
         public async Task<ResponseTenantDTO> GetById(int id, int userId)
-        {
-            var tenant = await _tenantRepository.GetOneAsync(
-                t => t.Id == id,
-                t => t.OwnerUser,
-                t => t.TenantPlan
-            );
+{
+    var tenant = await _tenantRepository.GetOneAsync(
+        t => t.Id == id,
+        t => t.OwnerUser,
+        t => t.TenantPlan,
+        t => t.Professors,
+        t => t.Students
+    );
 
-            if (tenant == null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    "No existe el tenant"
-                );
-            }
+    if (tenant == null)
+    {
+        throw new HttpResponseError(
+            HttpStatusCode.NotFound,
+            "No existe el tenant"
+        );
+    }
 
-            var hasAccess =
-                tenant.OwnerUserId == userId ||
-                tenant.Professors.Any(p => p.UserId == userId) ||
-                tenant.Students.Any(s => s.UserId == userId);
+    var hasAccess =
+        tenant.OwnerUserId == userId ||
+        tenant.Professors.Any(p => p.UserId == userId) ||
+        tenant.Students.Any(s => s.UserId == userId);
 
+    if (!hasAccess)
+    {
+        throw new HttpResponseError(
+            HttpStatusCode.NotFound,
+            "No existe el tenant"
+        );
+    }
 
-            if (!hasAccess)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    "No existe el tenant"
-                );
-            }
+    var response = _mapper.Map<ResponseTenantDTO>(tenant);
+    response.Role = GetRole(tenant, userId);
 
-            return _mapper.Map<ResponseTenantDTO>(tenant);
-        }
+    return response;
+}
 
         public async Task<List<ResponseTenantDTO>> GetAllByOwnerId(int ownerId)
         {
@@ -192,6 +196,16 @@ namespace backend_proyecto.Services
             var tenants = await _tenantRepository.GetMyTenants(userId);
 
             return tenants;
+        }
+        private static string GetRole(Tenant tenant, int userId)
+        {
+            if (tenant.OwnerUserId == userId)
+                return Roles.TENANT;
+
+            if (tenant.Professors.Any(p => p.UserId == userId))
+                return Roles.PROFESSOR;
+
+            return Roles.STUDENT;
         }
     }
 }

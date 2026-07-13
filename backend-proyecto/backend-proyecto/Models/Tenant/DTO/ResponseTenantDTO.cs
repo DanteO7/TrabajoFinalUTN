@@ -8,6 +8,7 @@
         public string Name { get; set; } = null!;
         public bool IsActive { get; set; }
         public int TenantPlanId { get; set; }
+        public string Role { get; set; } = null!;
         public ResponseTenantPlanDTO TenantPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
     }
