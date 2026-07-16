@@ -42,15 +42,15 @@ export default function Footer() {
       </div>
       <hr className="text-gray-400" />
       <p className="text-center text-[0.8rem] text-gray-700">
-        <Link href="aviso-legal" className="hover:text-gray-900">
+        <Link href="/aviso-legal" className="hover:text-gray-900">
           Aviso Legal
         </Link>{" "}
         |{" "}
-        <Link href="politica-y-privacidad" className="hover:text-gray-900">
+        <Link href="/politica-y-privacidad" className="hover:text-gray-900">
           Política de Privacidad
         </Link>{" "}
         |{" "}
-        <Link href="terminos-y-condiciones" className="hover:text-gray-900">
+        <Link href="/terminos-y-condiciones" className="hover:text-gray-900">
           Términos y Condiciones
         </Link>
       </p>

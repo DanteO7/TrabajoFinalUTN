@@ -1,35 +1,25 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import FormInput from "../form-input";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createTenantSchema } from "../../schema/tenant-schema";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createTenant } from "../../services/tenant";
-import { getTenantPlans } from "../../services/tenant-plan";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ErrorModal from "../modals/error-modal";
 import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
+import { createActivity } from "../../services/activity";
+import { createActivitySchema } from "../../schema/activity-schema";
 
-export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
-  const { data: plans, isLoading } = useQuery({
-    queryKey: ["tenantsPlan"],
-    queryFn: getTenantPlans,
-  });
+export default function ActivityForm({ tenantId, close }) {
+  const queryClient = useQueryClient();
 
   const {
     register,
     handleSubmit,
-    watch,
-    reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createTenantSchema),
+    resolver: zodResolver(createActivitySchema),
     mode: "onTouched",
-    defaultValues: {
-      name: "",
-      tenantPlanId: selectedPlan?.id || "",
-    },
   });
 
   const [backendError, setBackendError] = useState();
@@ -38,10 +28,11 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const [succesModal, setSuccesModal] = useState(false);
 
   const mutation = useMutation({
-    mutationKey: ["createTenant"],
-    mutationFn: createTenant,
+    mutationKey: ["createActivity"],
+    mutationFn: createActivity,
     onSuccess: () => {
-      setSuccessMessage("Negocio creado correctamente");
+      queryClient.invalidateQueries(["getActivities", tenantId]);
+      setSuccessMessage("Actividad creada correctamente");
       setSuccesModal(true);
       setBackendError(null);
 
@@ -51,7 +42,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al crear tu negocio";
+      let msg = "Ocurrió un error al crear la actividad";
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -61,22 +52,16 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
     },
   });
 
-  const selectedPlanId = Number(watch("tenantPlanId"));
-  const currentPlan = plans.find((p) => p.id === selectedPlanId);
-
-  const onSubmit = (data) => {
+  const onSubmit = (form) => {
+    const data = {
+      name: form.name,
+      description: form.descrition,
+      tenantId,
+    };
     mutation.mutate(data);
   };
 
-  useEffect(() => {
-    reset({
-      name: "",
-      tenantPlanId: selectedPlan?.id || "",
-    });
-  }, [selectedPlan, reset]);
-
   const handleClose = () => {
-    setSelectedPlan(null);
     close();
   };
 
@@ -90,50 +75,40 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear tu negocio
+        Crear una actividad
       </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre del negocio"
+          label="Nombre de la actividad"
           id="name"
-          placeholder="Ej: Gym Power"
+          placeholder="Ej: Pilates, Bicicleta, etc."
           register={register("name")}
           error={errors.name}
         />
-
         <div>
-          <label className="block mb-2">Plan</label>
-          <select
-            className="w-full rounded-[13px] px-3 py-2 border border-gray-200 bg-[#efefef]"
-            {...register("tenantPlanId")}
-          >
-            <option value="">
-              {isLoading ? "Cargando..." : "Seleccionar plan"}
-            </option>
-            {plans.map((plan) => (
-              <option key={plan.id} value={plan.id}>
-                {plan.name}
-              </option>
-            ))}
-          </select>
+          <label htmlFor="description" className="block mb-2">
+            Descripción (opcional)
+          </label>
 
-          {errors.tenantPlanId && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.tenantPlanId.message}
+          <textarea
+            id="description"
+            rows={4}
+            placeholder="Explicación de la actividad..."
+            {...register("description")}
+            className="w-full rounded-[13px] px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-[13px] mt-1">
+              {errors.description.message}
             </p>
           )}
-        </div>
-
-        <div className="text-center bg-[#efefef] rounded-xl py-3">
-          <p className="text-sm text-gray-600">Precio mensual</p>
-          <p className="text-2xl font-semibold">${currentPlan?.price || 0}</p>
         </div>
 
         <button
           type="submit"
           className="mt-2 bg-[#333] text-[#efefef] rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer"
         >
-          Contratar
+          Crear actividad
         </button>
       </form>
       {errorModal && (

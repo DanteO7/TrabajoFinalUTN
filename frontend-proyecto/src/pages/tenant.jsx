@@ -153,9 +153,9 @@ export default function Tenant({ id }) {
       <div className="w-full max-w-6xl mt-12">
         <button
           onClick={() => setLocation("/tu-espacio")}
-          className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6"
+          className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack className="cursor-pointer" />
+          <IoArrowBack />
           Tu espacio
         </button>
         {isLoading ? (

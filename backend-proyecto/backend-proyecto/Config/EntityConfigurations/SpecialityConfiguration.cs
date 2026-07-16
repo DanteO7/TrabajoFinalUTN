@@ -11,10 +11,17 @@ namespace backend_proyecto.Config.EntityConfigurations
             entity.HasKey(s => s.Id);
             entity.Property(s => s.Name).IsRequired().HasMaxLength(50);
 
+            entity.Property(s => s.Description)
+                  .HasMaxLength(300)
+                  .IsRequired(false);
+
             entity.HasOne(s => s.Tenant)
                   .WithMany()
                   .HasForeignKey(s => s.TenantId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(s => new { s.TenantId, s.Name })
+                  .IsUnique();
         }
     }
 }

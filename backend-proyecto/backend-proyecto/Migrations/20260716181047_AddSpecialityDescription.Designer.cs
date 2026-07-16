@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend_proyecto.Config;
@@ -11,9 +12,11 @@ using backend_proyecto.Config;
 namespace backend_proyecto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260716181047_AddSpecialityDescription")]
+    partial class AddSpecialityDescription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -473,41 +476,6 @@ namespace backend_proyecto.Migrations
                     b.ToTable("Classes");
                 });
 
-            modelBuilder.Entity("backend_proyecto.Models.Invitation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<int>("TenantId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("Token")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("Used")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.ToTable("Invitations");
-                });
-
             modelBuilder.Entity("backend_proyecto.Models.PasswordReset", b =>
                 {
                     b.Property<int>("Id")
@@ -944,17 +912,6 @@ namespace backend_proyecto.Migrations
                     b.Navigation("Activity");
 
                     b.Navigation("Professor");
-
-                    b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("backend_proyecto.Models.Invitation", b =>
-                {
-                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
-                        .WithMany()
-                        .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Tenant");
                 });

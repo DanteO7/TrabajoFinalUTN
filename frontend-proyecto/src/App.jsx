@@ -24,6 +24,7 @@ import Activities from "./pages/tenant/activities";
 import Specialities from "./pages/tenant/specialities";
 import Payments from "./pages/tenant/payments";
 import Groups from "./pages/tenant/groups";
+import Invitation from "./pages/invitation";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +125,10 @@ export default function App() {
 
           <Route path="/tu-espacio/:id/grupos">
             {(params) => <Groups tenantId={params.id} />}
+          </Route>
+
+          <Route path="/invitacion/:token">
+            {(params) => <Invitation token={params.token} />}
           </Route>
         </Switch>
       </Suspense>

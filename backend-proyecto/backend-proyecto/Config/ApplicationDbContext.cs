@@ -25,7 +25,7 @@ namespace backend_proyecto.Config
         public DbSet<GroupPermission> GroupPermissions { get; set; } = null!;
         public DbSet<EmailVerification> EmailVerifications { get; set; }
         public DbSet<PasswordReset> PasswordResets { get; set; }
-
+        public DbSet<Invitation> Invitations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

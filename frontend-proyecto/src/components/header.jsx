@@ -30,19 +30,21 @@ export default function Header() {
         <nav className="hidden min-[900px]:flex gap-8"></nav>
 
         <div className="flex gap-5 items-center">
-          <Link
-            href="tu-espacio"
-            className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-0.75"
-          >
-            Tu espacio
-          </Link>
+          {isAuthenticated && (
+            <Link
+              href="/tu-espacio"
+              className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-0.75"
+            >
+              Tu espacio
+            </Link>
+          )}
           {isAuthenticated ? (
-            <Link href="perfil">
+            <Link href="/perfil">
               <IoPersonSharp size={22} />
             </Link>
           ) : (
             <Link
-              href="iniciar-sesion"
+              href="/iniciar-sesion"
               className="border rounded-xl px-2 py-1 text-[13px]"
             >
               Inicia sesión
@@ -89,13 +91,13 @@ export default function Header() {
                 Inicio
               </Link>
               <Link
-                href="perfil"
+                href="/perfil"
                 className="cursor-pointer transition-all duration-200 "
               >
                 Perfil
               </Link>
               <Link
-                href="tu-espacio"
+                href="/tu-espacio"
                 className="cursor-pointer transition-all duration-200 "
               >
                 Tu espacio
@@ -103,7 +105,7 @@ export default function Header() {
               <li className="cursor-pointer transition-all duration-200 "></li>
             </ul>
           </nav>
-          <Link href="ajustes">
+          <Link href="/ajustes">
             <IoMdSettings size={22} />
           </Link>
         </div>

@@ -76,11 +76,6 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
             }
 
-            if (updateSpecialityDTO.Name == speciality.Name)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser igual al anterior");
-            }
-
             _mapper.Map(updateSpecialityDTO, speciality);
             await _specialityRepository.UpdateOneAsync(speciality);
             return _mapper.Map<ResponseSpecialityDTO>(speciality);

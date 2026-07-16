@@ -67,7 +67,8 @@ builder.Services.AddScoped<ProfessorServices>();
 builder.Services.AddScoped<ReservationServices>();
 builder.Services.AddScoped<GroupServices>();
 builder.Services.AddScoped<PermissionService>();
-builder.Services.AddScoped<EmailServices>();
+builder.Services.AddScoped<EmailServices>(); 
+builder.Services.AddScoped<InvitationServices>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
@@ -81,7 +82,8 @@ builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
 builder.Services.AddScoped<IProfessorRepository, ProfessorRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>(); 
+builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));
