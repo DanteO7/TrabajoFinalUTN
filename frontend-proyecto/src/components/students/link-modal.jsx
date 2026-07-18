@@ -1,26 +1,30 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import {
   createInvitation,
+  deleteInvitation,
   getInvitationByTenant,
 } from "../../services/invitation";
 
-export default function LinkModal({ tenantId, close }) {
+export default function StudentForm({ tenantId, close }) {
+  const queryClient = useQueryClient();
+
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
-  // Obtener la invitación actual
   const { data: currentInvitation, isLoading } = useQuery({
     queryKey: ["invitation", tenantId],
     queryFn: () => getInvitationByTenant(tenantId),
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const mutation = useMutation({
@@ -30,13 +34,8 @@ export default function LinkModal({ tenantId, close }) {
         role: "Student",
       }),
 
-    onSuccess: () => {
-      setSuccessMessage("Link generado correctamente.");
-      setSuccessModal(true);
-
-      setTimeout(() => {
-        setSuccessModal(false);
-      }, 3000);
+    onSuccess: (data) => {
+      queryClient.setQueryData(["invitation", tenantId], data);
     },
 
     onError: (error) => {
@@ -47,6 +46,21 @@ export default function LinkModal({ tenantId, close }) {
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteInvitation(id),
+    onSuccess: () => {
+      queryClient.setQueryData(["invitation", tenantId], null);
+    },
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Error al eliminar el link.";
+      if (data?.message) msg = data.message;
 
       setBackendError(msg);
       setErrorModal(true);
@@ -89,7 +103,7 @@ export default function LinkModal({ tenantId, close }) {
               onClick={() =>
                 navigator.clipboard.writeText(currentInvitation.link)
               }
-              className="w-full bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition"
+              className="cursor-pointer w-full bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition"
             >
               Copiar link
             </button>
@@ -109,6 +123,15 @@ export default function LinkModal({ tenantId, close }) {
           >
             {mutation.isPending ? "Generando..." : "Generar nuevo link"}
           </button>
+          {hasValidLink && (
+            <button
+              onClick={() => deleteMutation.mutate(currentInvitation.id)}
+              disabled={deleteMutation.isPending}
+              className="cursor-pointer w-full mt-2 bg-red-500 text-white rounded-xl py-2 hover:bg-red-600 transition"
+            >
+              {deleteMutation.isPending ? "Eliminando..." : "Eliminar link"}
+            </button>
+          )}
         </>
       ) : (
         <>

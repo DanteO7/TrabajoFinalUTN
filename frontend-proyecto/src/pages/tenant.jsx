@@ -13,11 +13,18 @@ import { getTenantById } from "../services/tenant";
 import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
+import { useState } from "react";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
+  const [error, setError] = useState();
 
-  const { data: tenant, isLoading } = useQuery({
+  const {
+    data: tenant,
+    isLoading,
+    isError,
+    error: backendError,
+  } = useQuery({
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
   });
@@ -26,7 +33,7 @@ export default function Tenant({ id }) {
     Tenant: [
       {
         title: "Alumnos",
-        description: "Administrá todos los alumnos del espacio.",
+        description: "Administrá los alumnos del espacio.",
         icon: <FaUsers size={30} />,
         href: "alumnos",
       },
@@ -159,9 +166,15 @@ export default function Tenant({ id }) {
           Tu espacio
         </button>
         {isLoading ? (
-          <p>xd</p>
+          <p>Cargando...</p>
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            {backendError?.response?.data?.message ||
+              backendError?.response?.data ||
+              "Ocurrió un error al cargar el negocio."}
+          </div>
         ) : (
-          <div className="flex justify-between items-start flex-wrap gap-5">
+          <div className="flex flex-col justify-between items-start flex-wrap gap-5">
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
                 {tenant?.name}
@@ -194,7 +207,7 @@ export default function Tenant({ id }) {
               </p>
             </div>
 
-            <div className="grid gap-6 mt-10 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-6 mt-10 mx-auto min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3">
               {cards?.map((section) => (
                 <Link
                   key={section.href}

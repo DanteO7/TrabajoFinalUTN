@@ -55,7 +55,7 @@ export default function ActivityForm({ tenantId, close }) {
   const onSubmit = (form) => {
     const data = {
       name: form.name,
-      description: form.descrition,
+      description: form.description,
       tenantId,
     };
     mutation.mutate(data);

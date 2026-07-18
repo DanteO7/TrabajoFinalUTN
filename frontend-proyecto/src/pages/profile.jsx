@@ -30,6 +30,8 @@ export default function Profile() {
 
   const [openChangeEmail, setOpenChangeEmail] = useState(false);
 
+  const [seconds, setSeconds] = useState(0);
+
   const {
     register,
     getValues,
@@ -80,7 +82,17 @@ export default function Profile() {
       forgotPassword({
         email: getValues("email"),
       });
+      setSeconds(30);
       setOpenForgotPassword(true);
+      const interval = setInterval(() => {
+        setSeconds((s) => {
+          if (s <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return s - 1;
+        });
+      }, 1000);
     } catch (error) {
       setBackendError(`Error enviando email: ${error}`);
       setErrorModal(true);
@@ -145,16 +157,21 @@ export default function Profile() {
               <button
                 type="submit"
                 disabled={isSubmitting || mutation.isPending}
-                className="text-[#efefef] w-fit bg-[#333] rounded-[13px] px-5 py-2  cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+                className="text-[#efefef] w-fit bg-[#333] rounded-[13px] px-5 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
               >
                 {mutation.isPending ? "Actualizando" : "Actualizar perfil"}
               </button>
               <button
                 type="button"
                 onClick={handleForgotPassword}
-                className="text-[#efefef] w-fit bg-[#333] rounded-[13px] px-5 py-2  cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+                disabled={seconds > 0}
+                className={`w-fit rounded-[13px] px-5 py-2 border-[1.7px] border-[#333] transition-all duration-300 ${
+                  seconds > 0
+                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                    : "hover:bg-gray-300 hover:text-[#333] cursor-pointer"
+                }`}
               >
-                Cambiar contraseña
+                {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
               </button>
               <button
                 onClick={() => {

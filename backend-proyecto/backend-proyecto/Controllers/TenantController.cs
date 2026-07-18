@@ -1,8 +1,10 @@
-﻿using backend_proyecto.Enums;
+﻿using AutoMapper;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -14,9 +16,16 @@ namespace backend_proyecto.Controllers
     public class TenantController : ControllerBase
     {
         private readonly TenantServices _tenantServices;
-        public TenantController(TenantServices tenantServices)
+        private readonly IUserServices _userServices;
+        private readonly AuthServices _authServices;
+        private readonly IMapper _mapper;
+
+        public TenantController(TenantServices tenantServices, IUserServices userServices, AuthServices authServices, IMapper mapper)
         {
             _tenantServices = tenantServices;
+            _userServices = userServices;
+            _authServices = authServices;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -42,7 +51,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}, {Roles.STUDENT}")]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -51,7 +60,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirst("id")!.Value);
-
+                
                 var tenant = await _tenantServices.GetById(id, userId);
                 return Ok(tenant);
             }
@@ -97,6 +106,13 @@ namespace backend_proyecto.Controllers
             try
             {
                 var tenant = await _tenantServices.CreateOne(createTenantDTO);
+
+                var user = await _userServices.GetOneById(createTenantDTO.OwnerUserId);
+                var userDto = _mapper.Map<UserWithoutPassDTO>(user);
+
+                var token = await _authServices.GenerateJwt(userDto);
+                _authServices.SetCookie(token, HttpContext);
+
                 return Created("Created", tenant);
             }
             catch (HttpResponseError ex)

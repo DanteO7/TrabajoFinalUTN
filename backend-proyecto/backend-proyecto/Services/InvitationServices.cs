@@ -41,10 +41,11 @@ namespace backend_proyecto.Services
                     $"No se encontró un tenant con el Id = '{dto.TenantId}'");
             }
 
-            if (dto.Role != Roles.STUDENT && dto.Role != Roles.PROFESSOR)
+            // ← Eliminar la invitación anterior
+            var oldInvitation = await _invitationRepository.GetOneAsync(i => i.TenantId == dto.TenantId);
+            if (oldInvitation != null)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    $"El rol '{dto.Role}' no es válido. Los roles permitidos son '{Roles.STUDENT}' y '{Roles.PROFESSOR}'");
+                await _invitationRepository.DeleteOneAsync(oldInvitation);
             }
 
             var invitation = new Invitation
@@ -59,7 +60,9 @@ namespace backend_proyecto.Services
 
             return new ResponseInvitationDTO
             {
-                Link = $"http://localhost:5173/invitacion/{invitation.Token}"
+                Id = invitation.Id,
+                Link = $"http://localhost:5173/invitacion/{invitation.Token}",
+                ExpirationDate = invitation.ExpirationDate
             };
         }
 
@@ -207,6 +210,7 @@ namespace backend_proyecto.Services
 
             return new ResponseInvitationDTO
             {
+                Id = invitation.Id,
                 Link = $"http://localhost:5173/invitacion/{invitation.Token}",
                 ExpirationDate = invitation.ExpirationDate
             };
