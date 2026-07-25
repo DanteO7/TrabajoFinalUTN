@@ -7,6 +7,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { Link } from "wouter";
 import ActivityForm from "../../components/activities/activity-form";
 import ActivityModal from "../../components/activities/activity-modal";
+import Loading from "../../components/loading";
 
 export default function Activities({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -36,7 +37,7 @@ export default function Activities({ tenantId }) {
         </button>
 
         {isLoading ? (
-          <p>Cargando...</p>
+          <Loading />
         ) : (
           <>
             <div>

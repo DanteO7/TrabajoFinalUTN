@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMyTenants } from "../services/tenant";
 import MyTenantCard from "../components/your-space/my-tenant-card";
 import { Link } from "wouter";
+import Loading from "../components/loading";
 
 export default function YourSpace() {
   const { data: myTenants, isLoading } = useQuery({
@@ -23,18 +24,17 @@ export default function YourSpace() {
             administrás y aquellos a los que fuiste invitado.
           </p>
         </div>
-        <div className="grid gap-6 justify-center min-[900px]:grid-cols-2 w-full min-[900px]:w-[65%] min-[1350px]:w-[50%]">
-          {isLoading ? (
-            <p>xd</p>
-          ) : (
-            myTenants?.map((t) => (
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <div className="grid gap-6 justify-center min-[900px]:grid-cols-2 w-full min-[900px]:w-[65%] min-[1350px]:w-[50%]">
+            {myTenants?.map((t) => (
               <Link key={t.id} href={`tu-espacio/${t.id}`}>
                 <MyTenantCard myTenant={t} key={t.id} />
               </Link>
-            ))
-          )}
-          {}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </MainLayout>
   );

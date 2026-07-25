@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import SpecialityForm from "../../components/specialities/speciality-form";
 import SpecialityModal from "../../components/specialities/speciality-modal";
+import Loading from "../../components/loading";
 
 export default function Specialities({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -33,9 +34,8 @@ export default function Specialities({ tenantId }) {
           <IoArrowBack />
           Volver
         </button>
-
         {isLoading ? (
-          <p>Cargando...</p>
+          <Loading />
         ) : (
           <>
             <div>

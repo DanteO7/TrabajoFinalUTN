@@ -14,6 +14,7 @@ import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
 import { useState } from "react";
+import Loading from "../components/loading";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
@@ -166,7 +167,7 @@ export default function Tenant({ id }) {
           Tu espacio
         </button>
         {isLoading ? (
-          <p>Cargando...</p>
+          <Loading />
         ) : isError ? (
           <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
             {backendError?.response?.data?.message ||

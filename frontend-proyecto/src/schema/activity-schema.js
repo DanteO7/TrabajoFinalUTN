@@ -5,7 +5,7 @@ export const createActivitySchema = z.object({
     .string()
     .trim()
     .min(1, "El nombre es obligatorio")
-    .max(50, "El nombre no puede superar los 50 caracteres"),
+    .max(20, "El nombre no puede superar los 50 caracteres"),
 
   description: z
     .string()

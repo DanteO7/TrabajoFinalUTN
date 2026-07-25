@@ -5,6 +5,7 @@ import { getStudents } from "../../services/student";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import LinkModal from "../../components/students/link-modal";
+import Loading from "../../components/loading";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -40,7 +41,7 @@ export default function Students({ tenantId }) {
         </button>
 
         {isLoading ? (
-          <p>Cargando...</p>
+          <Loading />
         ) : (
           <>
             <div>
@@ -107,11 +108,11 @@ export default function Students({ tenantId }) {
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
-                  <h3 className="text-xl font-semibold">
+                  <h3 className="text-xl  font-semibold">
                     Todavía no hay alumnos
                   </h3>
 
-                  <p className="text-gray-500 mt-2 mb-6">
+                  <p className="text-gray-500 px-2 mt-2 mb-6">
                     Invitá tu primer alumno para comenzar.
                   </p>
 

@@ -31,7 +31,7 @@ export default function LinkModal({ tenantId, close }) {
     mutationFn: () =>
       createInvitation({
         tenantId,
-        role: "Student",
+        role: "Professor",
       }),
 
     onSuccess: (data) => {
@@ -83,7 +83,7 @@ export default function LinkModal({ tenantId, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold text-center mb-6">
-        Invitar alumno
+        Invitar profesor
       </h2>
 
       {isLoading ? (

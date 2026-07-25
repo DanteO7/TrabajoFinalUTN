@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateActivity, deleteActivity } from "../../services/activity";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createActivitySchema } from "../../schema/activity-schema";
 
 export default function ActivityModal({ activity, tenantId, close }) {
   const [editing, setEditing] = useState(false);
@@ -21,11 +23,18 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       name: activity.name,
       description: activity.description,
     },
+    resolver: zodResolver(createActivitySchema),
+    mode: "onTouched",
   });
 
   const deleteMutation = useMutation({
@@ -130,7 +139,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
             <button
               onClick={() => setEditing(true)}
-              className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              className="cursor-pointer flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
             >
               <Pencil size={18} />
               Editar
@@ -143,7 +152,11 @@ export default function ActivityModal({ activity, tenantId, close }) {
             Editar actividad
           </h2>
 
-          <FormInput label="Nombre" register={register("name")} />
+          <FormInput
+            label="Nombre"
+            register={register("name")}
+            error={errors.name}
+          />
 
           <div>
             <label className="block mb-2">Descripción</label>
@@ -151,8 +164,13 @@ export default function ActivityModal({ activity, tenantId, close }) {
             <textarea
               rows={4}
               {...register("description")}
-              className="w-full rounded-xl bg-[#efefef] border px-3 py-2 resize-none"
+              className={`w-full rounded-xl bg-[#efefef] border-[1.7px] px-3 py-2 resize-none ${errors.description ? "border-red-500" : "border-gray-300"}`}
             />
+            {errors.description && (
+              <p className="text-red-500 text-[13px] mt-1">
+                {errors.description.message}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3">
@@ -162,14 +180,14 @@ export default function ActivityModal({ activity, tenantId, close }) {
                 reset();
                 setEditing(false);
               }}
-              className="border px-4 py-2 rounded-xl"
+              className="cursor-pointer border px-4 py-2 rounded-xl transition-all duration-200 hover:bg-gray-200"
             >
               Cancelar
             </button>
 
             <button
               type="submit"
-              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              className="cursor-pointer bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-[#222] transition-all duration-200"
             >
               Guardar cambios
             </button>

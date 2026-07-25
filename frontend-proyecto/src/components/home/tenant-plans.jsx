@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getTenantPlans } from "../../services/tenant-plan";
 import PlanCard from "./plan-card";
 import { useAuthStore } from "../../store/auth-store";
+import Loading from "../loading";
 
 export default function TenantPlans({
   onOpenModal,
@@ -15,7 +16,7 @@ export default function TenantPlans({
     queryFn: getTenantPlans,
   });
 
-  if (isLoading) return <p>Cargando...</p>;
+  if (isLoading) return <Loading />;
 
   return (
     <section className="flex flex-col justify-center items-center w-full gap-5">

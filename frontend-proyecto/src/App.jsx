@@ -25,6 +25,7 @@ import Specialities from "./pages/tenant/specialities";
 import Payments from "./pages/tenant/payments";
 import Groups from "./pages/tenant/groups";
 import Invitation from "./pages/invitation";
+import Loading from "./components/loading";
 
 const queryClient = new QueryClient();
 
@@ -53,7 +54,7 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={"cargando"}>
+      <Suspense fallback={<Loading />}>
         <Switch>
           <Route path={"/"}>
             <Home />
