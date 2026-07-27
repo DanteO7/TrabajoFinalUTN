@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="flex justify-between items-center flex-col-reverse gap-4 lg:gap-15 md:flex-row">
         <div>
           <p className="m-2 text-center md:text-left ">
-            Teléfono:(+54) 3400-532514 | Email: dante.orsetti@gmail.com
+            Teléfono:(+54) 3400-532514 | Email: contacto@turnofacilapp.com.ar
           </p>
           <p className="m-2 text-center md:text-left">
             &copy;2026 Turno Facil. Todos los derechos reservados.

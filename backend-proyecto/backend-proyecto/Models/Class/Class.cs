@@ -9,7 +9,7 @@
         public Professor Professor { get; set; } = null!;
         public int TenantId { get; set; }
         public Tenant Tenant { get; set; } = null!;
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public int MaxCapacity { get; set; }

@@ -15,6 +15,7 @@ import { useLocation } from "wouter";
 import SuccessModal from "../components/modals/success-modal";
 import ChangeEmailForm from "../components/profile/change-email-form";
 import EmailSentModal from "../components/modals/email-sent-modal";
+import { useEffect } from "react";
 
 export default function Profile() {
   const { user, isAuthenticated, login, logout } = useAuthStore();
@@ -77,24 +78,71 @@ export default function Profile() {
     mutation.mutate({ id: user.id, data });
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem("forgotPasswordCooldown");
+
+    if (saved) {
+      const remaining = Math.max(
+        0,
+        Math.ceil((Number(saved) - Date.now()) / 1000),
+      );
+
+      setSeconds(remaining);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (seconds <= 0) return;
+
+    const interval = setInterval(() => {
+      const saved = localStorage.getItem("forgotPasswordCooldown");
+
+      if (!saved) {
+        setSeconds(0);
+        return;
+      }
+
+      const remaining = Math.max(
+        0,
+        Math.ceil((Number(saved) - Date.now()) / 1000),
+      );
+
+      setSeconds(remaining);
+
+      if (remaining <= 0) {
+        localStorage.removeItem("forgotPasswordCooldown");
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [seconds]);
+
   const handleForgotPassword = async () => {
     try {
-      forgotPassword({
+      await forgotPassword({
         email: getValues("email"),
       });
-      setSeconds(30);
+
+      const endTime = Date.now() + 30_000;
+      localStorage.setItem("forgotPasswordCooldown", endTime.toString());
+
+      setSeconds(60);
       setOpenForgotPassword(true);
-      const interval = setInterval(() => {
-        setSeconds((s) => {
-          if (s <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return s - 1;
-        });
-      }, 1000);
     } catch (error) {
-      setBackendError(`Error enviando email: ${error}`);
+      if (error.response?.status === 429) {
+        const remaining = error.response.data.remainingSeconds;
+
+        setSeconds(remaining);
+
+        localStorage.setItem(
+          "forgotPasswordCooldown",
+          (Date.now() + remaining * 1000).toString(),
+        );
+
+        return;
+      }
+      setBackendError("Error enviando el correo.");
       setErrorModal(true);
     }
   };
@@ -219,6 +267,8 @@ export default function Profile() {
           close={() => setOpenForgotPassword(false)}
           email={user.email}
           isSuccesOrError={true}
+          sendAgain={handleForgotPassword}
+          seconds={seconds}
         />
       )}
     </MainLayout>

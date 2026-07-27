@@ -28,14 +28,14 @@ namespace backend_proyecto.Services
             _reservationRepository = reservationRepository;
         }
 
-        public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateTime date)
+        public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date)
         {
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
-            var classes = await _classRepository.GetAllAsync(c => c.TenantId == tenantId && c.Date.Date == date.Date, c => c.Activity, c => c.Professor, c => c.Reservations);
+            var classes = await _classRepository.GetAllAsync(c => c.TenantId == tenantId && c.Date == date, c => c.Activity, c => c.Professor, c => c.Reservations);
             return _mapper.Map<List<ResponseClassDTO>>(classes);
         }
 
@@ -59,9 +59,9 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createClassDTO.TenantId}'");
             }
 
-            if(createClassDTO.Date.Date < DateTime.Now.Date)
+            if (createClassDTO.Date < DateOnly.FromDateTime(DateTime.Now))
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede crear una clase para un dia anterior = '{createClassDTO.Date.Date}'");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede crear una clase para un dia anterior = '{createClassDTO.Date}'");
             }
 
             if(createClassDTO.StartTime >= createClassDTO.EndTime)
@@ -136,9 +136,9 @@ namespace backend_proyecto.Services
 
             if (updateClassDTO.Date != null)
             {
-                if (updateClassDTO.Date.Value.Date < DateTime.Now.Date)
+                if (updateClassDTO.Date < DateOnly.FromDateTime(DateTime.Now))
                 {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede asignar una clase a un día anterior = '{updateClassDTO.Date.Value.Date}'");
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede asignar una clase a un día anterior = '{updateClassDTO.Date}'");
                 }
             }
 

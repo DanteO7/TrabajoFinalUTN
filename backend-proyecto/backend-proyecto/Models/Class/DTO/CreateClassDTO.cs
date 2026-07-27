@@ -14,7 +14,7 @@ namespace backend_proyecto.Models.DTOs
         public int TenantId { get; set; }
         
         [Required]
-        public DateTime Date { get; set; }
+        public DateOnly Date { get; set; }
 
         [Required]
         public TimeOnly StartTime { get; set; }

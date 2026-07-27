@@ -20,7 +20,7 @@ namespace backend_proyecto.Repositories
         {
             return await _db.Classes.AnyAsync(c =>
                 c.ProfessorId == dto.ProfessorId &&
-                c.Date.Date == dto.Date.Date &&
+                c.Date == dto.Date &&
                 dto.StartTime < c.EndTime &&
                 dto.EndTime > c.StartTime &&
                 (classIdToIgnore == null || c.Id != classIdToIgnore)

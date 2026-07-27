@@ -42,7 +42,7 @@ namespace backend_proyecto.Services
             }
 
             // ← Eliminar la invitación anterior
-            var oldInvitation = await _invitationRepository.GetOneAsync(i => i.TenantId == dto.TenantId);
+            var oldInvitation = await _invitationRepository.GetOneAsync(i => i.TenantId == dto.TenantId && i.Role == dto.Role);
             if (oldInvitation != null)
             {
                 await _invitationRepository.DeleteOneAsync(oldInvitation);
@@ -182,6 +182,7 @@ namespace backend_proyecto.Services
 
             return new ResponseInvitationInfoDTO
             {
+                Id = invitation.Id,
                 TenantName = invitation.Tenant.Name,
                 Role = invitation.Role,
                 ExpirationDate = invitation.ExpirationDate

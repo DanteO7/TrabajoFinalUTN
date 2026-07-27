@@ -4,8 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getStudents } from "../../services/student";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-import LinkModal from "../../components/students/link-modal";
 import Loading from "../../components/loading";
+import LinkModal from "../../components/modals/link-modal";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();

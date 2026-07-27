@@ -1,5 +1,6 @@
 ﻿using backend_proyecto.Config;
 using backend_proyecto.Models;
+using backend_proyecto.Utils.Errors;
 using Humanizer;
 using Resend;
 using System.Security.Cryptography;
@@ -21,7 +22,7 @@ namespace backend_proyecto.Services
         {
             var message = new EmailMessage();
 
-            message.From = "onboarding@resend.dev";
+            message.From = "turnos@turnofacilapp.com.ar";
             message.To.Add(to);
             message.Subject = "Código de verificación";
             message.HtmlBody = $"<h1>Tu código es: {code}</h1>";
@@ -30,8 +31,26 @@ namespace backend_proyecto.Services
         }
         public async Task ForgotPassword(string to)
         {
+            var lastReset = _context.PasswordResets
+                .Where(pr => pr.Email == to && !pr.Used)
+                .OrderByDescending(pr => pr.CreatedAt)
+                .FirstOrDefault();
+
+            if (lastReset != null)
+            {
+                var secondsPassed = (DateTime.UtcNow - lastReset.CreatedAt).TotalSeconds;
+
+                if (secondsPassed < 60)
+                {
+                    var remaining = 60 - (int)secondsPassed;
+                    throw new CooldownException(remaining);
+                }
+
+                _context.PasswordResets.Remove(lastReset);
+            }
+
             var oldPasswordResets = _context.PasswordResets
-                .Where(pr => pr.Email == to && !pr.Used);
+                .Where(pr => pr.Email == to);
 
             _context.PasswordResets.RemoveRange(oldPasswordResets);
 
@@ -41,7 +60,6 @@ namespace backend_proyecto.Services
                 .TrimEnd('=');
             var passwordReset = new PasswordReset
             {
-                Id = 1,
                 Email = to,
                 Token = token,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(10),
@@ -50,10 +68,9 @@ namespace backend_proyecto.Services
             _context.PasswordResets.Add(passwordReset);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine(token);
             var message = new EmailMessage();
 
-            message.From = "onboarding@resend.dev";
+            message.From = "turnos@turnofacilapp.com.ar";
             message.To.Add(to);
             message.Subject = "Recuperación de contraseña";
             message.HtmlBody = $@"

@@ -1,0 +1,71 @@
+/* Contenedor principal */
+.rdp {
+  --rdp-cell-size: 50px;
+  --rdp-accent-color: #333;
+  --rdp-background-color: #f0f0f0;
+  font-size: 16px;
+}
+
+/* Encabezados de días (Lu, Ma, Mi...) */
+.rdp-head_cell {
+  color: #666;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Cada celda de día */
+.rdp-day {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Día de hoy */
+.rdp-day.rdp-day_today {
+  background-color: #e0e0e0 !important;
+  color: #333 !important;
+  font-weight: bold !important;
+}
+
+/* Día seleccionado */
+.rdp-day.rdp-day_selected {
+  background-color: #333 !important;
+  color: white !important;
+  font-weight: bold !important;
+}
+
+/* Mes/año en la cabecera */
+.rdp-caption {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  padding: 10px 0;
+}
+
+/* Botones de navegación */
+.rdp-button_previous,
+.rdp-button_next {
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+  border: 1px solid #ddd !important;
+}
+
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background-color: #e0e0e0 !important;
+}
+/* Color de las flechas de navegación */
+.rdp-button_previous svg,
+.rdp-button_next svg {
+  fill: #333 !important; /* ← Tu color aquí */
+}
+
+/* O si querés cambiar el color al pasar el mouse */
+.rdp-button_previous:hover svg,
+.rdp-button_next:hover svg {
+  fill: #666 !important;
+}
+
+.rdp-day_button {
+  --rdp-day_button-width: 35px;
+  --rdp-day_button-height: 35px; /* También hay de altura */
+}

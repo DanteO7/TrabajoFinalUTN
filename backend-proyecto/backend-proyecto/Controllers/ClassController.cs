@@ -25,7 +25,7 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(List<ResponseClassDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ResponseClassDTO>>> GetByDate(int tenantId, DateTime date)
+        public async Task<ActionResult<List<ResponseClassDTO>>> GetByDate(int tenantId, DateOnly date)
         {
             try
             {

@@ -3,9 +3,9 @@ import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-import LinkModal from "../../components/professors/link-modal";
 import { getProfessors } from "../../services/professor";
 import Loading from "../../components/loading";
+import LinkModal from "../../components/modals/link-modal";
 
 export default function Professors({ tenantId }) {
   const [, setLocation] = useLocation();

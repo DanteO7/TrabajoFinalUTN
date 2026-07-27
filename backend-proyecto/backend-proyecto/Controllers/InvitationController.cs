@@ -67,8 +67,6 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        // GET /api/invitation/{token}
-        // El frontend consulta los datos de la invitación antes de aceptar
         [HttpGet("{token}")]
         [Authorize]
         public async Task<ActionResult<ResponseInvitationInfoDTO>> GetInvitationInfo(Guid token)

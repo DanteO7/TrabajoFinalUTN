@@ -46,7 +46,7 @@ public class UpdateClassShould
             ActivityId = 1,
             ProfessorId = 1,
             TenantId = 1,
-            Date = DateTime.Now.AddDays(1),
+            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
             StartTime = new TimeOnly(10, 0),
             EndTime = new TimeOnly(11, 0),
             MaxCapacity = 20
@@ -171,7 +171,7 @@ public class UpdateClassShould
 
         var dto = new UpdateClassDTO
         {
-            Date = DateTime.Now.AddDays(-1)
+            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
         };
 
         _classRepoMock

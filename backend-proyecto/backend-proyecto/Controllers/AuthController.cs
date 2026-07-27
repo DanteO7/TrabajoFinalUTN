@@ -186,8 +186,18 @@ namespace backend_proyecto.Controllers
             [FromBody] ForgotPasswordDTO dto,
             [FromServices] EmailServices emailServices)
         {
-
-            await emailServices.ForgotPassword(dto.Email);
+            try
+            {
+                await emailServices.ForgotPassword(dto.Email);
+            }
+            catch (CooldownException ex)
+            {
+                return StatusCode(429, new
+                {
+                    message = ex.Message,
+                    remainingSeconds = ex.RemainingSeconds
+                });
+            }
 
             return Ok(new
             {

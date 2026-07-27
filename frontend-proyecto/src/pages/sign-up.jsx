@@ -82,6 +82,7 @@ export default function SignUp() {
     } catch (error) {
       setBackendError(error?.response?.data ?? "Error enviando el código");
       setErrorModal(true);
+      setSeconds(error.response.data.remainingSeconds);
     }
   };
 

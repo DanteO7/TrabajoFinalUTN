@@ -5,6 +5,7 @@ using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Moq;
 using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UnitTests.Services.Class;
 
@@ -58,7 +59,8 @@ public class GetClassesShould
 
         // Act
 
-        var result = await _classServices.GetClassesByDate(1, DateTime.Now);
+        var result = await _classServices.GetClassesByDate(1, DateOnly.FromDateTime(DateTime.Now)
+);
 
         // Assert
 
@@ -78,7 +80,7 @@ public class GetClassesShould
         // Act
 
         var ex = await Assert.ThrowsAsync<HttpResponseError>(() =>
-            _classServices.GetClassesByDate(1, DateTime.Now));
+            _classServices.GetClassesByDate(1, DateOnly.FromDateTime(DateTime.Now)));
 
         // Assert
 
