@@ -200,10 +200,10 @@ namespace backend_proyecto.Services
             await _invitationRepository.DeleteOneAsync(invitation);
         }
 
-        public async Task<ResponseInvitationDTO> GetInvitationByTenant(int tenantId)
+        public async Task<ResponseInvitationDTO> GetInvitationByTenant(int tenantId, string role)
         {
-            var invitation = await _invitationRepository.GetOneAsync(i => i.TenantId == tenantId);
-
+            var invitation = await _invitationRepository.GetOneAsync(
+                i => i.TenantId == tenantId && i.Role == role);
             if (invitation == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, "No hay invitación activa");

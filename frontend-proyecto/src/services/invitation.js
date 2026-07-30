@@ -10,5 +10,5 @@ export const acceptInvitation = (token, data) =>
 
 export const deleteInvitation = (id) => request("delete", `/invitations/${id}`);
 
-export const getInvitationByTenant = (tenantId) =>
-  request("get", `/invitations/tenant/${tenantId}`);
+export const getInvitationByTenant = (tenantId, role) =>
+  request("get", `/invitations/tenant/${tenantId}/${role}`);

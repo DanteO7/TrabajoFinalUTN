@@ -69,7 +69,7 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{token}")]
         [Authorize]
-        public async Task<ActionResult<ResponseInvitationInfoDTO>> GetInvitationInfo(Guid token)
+        public async Task<ActionResult<ResponseInvitationInfoDTO>> GetInvitationInfo([FromRoute] Guid token)
         {
             try
             {
@@ -105,13 +105,13 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpGet("tenant/{tenantId}")]
+        [HttpGet("tenant/{tenantId}/{role}")]
         [Authorize(Roles = Roles.TENANT)]
-        public async Task<ActionResult<ResponseInvitationDTO>> GetInvitationByTenant(int tenantId)
+        public async Task<ActionResult<ResponseInvitationDTO>> GetInvitationByTenant(int tenantId, string role)
         {
             try
             {
-                var result = await _invitationServices.GetInvitationByTenant(tenantId);
+                var result = await _invitationServices.GetInvitationByTenant(tenantId, role);
                 return Ok(result);
             }
             catch (HttpResponseError ex)

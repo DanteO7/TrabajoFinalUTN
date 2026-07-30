@@ -130,6 +130,7 @@ export default function Students({ tenantId }) {
               <LinkModal
                 tenantId={tenantId}
                 close={() => setOpenModal(false)}
+                role="Student"
               />
             )}
 

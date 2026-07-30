@@ -11,7 +11,7 @@ import {
   getInvitationByTenant,
 } from "../../services/invitation";
 
-export default function LinkModal({ tenantId, close }) {
+export default function LinkModal({ tenantId, close, role }) {
   const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
@@ -21,8 +21,8 @@ export default function LinkModal({ tenantId, close }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const { data: currentInvitation, isLoading } = useQuery({
-    queryKey: ["invitation", tenantId],
-    queryFn: () => getInvitationByTenant(tenantId),
+    queryKey: ["invitation", tenantId, role],
+    queryFn: () => getInvitationByTenant(tenantId, role),
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -31,11 +31,11 @@ export default function LinkModal({ tenantId, close }) {
     mutationFn: () =>
       createInvitation({
         tenantId,
-        role: "Professor",
+        role,
       }),
 
     onSuccess: (data) => {
-      queryClient.setQueryData(["invitation", tenantId], data);
+      queryClient.setQueryData(["invitation", tenantId, role], data);
     },
 
     onError: (error) => {
@@ -55,7 +55,7 @@ export default function LinkModal({ tenantId, close }) {
   const deleteMutation = useMutation({
     mutationFn: (id) => deleteInvitation(id),
     onSuccess: () => {
-      queryClient.setQueryData(["invitation", tenantId], null);
+      queryClient.setQueryData(["invitation", tenantId, role], null);
     },
     onError: (error) => {
       const data = error?.response?.data;
@@ -83,7 +83,7 @@ export default function LinkModal({ tenantId, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold text-center mb-6">
-        Invitar profesor
+        Invitar {role}
       </h2>
 
       {isLoading ? (
