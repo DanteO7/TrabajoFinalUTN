@@ -12,7 +12,7 @@ services:
     restart: unless-stopped
 
     networks:
-      - turnofacil-network
+      - proxy-network
 
     ports:
       - "8080:8080"
@@ -35,11 +35,11 @@ services:
     restart: unless-stopped
 
     networks:
-      - turnofacil-network
+      - proxy-network
 
     ports:
       - "3000:80"
 
 networks:
-  turnofacil-network:
-    driver: bridge
+  proxy-network:
+    external: true
