@@ -104,10 +104,10 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("health")]
-        [Authorize(Roles =$"{Roles.PROFESSOR}, {Roles.STUDENT}, {Roles.ADMIN}, {Roles.TENANT}")]
-        public bool Health()
+        [AllowAnonymous]
+        public IActionResult Health()
         {
-            return true;
+            return Ok();
         }
 
         [Authorize]
