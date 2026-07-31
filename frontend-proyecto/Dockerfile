@@ -1,22 +1,18 @@
-# ==========================
-# Etapa 1 - Build
-# ==========================
-
 FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
-RUN npm install
+RUN corepack enable
+RUN corepack install
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN pnpm build
 
-# ==========================
-# Etapa 2 - Runtime
-# ==========================
 
 FROM nginx:alpine
 
