@@ -1,32 +1,19 @@
-# ==========================
-# Etapa 1 - Build
-# ==========================
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
 
-# Copiamos primero los archivos que cambian poco
-COPY backend-proyecto/backend-proyecto.sln .
-COPY backend-proyecto/backend-proyecto/backend-proyecto.csproj backend-proyecto/
+COPY backend-proyecto/backend-proyecto/backend-proyecto.csproj backend-proyecto/backend-proyecto/
 
-# Restauramos las dependencias
-RUN dotnet restore backend-proyecto/backend-proyecto.csproj
+RUN dotnet restore backend-proyecto/backend-proyecto/backend-proyecto.csproj
 
-# Ahora copiamos todo el código
-COPY backend-proyecto/. .
+COPY backend-proyecto/ backend-proyecto/
 
-# Publicamos la aplicación
-WORKDIR /src/backend-proyecto
+WORKDIR /src/backend-proyecto/backend-proyecto
 
 RUN dotnet publish \
     -c Release \
     -o /app/publish \
     --no-restore
-
-# ==========================
-# Etapa 2 - Runtime
-# ==========================
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
