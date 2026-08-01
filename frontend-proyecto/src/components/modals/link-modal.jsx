@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Modal from "../modals/modal";
-import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import {
   createInvitation,
@@ -16,9 +15,6 @@ export default function LinkModal({ tenantId, close, role }) {
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-
-  const [successMessage, setSuccessMessage] = useState();
-  const [successModal, setSuccessModal] = useState(false);
 
   const { data: currentInvitation, isLoading } = useQuery({
     queryKey: ["invitation", tenantId, role],
@@ -51,6 +47,7 @@ export default function LinkModal({ tenantId, close, role }) {
       setErrorModal(true);
     },
   });
+  console.log(currentInvitation);
 
   const deleteMutation = useMutation({
     mutationFn: (id) => deleteInvitation(id),
@@ -155,14 +152,6 @@ export default function LinkModal({ tenantId, close, role }) {
         <ErrorModal
           close={() => setErrorModal(false)}
           message={backendError}
-          isSuccesOrError
-        />
-      )}
-
-      {successModal && (
-        <SuccessModal
-          close={() => setSuccessModal(false)}
-          message={successMessage}
           isSuccesOrError
         />
       )}

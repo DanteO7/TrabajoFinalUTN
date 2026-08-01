@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
+import StudentModal from "../../components/students/student-modal";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -28,6 +29,19 @@ export default function Students({ tenantId }) {
       student.user.email.toLowerCase().includes(search.toLowerCase())
     );
   });
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "Paid":
+        return "Pagado";
+      case "Pending":
+        return "Pendiente";
+      case "Overdue":
+        return "Vencido";
+      default:
+        return status;
+    }
+  };
 
   return (
     <MainLayout>
@@ -94,14 +108,14 @@ export default function Students({ tenantId }) {
                       <span
                         className={`text-xs rounded-full px-3 py-1
                         ${
-                          student.monthlyFeeStatus === "PAID"
+                          student.monthlyFeeStatus === "Paid"
                             ? "bg-green-100 text-green-700"
-                            : student.monthlyFeeStatus === "PENDING"
+                            : student.monthlyFeeStatus === "Pending"
                               ? "bg-yellow-100 text-yellow-700"
                               : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {student.monthlyFeeStatus}
+                        {getStatusLabel(student.monthlyFeeStatus)}
                       </span>
                     </div>
                   </div>

@@ -26,6 +26,7 @@ import Payments from "./pages/tenant/payments";
 import Groups from "./pages/tenant/groups";
 import Invitation from "./pages/invitation";
 import Loading from "./components/loading";
+import StudentPlans from "./pages/tenant/student-plans";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,10 @@ export default function App() {
 
           <Route path="/tu-espacio/:id/grupos">
             {(params) => <Groups tenantId={params.id} />}
+          </Route>
+
+          <Route path="/tu-espacio/:id/planes">
+            {(params) => <StudentPlans tenantId={params.id} />}
           </Route>
 
           <Route path="/invitacion/:token">

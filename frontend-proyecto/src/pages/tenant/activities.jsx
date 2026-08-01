@@ -1,29 +1,37 @@
 import React, { useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
-import { getActivities } from "../../services/activity";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-import { Link } from "wouter";
+import { getActivities } from "../../services/activity";
+import Loading from "../../components/loading";
 import ActivityForm from "../../components/activities/activity-form";
 import ActivityModal from "../../components/activities/activity-modal";
-import Loading from "../../components/loading";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function Activities({ tenantId }) {
   const [, setLocation] = useLocation();
 
   const [search, setSearch] = useState("");
-  const [openModal, setOpenModal] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
+
+  const getUserRoles = useTenantStore((state) => state.getUserRoles);
+  const userRoles = getUserRoles(tenantId);
+  const isTenant = userRoles?.roles?.includes("Tenant");
 
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ["getActivities", tenantId],
     queryFn: () => getActivities(tenantId),
   });
 
-  const filteredActivities = activities.filter((a) =>
-    a.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredActivities = activities.filter((activity) => {
+    return (
+      activity.name.toLowerCase().includes(search.toLowerCase()) ||
+      (activity.description &&
+        activity.description.toLowerCase().includes(search.toLowerCase()))
+    );
+  });
 
   return (
     <MainLayout>
@@ -46,10 +54,10 @@ export default function Activities({ tenantId }) {
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar todas las actividades que se darán
-                en tu negocio.
+                Desde acá podés administrar todas las actividades del negocio.
               </p>
             </div>
+
             {activities.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
                 <input
@@ -59,12 +67,14 @@ export default function Activities({ tenantId }) {
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
-                <button
-                  onClick={() => setOpenModal(true)}
-                  className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                >
-                  + Nueva actividad
-                </button>
+                {isTenant && (
+                  <button
+                    onClick={() => setOpenForm(true)}
+                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                  >
+                    + Nueva actividad
+                  </button>
+                )}
               </div>
             )}
 
@@ -77,38 +87,45 @@ export default function Activities({ tenantId }) {
                     className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
+
+                    {activity.description && (
+                      <p className="text-gray-500 mt-2 line-clamp-2">
+                        {activity.description}
+                      </p>
+                    )}
                   </div>
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
-                  <h3 className="text-xl font-semibold">
-                    Todavía no hay actividades
-                  </h3>
+                  <h3 className="text-xl font-semibold">No hay actividades</h3>
 
-                  <p className="text-gray-500 mt-2 mb-6">
+                  <p className="text-gray-500 px-2 mt-2 mb-6">
                     Creá tu primera actividad para comenzar.
                   </p>
 
-                  <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Crear actividad
-                  </button>
+                  {isTenant && (
+                    <button
+                      onClick={() => setOpenForm(true)}
+                      className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                    >
+                      + Crear actividad
+                    </button>
+                  )}
                 </div>
               )}
             </div>
 
-            {openModal && (
+            {openForm && (
               <ActivityForm
                 tenantId={tenantId}
-                close={() => setOpenModal(false)}
+                close={() => setOpenForm(false)}
               />
             )}
+
             {selectedActivity && (
               <ActivityModal
-                activity={selectedActivity}
                 tenantId={tenantId}
+                activity={selectedActivity}
                 close={() => setSelectedActivity(null)}
               />
             )}

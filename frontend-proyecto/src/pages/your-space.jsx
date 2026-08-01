@@ -5,6 +5,8 @@ import { getMyTenants } from "../services/tenant";
 import MyTenantCard from "../components/your-space/my-tenant-card";
 import { Link } from "wouter";
 import Loading from "../components/loading";
+import { useEffect } from "react";
+import { useTenantStore } from "../store/tenant-store";
 
 export default function YourSpace() {
   const { data: myTenants, isLoading } = useQuery({
@@ -12,6 +14,17 @@ export default function YourSpace() {
     queryFn: getMyTenants,
   });
 
+  const fetchUserRolesInTenant = useTenantStore(
+    (state) => state.fetchUserRolesInTenant,
+  );
+
+  useEffect(() => {
+    if (myTenants) {
+      myTenants.forEach((tenant) => {
+        fetchUserRolesInTenant(tenant.id);
+      });
+    }
+  }, [myTenants, fetchUserRolesInTenant]);
   return (
     <MainLayout>
       <div className="w-full mt-10 flex flex-col gap-7 items-center lg:gap-10 lg:mt-15">
@@ -27,9 +40,13 @@ export default function YourSpace() {
         {isLoading ? (
           <Loading />
         ) : (
-          <div className="grid gap-6 justify-center min-[900px]:grid-cols-2 w-full min-[900px]:w-[65%] min-[1350px]:w-[50%]">
+          <div className="grid grid-cols-1 gap-6 justify-center min-[900px]:grid-cols-2 w-full min-[900px]:w-[65%] min-[1350px]:w-[50%]">
             {myTenants?.map((t) => (
-              <Link key={t.id} href={`tu-espacio/${t.id}`}>
+              <Link
+                className="w-full flex"
+                key={t.id}
+                href={`tu-espacio/${t.id}`}
+              >
                 <MyTenantCard myTenant={t} key={t.id} />
               </Link>
             ))}

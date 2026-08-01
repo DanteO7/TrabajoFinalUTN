@@ -20,23 +20,28 @@ export default function Classes({ tenantId }) {
   const [selectedClass, setSelectedClass] = useState(null);
 
   const { data: classes = [], isLoading } = useQuery({
-    queryKey: ["getClasses", tenantId, selectedDate],
+    queryKey: [
+      "getClasses",
+      tenantId,
+      selectedDate.toISOString().split("T")[0],
+    ],
     queryFn: () =>
       getClasses(tenantId, selectedDate.toISOString().split("T")[0]),
     staleTime: 5 * 60 * 1000,
   });
+  console.log(classes);
 
   const classesOfDay = useMemo(() => {
-    return classes.filter((c) => {
-      const classDate = new Date(c.date);
+    const selectedDateString = selectedDate.toISOString().split("T")[0];
 
-      return (
-        classDate.getFullYear() === selectedDate.getFullYear() &&
-        classDate.getMonth() === selectedDate.getMonth() &&
-        classDate.getDate() === selectedDate.getDate()
-      );
+    return classes.filter((c) => {
+      // c.date viene como "2026-08-02" del backend
+      const classDateString = c.date.split("T")[0];
+      return classDateString === selectedDateString;
     });
   }, [classes, selectedDate]);
+
+  const isDateInPast = selectedDate < new Date().setHours(0, 0, 0, 0);
 
   return (
     <MainLayout>
@@ -68,9 +73,11 @@ export default function Classes({ tenantId }) {
                 <DayPicker
                   mode="single"
                   selected={selectedDate}
+                  defaultMonth={selectedDate}
                   onSelect={(date) => {
                     if (date) setSelectedDate(date);
                   }}
+                  disabled={false}
                   formatters={{
                     formatWeekdayName: (date) => {
                       const days = [
@@ -83,6 +90,23 @@ export default function Classes({ tenantId }) {
                         "Sáb",
                       ];
                       return days[date.getDay()];
+                    },
+                    formatCaption: (date) => {
+                      const months = [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre",
+                      ];
+                      return `${months[date.getMonth()]} ${date.getFullYear()}`;
                     },
                   }}
                   className="border rounded-2xl shadow-md px-4 py-3"
@@ -118,8 +142,8 @@ export default function Classes({ tenantId }) {
                             </h3>
 
                             <p className="text-gray-500 mt-1">
-                              {classItem.professor.user.name}{" "}
-                              {classItem.professor.user.surname}
+                              {classItem?.professor?.user?.name}{" "}
+                              {classItem?.professor?.user?.surname}
                             </p>
                           </div>
 
@@ -137,6 +161,16 @@ export default function Classes({ tenantId }) {
                         </div>
                       </div>
                     ))
+                  ) : isDateInPast ? (
+                    <div className="border rounded-xl py-16 text-center">
+                      <h3 className="text-xl font-semibold text-red-600">
+                        No puedes crear clases para días anteriores
+                      </h3>
+
+                      <p className="text-gray-500 mt-2">
+                        Seleccioná una fecha futura para crear una nueva clase.
+                      </p>
+                    </div>
                   ) : (
                     <div className="border rounded-xl py-16 text-center">
                       <h3 className="text-xl font-semibold">
@@ -162,6 +196,7 @@ export default function Classes({ tenantId }) {
             {openModal && (
               <ClassForm
                 tenantId={tenantId}
+                defaultDate={selectedDate.toISOString().split("T")[0]}
                 close={() => setOpenModal(false)}
               />
             )}

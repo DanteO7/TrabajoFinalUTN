@@ -13,12 +13,10 @@ import { getTenantById } from "../services/tenant";
 import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
-import { useState } from "react";
 import Loading from "../components/loading";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
-  const [error, setError] = useState();
 
   const {
     data: tenant,
@@ -73,6 +71,12 @@ export default function Tenant({ id }) {
         description: "Administrá roles y permisos.",
         icon: <FaUserShield size={30} />,
         href: "grupos",
+      },
+      {
+        title: "Planes de Alumnos",
+        description: "Administrá los planes de tus alumnos.",
+        icon: <FaUserShield size={30} />,
+        href: "planes",
       },
     ],
 
@@ -208,7 +212,8 @@ export default function Tenant({ id }) {
               </p>
             </div>
 
-            <div className="grid gap-6 mt-10 mx-auto min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3">
+            <div className="grid gap-6 mt-10 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
+              {" "}
               {cards?.map((section) => (
                 <Link
                   key={section.href}

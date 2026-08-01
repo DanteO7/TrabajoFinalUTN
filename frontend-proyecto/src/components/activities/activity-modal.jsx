@@ -1,41 +1,32 @@
 import { X, Pencil } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modals/modal";
-import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateActivity, deleteActivity } from "../../services/activity";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createActivitySchema } from "../../schema/activity-schema";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function ActivityModal({ activity, tenantId, close }) {
+  const queryClient = useQueryClient();
+
+  const getUserRoles = useTenantStore((state) => state.getUserRoles);
+  const userRoles = getUserRoles(tenantId);
+  const isTenant = userRoles?.roles?.includes("Tenant");
+
   const [editing, setEditing] = useState(false);
   const [currentActivity, setCurrentActivity] = useState(activity);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [name, setName] = useState(currentActivity.name);
+  const [description, setDescription] = useState(
+    currentActivity.description || "",
+  );
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
-
-  const queryClient = useQueryClient();
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: activity.name,
-      description: activity.description,
-    },
-    resolver: zodResolver(createActivitySchema),
-    mode: "onTouched",
-  });
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteActivity(currentActivity.id),
@@ -63,15 +54,19 @@ export default function ActivityModal({ activity, tenantId, close }) {
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
+      else if (data?.message) msg = data.message;
 
       setBackendError(msg);
       setErrorModal(true);
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: (data) => updateActivity(activity.id, data),
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      updateActivity(currentActivity.id, {
+        name,
+        description,
+      }),
 
     onSuccess: (updatedActivity) => {
       queryClient.invalidateQueries({
@@ -82,15 +77,13 @@ export default function ActivityModal({ activity, tenantId, close }) {
       setSuccessModal(true);
 
       setCurrentActivity(updatedActivity);
-
-      reset(updatedActivity);
-
       setEditing(false);
 
       setTimeout(() => {
         setSuccessModal(false);
       }, 3000);
     },
+
     onError: (error) => {
       const data = error?.response?.data;
 
@@ -99,16 +92,12 @@ export default function ActivityModal({ activity, tenantId, close }) {
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
+      else if (data?.message) msg = data.message;
 
       setBackendError(msg);
       setErrorModal(true);
     },
   });
-
-  const onSubmit = (form) => {
-    mutation.mutate(form);
-  };
 
   return (
     <Modal open onClose={close}>
@@ -121,79 +110,87 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       {!editing ? (
         <>
-          <h2 className="text-2xl font-semibold mb-5">
+          <h2 className="text-2xl font-semibold mb-2">
             {currentActivity.name}
           </h2>
 
-          <p className="text-gray-600 whitespace-pre-wrap">
-            {currentActivity.description || "Sin descripción"}
-          </p>
+          {currentActivity.description && (
+            <p className="text-gray-600 mb-6">{currentActivity.description}</p>
+          )}
 
-          <div className="flex justify-end gap-3 mt-8 max-[360px]:text-[13px]">
-            <button
-              onClick={() => setDeleteModal(true)}
-              className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-            >
-              Eliminar actividad
-            </button>
+          {isTenant && (
+            <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
+              <button
+                onClick={() => setDeleteModal(true)}
+                className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
+              >
+                Eliminar actividad
+              </button>
 
-            <button
-              onClick={() => setEditing(true)}
-              className="cursor-pointer flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-            >
-              <Pencil size={18} />
-              Editar
-            </button>
-          </div>
+              <button
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              >
+                <Pencil size={18} />
+                Editar
+              </button>
+            </div>
+          )}
         </>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">
             Editar actividad
           </h2>
 
-          <FormInput
-            label="Nombre"
-            register={register("name")}
-            error={errors.name}
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-2">Nombre</label>
+
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
+              placeholder="Nombre de la actividad"
+            />
+          </div>
 
           <div>
-            <label className="block mb-2">Descripción</label>
+            <label className="block text-sm font-semibold mb-2">
+              Descripción (opcional)
+            </label>
 
             <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              {...register("description")}
-              className={`w-full rounded-xl bg-[#efefef] border-[1.7px] px-3 py-2 resize-none ${errors.description ? "border-red-500" : "border-gray-300"}`}
+              className="w-full rounded-xl px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
+              placeholder="Descripción de la actividad"
             />
-            {errors.description && (
-              <p className="text-red-500 text-[13px] mt-1">
-                {errors.description.message}
-              </p>
-            )}
           </div>
 
           <div className="flex justify-end gap-3">
             <button
-              type="button"
               onClick={() => {
-                reset();
                 setEditing(false);
+                setName(currentActivity.name);
+                setDescription(currentActivity.description || "");
               }}
-              className="cursor-pointer border px-4 py-2 rounded-xl transition-all duration-200 hover:bg-gray-200"
+              className="border px-4 py-2 rounded-xl"
             >
               Cancelar
             </button>
 
             <button
-              type="submit"
-              className="cursor-pointer bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-[#222] transition-all duration-200"
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending}
+              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700 disabled:opacity-50"
             >
-              Guardar cambios
+              {updateMutation.isPending ? "Actualizando..." : "Actualizar"}
             </button>
           </div>
-        </form>
+        </div>
       )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -209,6 +206,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
           isSuccesOrError={true}
         />
       )}
+
       {deleteModal && (
         <Modal open onClose={() => setDeleteModal(false)}>
           <h2 className="text-2xl font-semibold text-center">
@@ -217,7 +215,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
           <p className="text-center mt-5">
             ¿Seguro que querés eliminar la actividad{" "}
-            <span className="font-semibold">"{currentActivity.name}"</span>?
+            <span className="font-semibold">{currentActivity.name}</span>?
           </p>
 
           <p className="text-center text-gray-500 mt-2">
@@ -234,9 +232,10 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
             <button
               onClick={() => deleteMutation.mutate()}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700"
+              disabled={deleteMutation.isPending}
+              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
             >
-              Eliminar
+              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
             </button>
           </div>
         </Modal>

@@ -15,7 +15,7 @@ import { createClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
 
-export default function ClassForm({ tenantId, close }) {
+export default function ClassForm({ tenantId, defaultDate, close }) {
   const queryClient = useQueryClient();
 
   const {
@@ -25,6 +25,9 @@ export default function ClassForm({ tenantId, close }) {
   } = useForm({
     resolver: zodResolver(createClassSchema),
     mode: "onTouched",
+    defaultValues: {
+      date: defaultDate || "", // ← Agregar esto
+    },
   });
 
   const [backendError, setBackendError] = useState();
@@ -76,10 +79,12 @@ export default function ClassForm({ tenantId, close }) {
 
   const onSubmit = (form) => {
     mutation.mutate({
-      ...form,
-      tenantId,
       activityId: Number(form.activityId),
       professorId: Number(form.professorId),
+      tenantId,
+      date: form.date,
+      startTime: `${form.startTime}:00`,
+      endTime: `${form.endTime}:00`,
       maxCapacity: Number(form.maxCapacity),
     });
   };

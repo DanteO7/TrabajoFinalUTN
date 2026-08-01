@@ -148,8 +148,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
           <div className="space-y-2 text-gray-600">
             <p>
-              <b>Profesor:</b> {currentClass.professor.user.name}{" "}
-              {currentClass.professor.user.surname}
+              <b>Profesor:</b> {currentClass.professor.user?.name}{" "}
+              {currentClass.professor.user?.surname}
             </p>
 
             <p>

@@ -6,8 +6,15 @@ import { IoArrowBack } from "react-icons/io5";
 import { getProfessors } from "../../services/professor";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
+import ProfessorModal from "../../components/professors/professor-modal";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function Professors({ tenantId }) {
+  const getUserRoles = useTenantStore((state) => state.getUserRoles);
+  const userRoles = getUserRoles(tenantId);
+
+  const isTenant = userRoles?.roles.includes("Tenant");
+
   const [, setLocation] = useLocation();
 
   const [search, setSearch] = useState("");
@@ -59,16 +66,17 @@ export default function Professors({ tenantId }) {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar alumno..."
+                  placeholder="Buscar profesor..."
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
-
-                <button
-                  onClick={() => setOpenModal(true)}
-                  className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                >
-                  + Invitar alumno
-                </button>
+                {isTenant && (
+                  <button
+                    onClick={() => setOpenModal(true)}
+                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                  >
+                    + Invitar profesor
+                  </button>
+                )}
               </div>
             )}
 
@@ -80,30 +88,41 @@ export default function Professors({ tenantId }) {
                     onClick={() => setSelectedProfessor(professor)}
                     className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
-                    <h3 className="font-semibold text-xl">
-                      {professor.user.name} {professor.user.surname}
-                    </h3>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-xl">
+                        {professor.user.name} {professor.user.surname}
+                      </h3>
+
+                      <span
+                        className={`text-xs rounded-full px-2 py-1 font-medium ${
+                          professor.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {professor.isActive ? "Activo" : "Inactivo"}
+                      </span>
+                    </div>
 
                     <p className="text-gray-500 mt-2">{professor.user.email}</p>
 
-                    <div className="mt-4 flex justify-between items-center">
-                      <span className="text-sm font-medium">
-                        {professor.professorPlan.name}
-                      </span>
-
-                      <span
-                        className={`text-xs rounded-full px-3 py-1
-                        ${
-                          professor.monthlyFeeStatus === "PAID"
-                            ? "bg-green-100 text-green-700"
-                            : professor.monthlyFeeStatus === "PENDING"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {professor.monthlyFeeStatus}
-                      </span>
-                    </div>
+                    {professor.specialities.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-xs text-gray-600 mb-2">
+                          Especialidades
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {professor.specialities.map((spec) => (
+                            <span
+                              key={spec.specialityId}
+                              className="bg-[#333] text-white text-xs rounded-full px-2 py-1"
+                            >
+                              {spec.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -135,7 +154,7 @@ export default function Professors({ tenantId }) {
             )}
 
             {selectedProfessor && (
-              <professorModal
+              <ProfessorModal
                 tenantId={tenantId}
                 professor={selectedProfessor}
                 close={() => setSelectedProfessor(null)}
