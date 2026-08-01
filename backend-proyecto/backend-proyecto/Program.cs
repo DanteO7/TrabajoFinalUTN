@@ -66,7 +66,7 @@ builder.Services.AddScoped<StudentServices>();
 builder.Services.AddScoped<ProfessorServices>();
 builder.Services.AddScoped<ReservationServices>();
 builder.Services.AddScoped<GroupServices>();
-builder.Services.AddScoped<PermissionService>();
+builder.Services.AddScoped<PermissionServices>();
 builder.Services.AddScoped<EmailServices>(); 
 builder.Services.AddScoped<InvitationServices>();
 
@@ -126,6 +126,22 @@ builder.Services.Configure<ResendClientOptions>(options =>
 builder.Services.AddTransient<IResend, ResendClient>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    try
+    {
+        db.Database.Migrate();
+        Console.WriteLine("Migraciones aplicadas correctamente.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.ToString());
+        throw;
+    }
+}
 
 var allowedOrigins = builder.Configuration
     .GetSection("Frontend:AllowedOrigins")
