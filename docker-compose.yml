@@ -1,4 +1,19 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: turnofacil-postgres
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    networks:
+      - proxy-network
+
   backend:
     container_name: turnofacil-backend
 
@@ -10,6 +25,9 @@ services:
       - .env
 
     restart: unless-stopped
+
+    depends_on:
+      - postgres
 
     networks:
       - proxy-network
@@ -37,8 +55,8 @@ services:
     networks:
       - proxy-network
 
-    ports:
-      - "3000:80"
+volumes:
+  postgres-data:
 
 networks:
   proxy-network:
