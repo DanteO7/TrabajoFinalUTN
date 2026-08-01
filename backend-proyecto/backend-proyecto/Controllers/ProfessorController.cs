@@ -44,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}, {Roles.STUDENT}")]
         [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]

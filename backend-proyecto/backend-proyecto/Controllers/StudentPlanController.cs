@@ -21,7 +21,6 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(List<ResponseStudentPlanDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]

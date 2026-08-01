@@ -35,7 +35,15 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
-            var classes = await _classRepository.GetAllAsync(c => c.TenantId == tenantId && c.Date == date, c => c.Activity, c => c.Professor, c => c.Reservations);
+
+            var classes = await _classRepository.Query()
+                .Where(c => c.TenantId == tenantId && c.Date == date)
+                .Include(c => c.Activity)
+                .Include(c => c.Professor)
+                    .ThenInclude(p => p.User)
+                .Include(c => c.Reservations)
+                .ToListAsync();
+
             return _mapper.Map<List<ResponseClassDTO>>(classes);
         }
 

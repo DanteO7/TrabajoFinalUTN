@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using backend_projeto.Models.DTOs;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
@@ -11,14 +12,25 @@ namespace backend_proyecto.Services
     public class TenantServices
     {
         private readonly ITenantRepository _tenantRepository;
-        private readonly IUserRepository _userRepository;
         private readonly ITenantPlanRepository _tenantPlanRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IStudentRepository _studentRepository;
+        private readonly IProfessorRepository _professorRepository;
         private readonly IMapper _mapper;
-        public TenantServices(ITenantRepository tenantRepository, IUserRepository userRepository, ITenantPlanRepository tenantPlanRepository, IMapper mapper)
+
+        public TenantServices(
+            ITenantRepository tenantRepository,
+            ITenantPlanRepository tenantPlanRepository,
+            IUserRepository userRepository,
+            IStudentRepository studentRepository,
+            IProfessorRepository professorRepository,
+            IMapper mapper)
         {
             _tenantRepository = tenantRepository;
-            _userRepository = userRepository;
             _tenantPlanRepository = tenantPlanRepository;
+            _userRepository = userRepository;
+            _studentRepository = studentRepository;
+            _professorRepository = professorRepository;
             _mapper = mapper;
         }
 
@@ -29,41 +41,41 @@ namespace backend_proyecto.Services
         }
 
         public async Task<ResponseTenantDTO> GetById(int id, int userId)
-{
-    var tenant = await _tenantRepository.GetOneAsync(
-        t => t.Id == id,
-        t => t.OwnerUser,
-        t => t.TenantPlan,
-        t => t.Professors,
-        t => t.Students
-    );
+        {
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == id,
+                t => t.OwnerUser,
+                t => t.TenantPlan,
+                t => t.Professors,
+                t => t.Students
+            );
 
-    if (tenant == null)
-    {
-        throw new HttpResponseError(
-            HttpStatusCode.NotFound,
-            "No existe el tenant"
-        );
-    }
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No existe el tenant"
+                );
+            }
 
-    var hasAccess =
-        tenant.OwnerUserId == userId ||
-        tenant.Professors.Any(p => p.UserId == userId) ||
-        tenant.Students.Any(s => s.UserId == userId);
+            var hasAccess =
+                tenant.OwnerUserId == userId ||
+                tenant.Professors.Any(p => p.UserId == userId) ||
+                tenant.Students.Any(s => s.UserId == userId);
 
-    if (!hasAccess)
-    {
-        throw new HttpResponseError(
-            HttpStatusCode.NotFound,
-            "No existe el tenant"
-        );
-    }
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No existe el tenant"
+                );
+            }
 
-    var response = _mapper.Map<ResponseTenantDTO>(tenant);
-    response.Role = GetRole(tenant, userId);
+            var response = _mapper.Map<ResponseTenantDTO>(tenant);
+            response.Role = GetRole(tenant, userId);
 
-    return response;
-}
+            return response;
+        }
 
         public async Task<List<ResponseTenantDTO>> GetAllByOwnerId(int ownerId)
         {
@@ -74,15 +86,17 @@ namespace backend_proyecto.Services
         public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO)
         {
             var user = await _userRepository.GetOneAsync(p => p.Id == createTenantDTO.OwnerUserId);
-            if(user == null)
+            if (user == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Usuario con el Id = '{createTenantDTO.OwnerUserId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    $"No existe Usuario con el Id = '{createTenantDTO.OwnerUserId}'");
             }
 
             var plan = await _tenantPlanRepository.GetOneAsync(p => p.Id == createTenantDTO.TenantPlanId);
-            if(plan == null)
+            if (plan == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe plan de Tenant con el Id = '{createTenantDTO.TenantPlanId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    $"No existe plan de Tenant con el Id = '{createTenantDTO.TenantPlanId}'");
             }
 
             var existingTenant = await _tenantRepository.GetOneAsync(t =>
@@ -95,8 +109,6 @@ namespace backend_proyecto.Services
                     $"Ya existe un tenant con el nombre '{createTenantDTO.Name}' para este usuario");
             }
 
-            // falta validar el pago
-
             var tenant = new Tenant
             {
                 OwnerUserId = createTenantDTO.OwnerUserId,
@@ -107,6 +119,17 @@ namespace backend_proyecto.Services
             };
 
             await _tenantRepository.CreateOneAsync(tenant);
+
+            // ← Crear automáticamente el Professor para el dueño
+            var professor = new Professor
+            {
+                UserId = createTenantDTO.OwnerUserId,
+                TenantId = tenant.Id,
+                IsActive = true
+            };
+
+            await _professorRepository.CreateOneAsync(professor);
+
             return _mapper.Map<ResponseTenantDTO>(tenant);
         }
 
@@ -206,6 +229,26 @@ namespace backend_proyecto.Services
                 return Roles.PROFESSOR;
 
             return Roles.STUDENT;
+        }
+
+        public async Task<UserTenantRolesDTO> GetUserRolesInTenant(int userId, int tenantId)
+        {
+            var roles = new List<string>();
+
+            if (await _professorRepository.ExistsByUserAndTenant(userId, tenantId))
+                roles.Add(Roles.PROFESSOR);
+
+            if (await _studentRepository.ExistsByUserAndTenant(userId, tenantId))
+                roles.Add(Roles.STUDENT);
+
+            if (await _tenantRepository.ExistsByOwnerAndId(userId, tenantId))
+                roles.Add(Roles.TENANT);
+
+            return new UserTenantRolesDTO
+            {
+                Roles = roles,
+                HasAccessToTenant = roles.Count > 0
+            };
         }
     }
 }

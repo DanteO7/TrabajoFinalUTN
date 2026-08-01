@@ -152,6 +152,9 @@ namespace backend_proyecto.Services
             var claims = new ClaimsIdentity();
             claims.AddClaim(new Claim("id", user.Id.ToString()));
 
+            var isStudent = await _studentRepo.ExistsByUserId(user.Id);
+            Console.WriteLine($"UserId: {user.Id}, IsStudent: {isStudent}");
+
             if (await _professorRepo.ExistsByUserId(user.Id))
                 claims.AddClaim(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
             if (await _studentRepo.ExistsByUserId(user.Id))

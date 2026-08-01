@@ -183,6 +183,7 @@ namespace backend_proyecto.Services
             return new ResponseInvitationInfoDTO
             {
                 Id = invitation.Id,
+                TenantId = invitation.TenantId, 
                 TenantName = invitation.Tenant.Name,
                 Role = invitation.Role,
                 ExpirationDate = invitation.ExpirationDate

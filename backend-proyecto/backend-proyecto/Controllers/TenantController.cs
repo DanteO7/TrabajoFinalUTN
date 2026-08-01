@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using backend_projeto.Models.DTOs;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
@@ -182,6 +183,22 @@ namespace backend_proyecto.Controllers
             var tenants = await _tenantServices.GetMyTenants(userId);
 
             return Ok(tenants);
+        }
+
+        [HttpGet("{tenantId}/user-roles")]
+        [Authorize]
+        public async Task<ActionResult<UserTenantRolesDTO>> GetUserRolesInTenant(int tenantId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var roles = await _tenantServices.GetUserRolesInTenant(userId, tenantId);
+                return Ok(roles);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
+            }
         }
     }
 }

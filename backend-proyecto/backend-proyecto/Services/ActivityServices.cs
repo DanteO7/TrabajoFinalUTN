@@ -3,6 +3,7 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -11,11 +12,13 @@ namespace backend_proyecto.Services
     {
         private readonly IActivityRepository _activityRepository;
         private readonly ITenantRepository _tenantRepository;
+        private readonly PermissionServices _permissionServices;
         private readonly IMapper _mapper;
-        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, IMapper mapper)
+        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, PermissionServices permissionServices, IMapper mapper)
         {
             _activityRepository = activityRepository;
             _tenantRepository = tenantRepository;
+            _permissionServices = permissionServices;
             _mapper = mapper;
         }
         
@@ -40,8 +43,10 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseActivityDTO>(activity);
         }
 
-        public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO)
+        public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO, int userId)
         {
+            await _permissionServices.CheckPermission(userId, createActivityDTO.TenantId, Permissions.ACTIVITY_CREATE);
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createActivityDTO.TenantId);
             if (tenant == null)
             {
@@ -51,9 +56,9 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la actividad no puede ser nulo o tener mas de 50 caracteres");
             }
-            if (createActivityDTO.Name != null && await _activityRepository.ExistsByName(createActivityDTO.Name))
+            if (createActivityDTO.Name != null && await _activityRepository.ExistsByName(createActivityDTO.Name, createActivityDTO.TenantId))
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una actividad con ese nombre");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una actividad con ese nombre en este negocio");
             }
 
             var activity = _mapper.Map<Activity>(createActivityDTO);

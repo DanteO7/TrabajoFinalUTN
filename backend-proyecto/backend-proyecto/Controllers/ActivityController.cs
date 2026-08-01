@@ -19,7 +19,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.TENANT}, {Roles.ADMIN}, {Roles.STUDENT}")]
         [ProducesResponseType(typeof(List<ResponseActivityDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -50,7 +50,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var activity = await _activityServices.CreateOne(createActivityDTO);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var activity = await _activityServices.CreateOne(createActivityDTO, userId);
                 return Created("Activity created", activity);
             }
             catch (HttpResponseError ex)
