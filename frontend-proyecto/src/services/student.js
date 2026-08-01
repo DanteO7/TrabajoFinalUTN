@@ -3,7 +3,8 @@ import { request } from "./api";
 export const assignStudent = (data) =>
   request("post", "/students/assign", data);
 
-export const getStudents = () => request("get", "/students");
+export const getStudents = (tenantId) =>
+  request("get", "/students", null, { tenantId });
 
 export const getStudentById = (id) => request("get", `/students/${id}`);
 

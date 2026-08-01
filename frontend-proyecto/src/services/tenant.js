@@ -29,3 +29,6 @@ export const updateTenantStatus = (id, data) =>
   request("patch", `/tenants/${id}/status`, data);
 
 export const getMyTenants = () => request("get", "/tenants/my-tenants");
+
+export const getUserRolesInTenant = (tenantId) =>
+  request("get", `/tenants/${tenantId}/user-roles`);

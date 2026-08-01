@@ -6,7 +6,7 @@ export const getInvitationInfo = (token) =>
   request("get", `/invitations/${token}`);
 
 export const acceptInvitation = (token, data) =>
-  request("post", `/invitations/accept/${token}`, data);
+  request("post", `/invitations/${token}/accept`, data);
 
 export const deleteInvitation = (id) => request("delete", `/invitations/${id}`);
 
