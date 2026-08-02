@@ -133,15 +133,6 @@ namespace backend_proyecto.Services
                 }
             }
 
-            if (updateClassDTO.TenantId != null)
-            {
-                var tenant = await _tenantRepository.GetOneAsync(t => t.Id == updateClassDTO.TenantId);
-                if (tenant == null)
-                {
-                    throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{updateClassDTO.TenantId}'");
-                }
-            }
-
             if (updateClassDTO.Date != null)
             {
                 if (updateClassDTO.Date < DateOnly.FromDateTime(DateTime.Now))
@@ -154,7 +145,7 @@ namespace backend_proyecto.Services
             {
                 if (updateClassDTO.StartTime >= updateClassDTO.EndTime)
                 {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"La hora de inicio debe ser menor a la hora de fin = Hora inicio: '{updateClassDTO.StartTime}', Hora fin: '{updateClassDTO.EndTime}'");
+                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"La hora de inicio debe ser menor a la hora de fin");
                 }
             }
 
@@ -163,7 +154,6 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no puede ser menor o igual a 0");
             }
 
-            // Creo un CreateClassDTO para pasarselo al ExistsScheduleConflict
             if (updateClassDTO.ProfessorId != null ||
                 updateClassDTO.Date != null ||
                 updateClassDTO.StartTime != null ||
@@ -176,12 +166,12 @@ namespace backend_proyecto.Services
                     StartTime = updateClassDTO.StartTime ?? classEntity.StartTime,
                     EndTime = updateClassDTO.EndTime ?? classEntity.EndTime,
                     ActivityId = updateClassDTO.ActivityId ?? classEntity.ActivityId,
-                    TenantId = updateClassDTO.TenantId ?? classEntity.TenantId,
+                    TenantId = classEntity.TenantId,
                     MaxCapacity = updateClassDTO.MaxCapacity ?? classEntity.MaxCapacity
                 };
 
-            var conflict = await _classRepository.ExistsScheduleConflict(dtoForValidation, id);
-            if (conflict)
+                var conflict = await _classRepository.ExistsScheduleConflict(dtoForValidation, id);
+                if (conflict)
                 {
                     throw new HttpResponseError(HttpStatusCode.BadRequest, $"El profesor ya tiene una clase en ese horario");
                 }
@@ -189,6 +179,15 @@ namespace backend_proyecto.Services
 
             _mapper.Map(updateClassDTO, classEntity);
             await _classRepository.UpdateOneAsync(classEntity);
+
+            classEntity = await _classRepository.Query()
+                .Where(c => c.Id == id)
+                .Include(c => c.Activity)
+                .Include(c => c.Professor)
+                    .ThenInclude(p => p.User)
+                .Include(c => c.Reservations)
+                .FirstOrDefaultAsync();
+
             return _mapper.Map<ResponseClassDTO>(classEntity);
         }
     }

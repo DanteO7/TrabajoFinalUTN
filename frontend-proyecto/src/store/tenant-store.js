@@ -2,11 +2,10 @@ import { create } from "zustand";
 import { getUserRolesInTenant } from "../services/tenant";
 
 export const useTenantStore = create((set) => ({
-  userRolesInTenant: {}, // { tenantId: { roles: [...], hasAccessToTenant: bool } }
+  userRolesInTenant: {},
   loadingRoles: {},
 
   fetchUserRolesInTenant: async (tenantId) => {
-    // Si ya lo tenemos en cache, no repetir la query
     set((state) => ({
       loadingRoles: { ...state.loadingRoles, [tenantId]: true },
     }));

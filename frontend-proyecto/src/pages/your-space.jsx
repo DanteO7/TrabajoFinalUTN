@@ -25,6 +25,7 @@ export default function YourSpace() {
       });
     }
   }, [myTenants, fetchUserRolesInTenant]);
+
   return (
     <MainLayout>
       <div className="w-full mt-10 flex flex-col gap-7 items-center lg:gap-10 lg:mt-15">

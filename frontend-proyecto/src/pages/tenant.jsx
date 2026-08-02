@@ -31,6 +31,12 @@ export default function Tenant({ id }) {
   const sections = {
     Tenant: [
       {
+        title: "Clases",
+        description: "Administrá las clases.",
+        icon: <FaCalendarAlt size={30} />,
+        href: "clases",
+      },
+      {
         title: "Alumnos",
         description: "Administrá los alumnos del espacio.",
         icon: <FaUsers size={30} />,
@@ -41,12 +47,6 @@ export default function Tenant({ id }) {
         description: "Visualizá y gestioná profesores.",
         icon: <FaChalkboardTeacher size={30} />,
         href: "profesores",
-      },
-      {
-        title: "Clases",
-        description: "Administrá las clases.",
-        icon: <FaCalendarAlt size={30} />,
-        href: "clases",
       },
       {
         title: "Actividades",
@@ -67,31 +67,31 @@ export default function Tenant({ id }) {
         href: "pagos",
       },
       {
-        title: "Grupos",
-        description: "Administrá roles y permisos.",
-        icon: <FaUserShield size={30} />,
-        href: "grupos",
-      },
-      {
         title: "Planes de Alumnos",
         description: "Administrá los planes de tus alumnos.",
         icon: <FaUserShield size={30} />,
         href: "planes",
       },
+      {
+        title: "Grupos",
+        description: "Administrá roles y permisos.",
+        icon: <FaUserShield size={30} />,
+        href: "grupos",
+      },
     ],
 
     Professor: [
-      {
-        title: "Profesores",
-        description: "Ver profesores.",
-        icon: <FaChalkboardTeacher size={30} />,
-        href: "profesores",
-      },
       {
         title: "Clases",
         description: "Tus clases.",
         icon: <FaCalendarAlt size={30} />,
         href: "clases",
+      },
+      {
+        title: "Profesores",
+        description: "Ver profesores.",
+        icon: <FaChalkboardTeacher size={30} />,
+        href: "profesores",
       },
       {
         title: "Actividades",
@@ -115,16 +115,16 @@ export default function Tenant({ id }) {
 
     Student: [
       {
-        title: "Profesores",
-        description: "Conocé a tus profesores.",
-        icon: <FaChalkboardTeacher size={30} />,
-        href: "profesores",
-      },
-      {
         title: "Clases",
         description: "Tus clases.",
         icon: <FaCalendarAlt size={30} />,
         href: "clases",
+      },
+      {
+        title: "Profesores",
+        description: "Conocé a tus profesores.",
+        icon: <FaChalkboardTeacher size={30} />,
+        href: "profesores",
       },
       {
         title: "Actividades",

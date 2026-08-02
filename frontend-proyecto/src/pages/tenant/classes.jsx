@@ -11,6 +11,7 @@ import "../../css/day-picker.css";
 import ClassForm from "../../components/classes/class-form";
 import ClassModal from "../../components/classes/class-modal";
 import Loading from "../../components/loading";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function Classes({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -19,24 +20,22 @@ export default function Classes({ tenantId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
+  const getUserRoles = useTenantStore((state) => state.getUserRoles);
+  const userRoles = getUserRoles(tenantId);
+  const canCreateClass =
+    userRoles?.roles?.includes("Tenant") || userRoles?.roles?.includes("Admin");
+
   const { data: classes = [], isLoading } = useQuery({
-    queryKey: [
-      "getClasses",
-      tenantId,
-      selectedDate.toISOString().split("T")[0],
-    ],
+    queryKey: ["getClasses", tenantId, selectedDate],
     queryFn: () =>
       getClasses(tenantId, selectedDate.toISOString().split("T")[0]),
     staleTime: 5 * 60 * 1000,
   });
-  console.log(classes);
 
   const classesOfDay = useMemo(() => {
-    const selectedDateString = selectedDate.toISOString().split("T")[0];
-
     return classes.filter((c) => {
-      // c.date viene como "2026-08-02" del backend
       const classDateString = c.date.split("T")[0];
+      const selectedDateString = selectedDate.toISOString().split("T")[0];
       return classDateString === selectedDateString;
     });
   }, [classes, selectedDate]);
@@ -77,7 +76,6 @@ export default function Classes({ tenantId }) {
                   onSelect={(date) => {
                     if (date) setSelectedDate(date);
                   }}
-                  disabled={false}
                   formatters={{
                     formatWeekdayName: (date) => {
                       const days = [
@@ -119,12 +117,14 @@ export default function Classes({ tenantId }) {
                     Clases del {selectedDate.toLocaleDateString("es-AR")}
                   </h2>
 
-                  <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Nueva clase
-                  </button>
+                  {canCreateClass && (
+                    <button
+                      onClick={() => setOpenModal(true)}
+                      className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                    >
+                      + Nueva clase
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid gap-5">
@@ -142,8 +142,8 @@ export default function Classes({ tenantId }) {
                             </h3>
 
                             <p className="text-gray-500 mt-1">
-                              {classItem?.professor?.user?.name}{" "}
-                              {classItem?.professor?.user?.surname}
+                              {classItem.professor.user.name}{" "}
+                              {classItem.professor.user.surname}
                             </p>
                           </div>
 
@@ -169,6 +169,17 @@ export default function Classes({ tenantId }) {
 
                       <p className="text-gray-500 mt-2">
                         Seleccioná una fecha futura para crear una nueva clase.
+                      </p>
+                    </div>
+                  ) : !canCreateClass ? (
+                    <div className="border rounded-xl py-16 text-center">
+                      <h3 className="text-xl font-semibold">
+                        No hay clases este día
+                      </h3>
+
+                      <p className="text-gray-500 mt-2">
+                        Esperá a que los profesores creen clases para esta
+                        fecha.
                       </p>
                     </div>
                   ) : (

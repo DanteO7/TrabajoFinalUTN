@@ -1,30 +1,55 @@
 import { X, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import Modal from "../modals/modal";
 import FormInput from "../form-input";
-import SuccessModal from "../modals/success-modal";
-import ErrorModal from "../modals/error-modal";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateClass, deleteClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
+import SuccessModal from "../modals/success-modal";
+import ErrorModal from "../modals/error-modal";
+import { useTenantStore } from "../../store/tenant-store";
+import { updateClassSchema } from "../../schema/class-schema";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const [editing, setEditing] = useState(false);
-  const [currentClass, setCurrentClass] = useState(classItem);
+  const getUserRoles = useTenantStore((state) => state.getUserRoles);
+  const userRoles = getUserRoles(tenantId);
+  const canEdit =
+    userRoles?.roles?.includes("Tenant") ||
+    userRoles?.roles?.includes("Professor");
+  const isStudent = userRoles?.roles?.includes("Student");
 
+  const [editing, setEditing] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [currentClass, setCurrentClass] = useState(classItem);
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
+
+  console.log(currentClass);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(updateClassSchema),
+    mode: "onTouched",
+    defaultValues: {
+      activityId: currentClass.activityId?.toString() || "",
+      professorId: currentClass.professorId?.toString() || "",
+      date: currentClass.date,
+      startTime: currentClass.startTime?.slice(0, 5) || "",
+      endTime: currentClass.endTime?.slice(0, 5) || "",
+      maxCapacity: currentClass.maxCapacity?.toString() || "",
+    },
+  });
 
   const { data: activities = [] } = useQuery({
     queryKey: ["getActivities", tenantId],
@@ -36,58 +61,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
     queryFn: () => getProfessors(tenantId),
   });
 
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: {
-      activityId: classItem.activityId,
-      professorId: classItem.professorId,
-      date: classItem.date?.split("T")[0],
-      startTime: classItem.startTime?.slice(0, 5),
-      endTime: classItem.endTime?.slice(0, 5),
-      maxCapacity: classItem.maxCapacity,
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: (data) => updateClass(currentClass.id, data),
-
-    onSuccess: (updatedClass) => {
-      queryClient.invalidateQueries({
-        queryKey: ["getClasses", tenantId],
-      });
-
-      setCurrentClass(updatedClass);
-
-      reset({
-        activityId: updatedClass.activityId,
-        professorId: updatedClass.professorId,
-        date: updatedClass.date?.split("T")[0],
-        startTime: updatedClass.startTime?.slice(0, 5),
-        endTime: updatedClass.endTime?.slice(0, 5),
-        maxCapacity: updatedClass.maxCapacity,
-      });
-
-      setEditing(false);
-
-      setSuccessMessage("Clase actualizada correctamente");
-      setSuccessModal(true);
-
-      setTimeout(() => setSuccessModal(false), 3000);
-    },
-
-    onError: (error) => {
-      const data = error?.response?.data;
-
-      let msg = "Ocurrió un error al actualizar la clase";
-
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
-
-      setBackendError(msg);
-      setErrorModal(true);
-    },
-  });
+  const isFull = currentClass.reservationsCount >= currentClass.maxCapacity;
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteClass(currentClass.id),
@@ -98,7 +72,6 @@ export default function ClassModal({ classItem, tenantId, close }) {
       });
 
       setDeleteModal(false);
-
       setSuccessMessage("Clase eliminada correctamente");
       setSuccessModal(true);
 
@@ -109,13 +82,53 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
-
       let msg = "Ocurrió un error al eliminar la clase";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (form) =>
+      updateClass(currentClass.id, {
+        activityId: form.activityId ? Number(form.activityId) : undefined,
+        professorId: form.professorId ? Number(form.professorId) : undefined,
+        date: form.date || undefined,
+        startTime: form.startTime ? `${form.startTime}:00` : undefined,
+        endTime: form.endTime ? `${form.endTime}:00` : undefined,
+        maxCapacity: form.maxCapacity ? Number(form.maxCapacity) : undefined,
+      }),
+
+    onSuccess: (updatedClass) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getClasses", tenantId],
+      });
+
+      setSuccessMessage("Clase actualizada correctamente");
+      setSuccessModal(true);
+
+      setCurrentClass(updatedClass);
+      setEditing(false);
+
+      setTimeout(() => {
+        setSuccessModal(false);
+      }, 3000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al actualizar la clase";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
 
       setBackendError(msg);
       setErrorModal(true);
@@ -123,134 +136,173 @@ export default function ClassModal({ classItem, tenantId, close }) {
   });
 
   const onSubmit = (form) => {
-    updateMutation.mutate({
-      ...form,
-      activityId: Number(form.activityId),
-      professorId: Number(form.professorId),
-      maxCapacity: Number(form.maxCapacity),
-    });
+    updateMutation.mutate(form);
   };
 
   return (
     <Modal open onClose={close}>
       <button
         onClick={close}
-        className="absolute top-4 right-4 text-gray-500 hover:text-black"
+        className="absolute top-4 right-4 text-gray-500 hover:text-black transition duration-200 cursor-pointer"
       >
         <X size={20} />
       </button>
 
       {!editing ? (
         <>
-          <h2 className="text-2xl font-semibold mb-5">
+          <h2 className="text-2xl font-semibold mb-2">
             {currentClass.activity.name}
           </h2>
 
-          <div className="space-y-2 text-gray-600">
-            <p>
-              <b>Profesor:</b> {currentClass.professor.user?.name}{" "}
-              {currentClass.professor.user?.surname}
-            </p>
+          <p className="text-gray-600 mb-6">
+            {currentClass.professor.user?.name}{" "}
+            {currentClass.professor.user?.surname}
+          </p>
 
-            <p>
-              <b>Fecha:</b> {new Date(currentClass.date).toLocaleDateString()}
-            </p>
+          <div className="space-y-4 mb-8">
+            <div className="bg-[#efefef] rounded-xl p-4">
+              <p className="text-sm text-gray-600 mb-1">Fecha</p>
+              <p className="font-semibold text-[#333]">
+                {new Date(currentClass.date).toLocaleDateString("es-AR")}
+              </p>
+            </div>
 
-            <p>
-              <b>Horario:</b> {currentClass.startTime.slice(0, 5)} -{" "}
-              {currentClass.endTime.slice(0, 5)}
-            </p>
+            <div className="bg-[#efefef] rounded-xl p-4">
+              <p className="text-sm text-gray-600 mb-1">Horario</p>
+              <p className="font-semibold text-[#333]">
+                {currentClass.startTime.slice(0, 5)} -{" "}
+                {currentClass.endTime.slice(0, 5)}
+              </p>
+            </div>
 
-            <p>
-              <b>Capacidad:</b> {currentClass.reservationsCount}/
-              {currentClass.maxCapacity}
-            </p>
-
-            <p>
-              <b>Lugares disponibles:</b> {currentClass.availableSpots}
-            </p>
+            <div className="bg-[#efefef] rounded-xl p-4">
+              <p className="text-sm text-gray-600 mb-1">Disponibilidad</p>
+              <div className="flex justify-between items-center">
+                <p className="font-semibold text-[#333]">
+                  {currentClass.reservationsCount} / {currentClass.maxCapacity}{" "}
+                  alumnos
+                </p>
+                {isFull && (
+                  <span className="bg-red-100 text-red-700 text-xs rounded-full px-2 py-1">
+                    Llena
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(true)}
-              className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-            >
-              Eliminar clase
-            </button>
+          {canEdit ? (
+            <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
+              <button
+                onClick={() => setDeleteModal(true)}
+                className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
+              >
+                Eliminar clase
+              </button>
 
+              <button
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              >
+                <Pencil size={18} />
+                Editar
+              </button>
+            </div>
+          ) : isStudent ? (
             <button
-              onClick={() => setEditing(true)}
-              className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              className={`w-full py-3 rounded-xl font-semibold transition ${
+                isFull
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-[#333] text-white hover:bg-gray-700 cursor-pointer"
+              }`}
+              disabled={isFull}
             >
-              <Pencil size={18} />
-              Editar
+              {isFull ? "Lista de espera" : "Entrar a la clase"}
             </button>
-          </div>
+          ) : null}
         </>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-center">Editar clase</h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            Editar clase
+          </h2>
 
           <div>
-            <label className="block mb-2">Actividad</label>
-
+            <label className="block text-sm font-semibold mb-2">
+              Actividad
+            </label>
             <select
               {...register("activityId")}
-              className="w-full rounded-xl border bg-[#efefef] px-3 py-2"
+              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
             >
+              <option value="">Selecciona una actividad</option>
               {activities.map((activity) => (
                 <option key={activity.id} value={activity.id}>
                   {activity.name}
                 </option>
               ))}
             </select>
+            {errors.activityId && (
+              <p className="text-red-500 text-[13px] mt-1">
+                {errors.activityId.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block mb-2">Profesor</label>
-
+            <label className="block text-sm font-semibold mb-2">Profesor</label>
             <select
               {...register("professorId")}
-              className="w-full rounded-xl border bg-[#efefef] px-3 py-2"
+              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
             >
+              <option value="">Selecciona un profesor</option>
               {professors.map((professor) => (
                 <option key={professor.id} value={professor.id}>
                   {professor.user.name} {professor.user.surname}
                 </option>
               ))}
             </select>
+            {errors.professorId && (
+              <p className="text-red-500 text-[13px] mt-1">
+                {errors.professorId.message}
+              </p>
+            )}
           </div>
 
-          <FormInput type="date" label="Fecha" register={register("date")} />
+          <FormInput
+            label="Fecha"
+            type="date"
+            register={register("date")}
+            error={errors.date}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <FormInput
               type="time"
               label="Hora inicio"
               register={register("startTime")}
+              error={errors.startTime}
             />
 
             <FormInput
               type="time"
               label="Hora fin"
               register={register("endTime")}
+              error={errors.endTime}
             />
           </div>
 
           <FormInput
-            type="number"
             label="Capacidad máxima"
+            type="number"
             register={register("maxCapacity")}
+            error={errors.maxCapacity}
           />
 
           <div className="flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => {
-                reset();
-                setEditing(false);
-              }}
+              onClick={() => setEditing(false)}
               className="border px-4 py-2 rounded-xl"
             >
               Cancelar
@@ -258,9 +310,10 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <button
               type="submit"
-              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              disabled={updateMutation.isPending}
+              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700 disabled:opacity-50"
             >
-              Guardar cambios
+              {updateMutation.isPending ? "Actualizando..." : "Actualizar"}
             </button>
           </div>
         </form>
@@ -270,7 +323,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
         <ErrorModal
           close={() => setErrorModal(false)}
           message={backendError}
-          isSuccesOrError
+          isSuccesOrError={true}
         />
       )}
 
@@ -278,7 +331,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
         <SuccessModal
           close={() => setSuccessModal(false)}
           message={successMessage}
-          isSuccesOrError
+          isSuccesOrError={true}
         />
       )}
 
@@ -287,7 +340,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
           <h2 className="text-2xl font-semibold text-center">Eliminar clase</h2>
 
           <p className="text-center mt-5">
-            ¿Seguro que querés eliminar esta clase?
+            ¿Seguro que querés eliminar la clase de{" "}
+            <span className="font-semibold">{currentClass.activity.name}</span>?
           </p>
 
           <p className="text-center text-gray-500 mt-2">
@@ -304,9 +358,10 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <button
               onClick={() => deleteMutation.mutate()}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700"
+              disabled={deleteMutation.isPending}
+              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
             >
-              Eliminar
+              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
             </button>
           </div>
         </Modal>

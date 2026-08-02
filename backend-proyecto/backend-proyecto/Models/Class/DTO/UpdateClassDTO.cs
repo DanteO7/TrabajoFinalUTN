@@ -4,7 +4,6 @@
     {
         public int? ActivityId { get; set; }
         public int? ProfessorId { get; set; }
-        public int? TenantId { get; set; }
         public DateOnly? Date { get; set; }
         public TimeOnly? StartTime { get; set; }
         public TimeOnly? EndTime { get; set; }

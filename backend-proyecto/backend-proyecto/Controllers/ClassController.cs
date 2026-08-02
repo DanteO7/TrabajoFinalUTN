@@ -106,7 +106,14 @@ namespace backend_proyecto.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Inner: {ex.InnerException?.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    ex.Message
+                );
             }
         }
     }
