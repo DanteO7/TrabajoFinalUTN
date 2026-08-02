@@ -61,7 +61,7 @@ namespace backend_proyecto.Services
             return new ResponseInvitationDTO
             {
                 Id = invitation.Id,
-                Link = $"http://localhost:5173/invitacion/{invitation.Token}",
+                Link = $"https://turnofacilapp.com.ar/invitacion/{invitation.Token}",
                 ExpirationDate = invitation.ExpirationDate
             };
         }
