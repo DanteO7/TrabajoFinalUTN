@@ -30,8 +30,6 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col text-[#333] dark:text-[#efefef] bg-[#ede9ee] dark:bg-gray-700">
-      <Header />
-
       <main className="flex-1 flex flex-col items-center gap-26 pb-17 px-5">
         {children}
       </main>

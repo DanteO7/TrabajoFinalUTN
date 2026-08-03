@@ -9,6 +9,7 @@ import i18n from "./i18n";
 import Loading from "./components/loading";
 import { ProtectedRoute } from "./router/protected-route";
 import Header from "./components/header";
+import { useLocation } from "wouter";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -38,6 +39,15 @@ const queryClient = new QueryClient();
 export default function App() {
   const { login, logout } = useAuthStore();
 
+  const [location] = useLocation();
+
+  const noHeaderRoutes = [
+    "/iniciar-sesion",
+    "/registrarse",
+    "/verificar-codigo",
+  ];
+  const shouldShowHeader = !noHeaderRoutes.includes(location);
+
   const { language, theme } = usePreferencesStore();
 
   useEffect(() => {
@@ -59,104 +69,100 @@ export default function App() {
   }, [login, logout]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Suspense
-        fallback={
-          <>
-            <Header />
-            <Loading />
-          </>
-        }
-      >
-        <Switch>
-          <Route path={"/"}>
-            <Home />
-          </Route>
+    <>
+      {shouldShowHeader && <Header />}
+      <QueryClientProvider client={queryClient}>
+        <Suspense fallback={<Loading />}>
+          <Switch>
+            <Route path={"/"}>
+              <Home />
+            </Route>
 
-          <Route path={"/iniciar-sesion"}>
-            <SignIn />
-          </Route>
+            <Route path={"/iniciar-sesion"}>
+              <SignIn />
+            </Route>
 
-          <Route path={"/registrarse"}>
-            <SignUp />
-          </Route>
+            <Route path={"/registrarse"}>
+              <SignUp />
+            </Route>
 
-          <Route path={"/verificar-codigo"}>
-            <VerifyCode />
-          </Route>
+            <Route path={"/verificar-codigo"}>
+              <VerifyCode />
+            </Route>
 
-          <Route path={"/perfil"}>
-            <Profile />
-          </Route>
+            <Route path={"/perfil"}>
+              <Profile />
+            </Route>
 
-          <Route path={"/ajustes"}>
-            <Settings />
-          </Route>
+            <Route path={"/ajustes"}>
+              <Settings />
+            </Route>
 
-          <Route path={"/resetear-contraseña"}>
-            <ResetPassword />
-          </Route>
+            <Route path={"/resetear-contraseña"}>
+              <ResetPassword />
+            </Route>
 
-          <Route path={"/tu-espacio"}>
-            <YourSpace />
-          </Route>
+            <Route path={"/tu-espacio"}>
+              <YourSpace />
+            </Route>
 
-          <ProtectedRoute path="/tu-espacio/:id">
-            {(params) => <Tenant id={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id">
+              {(params) => <Tenant id={params.id} />}
+            </ProtectedRoute>
 
-          <Route path={"/aviso-legal"}>
-            <Legal />
-          </Route>
+            <Route path={"/aviso-legal"}>
+              <Legal />
+            </Route>
 
-          <Route path={"/politica-y-privacidad"}>
-            <PrivacyPolicy />
-          </Route>
+            <Route path={"/politica-y-privacidad"}>
+              <PrivacyPolicy />
+            </Route>
 
-          <Route path={"/terminos-y-condiciones"}>
-            <Terms />
-          </Route>
+            <Route path={"/terminos-y-condiciones"}>
+              <Terms />
+            </Route>
 
-          <ProtectedRoute path="/tu-espacio/:id/alumnos">
-            {(params) => <Students tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/alumnos">
+              {(params) => <Students tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/profesores">
-            {(params) => <Professors tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/profesores">
+              {(params) => <Professors tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/clases">
-            {(params) => <Classes tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/clases">
+              {(params) => <Classes tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/actividades">
-            {(params) => <Activities tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/actividades">
+              {(params) => <Activities tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/profesiones">
-            {(params) => <Specialities tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/profesiones">
+              {(params) => <Specialities tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/pagos">
-            {(params) => <Payments tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/pagos">
+              {(params) => <Payments tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/grupos">
-            {(params) => <Groups tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/grupos">
+              {(params) => <Groups tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/tu-espacio/:id/planes">
-            {(params) => <StudentPlans tenantId={params.id} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/tu-espacio/:id/planes">
+              {(params) => <StudentPlans tenantId={params.id} />}
+            </ProtectedRoute>
 
-          <ProtectedRoute path="/invitacion/:token">
-            {(params) => <Invitation token={params.token} />}
-          </ProtectedRoute>
+            <ProtectedRoute path="/invitacion/:token">
+              {(params) => <Invitation token={params.token} />}
+            </ProtectedRoute>
 
-          <Route component={NotFound} />
-        </Switch>
-      </Suspense>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </>
   );
 }
