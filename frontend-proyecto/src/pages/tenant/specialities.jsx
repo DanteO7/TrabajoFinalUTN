@@ -15,7 +15,11 @@ export default function Specialities({ tenantId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedSpeciality, setSelectedSpeciality] = useState(null);
 
-  const { data: specialities = [], isLoading } = useQuery({
+  const {
+    data: specialities = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["getSpecialities", tenantId],
     queryFn: () => getSpecialities(tenantId),
   });
@@ -36,16 +40,21 @@ export default function Specialities({ tenantId }) {
         </button>
         {isLoading ? (
           <Loading />
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            Esta página no existe o no tienes acceso.
+          </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Especialidades
+                Profesiones
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar todas las especialidades de tus
-                profesores.
+                Define las áreas de estudio que ofrecen tus profesores. Cada
+                profesión se asigna a los docentes para que los alumnos conozcan
+                su especialización.
               </p>
             </div>
 
@@ -62,7 +71,7 @@ export default function Specialities({ tenantId }) {
                   onClick={() => setOpenModal(true)}
                   className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
                 >
-                  + Nueva especialidad
+                  + Nueva profesión
                 </button>
               </div>
             )}
@@ -81,16 +90,16 @@ export default function Specialities({ tenantId }) {
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
                   <h3 className="text-xl font-semibold">
-                    Todavía no hay especialidades
+                    Todavía no hay profesiones
                   </h3>
 
                   <p className="text-gray-500 mt-2 mb-6">
-                    Creá tu primera especialidad para comenzar.
+                    Creá tu primera profesión para comenzar.
                   </p>
 
                   <button
                     onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                    className="bg-[#333] text-white px-5 py-2 rounded-xl transition cursor-pointer hover:bg-[#222]"
                   >
                     + Crear especialidad
                   </button>

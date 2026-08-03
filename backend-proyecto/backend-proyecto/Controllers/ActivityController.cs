@@ -27,7 +27,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var activities = await _activityServices.GetAllByTenantId(tenantId);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var activities = await _activityServices.GetAllByTenantId(tenantId, userId);
                 return Ok(activities);
             }
             catch (HttpResponseError ex)

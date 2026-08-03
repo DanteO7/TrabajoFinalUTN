@@ -29,7 +29,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var classes = await _classServices.GetClassesByDate(tenantId, date);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var classes = await _classServices.GetClassesByDate(tenantId, date, userId);
                 return Ok(classes);
             }
             catch (HttpResponseError ex)
@@ -114,6 +115,29 @@ namespace backend_proyecto.Controllers
                     (int)HttpStatusCode.InternalServerError,
                     ex.Message
                 );
+            }
+        }
+
+        [HttpGet("{classId}/students")]
+        [Authorize(Roles = $"{Roles.TENANT},{Roles.PROFESSOR}")]
+        [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<ResponseClassStudentDTO>>> GetStudentsByClass(int classId)
+        {
+            try
+            {
+                var result = await _classServices.GetStudentsByClass(classId);
+                return Ok(result);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    new { message = ex.Message });
             }
         }
     }

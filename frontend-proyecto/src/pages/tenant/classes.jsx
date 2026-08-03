@@ -20,22 +20,35 @@ export default function Classes({ tenantId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
 
-  const getUserRoles = useTenantStore((state) => state.getUserRoles);
-  const userRoles = getUserRoles(tenantId);
+  const formatLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const userRoles = useTenantStore(
+    (state) => state.userRolesInTenant[tenantId],
+  );
   const canCreateClass =
     userRoles?.roles?.includes("Tenant") || userRoles?.roles?.includes("Admin");
+  console.log(userRoles);
 
-  const { data: classes = [], isLoading } = useQuery({
+  const {
+    data: classes = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["getClasses", tenantId, selectedDate],
-    queryFn: () =>
-      getClasses(tenantId, selectedDate.toISOString().split("T")[0]),
+    queryFn: () => getClasses(tenantId, formatLocalDate(selectedDate)),
     staleTime: 5 * 60 * 1000,
   });
 
   const classesOfDay = useMemo(() => {
     return classes.filter((c) => {
       const classDateString = c.date.split("T")[0];
-      const selectedDateString = selectedDate.toISOString().split("T")[0];
+      const selectedDateString = formatLocalDate(selectedDate);
       return classDateString === selectedDateString;
     });
   }, [classes, selectedDate]);
@@ -55,6 +68,10 @@ export default function Classes({ tenantId }) {
 
         {isLoading ? (
           <Loading />
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            Esta página no existe o no tienes acceso.
+          </div>
         ) : (
           <>
             <div>
@@ -120,7 +137,7 @@ export default function Classes({ tenantId }) {
                   {canCreateClass && (
                     <button
                       onClick={() => setOpenModal(true)}
-                      className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                      className="bg-[#333] min-w-35 text-white text-[] px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
                     >
                       + Nueva clase
                     </button>
@@ -207,7 +224,7 @@ export default function Classes({ tenantId }) {
             {openModal && (
               <ClassForm
                 tenantId={tenantId}
-                defaultDate={selectedDate.toISOString().split("T")[0]}
+                defaultDate={formatLocalDate(selectedDate)}
                 close={() => setOpenModal(false)}
               />
             )}

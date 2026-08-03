@@ -58,9 +58,14 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseStudentDTO>(student);
         }
 
-        public async Task<List<ResponseStudentDTO>> GetAll(int? tenantId)
+        public async Task<List<ResponseStudentDTO>> GetAll(int? tenantId, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
             if (tenantId != null && tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
@@ -74,6 +79,20 @@ namespace backend_proyecto.Services
             {
                 query = query.Where(s => s.TenantId == tenantId);
             }
+
+            if (tenant != null)
+            {
+                var hasAccess =
+                   tenant.OwnerUserId == userId ||
+                   tenant.Professors.Any(p => p.UserId == userId) ||
+                   tenant.Students.Any(s => s.UserId == userId);
+
+                if (!hasAccess)
+                {
+                    throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+                }
+            }
+
             var students = await query.ToListAsync();
             return _mapper.Map<List<ResponseStudentDTO>>(students);
         }
@@ -146,6 +165,22 @@ namespace backend_proyecto.Services
 
             student.MonthlyFeeStatus = status;
             await _studentRepository.UpdateOneAsync(student);
+            return _mapper.Map<ResponseStudentDTO>(student);
+        }
+        public async Task<ResponseStudentDTO> GetByUserAndTenant(int userId, int tenantId)
+        {
+            var student = await _studentRepository.GetOneAsync(
+                s => s.UserId == userId && s.TenantId == tenantId,
+                s => s.User,
+                s => s.StudentPlan
+            );
+
+            if (student == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    "No existe un registro de alumno para este usuario en este tenant");
+            }
+
             return _mapper.Map<ResponseStudentDTO>(student);
         }
     }

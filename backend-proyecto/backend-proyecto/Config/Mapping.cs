@@ -70,6 +70,20 @@ namespace backend_proyecto.Config
                 .ForMember(dest => dest.AvailableSpots,
                     opt => opt.MapFrom(src => src.MaxCapacity - src.Reservations.Count()));
 
+            CreateMap<Reservation, ResponseClassStudentDTO>()
+                .ForMember(d => d.ReservationId,
+                    o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.StudentId,
+                    o => o.MapFrom(s => s.Student.Id))
+                .ForMember(d => d.Name,
+                    o => o.MapFrom(s => s.Student.User.Name))
+                .ForMember(d => d.Surname,
+                    o => o.MapFrom(s => s.Student.User.Surname))
+                .ForMember(d => d.Email,
+                    o => o.MapFrom(s => s.Student.User.Email))
+                .ForMember(d => d.ReservationStatus,
+                    o => o.MapFrom(s => s.ReservationStatus));
+
             // reservation
             CreateMap<CreateReservationDTO, Reservation>();
             CreateMap<Reservation, ResponseReservationDTO>();

@@ -16,6 +16,7 @@ import SuccessModal from "../components/modals/success-modal";
 import ChangeEmailForm from "../components/profile/change-email-form";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import { useEffect } from "react";
+import { useTenantStore } from "../store/tenant-store";
 
 export default function Profile() {
   const { user, isAuthenticated, login, logout } = useAuthStore();
@@ -28,6 +29,7 @@ export default function Profile() {
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
 
   const [, setLocation] = useLocation();
+  const clearRoles = useTenantStore((state) => state.clearRoles);
 
   const [openChangeEmail, setOpenChangeEmail] = useState(false);
 
@@ -79,17 +81,14 @@ export default function Profile() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("forgotPasswordCooldown");
+    if (seconds <= 0) return;
 
-    if (saved) {
-      const remaining = Math.max(
-        0,
-        Math.ceil((Number(saved) - Date.now()) / 1000),
-      );
+    const timer = setInterval(() => {
+      setSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
 
-      setSeconds(remaining);
-    }
-  }, []);
+    return () => clearInterval(timer);
+  }, [seconds]);
 
   useEffect(() => {
     if (seconds <= 0) return;
@@ -124,7 +123,7 @@ export default function Profile() {
         email: getValues("email"),
       });
 
-      const endTime = Date.now() + 30_000;
+      const endTime = Date.now() + 60_000;
       localStorage.setItem("forgotPasswordCooldown", endTime.toString());
 
       setSeconds(60);
@@ -219,10 +218,11 @@ export default function Profile() {
                     : "hover:bg-gray-300 hover:text-[#333] cursor-pointer"
                 }`}
               >
-                {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
+                {seconds > 0 ? `Reenviar en ${seconds}s` : "Cambiar contraseña"}
               </button>
               <button
                 onClick={() => {
+                  clearRoles();
                   signOut();
                   logout();
                   setLocation("/");

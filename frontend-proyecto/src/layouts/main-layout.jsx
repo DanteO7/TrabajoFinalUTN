@@ -2,8 +2,28 @@ import React from "react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getMyTenants } from "../services/tenant";
+import { useTenantStore } from "../store/tenant-store";
 
 export default function MainLayout({ children }) {
+  const fetchUserRolesInTenant = useTenantStore(
+    (state) => state.fetchUserRolesInTenant,
+  );
+
+  const { data: myTenants } = useQuery({
+    queryKey: ["myTenants"],
+    queryFn: getMyTenants,
+  });
+
+  useEffect(() => {
+    if (!myTenants) return;
+    console.log("MainLayout", myTenants);
+
+    myTenants.forEach((tenant) => {
+      fetchUserRolesInTenant(tenant.id);
+    });
+  }, [myTenants, fetchUserRolesInTenant]);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);

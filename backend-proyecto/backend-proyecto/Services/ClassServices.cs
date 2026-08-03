@@ -28,16 +28,32 @@ namespace backend_proyecto.Services
             _reservationRepository = reservationRepository;
         }
 
-        public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date)
+        public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors 
+            );
+
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
 
+            var hasAccess =
+                tenant.OwnerUserId == userId ||
+                tenant.Professors.Any(p => p.UserId == userId) ||
+                tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
             var classes = await _classRepository.Query()
                 .Where(c => c.TenantId == tenantId && c.Date == date)
+                .OrderBy(c => c.StartTime)
                 .Include(c => c.Activity)
                 .Include(c => c.Professor)
                     .ThenInclude(p => p.User)
@@ -189,6 +205,25 @@ namespace backend_proyecto.Services
                 .FirstOrDefaultAsync();
 
             return _mapper.Map<ResponseClassDTO>(classEntity);
+        }
+        public async Task<List<ResponseClassStudentDTO>> GetStudentsByClass(int classId)
+        {
+            var classEntity = await _classRepository.GetOneAsync(c => c.Id == classId);
+
+            if (classEntity == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró una clase con Id = '{classId}'");
+            }
+
+            var reservations = await _reservationRepository.Query()
+             .Where(r => r.ClassId == classId)
+             .Include(r => r.Student)
+                 .ThenInclude(s => s.User)
+             .ToListAsync();
+
+            return _mapper.Map<List<ResponseClassStudentDTO>>(reservations);
         }
     }
 }

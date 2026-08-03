@@ -15,3 +15,6 @@ export const updateStudentPlan = (id, data) =>
 
 export const updateStudentStatus = (id, data) =>
   request("patch", `/students/${id}/status`, data);
+
+export const getStudentByUser = (tenantId) =>
+  request("get", `/students/me/${tenantId}`);

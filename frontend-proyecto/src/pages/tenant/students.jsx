@@ -15,7 +15,11 @@ export default function Students({ tenantId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const { data: students = [], isLoading } = useQuery({
+  const {
+    data: students = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["getStudents", tenantId],
     queryFn: () => getStudents(tenantId),
   });
@@ -56,6 +60,10 @@ export default function Students({ tenantId }) {
 
         {isLoading ? (
           <Loading />
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            Esta página no existe o no tienes acceso.
+          </div>
         ) : (
           <>
             <div>

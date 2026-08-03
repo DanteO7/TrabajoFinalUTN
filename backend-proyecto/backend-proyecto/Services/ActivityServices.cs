@@ -22,13 +22,29 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
         
-        public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId)
+        public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
+
+            var hasAccess =
+               tenant.OwnerUserId == userId ||
+               tenant.Professors.Any(p => p.UserId == userId) ||
+               tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
             var activities = await _activityRepository.GetAllAsync(a => a.TenantId == tenantId, a => a.Tenant);
             return _mapper.Map<List<ResponseActivityDTO>>(activities);
         }

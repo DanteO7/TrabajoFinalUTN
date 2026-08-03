@@ -78,12 +78,12 @@ export default function SpecialityForm({ tenantId, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear una especialidad
+        Crear una profesión
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre de la especialidad"
+          label="Nombre de la profesión"
           placeholder="Ej: Kinesiólogo, Instructor de Pilates..."
           register={register("name")}
           error={errors.name}
@@ -109,7 +109,7 @@ export default function SpecialityForm({ tenantId, close }) {
           type="submit"
           className="mt-2 bg-[#333] text-white rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer"
         >
-          Crear especialidad
+          Crear profesión
         </button>
       </form>
 

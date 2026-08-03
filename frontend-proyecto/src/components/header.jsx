@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuthStore } from "../store/auth-store";
 
 export default function Header() {
   const [menu, setMenu] = useState(false);
+  const [location] = useLocation();
   const { isAuthenticated } = useAuthStore();
+
+  const handleHomeClick = (e) => {
+    if (location === "/") {
+      e.preventDefault();
+      window.location.href = "/";
+    }
+  };
 
   return (
     <header className="bg-[#222] w-full h-13 sticky top-0 z-30">
@@ -23,8 +31,13 @@ export default function Header() {
             <span className="w-6 h-0.75 rounded-4xl bg-[#ededed]"></span>
           </button>
         </div>
-        <Link href="/">
-          <img src="/logo.png" alt="logo de turno facil" className="w-28" />
+
+        <Link href="/" onClick={handleHomeClick}>
+          <img
+            src="/logo.png"
+            alt="logo de turno facil"
+            className="w-28 cursor-pointer"
+          />
         </Link>
 
         <nav className="hidden min-[900px]:flex gap-8"></nav>
@@ -33,13 +46,13 @@ export default function Header() {
           {isAuthenticated && (
             <Link
               href="/tu-espacio"
-              className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-0.75"
+              className="min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
             >
               Tu espacio
             </Link>
           )}
           {isAuthenticated ? (
-            <Link href="/perfil">
+            <Link className="hidden min-[900px]:flex" href="/perfil">
               <IoPersonSharp size={22} />
             </Link>
           ) : (
@@ -76,7 +89,7 @@ export default function Header() {
       >
         <button
           onClick={() => setMenu(false)}
-          className="cursor-pointer self-end text-2xl leading-none "
+          className="cursor-pointer self-end text-2xl leading-none"
         >
           ✕
         </button>
@@ -86,23 +99,28 @@ export default function Header() {
             <ul className="flex flex-col gap-4">
               <Link
                 href="/"
-                className="cursor-pointer transition-all duration-200 "
+                onClick={() => {
+                  handleHomeClick();
+                  setMenu(false);
+                }}
+                className="cursor-pointer transition-all duration-200"
               >
                 Inicio
               </Link>
               <Link
                 href="/perfil"
-                className="cursor-pointer transition-all duration-200 "
+                onClick={() => setMenu(false)}
+                className="cursor-pointer transition-all duration-200"
               >
                 Perfil
               </Link>
               <Link
                 href="/tu-espacio"
-                className="cursor-pointer transition-all duration-200 "
+                onClick={() => setMenu(false)}
+                className="cursor-pointer transition-all duration-200"
               >
                 Tu espacio
               </Link>
-              <li className="cursor-pointer transition-all duration-200 "></li>
             </ul>
           </nav>
           <Link href="/ajustes">

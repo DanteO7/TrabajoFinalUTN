@@ -16,11 +16,16 @@ export default function Activities({ tenantId }) {
   const [openForm, setOpenForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  const getUserRoles = useTenantStore((state) => state.getUserRoles);
-  const userRoles = getUserRoles(tenantId);
+  const userRoles = useTenantStore(
+    (state) => state.userRolesInTenant[tenantId],
+  );
   const isTenant = userRoles?.roles?.includes("Tenant");
 
-  const { data: activities = [], isLoading } = useQuery({
+  const {
+    data: activities = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["getActivities", tenantId],
     queryFn: () => getActivities(tenantId),
   });
@@ -46,6 +51,10 @@ export default function Activities({ tenantId }) {
 
         {isLoading ? (
           <Loading />
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            Esta página no existe o no tienes acceso.
+          </div>
         ) : (
           <>
             <div>

@@ -5,26 +5,12 @@ import { getMyTenants } from "../services/tenant";
 import MyTenantCard from "../components/your-space/my-tenant-card";
 import { Link } from "wouter";
 import Loading from "../components/loading";
-import { useEffect } from "react";
-import { useTenantStore } from "../store/tenant-store";
 
 export default function YourSpace() {
   const { data: myTenants, isLoading } = useQuery({
     queryKey: ["myTenants"],
     queryFn: getMyTenants,
   });
-
-  const fetchUserRolesInTenant = useTenantStore(
-    (state) => state.fetchUserRolesInTenant,
-  );
-
-  useEffect(() => {
-    if (myTenants) {
-      myTenants.forEach((tenant) => {
-        fetchUserRolesInTenant(tenant.id);
-      });
-    }
-  }, [myTenants, fetchUserRolesInTenant]);
 
   return (
     <MainLayout>

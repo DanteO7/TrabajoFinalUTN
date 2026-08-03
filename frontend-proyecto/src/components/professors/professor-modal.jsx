@@ -16,8 +16,9 @@ import { useTenantStore } from "../../store/tenant-store";
 export default function ProfessorModal({ professor, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const getUserRoles = useTenantStore((state) => state.getUserRoles);
-  const userRoles = getUserRoles(tenantId);
+  const userRoles = useTenantStore(
+    (state) => state.userRolesInTenant[tenantId],
+  );
   const isTenant = userRoles?.roles?.includes("Tenant");
 
   const [editing, setEditing] = useState(false);

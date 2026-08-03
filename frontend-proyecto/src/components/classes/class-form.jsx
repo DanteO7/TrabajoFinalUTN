@@ -26,7 +26,7 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
     resolver: zodResolver(createClassSchema),
     mode: "onTouched",
     defaultValues: {
-      date: defaultDate || "", // ← Agregar esto
+      date: defaultDate || "",
     },
   });
 

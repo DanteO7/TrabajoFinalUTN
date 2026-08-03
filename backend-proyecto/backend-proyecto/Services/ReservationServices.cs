@@ -26,13 +26,29 @@ namespace backend_proyecto.Services
             _studentPlanRepository = studentPlanRepository;
         }
 
-        public async Task<List<ResponseReservationDTO>> GetAllByDate(int tenantId, DateTime date)
+        public async Task<List<ResponseReservationDTO>> GetAllByDate(int tenantId, DateTime date, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
+
+            var hasAccess =
+                   tenant.OwnerUserId == userId ||
+                   tenant.Professors.Any(p => p.UserId == userId) ||
+                   tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
             var reservations = await _reservationRepository.GetAllAsync(r => r.TenantId == tenantId && r.ReservationDate.Date == date.Date, r => r.Class, r => r.Student);
             return _mapper.Map<List<ResponseReservationDTO>>(reservations);
         }
@@ -102,6 +118,25 @@ namespace backend_proyecto.Services
             if(student.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "El estudiante no tiene la cuota al día");
+            }
+            var startOfMonth = new DateTime(
+                classEntity.Date.Year,
+                classEntity.Date.Month,
+                1);
+
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            var reservationsThisMonth = await _reservationRepository.CountAsync(r =>
+                r.StudentId == student.Id &&
+                r.Class.Date >= DateOnly.FromDateTime(startOfMonth) &&
+                r.Class.Date < DateOnly.FromDateTime(endOfMonth) &&
+                r.ReservationStatus != ReservationStatus.CANCELLED);
+
+            if (reservationsThisMonth >= studentPlan.ClassesPerMonth)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya alcanzaste el límite de clases de tu plan para este mes");
             }
 
             var reservation = _mapper.Map<Reservation>(createReservationDTO);

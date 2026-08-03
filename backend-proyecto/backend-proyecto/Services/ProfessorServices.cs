@@ -49,10 +49,15 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
-        public async Task<List<ResponseProfessorDTO>> GetAll (int? tenantId)
+        public async Task<List<ResponseProfessorDTO>> GetAll (int? tenantId, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
-            if(tenantId != null && tenant == null)
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
+            if (tenantId != null && tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
 
@@ -66,6 +71,20 @@ namespace backend_proyecto.Services
             {
                 query = query.Where(p => p.TenantId == tenantId);
             }
+
+            if (tenant != null)
+            {
+                var hasAccess =
+                   tenant.OwnerUserId == userId ||
+                   tenant.Professors.Any(p => p.UserId == userId) ||
+                   tenant.Students.Any(s => s.UserId == userId);
+
+                if (!hasAccess)
+                {
+                    throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+                }
+            }
+            
             var professors = await query.ToListAsync();
             return _mapper.Map<List<ResponseProfessorDTO>>(professors);
         }

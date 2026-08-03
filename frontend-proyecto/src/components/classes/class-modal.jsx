@@ -8,16 +8,26 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateClass, deleteClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
+import {
+  createReservation,
+  deleteReservation,
+  getReservationsByStudent,
+} from "../../services/reservation";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { useTenantStore } from "../../store/tenant-store";
 import { updateClassSchema } from "../../schema/class-schema";
+import { useAuthStore } from "../../store/auth-store";
+import { useTenantStore } from "../../store/tenant-store";
+import { getStudentByUser } from "../../services/student";
+import ClassStudentsModal from "./class-students-modal";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
+  const { user } = useAuthStore();
 
-  const getUserRoles = useTenantStore((state) => state.getUserRoles);
-  const userRoles = getUserRoles(tenantId);
+  const userRoles = useTenantStore(
+    (state) => state.userRolesInTenant[tenantId],
+  );
   const canEdit =
     userRoles?.roles?.includes("Tenant") ||
     userRoles?.roles?.includes("Professor");
@@ -33,7 +43,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
-  console.log(currentClass);
+  const [studentsModal, setStudentsModal] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -61,7 +72,25 @@ export default function ClassModal({ classItem, tenantId, close }) {
     queryFn: () => getProfessors(tenantId),
   });
 
+  const { data: currentStudent } = useQuery({
+    queryKey: ["getStudentByUser", tenantId, user?.id],
+    queryFn: () => getStudentByUser(tenantId),
+    enabled: isStudent && !!user?.id,
+  });
+
+  const { data: reservations = [] } = useQuery({
+    queryKey: ["getReservationsByStudent", currentStudent?.id],
+    queryFn: () => getReservationsByStudent(currentStudent.id),
+    enabled: !!currentStudent,
+  });
+  console.log(currentStudent);
+
   const isFull = currentClass.reservationsCount >= currentClass.maxCapacity;
+  const currentReservation = reservations.find(
+    (r) => r.classId === currentClass.id,
+  );
+
+  const isReserved = !!currentReservation;
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteClass(currentClass.id),
@@ -135,6 +164,76 @@ export default function ClassModal({ classItem, tenantId, close }) {
     },
   });
 
+  const reservationMutation = useMutation({
+    mutationFn: () =>
+      createReservation({
+        classId: currentClass.id,
+        tenantId: tenantId,
+        studentId: currentStudent.id,
+        reservationDate: new Date().toISOString(),
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getClasses", tenantId],
+      });
+
+      setSuccessMessage("¡Te uniste a la clase correctamente!");
+      setSuccessModal(true);
+
+      setTimeout(() => {
+        close();
+      }, 3000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al unirse a la clase";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const cancelReservationMutation = useMutation({
+    mutationFn: () => deleteReservation(currentReservation.id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getClasses", tenantId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["getReservationsByStudent", currentStudent.id],
+      });
+
+      setSuccessMessage("Saliste de la clase correctamente");
+      setSuccessModal(true);
+
+      setTimeout(() => {
+        close();
+      }, 3000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al salir de la clase";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
   const onSubmit = (form) => {
     updateMutation.mutate(form);
   };
@@ -155,8 +254,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
           </h2>
 
           <p className="text-gray-600 mb-6">
-            {currentClass.professor.user?.name}{" "}
-            {currentClass.professor.user?.surname}
+            {currentClass.professor.user.name}{" "}
+            {currentClass.professor.user.surname}
           </p>
 
           <div className="space-y-4 mb-8">
@@ -177,16 +276,29 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Disponibilidad</p>
-              <div className="flex justify-between items-center">
-                <p className="font-semibold text-[#333]">
+
+              <div className="flex justify-between items-center gap-3">
+                <p className="font-semibold text-[14px] min-[900px]:text-[16px] text-[#333]">
                   {currentClass.reservationsCount} / {currentClass.maxCapacity}{" "}
                   alumnos
                 </p>
-                {isFull && (
-                  <span className="bg-red-100 text-red-700 text-xs rounded-full px-2 py-1">
-                    Llena
-                  </span>
-                )}
+
+                <div className="flex items-center gap-2">
+                  {canEdit && (
+                    <button
+                      onClick={() => setStudentsModal(true)}
+                      className="bg-[#333] text-[12px] min-[900px]:text-[16px] text-white px-3 min-[900px]:px-4 py-1.5 rounded-lg text-sm hover:bg-gray-700 transition cursor-pointer"
+                    >
+                      Ver alumnos
+                    </button>
+                  )}
+
+                  {isFull && (
+                    <span className="bg-red-100 text-red-700 text-xs rounded-full px-2 py-1">
+                      Llena
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -209,16 +321,35 @@ export default function ClassModal({ classItem, tenantId, close }) {
               </button>
             </div>
           ) : isStudent ? (
-            <button
-              className={`w-full py-3 rounded-xl font-semibold transition ${
-                isFull
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-[#333] text-white hover:bg-gray-700 cursor-pointer"
-              }`}
-              disabled={isFull}
-            >
-              {isFull ? "Lista de espera" : "Entrar a la clase"}
-            </button>
+            isReserved ? (
+              <button
+                onClick={() => cancelReservationMutation.mutate()}
+                disabled={cancelReservationMutation.isPending}
+                className="w-full py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+              >
+                {cancelReservationMutation.isPending
+                  ? "Saliendo..."
+                  : "Salir de la clase"}
+              </button>
+            ) : (
+              <button
+                onClick={() => reservationMutation.mutate()}
+                disabled={
+                  isFull || reservationMutation.isPending || !currentStudent
+                }
+                className={`w-full py-3 rounded-xl font-semibold transition ${
+                  isFull
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-[#333] text-white hover:bg-gray-700 cursor-pointer"
+                } disabled:opacity-50`}
+              >
+                {reservationMutation.isPending
+                  ? "Procesando..."
+                  : isFull
+                    ? "Lista de espera"
+                    : "Entrar a la clase"}
+              </button>
+            )
           ) : null}
         </>
       ) : (
@@ -276,21 +407,19 @@ export default function ClassModal({ classItem, tenantId, close }) {
             error={errors.date}
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput
-              type="time"
-              label="Hora inicio"
-              register={register("startTime")}
-              error={errors.startTime}
-            />
+          <FormInput
+            label="Hora de inicio"
+            type="time"
+            register={register("startTime")}
+            error={errors.startTime}
+          />
 
-            <FormInput
-              type="time"
-              label="Hora fin"
-              register={register("endTime")}
-              error={errors.endTime}
-            />
-          </div>
+          <FormInput
+            label="Hora de fin"
+            type="time"
+            register={register("endTime")}
+            error={errors.endTime}
+          />
 
           <FormInput
             label="Capacidad máxima"
@@ -365,6 +494,14 @@ export default function ClassModal({ classItem, tenantId, close }) {
             </button>
           </div>
         </Modal>
+      )}
+      {studentsModal && (
+        <ClassStudentsModal
+          classId={currentClass.id}
+          tenantId={tenantId}
+          maxCapacity={currentClass.maxCapacity}
+          close={() => setStudentsModal(false)}
+        />
       )}
     </Modal>
   );

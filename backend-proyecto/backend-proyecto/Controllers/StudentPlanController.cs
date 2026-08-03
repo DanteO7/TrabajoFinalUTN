@@ -28,7 +28,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var studentsPlan = await _studentPlanServices.GetAllByTenantId(tenantId);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var studentsPlan = await _studentPlanServices.GetAllByTenantId(tenantId, userId);
                 return Ok(studentsPlan);
             }
             catch (HttpResponseError ex)

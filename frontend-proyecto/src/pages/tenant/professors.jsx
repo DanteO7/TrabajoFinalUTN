@@ -10,8 +10,9 @@ import ProfessorModal from "../../components/professors/professor-modal";
 import { useTenantStore } from "../../store/tenant-store";
 
 export default function Professors({ tenantId }) {
-  const getUserRoles = useTenantStore((state) => state.getUserRoles);
-  const userRoles = getUserRoles(tenantId);
+  const userRoles = useTenantStore(
+    (state) => state.userRolesInTenant[tenantId],
+  );
 
   const isTenant = userRoles?.roles.includes("Tenant");
 
@@ -21,7 +22,11 @@ export default function Professors({ tenantId }) {
   const [openModal, setOpenModal] = useState(false);
   const [selectedProfessor, setSelectedProfessor] = useState(null);
 
-  const { data: professors = [], isLoading } = useQuery({
+  const {
+    data: professors = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["getProfessors", tenantId],
     queryFn: () => getProfessors(tenantId),
   });
@@ -49,6 +54,10 @@ export default function Professors({ tenantId }) {
 
         {isLoading ? (
           <Loading />
+        ) : isError ? (
+          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+            Esta página no existe o no tienes acceso.
+          </div>
         ) : (
           <>
             <div>

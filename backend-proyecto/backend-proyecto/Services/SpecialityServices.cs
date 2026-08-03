@@ -19,12 +19,27 @@ namespace backend_proyecto.Services
             _mapper = mapper;
         }
         
-        public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int tenantId)
+        public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int tenantId, int userId)
         {
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id  == tenantId);
-            if(tenant == null)
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
+            if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+            }
+
+            var hasAccess =
+                   tenant.OwnerUserId == userId ||
+                   tenant.Professors.Any(p => p.UserId == userId) ||
+                   tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
             }
 
             var specialities = await _specialityRepository.GetAllAsync(s => s.TenantId == tenantId, s => s.Tenant);

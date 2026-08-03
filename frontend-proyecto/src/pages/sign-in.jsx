@@ -9,9 +9,11 @@ import { signInSchema } from "../schema/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorModal from "../components/modals/error-modal";
 import EmailSentModal from "../components/modals/email-sent-modal";
+import { useTenantStore } from "../store/tenant-store";
 
 export default function SignIn() {
   const { login } = useAuthStore();
+  const clearRoles = useTenantStore((state) => state.clearRoles);
   const [, setLocation] = useLocation();
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -32,6 +34,7 @@ export default function SignIn() {
     mutationKey: ["signin"],
     mutationFn: signIn,
     onSuccess: (data) => {
+      clearRoles();
       login(data);
       setLocation("/");
     },
@@ -93,7 +96,7 @@ export default function SignIn() {
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
             Turno Fácil
           </h2>
-          <p className="text-center font-semibold text-gray-700 text-[17px]">
+          <p className="text-center font-semibold text-gray-700 text-[17px] min-[900px]:text-2xl">
             Iniciar sesión
           </p>
           <div>
@@ -124,13 +127,13 @@ export default function SignIn() {
           >
             {mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
           </button>
-          <button
+          {/* <button
             type="button"
             className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
             <img className="w-6" src="/google.png" alt="Icono de Google" />
             <p className="text-center">Inicia sesión con Google</p>
-          </button>
+          </button> */}
           <span
             onClick={handleForgotPassword}
             className="text-gray-500 cursor-pointer underline"

@@ -1,32 +1,37 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import SignIn from "./pages/sign-in";
-import SignUp from "./pages/sign-up";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, lazy } from "react";
 import { Route, Switch } from "wouter";
-import Home from "./pages/home";
 import { useAuthStore } from "./store/auth-store";
 import { me } from "./services/auth";
-import Profile from "./pages/profile";
-import Settings from "./pages/settings";
 import { usePreferencesStore } from "./store/preferences-store";
 import i18n from "./i18n";
-import ResetPassword from "./pages/reset-password";
-import YourSpace from "./pages/your-space";
-import Tenant from "./pages/tenant";
-import PrivacyPolicy from "./pages/privacy-policy";
-import Legal from "./pages/legal";
-import Terms from "./pages/terms";
-import Students from "./pages/tenant/students";
-import Professors from "./pages/tenant/professors";
-import Classes from "./pages/tenant/classes";
-import Activities from "./pages/tenant/activities";
-import Specialities from "./pages/tenant/specialities";
-import Payments from "./pages/tenant/payments";
-import Groups from "./pages/tenant/groups";
-import Invitation from "./pages/invitation";
 import Loading from "./components/loading";
-import StudentPlans from "./pages/tenant/student-plans";
+import { ProtectedRoute } from "./router/protected-route";
+import Header from "./components/header";
+
+const Home = lazy(() => import("./pages/home"));
+const SignIn = lazy(() => import("./pages/sign-in"));
+const SignUp = lazy(() => import("./pages/sign-up"));
+const VerifyCode = lazy(() => import("./pages/verify-code"));
+const YourSpace = lazy(() => import("./pages/your-space"));
+const Professors = lazy(() => import("./pages/tenant/professors"));
+const Students = lazy(() => import("./pages/tenant/students"));
+const Activities = lazy(() => import("./pages/tenant/activities"));
+const Classes = lazy(() => import("./pages/tenant/classes"));
+const StudentPlans = lazy(() => import("./pages/tenant/student-plans"));
+const Specialities = lazy(() => import("./pages/tenant/specialities"));
+const NotFound = lazy(() => import("./pages/not-found"));
+const Profile = lazy(() => import("./pages/profile"));
+const Settings = lazy(() => import("./pages/settings"));
+const Payments = lazy(() => import("./pages/tenant/payments"));
+const Groups = lazy(() => import("./pages/tenant/groups"));
+const Invitation = lazy(() => import("./pages/invitation"));
+const ResetPassword = lazy(() => import("./pages/reset-password"));
+const Legal = lazy(() => import("./pages/legal"));
+const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
+const Terms = lazy(() => import("./pages/terms"));
+const Tenant = lazy(() => import("./pages/tenant"));
 
 const queryClient = new QueryClient();
 
@@ -55,7 +60,14 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<Loading />}>
+      <Suspense
+        fallback={
+          <>
+            <Header />
+            <Loading />
+          </>
+        }
+      >
         <Switch>
           <Route path={"/"}>
             <Home />
@@ -67,6 +79,10 @@ export default function App() {
 
           <Route path={"/registrarse"}>
             <SignUp />
+          </Route>
+
+          <Route path={"/verificar-codigo"}>
+            <VerifyCode />
           </Route>
 
           <Route path={"/perfil"}>
@@ -85,9 +101,9 @@ export default function App() {
             <YourSpace />
           </Route>
 
-          <Route path="/tu-espacio/:id">
+          <ProtectedRoute path="/tu-espacio/:id">
             {(params) => <Tenant id={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
           <Route path={"/aviso-legal"}>
             <Legal />
@@ -101,41 +117,43 @@ export default function App() {
             <Terms />
           </Route>
 
-          <Route path="/tu-espacio/:id/alumnos">
+          <ProtectedRoute path="/tu-espacio/:id/alumnos">
             {(params) => <Students tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/profesores">
+          <ProtectedRoute path="/tu-espacio/:id/profesores">
             {(params) => <Professors tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/clases">
+          <ProtectedRoute path="/tu-espacio/:id/clases">
             {(params) => <Classes tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/actividades">
+          <ProtectedRoute path="/tu-espacio/:id/actividades">
             {(params) => <Activities tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/especialidades">
+          <ProtectedRoute path="/tu-espacio/:id/profesiones">
             {(params) => <Specialities tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/pagos">
+          <ProtectedRoute path="/tu-espacio/:id/pagos">
             {(params) => <Payments tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/grupos">
+          <ProtectedRoute path="/tu-espacio/:id/grupos">
             {(params) => <Groups tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/tu-espacio/:id/planes">
+          <ProtectedRoute path="/tu-espacio/:id/planes">
             {(params) => <StudentPlans tenantId={params.id} />}
-          </Route>
+          </ProtectedRoute>
 
-          <Route path="/invitacion/:token">
+          <ProtectedRoute path="/invitacion/:token">
             {(params) => <Invitation token={params.token} />}
-          </Route>
+          </ProtectedRoute>
+
+          <Route component={NotFound} />
         </Switch>
       </Suspense>
       <ReactQueryDevtools initialIsOpen={false} />

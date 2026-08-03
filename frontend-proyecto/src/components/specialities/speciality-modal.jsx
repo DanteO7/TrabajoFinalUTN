@@ -38,7 +38,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
       setDeleteModal(false);
 
-      setSuccessMessage("Especialidad eliminada correctamente");
+      setSuccessMessage("Profesión eliminada correctamente");
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -49,7 +49,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la especialidad";
+      let msg = "Ocurrió un error al eliminar la profesión";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -69,7 +69,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         queryKey: ["getSpecialities", tenantId],
       });
 
-      setSuccessMessage("Especialidad actualizada correctamente");
+      setSuccessMessage("Profesión actualizada correctamente");
       setSuccessModal(true);
 
       setCurrentSpeciality(updatedSpeciality);
@@ -86,7 +86,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la especialidad";
+      let msg = "Ocurrió un error al actualizar la profesión";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -126,7 +126,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
               onClick={() => setDeleteModal(true)}
               className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
             >
-              Eliminar especialidad
+              Eliminar profesión
             </button>
 
             <button
@@ -141,7 +141,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <h2 className="text-2xl font-semibold text-center">
-            Editar especialidad
+            Editar profesión
           </h2>
 
           <FormInput label="Nombre" register={register("name")} />
@@ -197,11 +197,11 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
       {deleteModal && (
         <Modal open onClose={() => setDeleteModal(false)}>
           <h2 className="text-2xl font-semibold text-center">
-            Eliminar especialidad
+            Eliminar profesión
           </h2>
 
           <p className="text-center mt-5">
-            ¿Seguro que querés eliminar la especialidad{" "}
+            ¿Seguro que querés eliminar la profesión{" "}
             <span className="font-semibold">"{currentSpeciality.name}"</span>?
           </p>
 

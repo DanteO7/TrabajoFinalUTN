@@ -55,29 +55,29 @@ export default function Tenant({ id }) {
         href: "actividades",
       },
       {
-        title: "Especialidades",
-        description: "Configurá especialidades.",
+        title: "Profesiones",
+        description: "Configurá profesiones.",
         icon: <FaBookOpen size={30} />,
-        href: "especialidades",
+        href: "profesiones",
       },
-      {
-        title: "Pagos",
-        description: "Consultá pagos.",
-        icon: <FaMoneyBillWave size={30} />,
-        href: "pagos",
-      },
+      // {
+      //   title: "Pagos",
+      //   description: "Consultá pagos.",
+      //   icon: <FaMoneyBillWave size={30} />,
+      //   href: "pagos",
+      // },
       {
         title: "Planes de Alumnos",
         description: "Administrá los planes de tus alumnos.",
         icon: <FaUserShield size={30} />,
         href: "planes",
       },
-      {
-        title: "Grupos",
-        description: "Administrá roles y permisos.",
-        icon: <FaUserShield size={30} />,
-        href: "grupos",
-      },
+      // {
+      //   title: "Grupos",
+      //   description: "Administrá roles y permisos.",
+      //   icon: <FaUserShield size={30} />,
+      //   href: "grupos",
+      // },
     ],
 
     Professor: [
@@ -100,17 +100,17 @@ export default function Tenant({ id }) {
         href: "actividades",
       },
       {
-        title: "Especialidades",
-        description: "Especialidades.",
+        title: "Profesiones",
+        description: "Configurá profesiones.",
         icon: <FaBookOpen size={30} />,
-        href: "especialidades",
+        href: "profesiones",
       },
-      {
-        title: "Pagos",
-        description: "Tus pagos.",
-        icon: <FaMoneyBillWave size={30} />,
-        href: "pagos",
-      },
+      // {
+      //   title: "Pagos",
+      //   description: "Tus pagos.",
+      //   icon: <FaMoneyBillWave size={30} />,
+      //   href: "pagos",
+      // },
     ],
 
     Student: [
@@ -132,12 +132,12 @@ export default function Tenant({ id }) {
         icon: <FaRunning size={30} />,
         href: "actividades",
       },
-      {
-        title: "Pagos",
-        description: "Consultá tus pagos.",
-        icon: <FaMoneyBillWave size={30} />,
-        href: "pagos",
-      },
+      // {
+      //   title: "Pagos",
+      //   description: "Consultá tus pagos.",
+      //   icon: <FaMoneyBillWave size={30} />,
+      //   href: "pagos",
+      // },
     ],
   };
 

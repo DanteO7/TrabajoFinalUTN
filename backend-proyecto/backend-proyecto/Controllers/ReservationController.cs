@@ -29,7 +29,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var reservations = await _reservationServices.GetAllByDate(tenantId, date);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var reservations = await _reservationServices.GetAllByDate(tenantId, date, userId);
                 return Ok(reservations);
             }
             catch (HttpResponseError ex)
