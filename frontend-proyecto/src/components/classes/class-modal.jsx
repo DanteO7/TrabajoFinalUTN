@@ -45,6 +45,15 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const [studentsModal, setStudentsModal] = useState(false);
 
+  const formatDateWithDay = (dateString) => {
+    const [year, month, day] = dateString.split("T")[0].split("-");
+    const date = new Date(year, month - 1, day);
+
+    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
+    const dateFormatted = date.toLocaleDateString("es-AR");
+
+    return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
+  };
   const {
     register,
     handleSubmit,
@@ -261,8 +270,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Fecha</p>
               <p className="font-semibold text-[#333]">
-                {new Date(currentClass.date).toLocaleDateString("es-AR")}
-              </p>
+                {formatDateWithDay(currentClass.date)}
+              </p>{" "}
             </div>
 
             <div className="bg-[#efefef] rounded-xl p-4">
