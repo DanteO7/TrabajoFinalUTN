@@ -10,6 +10,7 @@ import Loading from "./components/loading";
 import { ProtectedRoute } from "./router/protected-route";
 import Header from "./components/header";
 import { useLocation } from "wouter";
+import ForgotPassword from "./pages/forgot-password";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -45,6 +46,7 @@ export default function App() {
     "/iniciar-sesion",
     "/registrarse",
     "/verificar-codigo",
+    "/olvide-contraseña",
   ];
   const shouldShowHeader = !noHeaderRoutes.includes(location);
 
@@ -100,6 +102,10 @@ export default function App() {
 
             <Route path={"/resetear-contraseña"}>
               <ResetPassword />
+            </Route>
+
+            <Route path={"/olvide-contraseña"}>
+              <ForgotPassword />
             </Route>
 
             <Route path={"/tu-espacio"}>

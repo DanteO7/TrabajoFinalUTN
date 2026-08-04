@@ -44,8 +44,6 @@ export default function SignUp() {
   });
 
   const onSubmit = (credentials) => {
-    console.log("onSubmit called:", credentials);
-    console.log("Form errors:", errors);
     setBackendError(null);
     mutation.mutate({ email: credentials.email });
   };

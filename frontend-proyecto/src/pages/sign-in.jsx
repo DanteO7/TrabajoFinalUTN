@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import FormInput from "../components/form-input";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "../store/auth-store";
-import { forgotPassword, signIn } from "../services/auth";
+import { signIn } from "../services/auth";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { signInSchema } from "../schema/auth-schema";
@@ -17,13 +17,10 @@ export default function SignIn() {
   const [, setLocation] = useLocation();
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-  const [openForgotPassword, setOpenForgotPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
-    trigger,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(signInSchema),
@@ -53,25 +50,6 @@ export default function SignIn() {
   const onSubmit = (credentials) => {
     setBackendError(null);
     mutation.mutate(credentials);
-  };
-
-  const handleForgotPassword = async () => {
-    try {
-      const isValid = await trigger("email");
-
-      if (!isValid) return;
-
-      const email = getValues("email");
-
-      await forgotPassword({
-        email,
-      });
-
-      setOpenForgotPassword(true);
-    } catch (error) {
-      setBackendError(`Error enviando email: ${error.message}`);
-      setErrorModal(true);
-    }
   };
 
   return (
@@ -134,12 +112,12 @@ export default function SignIn() {
             <img className="w-6" src="/google.png" alt="Icono de Google" />
             <p className="text-center">Inicia sesión con Google</p>
           </button> */}
-          <span
-            onClick={handleForgotPassword}
+          <Link
+            href="/olvide-contraseña"
             className="text-gray-500 cursor-pointer underline"
           >
             ¿Olvidaste tu contraseña?
-          </span>
+          </Link>
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
             <span className="text-gray-500">si no tenes cuenta</span>
@@ -157,13 +135,6 @@ export default function SignIn() {
         <ErrorModal
           close={() => setErrorModal(false)}
           message={backendError}
-          isSuccesOrError={true}
-        />
-      )}
-      {openForgotPassword && (
-        <EmailSentModal
-          close={() => setOpenForgotPassword(false)}
-          email={getValues("email")}
           isSuccesOrError={true}
         />
       )}
