@@ -11,6 +11,7 @@ import { ProtectedRoute } from "./router/protected-route";
 import Header from "./components/header";
 import { useLocation } from "wouter";
 import ForgotPassword from "./pages/forgot-password";
+import Reservations from "./pages/tenant/reservations";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -158,6 +159,10 @@ export default function App() {
 
             <ProtectedRoute path="/tu-espacio/:id/planes">
               {(params) => <StudentPlans tenantId={params.id} />}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/reservas">
+              {(params) => <Reservations tenantId={params.id} />}
             </ProtectedRoute>
 
             <ProtectedRoute path="/invitacion/:token">

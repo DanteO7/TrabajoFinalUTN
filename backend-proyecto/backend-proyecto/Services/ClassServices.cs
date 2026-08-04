@@ -65,52 +65,85 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseClassDTO> CreateOne(CreateClassDTO createClassDTO)
         {
+            // Validar existencia de entidades
             var activity = await _activityRepository.GetOneAsync(a => a.Id == createClassDTO.ActivityId);
             if (activity == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{createClassDTO.ActivityId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    $"No se encontró una actividad con el Id = '{createClassDTO.ActivityId}'");
             }
 
             var professor = await _professorRepository.GetOneAsync(p => p.Id == createClassDTO.ProfessorId);
             if (professor == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un profesor con el Id = '{createClassDTO.ProfessorId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    $"No se encontró un profesor con el Id = '{createClassDTO.ProfessorId}'");
             }
 
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createClassDTO.TenantId);
             if (tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createClassDTO.TenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound,
+                    $"No se encontró un tenant con el Id = '{createClassDTO.TenantId}'");
             }
 
-            if (createClassDTO.Date < DateOnly.FromDateTime(DateTime.Now))
+            // Validar que la clase no sea en el pasado
+            var now = DateTime.Now;
+            var classDate = createClassDTO.Date;
+            var classTime = createClassDTO.StartTime;
+
+            if (classDate < DateOnly.FromDateTime(now))
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede crear una clase para un dia anterior = '{createClassDTO.Date}'");
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"No se puede crear una clase para un día anterior = '{createClassDTO.Date}'");
             }
 
-            if(createClassDTO.StartTime >= createClassDTO.EndTime)
+            // Si la clase es hoy, verificar que no haya pasado
+            if (classDate == DateOnly.FromDateTime(now))
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La hora de inicio debe ser menor a la hora del fin = Hora inicio: '{createClassDTO.StartTime}', Hora fin: '{createClassDTO.EndTime}'");
+                var classDateTime = classDate.ToDateTime(classTime);
+                if (classDateTime < now)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest,
+                        "No puedes crear una clase para una hora que ya pasó");
+                }
             }
 
-            if(createClassDTO.MaxCapacity <= 0)
+            // Validar horarios
+            if (createClassDTO.StartTime >= createClassDTO.EndTime)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no debe ser menor o igual a cero = '{createClassDTO.MaxCapacity}'");
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"La hora de inicio debe ser menor a la hora del fin = Hora inicio: '{createClassDTO.StartTime}', Hora fin: '{createClassDTO.EndTime}'");
             }
 
+            // Validar capacidad
+            if (createClassDTO.MaxCapacity <= 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"La capacidad máxima no debe ser menor o igual a cero = '{createClassDTO.MaxCapacity}'");
+            }
+
+            // Validar conflicto de horario del profesor
             var conflict = await _classRepository.ExistsScheduleConflict(createClassDTO, null);
             if (conflict)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El profesor ya tiene una clase en ese horario");
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"El profesor ya tiene una clase en ese horario");
             }
 
+            // Crear la clase
             var classMapped = _mapper.Map<Class>(createClassDTO);
             await _classRepository.CreateOneAsync(classMapped);
-            
-            // Volver a buscar la clase con sus relaciones
-            var createdClass = await _classRepository.GetOneAsync(c => c.Id == classMapped.Id, c => c.Activity, c => c.Professor, c => c.Reservations);
 
-            return _mapper.Map<ResponseClassDTO>(classMapped);
+            // Volver a buscar la clase con sus relaciones
+            var createdClass = await _classRepository.GetOneAsync(
+                c => c.Id == classMapped.Id,
+                c => c.Activity,
+                c => c.Professor,
+                c => c.Reservations
+            );
+
+            return _mapper.Map<ResponseClassDTO>(createdClass);
         }
 
         public async Task DeleteOne(int id)

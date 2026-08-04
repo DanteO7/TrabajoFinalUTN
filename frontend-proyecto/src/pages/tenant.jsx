@@ -7,6 +7,7 @@ import {
   FaMoneyBillWave,
   FaUserShield,
   FaBookOpen,
+  FaClipboardList,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -131,6 +132,12 @@ export default function Tenant({ id }) {
         description: "Actividades disponibles.",
         icon: <FaRunning size={30} />,
         href: "actividades",
+      },
+      {
+        title: "Reservas",
+        description: "Tus proximas clases.",
+        icon: <FaClipboardList size={30} />,
+        href: "reservas",
       },
       // {
       //   title: "Pagos",

@@ -11,7 +11,7 @@ import { getProfessors } from "../../services/professor";
 import {
   createReservation,
   deleteReservation,
-  getReservationsByStudent,
+  getReservationsByStudentId,
 } from "../../services/reservation";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
@@ -79,11 +79,10 @@ export default function ClassModal({ classItem, tenantId, close }) {
   });
 
   const { data: reservations = [] } = useQuery({
-    queryKey: ["getReservationsByStudent", currentStudent?.id],
-    queryFn: () => getReservationsByStudent(currentStudent.id),
+    queryKey: ["getReservationsByStudentId", currentStudent?.id],
+    queryFn: () => getReservationsByStudentId(currentStudent.id),
     enabled: !!currentStudent,
   });
-  console.log(currentStudent);
 
   const isFull = currentClass.reservationsCount >= currentClass.maxCapacity;
   const currentReservation = reservations.find(

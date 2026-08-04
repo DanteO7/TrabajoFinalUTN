@@ -9,6 +9,7 @@ namespace backend_proyecto.Repositories
     {
         Task<int> CountByClassId(int classId);
         Task<int> CountAsync(Expression<Func<Reservation, bool>> predicate);
+        Task UpdateRangeAsync(List<Reservation> reservations);
     }
     public class ReservationRepository : Repository<Reservation>, IReservationRepository
     {
@@ -24,6 +25,11 @@ namespace backend_proyecto.Repositories
         public async Task<int> CountAsync(Expression<Func<Reservation, bool>> predicate)
         {
             return await _db.Reservations.CountAsync(predicate);
+        }
+        public async Task UpdateRangeAsync(List<Reservation> reservations)
+        {
+            _db.Reservations.UpdateRange(reservations);
+            await _db.SaveChangesAsync();
         }
     }
 }

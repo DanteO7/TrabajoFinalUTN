@@ -88,7 +88,7 @@ export default function ClassStudentsModal({
           No hay alumnos inscriptos.
         </div>
       ) : (
-        <div className="space-y-3 mt-8 max-h-[400px] overflow-y-auto">
+        <div className="space-y-3 mt-8 max-h-100 overflow-y-auto">
           {students.map((student) => (
             <div
               key={student.reservationId}
