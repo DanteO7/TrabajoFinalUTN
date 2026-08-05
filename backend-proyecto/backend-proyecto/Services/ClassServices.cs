@@ -3,9 +3,8 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
-using Microsoft.AspNetCore.Http.HttpResults;
+using backend_proyecto.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -88,7 +87,7 @@ namespace backend_proyecto.Services
             }
 
             // Validar que la clase no sea en el pasado
-            var now = DateTime.Now;
+            var now = TimeHelper.Now();
             var classDate = createClassDTO.Date;
             var classTime = createClassDTO.StartTime;
 
@@ -184,7 +183,7 @@ namespace backend_proyecto.Services
 
             if (updateClassDTO.Date != null)
             {
-                if (updateClassDTO.Date < DateOnly.FromDateTime(DateTime.Now))
+                if (updateClassDTO.Date < DateOnly.FromDateTime(TimeHelper.Now()))
                 {
                     throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede asignar una clase a un día anterior = '{updateClassDTO.Date}'");
                 }

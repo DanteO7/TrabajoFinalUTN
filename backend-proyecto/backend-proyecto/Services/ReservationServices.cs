@@ -2,6 +2,7 @@
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using backend_proyecto.Utils;
 using AutoMapper;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +70,7 @@ namespace backend_proyecto.Services
             }
 
             // Validar que la clase no sea en el pasado
-            var nowLocal = DateTime.Now;
+            var nowLocal = TimeHelper.Now();
             var classDate = classEntity.Date;
             var classTime = classEntity.StartTime;
 
@@ -157,7 +158,7 @@ namespace backend_proyecto.Services
 
         public async Task UpdateCompletedReservations()
         {
-            var now = DateTime.Now;
+            var now = TimeHelper.Now();
             var today = DateOnly.FromDateTime(now);
             var currentTime = TimeOnly.FromDateTime(now);
 
@@ -276,7 +277,7 @@ namespace backend_proyecto.Services
                     "No puedes salir de una clase que ya finalizó");
             }
 
-            var now = DateTime.Now;
+            var now = TimeHelper.Now();
 
             var limit = reservation.Class.Date
                 .ToDateTime(reservation.Class.StartTime)
