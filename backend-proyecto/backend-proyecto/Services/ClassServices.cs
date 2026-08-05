@@ -147,11 +147,27 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
-            var classModel = await _classRepository.GetOneAsync(c => c.Id == id);
+            var classModel = await _classRepository.GetOneAsync(c => c.Id == id, c => c.Reservations);
             if(classModel == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una clase con el Id = '{id}'");
             }
+
+            if (classModel.Reservations.Count > 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No se puede eliminar una clase con reservas dentro");
+            }
+
+            var classStart = classModel.Date.ToDateTime(classModel.StartTime);
+
+            if (classStart < TimeHelper.Now())
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede eliminar una clase que ya comenzó"
+                );
+            }
+
             await _classRepository.DeleteOneAsync(classModel);
         }
 

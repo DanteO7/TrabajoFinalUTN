@@ -277,6 +277,12 @@ namespace backend_proyecto.Services
                     "No puedes salir de una clase que ya finalizó");
             }
 
+            if (reservation.ReservationStatus == ReservationStatus.COMPLETED)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    "No puedes salir de una clase que ya finalizó");
+            }
+
             var now = TimeHelper.Now();
 
             var limit = reservation.Class.Date

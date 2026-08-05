@@ -86,6 +86,9 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>(); 
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 
+// Backgound Services
+builder.Services.AddHostedService<ClassCleanupService>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));
 
