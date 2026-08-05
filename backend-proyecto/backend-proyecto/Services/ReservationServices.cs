@@ -245,7 +245,8 @@ namespace backend_proyecto.Services
             await UpdateCompletedReservations();
 
             var reservations = await _reservationRepository.Query()
-                .Where(r => r.StudentId == studentId).Include(r => r.Class).ThenInclude(c => c.Activity)
+                .Where(r => r.StudentId == studentId)
+                .Include(r => r.Class).ThenInclude(c => c.Activity)
                 .Include(r => r.Class)
                     .ThenInclude(c => c.Professor)
                         .ThenInclude(p => p.User)
