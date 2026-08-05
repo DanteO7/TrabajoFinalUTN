@@ -134,7 +134,7 @@ export default function Classes({ tenantId }) {
                     Clases del {selectedDate.toLocaleDateString("es-AR")}
                   </h2>
 
-                  {canCreateClass && (
+                  {canCreateClass && !isDateInPast && (
                     <button
                       onClick={() => setOpenModal(true)}
                       className="bg-[#333] min-w-35 text-white text-[] px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
@@ -179,15 +179,28 @@ export default function Classes({ tenantId }) {
                       </div>
                     ))
                   ) : isDateInPast ? (
-                    <div className="border rounded-xl py-16 text-center">
-                      <h3 className="text-xl font-semibold text-red-600">
-                        No puedes crear clases para días anteriores
-                      </h3>
+                    canCreateClass ? (
+                      <div className="border rounded-xl py-16 text-center">
+                        <h3 className="text-xl font-semibold text-red-600">
+                          No puedes crear clases para días anteriores
+                        </h3>
 
-                      <p className="text-gray-500 mt-2">
-                        Seleccioná una fecha futura para crear una nueva clase.
-                      </p>
-                    </div>
+                        <p className="text-gray-500 mt-2">
+                          Seleccioná una fecha futura para crear una nueva
+                          clase.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="border rounded-xl py-16 text-center">
+                        <h3 className="text-xl font-semibold text-red-600">
+                          No hubo clases este dia
+                        </h3>
+
+                        <p className="text-gray-500 mt-2">
+                          Seleccioná una fecha futura ver las clases disponibles
+                        </p>
+                      </div>
+                    )
                   ) : !canCreateClass ? (
                     <div className="border rounded-xl py-16 text-center">
                       <h3 className="text-xl font-semibold">

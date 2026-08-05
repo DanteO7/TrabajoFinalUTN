@@ -45,6 +45,12 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const [studentsModal, setStudentsModal] = useState(false);
 
+  const classStart = new Date(
+    `${currentClass.date.split("T")[0]}T${currentClass.startTime}`,
+  );
+
+  const classStarted = new Date() >= classStart;
+
   const formatDateWithDay = (dateString) => {
     const [year, month, day] = dateString.split("T")[0].split("-");
     const date = new Date(year, month - 1, day);
@@ -329,7 +335,11 @@ export default function ClassModal({ classItem, tenantId, close }) {
               </button>
             </div>
           ) : isStudent ? (
-            isReserved ? (
+            classStarted ? (
+              <div className="w-full py-3 rounded-xl text-center bg-gray-200 text-gray-600 font-semibold">
+                No disponible
+              </div>
+            ) : isReserved ? (
               <button
                 onClick={() => cancelReservationMutation.mutate()}
                 disabled={cancelReservationMutation.isPending}
