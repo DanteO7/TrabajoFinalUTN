@@ -8,6 +8,7 @@ import {
   FaUserShield,
   FaBookOpen,
   FaClipboardList,
+  FaTags,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -70,7 +71,7 @@ export default function Tenant({ id }) {
       {
         title: "Planes de Alumnos",
         description: "Administrá los planes de tus alumnos.",
-        icon: <FaUserShield size={30} />,
+        icon: <FaTags size={30} />,
         href: "planes",
       },
       // {

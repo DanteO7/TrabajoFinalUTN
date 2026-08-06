@@ -52,9 +52,9 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El precio no puede ser menor o igual a 0");
             }
-            if(createStudentPlanDTO.ClassesPerMonth <= 0 || createStudentPlanDTO.ClassesPerMonth > 23)
+            if(createStudentPlanDTO.ClassesPerMonth <= 0 || createStudentPlanDTO.ClassesPerMonth > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Las clases por mes no pueden ser menor o igual a 0 o mayor a 23");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Las clases por mes no pueden ser menor o igual a 0 o mayor a 50");
             }
 
             var studentPlan = _mapper.Map<StudentPlan>(createStudentPlanDTO);
