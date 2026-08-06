@@ -12,12 +12,14 @@ namespace backend_proyecto.Services
         private readonly IStudentPlanRepository _studentPlanRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper)
+        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository )
         {
             _studentPlanRepository = studentPlanRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
+            _studentRepository = studentRepository;
         }
 
         public async Task<List<ResponseStudentPlanDTO>> GetAllByTenantId(int tenantId)
@@ -70,6 +72,13 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de estudiante con el Id = '{id}'");
             }
 
+            var studentsWithPlan = await _studentRepository.CountAsync(s => s.StudentPlanId == id);
+            if (studentsWithPlan > 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"No puedes eliminar este plan porque {studentsWithPlan} estudiante(s) lo tienen asignado");
+            }
+
             await _studentPlanRepository.DeleteOneAsync(studentPlan);
         }
 
@@ -84,9 +93,9 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El precio no puede ser menor o igual a 0");
             }
-            if (updateStudentPlanDTO.ClassesPerMonth <= 0 || updateStudentPlanDTO.ClassesPerMonth > 23)
+            if (updateStudentPlanDTO.ClassesPerMonth <= 0 || updateStudentPlanDTO.ClassesPerMonth > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Las clases por mes no pueden ser menor o igual a 0 o mayor a 23");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Las clases por mes no pueden ser menor o igual a 0 o mayor a 50");
             }
             if (updateStudentPlanDTO.Name != null && updateStudentPlanDTO.Name.Length > 50)
             {
