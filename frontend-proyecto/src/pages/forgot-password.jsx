@@ -73,11 +73,11 @@ export default function ForgotPassword() {
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
           <p className="text-gray-400 font-semibold text-2xl">Verificación</p>
           <h3 className="text-gray-300 text-xl mt-2">
-            Verifica tu correo para completar el registro
+            Gestioná todos tus negocios desde un solo lugar
           </h3>
         </div>
       </div>
-      <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-[23%]">
+      <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
           className="flex flex-col gap-4"

@@ -46,9 +46,20 @@ export default function Header() {
           {isAuthenticated && (
             <div className="flex items-center gap-5">
               {user?.roles?.includes("Admin") && (
-                <Link className="hidden min-[900px]:flex" href="usuarios">
-                  Usuarios
-                </Link>
+                <>
+                  <Link
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
+                    href="usuarios"
+                  >
+                    Usuarios
+                  </Link>
+                  <Link
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
+                    href="usuarios"
+                  >
+                    Planes
+                  </Link>
+                </>
               )}
               <Link
                 href="/tu-espacio"
@@ -71,7 +82,7 @@ export default function Header() {
             </Link>
           )}
 
-          <Link className="hidden min-[900px]:flex" href="ajustes">
+          <Link className="hidden min-[900px]:flex">
             <IoMdSettings
               className="inline-block transition-transform duration-300 hover:scale-105 hover:rotate-70"
               size={22}
@@ -148,7 +159,7 @@ export default function Header() {
               )}
             </ul>
           </nav>
-          <Link onClick={() => setMenu(false)} href="/ajustes">
+          <Link onClick={() => setMenu(false)}>
             <IoMdSettings size={22} />
           </Link>
         </div>

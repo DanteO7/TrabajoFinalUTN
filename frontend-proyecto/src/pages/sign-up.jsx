@@ -50,7 +50,7 @@ export default function SignUp() {
 
   return (
     <div className="bg-[#ede9ee] min-h-screen text-[11px] flex">
-      <div className="text-black p-5 m-auto w-[90%] md:w-1/3 lg:w-[23%]">
+      <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
           className="flex flex-col gap-3"

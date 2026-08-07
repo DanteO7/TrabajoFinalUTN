@@ -65,7 +65,7 @@ export default function SignIn() {
           </h3>
         </div>
       </div>
-      <div className="text-black p-5 m-auto w-11/12 md:w-1/2 lg:w-1/4">
+      <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
           className="flex max-w flex-col gap-3.5"

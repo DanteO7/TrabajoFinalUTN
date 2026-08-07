@@ -57,7 +57,7 @@ export default function Users() {
 
         <UserSearchFilters />
 
-        <div className="grid grid-cols-2 gap-4 mt-6">
+        <div className="grid min-[900px]:grid-cols-2 gap-4 mt-6">
           {users.map((user) => (
             <UserItem key={user.id} user={user} onSelect={setUserSelected} />
           ))}
