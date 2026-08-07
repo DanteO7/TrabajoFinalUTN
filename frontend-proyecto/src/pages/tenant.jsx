@@ -163,7 +163,6 @@ export default function Tenant({ id }) {
       className: "border-yellow-600 text-yellow-600",
     },
   };
-
   const role = roleConfig[tenant?.role];
 
   const cards = sections[tenant?.role];

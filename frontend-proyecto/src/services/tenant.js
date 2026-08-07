@@ -32,3 +32,5 @@ export const getMyTenants = () => request("get", "/tenants/my-tenants");
 
 export const getUserRolesInTenant = (tenantId) =>
   request("get", `/tenants/${tenantId}/user-roles`);
+
+export const getUserTenants = (id) => request("get", `/tenants/user/${id}`);

@@ -1,4 +1,5 @@
-﻿using backend_proyecto.Enums;
+﻿using backend_projeto.Models.DTOs;
+using backend_proyecto.Enums;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
@@ -20,26 +21,35 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles =$"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<UserWithoutPassDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [ProducesResponseType(typeof(PagedResponse<UserWithoutPassDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<UserWithoutPassDTO>>> GetAll([FromQuery] string? search, [FromQuery] bool? isProfessor, [FromQuery] bool? isStudent)
+        public async Task<ActionResult<PagedResponse<UserWithoutPassDTO>>> GetUsers(
+            [FromQuery] string? search,
+            [FromQuery] string? role,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
             try
             {
-                var users = await _userServices.GetAll(search, isProfessor, isStudent);
-                return Ok(users);
+                page = page <= 0 ? 1 : page;
+                pageSize = pageSize <= 0 ? 10 : pageSize;
+                pageSize = pageSize > 50 ? 50 : pageSize;
+
+                var result = await _userServices.GetAll(search, role, page, pageSize);
+
+                return Ok(result);
             }
             catch (HttpResponseError ex)
             {
-                return StatusCode((int)ex.StatusCode, ex.Message);
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = ex.Message });
             }
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]

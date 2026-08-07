@@ -7,7 +7,7 @@ import { useAuthStore } from "../store/auth-store";
 export default function Header() {
   const [menu, setMenu] = useState(false);
   const [location] = useLocation();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const handleHomeClick = (e) => {
     if (location === "/") {
@@ -44,12 +44,19 @@ export default function Header() {
 
         <div className="flex gap-5 items-center">
           {isAuthenticated && (
-            <Link
-              href="/tu-espacio"
-              className="min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
-            >
-              Tu espacio
-            </Link>
+            <div className="flex items-center gap-5">
+              {user?.roles?.includes("Admin") && (
+                <Link className="hidden min-[900px]:flex" href="usuarios">
+                  Usuarios
+                </Link>
+              )}
+              <Link
+                href="/tu-espacio"
+                className="min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
+              >
+                Tu espacio
+              </Link>
+            </div>
           )}
           {isAuthenticated ? (
             <Link className="hidden min-[900px]:flex" href="/perfil">
@@ -108,22 +115,40 @@ export default function Header() {
                 Inicio
               </Link>
               <Link
-                href="/perfil"
+                href="perfil"
                 onClick={() => setMenu(false)}
                 className="cursor-pointer transition-all duration-200"
               >
                 Perfil
               </Link>
               <Link
-                href="/tu-espacio"
+                href="tu-espacio"
                 onClick={() => setMenu(false)}
                 className="cursor-pointer transition-all duration-200"
               >
                 Tu espacio
               </Link>
+              {user?.roles?.includes("Admin") && (
+                <>
+                  <Link
+                    href="usuarios"
+                    onClick={() => setMenu(false)}
+                    className="cursor-pointer transition-all duration-200"
+                  >
+                    Usuarios
+                  </Link>
+                  <Link
+                    href="usuarios"
+                    onClick={() => setMenu(false)}
+                    className="cursor-pointer transition-all duration-200"
+                  >
+                    Planes
+                  </Link>
+                </>
+              )}
             </ul>
           </nav>
-          <Link href="/ajustes">
+          <Link onClick={() => setMenu(false)} href="/ajustes">
             <IoMdSettings size={22} />
           </Link>
         </div>

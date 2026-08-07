@@ -200,5 +200,12 @@ namespace backend_proyecto.Controllers
                 return StatusCode((int)ex.StatusCode, new { message = ex.Message });
             }
         }
+
+        [HttpGet("user/{userId}")]
+        [Authorize(Roles = Roles.ADMIN)]
+        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetUserTenants(int userId)
+        {
+            return Ok(await _tenantServices.GetMyTenants(userId, userId));
+        }
     }
 }

@@ -7,9 +7,9 @@ export default function NotFound() {
   return (
     <MainLayout>
       <div className="w-full min-h-screen flex items-center justify-center">
-        <div className="text-center px-4 mt-10 min-[900px]:mt-0">
+        <div className="text-center px-4 mt-15 min-[900px]:mt-0">
           <div className="mb-8">
-            <h1 className="text-9xl md:text-[150px] font-bold text-[#333] leading-none">
+            <h1 className="text-[115px] md:text-[150px] font-bold text-[#333] leading-none">
               404
             </h1>
             <div className="h-1 w-30 bg-[#333] mx-auto mt-4"></div>

@@ -11,7 +11,7 @@ import { ProtectedRoute } from "./router/protected-route";
 import Header from "./components/header";
 import { useLocation } from "wouter";
 import ForgotPassword from "./pages/forgot-password";
-import Reservations from "./pages/tenant/reservations";
+import { AdminRoute } from "./router/admin-route";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -35,6 +35,8 @@ const Legal = lazy(() => import("./pages/legal"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
 const Terms = lazy(() => import("./pages/terms"));
 const Tenant = lazy(() => import("./pages/tenant"));
+const Users = lazy(() => import("./pages/users"));
+const Reservations = lazy(() => import("./pages/tenant/reservations"));
 
 const queryClient = new QueryClient();
 
@@ -128,6 +130,10 @@ export default function App() {
             <Route path={"/terminos-y-condiciones"}>
               <Terms />
             </Route>
+
+            <AdminRoute path={"/usuarios"}>
+              <Users />
+            </AdminRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/alumnos">
               {(params) => <Students tenantId={params.id} />}

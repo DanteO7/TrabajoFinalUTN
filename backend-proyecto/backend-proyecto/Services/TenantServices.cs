@@ -214,9 +214,9 @@ namespace backend_proyecto.Services
 
             return _mapper.Map<ResponseTenantDTO>(tenant);
         }
-        public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId)
+        public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId, int? targetUserId = null)
         {
-            var tenants = await _tenantRepository.GetMyTenants(userId);
+            var tenants = await _tenantRepository.GetMyTenants(userId, targetUserId);
 
             return tenants;
         }

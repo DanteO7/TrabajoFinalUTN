@@ -1,6 +1,6 @@
 import { request } from "./api";
 
-export const getUsers = () => request("get", "/users");
+export const getUsers = (params) => request("get", "/users", null, params);
 
 export const getUserById = (id) => request("get", `/users/${id}`);
 

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using backend_projeto.Models.DTOs;
 using backend_proyecto.Config;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
@@ -26,7 +28,11 @@ namespace backend_proyecto.Services
             _db = db;
         }
 
-        public async Task<List<UserWithoutPassDTO>> GetAll(string? search, bool? isProfessor, bool? isStudent)
+        public async Task<PagedResponse<UserWithoutPassDTO>> GetAll(
+            string? search,
+            string? role,
+            int page = 1,
+            int pageSize = 10)
         {
             IQueryable<User> query = _repo.Query();
 
@@ -39,17 +45,49 @@ namespace backend_proyecto.Services
                 u.Email.Trim().ToLower().Contains(normalized));
             }
 
-            if (isProfessor == true)
+            if (!string.IsNullOrWhiteSpace(role))
             {
-                query = query.Where(u => _db.Professors.Any(p => p.UserId == u.Id));
-            }
-            if (isStudent == true)
-            {
-                query = query.Where(u => _db.Students.Any(s => s.UserId == u.Id));
+                switch (role)
+                {
+                    case Roles.PROFESSOR:
+                        query = query.Where(u =>
+                            _db.Professors.Any(p => p.UserId == u.Id));
+                        break;
+
+                    case Roles.STUDENT:
+                        query = query.Where(u =>
+                            _db.Students.Any(s => s.UserId == u.Id));
+                        break;
+
+                    case Roles.TENANT:
+                        query = query.Where(u =>
+                            _db.Tenants.Any(t => t.OwnerUserId == u.Id));
+                        break;
+
+                    case Roles.ADMIN:
+                        query = query.Where(u =>
+                            _db.Admin.Any(a => a.UserId == u.Id));
+                        break;
+                }
             }
 
-            var users = await query.ToListAsync();
-            return _mapper.Map<List<UserWithoutPassDTO>>(users);
+            var totalCount = await query.CountAsync();
+
+
+            var users = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var mapped = _mapper.Map<List<UserWithoutPassDTO>>(users);
+
+            return new PagedResponse<UserWithoutPassDTO>
+            {
+                Items = mapped,
+                Page = page,
+                PageSize = pageSize,
+                HasNextPage = page * pageSize < totalCount
+            };
         }
 
         public async Task<UserWithoutPassDTO?> GetOneById(int id)

@@ -8,7 +8,7 @@ public interface ITenantRepository : IRepository<Tenant>
 {
     Task<bool> ExistsByUserId(int userId);
     Task<bool> ExistsByOwnerAndId(int userId, int tenantId);
-    Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId);
+    Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null);
 }
 
 public class TenantRepository : Repository<Tenant>, ITenantRepository
@@ -30,8 +30,10 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
         return await dbSet.AnyAsync(t => t.OwnerUserId == userId && t.Id == tenantId);
     }
 
-    public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId)
+    public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null)
     {
+        var userId = targetUserId ?? currentUserId;
+
         var tenants = await _db.Tenants
             .Where(t =>
                 t.OwnerUserId == userId ||

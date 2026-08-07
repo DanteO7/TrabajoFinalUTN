@@ -18,7 +18,6 @@ export default function MainLayout({ children }) {
 
   useEffect(() => {
     if (!myTenants) return;
-    console.log("MainLayout", myTenants);
 
     myTenants.forEach((tenant) => {
       fetchUserRolesInTenant(tenant.id);
