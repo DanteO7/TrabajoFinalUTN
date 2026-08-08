@@ -40,7 +40,7 @@ export default function Users() {
     <MainLayout>
       <div className="w-full max-w-6xl mt-12">
         <button
-          onClick={() => setLocation("/tu-espacio")}
+          onClick={() => setLocation("/")}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack />

@@ -20,6 +20,7 @@ import { useAuthStore } from "../../store/auth-store";
 import { useTenantStore } from "../../store/tenant-store";
 import { getStudentByUser } from "../../services/student";
 import ClassStudentsModal from "./class-students-modal";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -34,7 +35,6 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const isStudent = userRoles?.roles?.includes("Student");
 
   const [editing, setEditing] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [currentClass, setCurrentClass] = useState(classItem);
 
   const [backendError, setBackendError] = useState();
@@ -44,6 +44,8 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const [studentsModal, setStudentsModal] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState(false);
 
   const classStart = new Date(
     `${currentClass.date.split("T")[0]}T${currentClass.startTime}`,
@@ -114,7 +116,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
         queryKey: ["getClasses", tenantId],
       });
 
-      setDeleteModal(false);
+      setConfirmModal(false);
       setSuccessMessage("Clase eliminada correctamente");
       setSuccessModal(true);
 
@@ -131,7 +133,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
-
+      setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -223,7 +225,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["getReservationsByStudent", currentStudent.id],
+        queryKey: ["getReservationsByStudentId", currentStudent.id],
       });
 
       setSuccessMessage("Saliste de la clase correctamente");
@@ -250,6 +252,14 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const onSubmit = (form) => {
     updateMutation.mutate(form);
+  };
+
+  const decreaseReservationCount = () => {
+    const updatedClass = {
+      ...currentClass,
+      reservationsCount: currentClass.reservationsCount - 1,
+    };
+    setCurrentClass(updatedClass);
   };
 
   return (
@@ -320,7 +330,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
           {canEdit ? (
             <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
               <button
-                onClick={() => setDeleteModal(true)}
+                onClick={() => setConfirmModal(true)}
                 className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 Eliminar clase
@@ -466,6 +476,16 @@ export default function ClassModal({ classItem, tenantId, close }) {
         </form>
       )}
 
+      {confirmModal && (
+        <ConfirmModal
+          title="¿Eliminar esta clase?"
+          message={`Estás por eliminar la clase del dia ${formatDateWithDay(currentClass.date)} a las ${currentClass.startTime.slice(0, 5)} - ${currentClass.endTime.slice(0, 5)}.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
+      )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -482,43 +502,14 @@ export default function ClassModal({ classItem, tenantId, close }) {
         />
       )}
 
-      {deleteModal && (
-        <Modal open onClose={() => setDeleteModal(false)}>
-          <h2 className="text-2xl font-semibold text-center">Eliminar clase</h2>
-
-          <p className="text-center mt-5">
-            ¿Seguro que querés eliminar la clase de{" "}
-            <span className="font-semibold">{currentClass.activity.name}</span>?
-          </p>
-
-          <p className="text-center text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
-          </p>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(false)}
-              className="border rounded-xl px-4 py-2"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
-            </button>
-          </div>
-        </Modal>
-      )}
       {studentsModal && (
         <ClassStudentsModal
-          classId={currentClass.id}
+          currentClass={currentClass}
           tenantId={tenantId}
           maxCapacity={currentClass.maxCapacity}
           close={() => setStudentsModal(false)}
+          formatDateWithDay={formatDateWithDay}
+          decreaseReservationCount={decreaseReservationCount}
         />
       )}
     </Modal>

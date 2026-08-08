@@ -7,6 +7,7 @@ import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
 
 import { deleteReservation } from "../../services/reservation";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function ReservationModal({ reservation, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -17,11 +18,13 @@ export default function ReservationModal({ reservation, tenantId, close }) {
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
+  const [confirmModal, setConfirmModal] = useState(false);
+
   const classItem = reservation.class;
 
   const canCancel = reservation.reservationStatus === "Pending";
 
-  const cancelMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: () => deleteReservation(reservation.id),
 
     onSuccess: () => {
@@ -32,6 +35,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
       queryClient.invalidateQueries({
         queryKey: ["getClasses", tenantId],
       });
+      setConfirmModal(false);
 
       setSuccessMessage("Reserva cancelada correctamente");
       setSuccessModal(true);
@@ -51,16 +55,19 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
 
+      setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
     },
   });
 
+  var date = new Date(classItem.date).toLocaleDateString("es-AR");
+
   return (
     <Modal open onClose={close}>
       <button
         onClick={close}
-        className="absolute top-4 right-4 text-gray-500 hover:text-black"
+        className="absolute top-4 right-4 text-gray-500 hover:text-black transition duration-200 cursor-pointer"
       >
         <X size={20} />
       </button>
@@ -91,9 +98,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <div className="bg-[#efefef] rounded-xl p-4">
           <p className="text-sm text-gray-600 mb-1">Fecha</p>
 
-          <p className="font-semibold">
-            {new Date(classItem.date).toLocaleDateString("es-AR")}
-          </p>
+          <p className="font-semibold">{date}</p>
         </div>
 
         <div className="bg-[#efefef] rounded-xl p-4">
@@ -129,12 +134,22 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
       {canCancel && (
         <button
-          onClick={() => cancelMutation.mutate()}
-          disabled={cancelMutation.isPending}
+          onClick={() => setConfirmModal(true)}
+          disabled={deleteMutation.isPending}
           className="w-full mt-8 bg-red-600 text-white rounded-xl py-3 hover:bg-red-700 disabled:opacity-50 cursor-pointer transition"
         >
-          {cancelMutation.isPending ? "Cancelando..." : "Cancelar reserva"}
+          {deleteMutation.isPending ? "Cancelando..." : "Cancelar reserva"}
         </button>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          title="¿Cancelar esta reserva?"
+          message={`Estás por cancelar la reserva del dia ${date} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
       )}
 
       {errorModal && (

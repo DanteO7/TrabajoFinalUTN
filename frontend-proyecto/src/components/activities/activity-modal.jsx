@@ -6,6 +6,7 @@ import { updateActivity, deleteActivity } from "../../services/activity";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { useTenantStore } from "../../store/tenant-store";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function ActivityModal({ activity, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -17,7 +18,6 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
   const [editing, setEditing] = useState(false);
   const [currentActivity, setCurrentActivity] = useState(activity);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [name, setName] = useState(currentActivity.name);
   const [description, setDescription] = useState(
     currentActivity.description || "",
@@ -29,6 +29,8 @@ export default function ActivityModal({ activity, tenantId, close }) {
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
+  const [confirmModal, setConfirmModal] = useState(false);
+
   const deleteMutation = useMutation({
     mutationFn: () => deleteActivity(currentActivity.id),
 
@@ -37,7 +39,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
         queryKey: ["getActivities", tenantId],
       });
 
-      setDeleteModal(false);
+      setConfirmModal(false);
 
       setSuccessMessage("Actividad eliminada correctamente");
       setSuccessModal(true);
@@ -57,6 +59,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
 
+      setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -115,14 +118,14 @@ export default function ActivityModal({ activity, tenantId, close }) {
             {currentActivity.name}
           </h2>
 
-          {currentActivity.description && (
-            <p className="text-gray-600 mb-6">{currentActivity.description}</p>
-          )}
+          <p className="text-gray-600 whitespace-pre-wrap">
+            {currentActivity.description || "Sin descripción"}
+          </p>
 
           {isTenant && (
-            <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
+            <div className="flex justify-end gap-3 max-[360px]:text-[13px] mt-8">
               <button
-                onClick={() => setDeleteModal(true)}
+                onClick={() => setConfirmModal(true)}
                 className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 Eliminar actividad
@@ -192,6 +195,16 @@ export default function ActivityModal({ activity, tenantId, close }) {
         </div>
       )}
 
+      {confirmModal && (
+        <ConfirmModal
+          title="¿Eliminar esta actividad?"
+          message={`Estás por eliminar la actividad "${activity.name}". Esta acción no se puede deshacer.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
+      )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -206,40 +219,6 @@ export default function ActivityModal({ activity, tenantId, close }) {
           message={successMessage}
           isSuccesOrError={true}
         />
-      )}
-
-      {deleteModal && (
-        <Modal open onClose={() => setDeleteModal(false)}>
-          <h2 className="text-2xl font-semibold text-center">
-            Eliminar actividad
-          </h2>
-
-          <p className="text-center mt-5">
-            ¿Seguro que querés eliminar la actividad{" "}
-            <span className="font-semibold">{currentActivity.name}</span>?
-          </p>
-
-          <p className="text-center text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
-          </p>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(false)}
-              className="border rounded-xl px-4 py-2"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
-            </button>
-          </div>
-        </Modal>
       )}
     </Modal>
   );

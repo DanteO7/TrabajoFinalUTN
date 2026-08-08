@@ -118,7 +118,7 @@ export default function Professors({ tenantId }) {
                     {professor.specialities.length > 0 && (
                       <div className="mt-4">
                         <p className="text-xs text-gray-600 mb-2">
-                          Especialidades
+                          Profesiones:
                         </p>
                         <div className="flex flex-wrap gap-1">
                           {professor.specialities.map((spec) => (

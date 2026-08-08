@@ -12,6 +12,7 @@ import { getSpecialities } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { useTenantStore } from "../../store/tenant-store";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function ProfessorModal({ professor, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -23,7 +24,6 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
   const [editing, setEditing] = useState(false);
   const [currentProfessor, setCurrentProfessor] = useState(professor);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [isActive, setIsActive] = useState(currentProfessor.isActive);
   const [selectedSpeciality, setSelectedSpeciality] = useState(null);
 
@@ -32,6 +32,8 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState(false);
 
   const { data: specialities = [] } = useQuery({
     queryKey: ["getSpecialities", tenantId],
@@ -54,7 +56,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
         queryKey: ["getProfessors", tenantId],
       });
 
-      setDeleteModal(false);
+      setConfirmModal(false);
 
       setSuccessMessage("Profesor eliminado correctamente");
       setSuccessModal(true);
@@ -73,7 +75,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
-
+      setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -234,7 +236,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
             {currentProfessor.specialities.length > 0 && (
               <div className="bg-[#efefef] rounded-xl p-4">
-                <p className="text-sm text-gray-600 mb-3">Especialidades</p>
+                <p className="text-sm text-gray-600 mb-3">Profesiones</p>
                 <div className="flex flex-wrap gap-2">
                   {currentProfessor.specialities.map((spec) => (
                     <span
@@ -252,7 +254,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           {isTenant && (
             <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
               <button
-                onClick={() => setDeleteModal(true)}
+                onClick={() => setConfirmModal(true)}
                 className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
               >
                 Eliminar profesor
@@ -310,13 +312,13 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
           <div>
             <label className="block text-sm font-semibold mb-3">
-              Especialidades
+              Profesiones
             </label>
 
             {currentProfessor.specialities.length > 0 && (
               <div className="mb-4 p-3 bg-[#efefef] rounded-xl">
                 <p className="text-xs text-gray-600 mb-2">
-                  Especialidades actuales
+                  Profesiones actuales
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {currentProfessor.specialities.map((spec) => (
@@ -369,7 +371,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             {availableSpecialities.length === 0 &&
               currentProfessor.specialities.length > 0 && (
                 <p className="text-sm text-gray-500">
-                  Todas las especialidades están asignadas
+                  Todas las profesiones están asignadas
                 </p>
               )}
           </div>
@@ -389,6 +391,16 @@ export default function ProfessorModal({ professor, tenantId, close }) {
         </div>
       )}
 
+      {confirmModal && (
+        <ConfirmModal
+          title="Eliminar este profesor?"
+          message={`Estás por eliminar el alumno "${currentProfessor.user.name} ${currentProfessor.user.surname} ". Esta acción no se puede deshacer.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
+      )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -403,43 +415,6 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           message={successMessage}
           isSuccesOrError={true}
         />
-      )}
-
-      {deleteModal && (
-        <Modal open onClose={() => setDeleteModal(false)}>
-          <h2 className="text-2xl font-semibold text-center">
-            Eliminar profesor
-          </h2>
-
-          <p className="text-center mt-5">
-            ¿Seguro que querés eliminar a{" "}
-            <span className="font-semibold">
-              {currentProfessor.user.name} {currentProfessor.user.surname}
-            </span>
-            ?
-          </p>
-
-          <p className="text-center text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
-          </p>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(false)}
-              className="border rounded-xl px-4 py-2"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
-            </button>
-          </div>
-        </Modal>
       )}
     </Modal>
   );

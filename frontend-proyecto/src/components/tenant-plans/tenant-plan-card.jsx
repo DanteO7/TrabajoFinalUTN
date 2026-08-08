@@ -3,9 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
 import { useState } from "react";
-import { deleteStudentPlan } from "../../services/student-plan";
+import { deleteTenantPlan } from "../../services/tenant-plan";
 
-export default function StudentPlanCard({ plan, tenantId, onEdit }) {
+export default function TenantPlanCard({ plan, onEdit }) {
   const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
@@ -13,13 +13,13 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
   const [confirmModal, setConfirmModal] = useState(false);
 
   const deleteMutation = useMutation({
-    mutationFn: () => deleteStudentPlan(plan.id),
+    mutationFn: () => deleteTenantPlan(plan.id),
 
     onSuccess: () => {
       setConfirmModal(false);
 
       queryClient.invalidateQueries({
-        queryKey: ["getStudentPlans", tenantId],
+        queryKey: ["getTenantPlans"],
       });
     },
 
@@ -43,14 +43,15 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
 
   return (
     <>
-      <div className="border rounded-2xl p-5 shadow-sm">
+      <div className=" border rounded-2xl p-5 shadow-sm">
         <div className="flex justify-between items-start mb-5">
           <div>
             <h3 className="text-xl font-semibold text-[#333]">{plan.name}</h3>
 
-            <p className="text-sm text-gray-500 mt-2">
-              {plan.classesPerMonth} clases/mes
-            </p>
+            <div className="mt-2 space-y-1 text-sm text-gray-500">
+              <p>{plan.maxStudents} alumnos</p>
+              <p>{plan.maxProfessors} profesores</p>
+            </div>
           </div>
 
           <div className="text-right">

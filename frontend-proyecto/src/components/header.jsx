@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
+import { FaBook, FaHome } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 import { Link, useLocation } from "wouter";
 import { useAuthStore } from "../store/auth-store";
+import MenuItem from "./menu-item";
+import { MdSpaceDashboard } from "react-icons/md";
 
 export default function Header() {
   const [menu, setMenu] = useState(false);
@@ -15,6 +20,8 @@ export default function Header() {
       window.location.href = "/";
     }
   };
+
+  var isAdmin = user?.roles?.includes("Admin");
 
   return (
     <header className="bg-[#222] w-full h-13 sticky top-0 z-30">
@@ -42,20 +49,22 @@ export default function Header() {
 
         <nav className="hidden min-[900px]:flex gap-8"></nav>
 
-        <div className="flex gap-5 items-center">
+        <div
+          className={`flex gap-5 items-center ${isAdmin && "min-[900px]:mr-25"}`}
+        >
           {isAuthenticated && (
-            <div className="flex items-center gap-5">
-              {user?.roles?.includes("Admin") && (
+            <div className={`flex items-center gap-5`}>
+              {isAdmin && (
                 <>
                   <Link
-                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="usuarios"
                   >
                     Usuarios
                   </Link>
                   <Link
-                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
-                    href="usuarios"
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
+                    href="planes"
                   >
                     Planes
                   </Link>
@@ -63,7 +72,7 @@ export default function Header() {
               )}
               <Link
                 href="/tu-espacio"
-                className="min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px]"
+                className="min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
               >
                 Tu espacio
               </Link>
@@ -114,54 +123,61 @@ export default function Header() {
 
         <div className="flex flex-col justify-between h-full">
           <nav>
-            <ul className="flex flex-col gap-4">
-              <Link
+            <ul className="flex flex-col gap-4 mt-3">
+              <MenuItem
                 href="/"
+                icon={FaHome}
                 onClick={() => {
-                  handleHomeClick();
                   setMenu(false);
                 }}
-                className="cursor-pointer transition-all duration-200"
               >
                 Inicio
-              </Link>
-              <Link
-                href="perfil"
+              </MenuItem>
+
+              <MenuItem
+                href="/perfil"
+                icon={FaUser}
                 onClick={() => setMenu(false)}
-                className="cursor-pointer transition-all duration-200"
               >
                 Perfil
-              </Link>
-              <Link
-                href="tu-espacio"
+              </MenuItem>
+
+              <MenuItem
+                href="/tu-espacio"
+                icon={MdSpaceDashboard}
                 onClick={() => setMenu(false)}
-                className="cursor-pointer transition-all duration-200"
               >
                 Tu espacio
-              </Link>
+              </MenuItem>
+
               {user?.roles?.includes("Admin") && (
                 <>
-                  <Link
-                    href="usuarios"
+                  <MenuItem
+                    href="/usuarios"
+                    icon={FaUsers}
                     onClick={() => setMenu(false)}
-                    className="cursor-pointer transition-all duration-200"
                   >
                     Usuarios
-                  </Link>
-                  <Link
-                    href="usuarios"
+                  </MenuItem>
+
+                  <MenuItem
+                    href="/planes"
+                    icon={FaBook}
                     onClick={() => setMenu(false)}
-                    className="cursor-pointer transition-all duration-200"
                   >
                     Planes
-                  </Link>
+                  </MenuItem>
                 </>
               )}
+              {/* <MenuItem
+                href="/ajustes"
+                icon={IoMdSettings}
+                onClick={() => setMenu(false)}
+              >
+                Ajustes
+              </MenuItem> */}
             </ul>
           </nav>
-          <Link onClick={() => setMenu(false)}>
-            <IoMdSettings size={22} />
-          </Link>
         </div>
       </div>
     </header>

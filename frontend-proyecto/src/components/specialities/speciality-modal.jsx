@@ -7,17 +7,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateSpeciality, deleteSpeciality } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function SpecialityModal({ speciality, tenantId, close }) {
   const [editing, setEditing] = useState(false);
   const [currentSpeciality, setCurrentSpeciality] = useState(speciality);
-  const [deleteModal, setDeleteModal] = useState(false);
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -36,7 +38,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         queryKey: ["getSpecialities", tenantId],
       });
 
-      setDeleteModal(false);
+      setConfirmModal(false);
 
       setSuccessMessage("Profesión eliminada correctamente");
       setSuccessModal(true);
@@ -47,6 +49,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
     },
 
     onError: (error) => {
+      setConfirmModal(false);
       const data = error?.response?.data;
 
       let msg = "Ocurrió un error al eliminar la profesión";
@@ -121,17 +124,17 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
             {currentSpeciality.description || "Sin descripción"}
           </p>
 
-          <div className="flex justify-end gap-3 mt-8 max-[360px]:text-[13px]">
+          <div className="grid grid-cols-2 gap-3 mt-8 max-[360px]:text-[14px] text-center">
             <button
-              onClick={() => setDeleteModal(true)}
-              className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
+              onClick={() => setConfirmModal(true)}
+              className="flex-1 rounded-xl bg-red-500 py-2.5 text-white hover:bg-red-600 transition cursor-pointer duration-200"
             >
-              Eliminar profesión
+              Eliminar
             </button>
 
             <button
               onClick={() => setEditing(true)}
-              className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#333] py-2.5 text-white hover:bg-[#222] transition cursor-pointer duration-200"
             >
               <Pencil size={18} />
               Editar
@@ -140,9 +143,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         </>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-center">
-            Editar profesión
-          </h2>
+          <h2 className="text-2xl font-semibold text-center">Editar</h2>
 
           <FormInput label="Nombre" register={register("name")} />
 
@@ -156,7 +157,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
             />
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => {
@@ -172,10 +173,20 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
               type="submit"
               className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
             >
-              Guardar cambios
+              Guardar
             </button>
           </div>
         </form>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          title="¿Eliminar esta profesión?"
+          message={`Estás por eliminar la profesion "${speciality.name}". Esta acción no se puede deshacer.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
       )}
 
       {errorModal && (
@@ -192,39 +203,6 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
           message={successMessage}
           isSuccesOrError={true}
         />
-      )}
-
-      {deleteModal && (
-        <Modal open onClose={() => setDeleteModal(false)}>
-          <h2 className="text-2xl font-semibold text-center">
-            Eliminar profesión
-          </h2>
-
-          <p className="text-center mt-5">
-            ¿Seguro que querés eliminar la profesión{" "}
-            <span className="font-semibold">"{currentSpeciality.name}"</span>?
-          </p>
-
-          <p className="text-center text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
-          </p>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(false)}
-              className="border rounded-xl px-4 py-2"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={() => deleteMutation.mutate()}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700"
-            >
-              Eliminar
-            </button>
-          </div>
-        </Modal>
       )}
     </Modal>
   );

@@ -10,13 +10,13 @@ import {
   updateStudentPlan,
   updateStudentStatus,
 } from "../../services/student";
+import ConfirmModal from "../modals/confirm-modal";
 
 export default function StudentModal({ student, tenantId, close }) {
   const queryClient = useQueryClient();
 
   const [editing, setEditing] = useState(false);
   const [currentStudent, setCurrentStudent] = useState(student);
-  const [deleteModal, setDeleteModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(
     currentStudent.monthlyFeeStatus,
   );
@@ -30,7 +30,8 @@ export default function StudentModal({ student, tenantId, close }) {
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
-  // Obtener planes disponibles
+  const [confirmModal, setConfirmModal] = useState(false);
+
   const { data: plans = [] } = useQuery({
     queryKey: ["getStudentPlans", tenantId],
     queryFn: () => getStudentPlans(tenantId),
@@ -43,8 +44,7 @@ export default function StudentModal({ student, tenantId, close }) {
       queryClient.invalidateQueries({
         queryKey: ["getStudents", tenantId],
       });
-
-      setDeleteModal(false);
+      setConfirmModal(false);
 
       setSuccessMessage("Alumno eliminado correctamente");
       setSuccessModal(true);
@@ -55,6 +55,8 @@ export default function StudentModal({ student, tenantId, close }) {
     },
 
     onError: (error) => {
+      setConfirmModal(false);
+
       const data = error?.response?.data;
 
       let msg = "Ocurrió un error al eliminar el alumno";
@@ -234,7 +236,7 @@ export default function StudentModal({ student, tenantId, close }) {
 
           <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
             <button
-              onClick={() => setDeleteModal(true)}
+              onClick={() => setConfirmModal(true)}
               className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
             >
               Eliminar alumno
@@ -332,6 +334,15 @@ export default function StudentModal({ student, tenantId, close }) {
           </div>
         </div>
       )}
+      {confirmModal && (
+        <ConfirmModal
+          title="¿Eliminar este alumno?"
+          message={`Estás por eliminar el alumno "${currentStudent.user.name} ${currentStudent.user.surname} ". Esta acción no se puede deshacer.`}
+          onConfirm={() => deleteMutation.mutate()}
+          close={() => setConfirmModal(false)}
+          isPending={deleteMutation.isPending}
+        />
+      )}
 
       {errorModal && (
         <ErrorModal
@@ -347,43 +358,6 @@ export default function StudentModal({ student, tenantId, close }) {
           message={successMessage}
           isSuccesOrError={true}
         />
-      )}
-
-      {deleteModal && (
-        <Modal open onClose={() => setDeleteModal(false)}>
-          <h2 className="text-2xl font-semibold text-center">
-            Eliminar alumno
-          </h2>
-
-          <p className="text-center mt-5">
-            ¿Seguro que querés eliminar a{" "}
-            <span className="font-semibold">
-              {currentStudent.user.name} {currentStudent.user.surname}
-            </span>
-            ?
-          </p>
-
-          <p className="text-center text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
-          </p>
-
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              onClick={() => setDeleteModal(false)}
-              className="border rounded-xl px-4 py-2"
-            >
-              Cancelar
-            </button>
-
-            <button
-              onClick={() => deleteMutation.mutate()}
-              disabled={deleteMutation.isPending}
-              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 disabled:opacity-50"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
-            </button>
-          </div>
-        </Modal>
       )}
     </Modal>
   );

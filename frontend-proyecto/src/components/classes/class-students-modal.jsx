@@ -9,13 +9,18 @@ import SuccessModal from "../modals/success-modal";
 import { getStudentsByClass } from "../../services/class";
 import { deleteReservation } from "../../services/reservation";
 import { useState } from "react";
+import ConfirmModal from "../modals/confirm-modal";
+import ClassStudentCard from "./class-student-card";
 
 export default function ClassStudentsModal({
-  classId,
+  currentClass,
   tenantId,
   maxCapacity,
   close,
+  formatDateWithDay,
+  decreaseReservationCount,
 }) {
+  const classId = currentClass.id;
   const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
@@ -24,13 +29,15 @@ export default function ClassStudentsModal({
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
 
+  const [reservationToDelete, setReservationToDelete] = useState(null);
+
   const { data: students = [], isLoading } = useQuery({
     queryKey: ["classStudents", classId],
     queryFn: () => getStudentsByClass(classId),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: deleteReservation,
+    mutationFn: (reservationId) => deleteReservation(reservationId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -40,7 +47,8 @@ export default function ClassStudentsModal({
       queryClient.invalidateQueries({
         queryKey: ["getClasses", tenantId],
       });
-
+      decreaseReservationCount();
+      setReservationToDelete(null);
       setSuccessMessage("Alumno eliminado de la clase");
       setSuccessModal(true);
 
@@ -59,6 +67,7 @@ export default function ClassStudentsModal({
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
 
+      setReservationToDelete(null);
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -66,13 +75,6 @@ export default function ClassStudentsModal({
 
   return (
     <Modal open onClose={close}>
-      <button
-        onClick={close}
-        className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
-      >
-        <X size={20} />
-      </button>
-
       <h2 className="text-2xl font-semibold text-center">Alumnos inscriptos</h2>
 
       <p className="text-center text-gray-500 mt-2">
@@ -90,28 +92,33 @@ export default function ClassStudentsModal({
       ) : (
         <div className="space-y-3 mt-8 max-h-100 overflow-y-auto">
           {students.map((student) => (
-            <div
-              key={student.reservationId}
-              className="border rounded-xl p-4 flex justify-between items-center"
-            >
-              <div>
-                <h3 className="font-semibold">
-                  {student.name} {student.surname}
-                </h3>
-
-                <p className="text-sm text-gray-500">{student.email}</p>
-              </div>
-
-              <button
-                onClick={() => deleteMutation.mutate(student.reservationId)}
-                disabled={deleteMutation.isPending}
-                className="text-red-600 hover:text-red-800 transition cursor-pointer"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
+            <ClassStudentCard
+              key={student.studentId}
+              student={student}
+              currentClass={currentClass}
+              formatDateWithDay={formatDateWithDay}
+              onDelete={() => setReservationToDelete(student)}
+              isPending={deleteMutation.isPending}
+            />
           ))}
         </div>
+      )}
+
+      {reservationToDelete && (
+        <ConfirmModal
+          title="¿Cancelar esta reserva?"
+          message={`Estás por cancelar la reserva de ${
+            reservationToDelete.name
+          } del día ${formatDateWithDay(currentClass.date)} a las ${currentClass.startTime.slice(
+            0,
+            5,
+          )} - ${currentClass.endTime.slice(0, 5)}.`}
+          onConfirm={() =>
+            deleteMutation.mutate(reservationToDelete.reservationId)
+          }
+          close={() => setReservationToDelete(null)}
+          isPending={deleteMutation.isPending}
+        />
       )}
 
       {errorModal && (

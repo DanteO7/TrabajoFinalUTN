@@ -3,12 +3,14 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 public interface ITenantRepository : IRepository<Tenant>
 {
     Task<bool> ExistsByUserId(int userId);
     Task<bool> ExistsByOwnerAndId(int userId, int tenantId);
     Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null);
+    Task<int> CountAsync(Expression<Func<Tenant, bool>> predicate);
 }
 
 public class TenantRepository : Repository<Tenant>, ITenantRepository
@@ -55,5 +57,9 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
             .ToListAsync();
 
         return tenants;
+    }
+    public async Task<int> CountAsync(Expression<Func<Tenant, bool>> predicate)
+    {
+        return await _db.Tenants.CountAsync(predicate);
     }
 }

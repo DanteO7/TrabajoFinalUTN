@@ -10,12 +10,14 @@ namespace backend_proyecto.Services
     public class TenantPlanServices
     {
         private readonly ITenantPlanRepository _tenantPlanRepository;
+        private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
 
-        public TenantPlanServices(ITenantPlanRepository tenantPlanRepository, IMapper mapper)
+        public TenantPlanServices(ITenantPlanRepository tenantPlanRepository, IMapper mapper, ITenantRepository tenantRepository)
         {
             _tenantPlanRepository = tenantPlanRepository;
             _mapper = mapper;
+            _tenantRepository = tenantRepository;
         }
 
         public async Task<List<ResponseTenantPlanDTO>> GetAll()
@@ -54,6 +56,14 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan tenant con el Id = '{id}'");
             }
+
+            var tenantWithPlan = await _tenantRepository.CountAsync(t => t.TenantPlanId == id);
+            if (tenantWithPlan > 0)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest,
+                    $"No puedes eliminar este plan porque {tenantWithPlan} negocios lo tienen asignado");
+            }
+
             await _tenantPlanRepository.DeleteOneAsync(tenantPlan);
         }
 

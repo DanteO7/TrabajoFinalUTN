@@ -23,6 +23,7 @@ export default function MainLayout({ children }) {
       fetchUserRolesInTenant(tenant.id);
     });
   }, [myTenants, fetchUserRolesInTenant]);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);

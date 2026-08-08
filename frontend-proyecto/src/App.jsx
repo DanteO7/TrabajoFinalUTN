@@ -37,6 +37,7 @@ const Terms = lazy(() => import("./pages/terms"));
 const Tenant = lazy(() => import("./pages/tenant"));
 const Users = lazy(() => import("./pages/users"));
 const Reservations = lazy(() => import("./pages/tenant/reservations"));
+const TenantPlans = lazy(() => import("./pages/tenant-plans"));
 
 const queryClient = new QueryClient();
 
@@ -133,6 +134,10 @@ export default function App() {
 
             <AdminRoute path={"/usuarios"}>
               <Users />
+            </AdminRoute>
+
+            <AdminRoute path={"/planes"}>
+              <TenantPlans />
             </AdminRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/alumnos">
