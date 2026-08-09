@@ -46,22 +46,19 @@ export default function Users() {
           <IoArrowBack />
           Volver
         </button>
-
         <h1 className="text-4xl min-[900px]:text-5xl font-bold mb-2">
           Usuarios registrados
         </h1>
-
         <p className="text-gray-500 mb-6">
           Administrá todos los usuarios del sistema
         </p>
-
         <UserSearchFilters />
-
         <div className="grid min-[900px]:grid-cols-2 gap-4 mt-6">
           {users.map((user) => (
             <UserItem key={user.id} user={user} onSelect={setUserSelected} />
           ))}
         </div>
+        <div ref={sentinelRef} className="h-4" />
       </div>
 
       {userSelected && (

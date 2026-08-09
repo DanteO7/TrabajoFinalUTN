@@ -1,10 +1,21 @@
-import React from "react";
+import { IoArrowBack } from "react-icons/io5";
 import MainLayout from "../layouts/main-layout";
 
 export default function Terms() {
+  const handleBack = () => {
+    window.history.back();
+  };
+
   return (
     <MainLayout>
-      <div className="lg:w-[60%] mt-10">
+      <div className="lg:w-[60%] mt-12">
+        <button
+          onClick={handleBack}
+          className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer "
+        >
+          <IoArrowBack />
+          Volver
+        </button>
         <h2 className="text-4xl font-semibold">Términos y Condiciones</h2>
         <span className="text-gray-600 text-[13px] my-20">
           Última actualización: 8 de julio de 2026

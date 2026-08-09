@@ -10,7 +10,7 @@ import { useTenantStore } from "../store/tenant-store";
 
 export default function VerifyCode() {
   const [, setLocation] = useLocation();
-  const { login } = useAuthStore();
+  const { login, user } = useAuthStore();
   const clearRoles = useTenantStore((state) => state.clearRoles);
   const [seconds, setSeconds] = useState(0);
   const [errorModal, setErrorModal] = useState(false);
@@ -48,7 +48,11 @@ export default function VerifyCode() {
       localStorage.removeItem("pendingSignUp");
       clearRoles();
       login(data);
-      setLocation("/");
+      if (user.roles != null) {
+        setLocation("/tu-espacio");
+      } else {
+        setLocation("/");
+      }
     },
     onError: (error) => {
       const data = error?.response?.data;
