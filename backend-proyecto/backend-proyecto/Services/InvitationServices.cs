@@ -15,6 +15,9 @@ namespace backend_proyecto.Services
         private readonly IUserRepository _userRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IStudentPlanRepository _studentPlanRepository;
+        private readonly StudentServices _studentServices;
+        private readonly ProfessorServices _professorServices;
+
 
         public InvitationServices(
             IInvitationRepository invitationRepository,
@@ -22,7 +25,10 @@ namespace backend_proyecto.Services
             IProfessorRepository professorRepository,
             IUserRepository userRepository,
             ITenantRepository tenantRepository,
-            IStudentPlanRepository studentPlanRepository)
+            IStudentPlanRepository studentPlanRepository,
+            StudentServices studentServices,
+            ProfessorServices professorServices
+            )
         {
             _invitationRepository = invitationRepository;
             _studentRepository = studentRepository;
@@ -30,6 +36,8 @@ namespace backend_proyecto.Services
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
             _studentPlanRepository = studentPlanRepository;
+            _studentServices = studentServices;
+            _professorServices = professorServices;
         }
 
         public async Task<ResponseInvitationDTO> CreateInvitation(CreateInvitationDTO dto)
@@ -68,7 +76,6 @@ namespace backend_proyecto.Services
 
         public async Task AcceptInvitation(Guid token, int userId, int? studentPlanId)
         {
-            // Buscar la invitación
             var invitation = await _invitationRepository.GetOneAsync(i => i.Token == token);
             if (invitation == null)
             {
@@ -76,19 +83,10 @@ namespace backend_proyecto.Services
                     "La invitación no existe o el link es inválido");
             }
 
-            // Validar expiración
             if (DateTime.UtcNow > invitation.ExpirationDate)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     "La invitación ha expirado");
-            }
-
-            // Validar que el usuario existe
-            var user = await _userRepository.GetOneAsync(u => u.Id == userId);
-            if (user == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró un usuario con el Id = '{userId}'");
             }
 
             if (invitation.Role == Roles.STUDENT)
@@ -101,67 +99,36 @@ namespace backend_proyecto.Services
             }
         }
 
-        private async Task AcceptAsStudent(Invitation invitation, int userId, int? studentPlanId)
+        private async Task AcceptAsStudent(
+            Invitation invitation,
+            int userId,
+            int? studentPlanId)
         {
-            // Validar que el usuario no sea ya alumno en este tenant
-            var existingStudent = await _studentRepository.GetOneAsync(
-                s => s.UserId == userId && s.TenantId == invitation.TenantId);
-
-            if (existingStudent != null)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "Ya sos alumno en este negocio");
-            }
-
-            // Validar que se mande un plan
             if (studentPlanId == null)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "Debés seleccionar un plan para unirte como alumno");
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Debés seleccionar un plan para unirte como alumno"
+                );
             }
 
-            // Validar que el plan existe y pertenece al tenant
-            var studentPlan = await _studentPlanRepository.GetOneAsync(
-                p => p.Id == studentPlanId && p.TenantId == invitation.TenantId);
-
-            if (studentPlan == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró un plan con el Id = '{studentPlanId}' para este negocio");
-            }
-
-            var student = new Student
+            await _studentServices.AssignOne(new AssignStudentDTO
             {
                 UserId = userId,
                 TenantId = invitation.TenantId,
-                StudentPlanId = studentPlan.Id,
-                MonthlyFeeStatus = MonthlyFeeStatus.PENDING
-            };
-
-            await _studentRepository.CreateOneAsync(student);
+                StudentPlanId = studentPlanId.Value
+            });
         }
 
         private async Task AcceptAsProfessor(Invitation invitation, int userId)
         {
-            // Validar que el usuario no sea ya profesor en este tenant
-            var existingProfessor = await _professorRepository.GetOneAsync(
-                p => p.UserId == userId && p.TenantId == invitation.TenantId);
-
-            if (existingProfessor != null)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "Ya sos profesor en este negocio");
-            }
-
-            var professor = new Professor
+            await _professorServices.AssignOne(new AssignProfessorDTO
             {
                 UserId = userId,
-                TenantId = invitation.TenantId,
-                IsActive = false
-            };
-
-            await _professorRepository.CreateOneAsync(professor);
+                TenantId = invitation.TenantId
+            });
         }
+
         public async Task<ResponseInvitationInfoDTO> GetInvitationInfo(Guid token)
         {
             var invitation = await _invitationRepository.GetOneAsync(

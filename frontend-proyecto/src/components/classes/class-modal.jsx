@@ -62,6 +62,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
   };
+
   const {
     register,
     handleSubmit,

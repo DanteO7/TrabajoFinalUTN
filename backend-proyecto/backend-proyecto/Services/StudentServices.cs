@@ -16,13 +16,16 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IStudentPlanRepository _studentPlanRepository;
         private readonly IMapper _mapper;
-        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper)
+        private readonly IProfessorRepository _professorRepository;
+
+        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper, IProfessorRepository professorRepository)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
             _studentPlanRepository = studentPlanRepository;
             _mapper = mapper;
+            _professorRepository = professorRepository;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -45,11 +48,31 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{assignStudentDTO.StudentPlanId}'");
             }
 
-            var existingStudent = await _studentRepository.GetOneAsync(s => s.UserId == assignStudentDTO.UserId && s.TenantId == assignStudentDTO.TenantId);
+            var existingStudent = await _studentRepository.GetOneAsync(
+                s => s.UserId == assignStudentDTO.UserId &&
+                     s.TenantId == assignStudentDTO.TenantId
+            );
+
             if (existingStudent != null)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El usuario '{existingStudent.UserId}' ya está asignado a este tenant = '{assignStudentDTO.TenantId}'");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El usuario ya está asignado como alumno a este negocio.");
             }
+
+            var existingProfessor = await _professorRepository.GetOneAsync(
+                p => p.UserId == assignStudentDTO.UserId &&
+                     p.TenantId == assignStudentDTO.TenantId
+            );
+
+            if (existingProfessor != null)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El usuario ya está asignado como profesor a este negocio.");
+            }
+
+            if (tenant.OwnerUserId == assignStudentDTO.UserId)
+            {
+                throw new HttpResponseError( HttpStatusCode.BadRequest,$"El usuario ya es el administrador de este negocio.");
+            }
+
 
             var student = _mapper.Map<Student>(assignStudentDTO);
             student.MonthlyFeeStatus = MonthlyFeeStatus.PENDING;

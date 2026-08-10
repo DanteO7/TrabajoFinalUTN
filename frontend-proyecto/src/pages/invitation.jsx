@@ -113,7 +113,6 @@ export default function Invitation({ token }) {
               </p>
             </div>
 
-            {/* Selector de plan para estudiantes */}
             {invitation?.role === "Student" && (
               <div>
                 <label className="block text-sm font-semibold mb-3">
