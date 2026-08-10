@@ -80,5 +80,37 @@ namespace backend_proyecto.Services
 
             await _resend.EmailSendAsync(message);
         }
+        public async Task SendWaitlistAvailableEmail(
+            string to,
+            string tenantName,
+            DateOnly date,
+            TimeOnly startTime)
+        {
+            var message = new EmailMessage();
+
+            message.From = "turnos@turnofacilapp.com.ar";
+            message.To.Add(to);
+
+            message.Subject = "¡Se liberó un lugar en una clase!";
+
+            message.HtmlBody = $@"
+                <h2>¡Hay un lugar disponible!</h2>
+
+                <p>
+                    Se liberó un lugar en <strong>{tenantName}</strong>.
+                </p>
+
+                <p>
+                    Fecha: {date:dd/MM/yyyy}<br>
+                    Horario: {startTime:HH\:mm}
+                </p>
+
+                <p>
+                    Ingresá a Turno Fácil para reservar tu lugar.
+                </p>
+            ";
+
+            await _resend.EmailSendAsync(message);
+        }
     }
 }

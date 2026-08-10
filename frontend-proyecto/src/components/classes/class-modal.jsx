@@ -21,6 +21,11 @@ import { useTenantStore } from "../../store/tenant-store";
 import { getStudentByUser } from "../../services/student";
 import ClassStudentsModal from "./class-students-modal";
 import ConfirmModal from "../modals/confirm-modal";
+import {
+  createWaitlist,
+  deleteWaitlist,
+  getWaitlistByStudentId,
+} from "../../services/waitlist";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -101,6 +106,16 @@ export default function ClassModal({ classItem, tenantId, close }) {
     queryFn: () => getReservationsByStudentId(currentStudent.id),
     enabled: !!currentStudent,
   });
+
+  const { data: waitlists = [] } = useQuery({
+    queryKey: ["getWaitlistByStudentId", currentStudent?.id],
+    queryFn: () => getWaitlistByStudentId(currentStudent.id),
+    enabled: !!currentStudent,
+  });
+
+  const currentWaitlist = waitlists.find((w) => w.classId === currentClass.id);
+
+  const isInWaitlist = !!currentWaitlist;
 
   const isFull = currentClass.reservationsCount >= currentClass.maxCapacity;
   const currentReservation = reservations.find(
@@ -206,6 +221,70 @@ export default function ClassModal({ classItem, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
       let msg = "Ocurrió un error al unirse a la clase";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const waitlistMutation = useMutation({
+    mutationFn: () =>
+      createWaitlist({
+        classId: currentClass.id,
+        studentId: currentStudent.id,
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getWaitlistByStudentId", currentStudent.id],
+      });
+
+      setSuccessMessage("Te agregaste a la lista de espera correctamente.");
+      setSuccessModal(true);
+
+      setTimeout(() => {
+        setSuccessModal(false);
+      }, 3000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al entrar a la lista de espera";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const deleteWaitlistMutation = useMutation({
+    mutationFn: () => deleteWaitlist(currentWaitlist.id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["getWaitlistByStudentId", currentStudent.id],
+      });
+
+      setSuccessMessage("Saliste de la lista de espera correctamente.");
+      setSuccessModal(true);
+
+      setTimeout(() => {
+        setSuccessModal(false);
+      }, 3000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al salir de la lista de espera";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -360,23 +439,35 @@ export default function ClassModal({ classItem, tenantId, close }) {
                   ? "Saliendo..."
                   : "Salir de la clase"}
               </button>
+            ) : isInWaitlist ? (
+              <button
+                onClick={() => deleteWaitlistMutation.mutate()}
+                disabled={deleteWaitlistMutation.isPending}
+                className="w-full py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+              >
+                {deleteWaitlistMutation.isPending
+                  ? "Saliendo..."
+                  : "Salir de lista de espera"}
+              </button>
+            ) : isFull ? (
+              <button
+                onClick={() => waitlistMutation.mutate()}
+                disabled={waitlistMutation.isPending || !currentStudent}
+                className="w-full py-3 rounded-xl font-semibold bg-[#333] text-white hover:bg-gray-700 disabled:opacity-50 cursor-pointer"
+              >
+                {waitlistMutation.isPending
+                  ? "Agregando..."
+                  : "Lista de espera"}
+              </button>
             ) : (
               <button
                 onClick={() => reservationMutation.mutate()}
-                disabled={
-                  isFull || reservationMutation.isPending || !currentStudent
-                }
-                className={`w-full py-3 rounded-xl font-semibold transition ${
-                  isFull
-                    ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-[#333] text-white hover:bg-gray-700 cursor-pointer"
-                } disabled:opacity-50`}
+                disabled={reservationMutation.isPending || !currentStudent}
+                className="w-full py-3 rounded-xl font-semibold bg-[#333] text-white hover:bg-gray-700 disabled:opacity-50 cursor-pointer"
               >
                 {reservationMutation.isPending
                   ? "Procesando..."
-                  : isFull
-                    ? "Lista de espera"
-                    : "Entrar a la clase"}
+                  : "Entrar a la clase"}
               </button>
             )
           ) : null}

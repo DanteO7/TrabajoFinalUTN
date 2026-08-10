@@ -27,7 +27,7 @@ namespace backend_proyecto.Config
         public DbSet<PasswordReset> PasswordResets { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Admin> Admin { get; set; }
-
+        public DbSet<Waitlist> Waitlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

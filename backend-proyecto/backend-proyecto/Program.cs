@@ -2,6 +2,7 @@ using Auth.Utils.Filters;
 using backend_proyecto.Config;
 using backend_proyecto.Repositories;
 using backend_proyecto.Services;
+using backend_proyecto.Services.Observer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -70,6 +71,10 @@ builder.Services.AddScoped<GroupServices>();
 builder.Services.AddScoped<PermissionServices>();
 builder.Services.AddScoped<EmailServices>(); 
 builder.Services.AddScoped<InvitationServices>();
+builder.Services.AddScoped<WaitlistServices>();
+
+builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
+builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
@@ -85,6 +90,7 @@ builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>(); 
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
+builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
 
 // Backgound Services
 builder.Services.AddHostedService<ClassCleanupService>();

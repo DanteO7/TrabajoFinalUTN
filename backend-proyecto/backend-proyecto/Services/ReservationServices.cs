@@ -1,12 +1,13 @@
-﻿using backend_proyecto.Models;
+﻿using AutoMapper;
+using backend_proyecto.Enums;
+using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
-using backend_proyecto.Utils.Errors;
+using backend_proyecto.Services.Observer;
 using backend_proyecto.Utils;
-using AutoMapper;
-using System.Net;
+using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
-using backend_proyecto.Enums;
+using System.Net;
 
 namespace backend_proyecto.Services
 {
@@ -18,14 +19,16 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IStudentPlanRepository _studentPlanRepository;
         private readonly IMapper _mapper;
+        private readonly IWaitlistSubject _waitlistSubject;
 
         public ReservationServices(
-            IReservationRepository reservationRepository,
-            IClassRepository classRepository,
-            IStudentRepository studentRepository,
-            ITenantRepository tenantRepository,
-            IStudentPlanRepository studentPlanRepository,
-            IMapper mapper)
+             IReservationRepository reservationRepository,
+             IClassRepository classRepository,
+             IStudentRepository studentRepository,
+             ITenantRepository tenantRepository,
+             IStudentPlanRepository studentPlanRepository,
+             IMapper mapper,
+             IWaitlistSubject waitlistSubject)
         {
             _reservationRepository = reservationRepository;
             _classRepository = classRepository;
@@ -33,6 +36,7 @@ namespace backend_proyecto.Services
             _tenantRepository = tenantRepository;
             _studentPlanRepository = studentPlanRepository;
             _mapper = mapper;
+            _waitlistSubject = waitlistSubject;
         }
 
         public async Task<ResponseReservationDTO> CreateOne(CreateReservationDTO createReservationDTO)
@@ -297,7 +301,17 @@ namespace backend_proyecto.Services
                 );
             }
 
+            var wasFull =
+                await _reservationRepository.CountAsync(
+                    r => r.ClassId == reservation.ClassId
+                ) >= reservation.Class.MaxCapacity;
+
             await _reservationRepository.DeleteOneAsync(reservation);
+
+            if (wasFull)
+            {
+                await _waitlistSubject.Notify(reservation.Class.Id);
+            }
         }
     }
 }

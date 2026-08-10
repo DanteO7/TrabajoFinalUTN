@@ -96,6 +96,9 @@ namespace backend_proyecto.Config
             CreateMap<ProfessorSpeciality, ResponseProfessorSpecialityDTO>()
                 .ForMember(dest => dest.SpecialityId, opt => opt.MapFrom(src => src.SpecialityId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Speciality.Name));
+
+            // waitlist
+            CreateMap<Waitlist, ResponseWaitlistDTO>();
         }
     }
 }

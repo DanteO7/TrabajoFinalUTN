@@ -14,5 +14,6 @@
         public TimeOnly EndTime { get; set; }
         public int MaxCapacity { get; set; }
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<Waitlist> Waitlists { get; set; } = new List<Waitlist>();
     }
 }
