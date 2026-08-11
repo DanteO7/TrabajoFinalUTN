@@ -44,11 +44,11 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<AuthOperationFilter>();
 });
 
-// DbContext configuration
+var conn = builder.Configuration.GetConnectionString("DatabaseConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
 {
     opts.UseNpgsql(
-        builder.Configuration.GetConnectionString("DatabaseConnection"),
+        conn,
         o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
     );
 });
