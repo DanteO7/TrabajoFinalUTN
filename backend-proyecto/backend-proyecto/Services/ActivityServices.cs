@@ -129,12 +129,11 @@ namespace backend_proyecto.Services
             }
 
             var oldName = activity.Name;
-
             _mapper.Map(updateActivityDTO, activity);
 
-            if (updateActivityDTO.Name != null &&
-                updateActivityDTO.Name != oldName)
+            if (updateActivityDTO.Name != null)
             {
+                // Actualizar clases futuras
                 var futureClasses = await _classRepository.Query()
                     .Where(c =>
                         c.ActivityId == activity.Id &&
@@ -142,9 +141,24 @@ namespace backend_proyecto.Services
                     )
                     .ToListAsync();
 
-                foreach (var classEntity in futureClasses)
+                // Actualizar también clases pasadas sin ActivityName
+                var pastClassesWithoutName = await _classRepository.Query()
+                    .Where(c =>
+                        c.ActivityId == activity.Id &&
+                        (c.ActivityName == "" || c.ActivityName == null)
+                    )
+                    .ToListAsync();
+
+                var allClassesToUpdate = futureClasses.Concat(pastClassesWithoutName).ToList();
+
+                foreach (var classEntity in allClassesToUpdate)
                 {
                     classEntity.ActivityName = activity.Name;
+                }
+
+                if (allClassesToUpdate.Count > 0)
+                {
+                    await _classRepository.UpdateRangeAsync(allClassesToUpdate);
                 }
             }
 

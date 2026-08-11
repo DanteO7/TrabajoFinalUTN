@@ -8,6 +8,7 @@ namespace backend_proyecto.Repositories
     public interface IClassRepository : IRepository<Class>
     {
         Task<bool> ExistsScheduleConflict(CreateClassDTO dto, int? classIdToIgnore);
+        Task UpdateRangeAsync(List<Class> classes);
     }
     public class ClassRepository : Repository<Class>, IClassRepository
     {
@@ -25,6 +26,11 @@ namespace backend_proyecto.Repositories
                 dto.EndTime > c.StartTime &&
                 (classIdToIgnore == null || c.Id != classIdToIgnore)
             );
+        }
+        public async Task UpdateRangeAsync(List<Class> classes)
+        {
+            _db.Classes.UpdateRange(classes);
+            await _db.SaveChangesAsync();
         }
     }
 }

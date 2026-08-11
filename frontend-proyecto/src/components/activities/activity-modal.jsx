@@ -39,6 +39,10 @@ export default function ActivityModal({ activity, tenantId, close }) {
         queryKey: ["getActivities", tenantId],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["getClasses", tenantId],
+      });
+
       setConfirmModal(false);
 
       setSuccessMessage("Actividad eliminada correctamente");
@@ -75,6 +79,10 @@ export default function ActivityModal({ activity, tenantId, close }) {
     onSuccess: (updatedActivity) => {
       queryClient.invalidateQueries({
         queryKey: ["getActivities", tenantId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["getClasses", tenantId],
       });
 
       setSuccessMessage("Actividad actualizada correctamente");
