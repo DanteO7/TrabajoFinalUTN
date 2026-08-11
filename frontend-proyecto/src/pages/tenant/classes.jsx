@@ -155,7 +155,7 @@ export default function Classes({ tenantId }) {
                         <div className="flex justify-between items-center">
                           <div>
                             <h3 className="text-xl font-semibold">
-                              {classItem.activity.name}
+                              {classItem.activityName}
                             </h3>
 
                             <p className="text-gray-500 mt-1">

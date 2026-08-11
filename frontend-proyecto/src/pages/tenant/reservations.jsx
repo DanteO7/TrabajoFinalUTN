@@ -15,8 +15,12 @@ import ReservationFilter from "../../components/reservations/reservation-filter"
 import ReservationEmpty from "../../components/reservations/reservation-empty";
 
 import Loader from "../../components/loading";
+import { useLocation } from "wouter";
+import { IoArrowBack } from "react-icons/io5";
 
 export default function Reservations({ tenantId }) {
+  const [, setLocation] = useLocation();
+
   const { user } = useAuthStore();
 
   const [selectedReservation, setSelectedReservation] = useState(null);
@@ -65,6 +69,13 @@ export default function Reservations({ tenantId }) {
   return (
     <MainLayout>
       <div className="w-full max-w-6xl mt-12">
+        <button
+          onClick={() => setLocation(`/tu-espacio/${tenantId}`)}
+          className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
+        >
+          <IoArrowBack />
+          Volver
+        </button>
         <div className="flex justify-between items-center flex-wrap gap-5">
           <div>
             <h1 className="text-4xl min-[900px]:text-5xl font-bold">

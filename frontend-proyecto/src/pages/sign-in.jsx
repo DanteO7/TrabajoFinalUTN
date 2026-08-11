@@ -12,7 +12,7 @@ import EmailSentModal from "../components/modals/email-sent-modal";
 import { useTenantStore } from "../store/tenant-store";
 
 export default function SignIn() {
-  const { login, user } = useAuthStore();
+  const { login } = useAuthStore();
   const clearRoles = useTenantStore((state) => state.clearRoles);
   const [, setLocation] = useLocation();
   const [backendError, setBackendError] = useState();
@@ -33,7 +33,8 @@ export default function SignIn() {
     onSuccess: (data) => {
       clearRoles();
       login(data);
-      if (user?.roles != null) {
+
+      if (data?.roles?.length > 0) {
         setLocation("/tu-espacio");
       } else {
         setLocation("/");

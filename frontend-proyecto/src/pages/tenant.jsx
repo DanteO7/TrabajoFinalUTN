@@ -35,49 +35,49 @@ export default function Tenant({ id }) {
       {
         title: "Clases",
         description: "Administrá las clases.",
-        icon: <FaCalendarAlt size={30} />,
+        icon: <FaCalendarAlt size={35} />,
         href: "clases",
       },
       {
         title: "Alumnos",
         description: "Administrá los alumnos del espacio.",
-        icon: <FaUsers size={30} />,
+        icon: <FaUsers size={35} />,
         href: "alumnos",
       },
       {
         title: "Profesores",
         description: "Visualizá y gestioná profesores.",
-        icon: <FaChalkboardTeacher size={30} />,
+        icon: <FaChalkboardTeacher size={35} />,
         href: "profesores",
       },
       {
         title: "Actividades",
         description: "Gestioná actividades.",
-        icon: <FaRunning size={30} />,
+        icon: <FaRunning size={35} />,
         href: "actividades",
       },
       {
         title: "Profesiones",
         description: "Configurá profesiones.",
-        icon: <FaBookOpen size={30} />,
+        icon: <FaBookOpen size={35} />,
         href: "profesiones",
       },
       // {
       //   title: "Pagos",
       //   description: "Consultá pagos.",
-      //   icon: <FaMoneyBillWave size={30} />,
+      //   icon: <FaMoneyBillWave size={35} />,
       //   href: "pagos",
       // },
       {
         title: "Planes de Alumnos",
         description: "Administrá los planes de tus alumnos.",
-        icon: <FaTags size={30} />,
+        icon: <FaTags size={35} />,
         href: "planes",
       },
       // {
       //   title: "Grupos",
       //   description: "Administrá roles y permisos.",
-      //   icon: <FaUserShield size={30} />,
+      //   icon: <FaUserShield size={35} />,
       //   href: "grupos",
       // },
     ],
@@ -86,31 +86,31 @@ export default function Tenant({ id }) {
       {
         title: "Clases",
         description: "Tus clases.",
-        icon: <FaCalendarAlt size={30} />,
+        icon: <FaCalendarAlt size={35} />,
         href: "clases",
       },
       {
         title: "Profesores",
         description: "Ver profesores.",
-        icon: <FaChalkboardTeacher size={30} />,
+        icon: <FaChalkboardTeacher size={35} />,
         href: "profesores",
       },
       {
         title: "Actividades",
         description: "Actividades disponibles.",
-        icon: <FaRunning size={30} />,
+        icon: <FaRunning size={35} />,
         href: "actividades",
       },
       {
         title: "Profesiones",
         description: "Configurá profesiones.",
-        icon: <FaBookOpen size={30} />,
+        icon: <FaBookOpen size={35} />,
         href: "profesiones",
       },
       // {
       //   title: "Pagos",
       //   description: "Tus pagos.",
-      //   icon: <FaMoneyBillWave size={30} />,
+      //   icon: <FaMoneyBillWave size={35} />,
       //   href: "pagos",
       // },
     ],
@@ -118,32 +118,32 @@ export default function Tenant({ id }) {
     Student: [
       {
         title: "Clases",
-        description: "Tus clases.",
-        icon: <FaCalendarAlt size={30} />,
+        description: "Clases disponibles.",
+        icon: <FaCalendarAlt size={35} />,
         href: "clases",
       },
       {
         title: "Profesores",
         description: "Conocé a tus profesores.",
-        icon: <FaChalkboardTeacher size={30} />,
+        icon: <FaChalkboardTeacher size={35} />,
         href: "profesores",
       },
       {
         title: "Actividades",
         description: "Actividades disponibles.",
-        icon: <FaRunning size={30} />,
+        icon: <FaRunning size={35} />,
         href: "actividades",
       },
       {
         title: "Reservas",
         description: "Tus proximas clases.",
-        icon: <FaClipboardList size={30} />,
+        icon: <FaClipboardList size={35} />,
         href: "reservas",
       },
       // {
       //   title: "Pagos",
       //   description: "Consultá tus pagos.",
-      //   icon: <FaMoneyBillWave size={30} />,
+      //   icon: <FaMoneyBillWave size={35} />,
       //   href: "pagos",
       // },
     ],
@@ -214,25 +214,25 @@ export default function Tenant({ id }) {
                   {role?.text}
                 </span>
               </div>
-              <p className="text-gray-500 mt-1">
-                Desde acá podés administrar todas las áreas de tu negocio.
-              </p>
             </div>
-
-            <div className="grid gap-6 mt-10 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
-              {" "}
+            <p className="text-gray-500 mt-1">
+              Desde acá podés administrar todas las áreas de tu negocio.
+            </p>
+            <div className="grid gap-4.5 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {cards?.map((section) => (
                 <Link
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-4">
+                  <div className=" cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.25 max-[900px]:items-center">
                     <div className="text-[#FF8A90]">{section.icon}</div>
 
                     <div>
-                      <h3 className="font-semibold text-xl">{section.title}</h3>
+                      <h3 className="font-semibold text-[19px]">
+                        {section.title}
+                      </h3>
 
-                      <p className="text-gray-500 mt-2">
+                      <p className="text-gray-500 mt-1 max-[900px]:text-[12px]">
                         {section.description}
                       </p>
                     </div>

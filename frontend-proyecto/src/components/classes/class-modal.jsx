@@ -341,6 +341,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
     };
     setCurrentClass(updatedClass);
   };
+  console.log(currentClass);
 
   return (
     <Modal open onClose={close}>
@@ -354,7 +355,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       {!editing ? (
         <>
           <h2 className="text-2xl font-semibold mb-2">
-            {currentClass.activity.name}
+            {currentClass.activityName}
           </h2>
 
           <p className="text-gray-600 mb-6">
