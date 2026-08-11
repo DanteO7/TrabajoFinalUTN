@@ -3,8 +3,9 @@
     public class Class
     {
         public int Id { get; set; }
-        public int ActivityId { get; set; }
-        public Activity Activity { get; set; } = null!;
+        public int? ActivityId { get; set; }
+        public Activity? Activity { get; set; }
+        public string ActivityName { get; set; } = null!;
         public int ProfessorId { get; set; }
         public Professor Professor { get; set; } = null!;
         public int TenantId { get; set; }

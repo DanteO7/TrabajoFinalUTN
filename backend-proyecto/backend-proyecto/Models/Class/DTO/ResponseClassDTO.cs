@@ -4,7 +4,8 @@
     {
         public int Id { get; set; }
         public int ActivityId { get; set; }
-        public ResponseActivityDTO Activity { get; set; } = null!;
+        public ResponseActivityDTO Activity { get; set; } = null!; 
+        public string ActivityName { get; set; } = null!;
         public int ProfessorId { get; set; }
         public ResponseProfessorDTO Professor { get; set; } = null!;
         public int TenantId { get; set; }

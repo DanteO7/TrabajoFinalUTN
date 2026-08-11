@@ -2,8 +2,10 @@
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
+using backend_proyecto.Utils;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -14,12 +16,15 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly PermissionServices _permissionServices;
         private readonly IMapper _mapper;
-        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, PermissionServices permissionServices, IMapper mapper)
+        private readonly IClassRepository _classRepository;
+
+        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, PermissionServices permissionServices, IMapper mapper, IClassRepository classRepository)
         {
             _activityRepository = activityRepository;
             _tenantRepository = tenantRepository;
             _permissionServices = permissionServices;
             _mapper = mapper;
+            _classRepository = classRepository;
         }
         
         public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId, int userId)
@@ -85,9 +90,27 @@ namespace backend_proyecto.Services
         public async Task DeleteOne(int id)
         {
             var activity = await _activityRepository.GetOneAsync(a => a.Id == id);
+
             if (activity == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{id}'");
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró una actividad con el Id = '{id}'"
+                );
+            }
+
+            var hasFutureClass = await _classRepository.Query()
+                .AnyAsync(c =>
+                    c.ActivityId == id &&
+                    c.Date.ToDateTime(c.StartTime) > TimeHelper.Now()
+                );
+
+            if (hasFutureClass)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede eliminar una actividad que tenga clases futuras"
+                );
             }
 
             await _activityRepository.DeleteOneAsync(activity);
@@ -105,7 +128,26 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
             }
 
+            var oldName = activity.Name;
+
             _mapper.Map(updateActivityDTO, activity);
+
+            if (updateActivityDTO.Name != null &&
+                updateActivityDTO.Name != oldName)
+            {
+                var futureClasses = await _classRepository.Query()
+                    .Where(c =>
+                        c.ActivityId == activity.Id &&
+                        c.Date.ToDateTime(c.StartTime) > TimeHelper.Now()
+                    )
+                    .ToListAsync();
+
+                foreach (var classEntity in futureClasses)
+                {
+                    classEntity.ActivityName = activity.Name;
+                }
+            }
+
             await _activityRepository.UpdateOneAsync(activity);
             return _mapper.Map<ResponseActivityDTO>(activity);
         }

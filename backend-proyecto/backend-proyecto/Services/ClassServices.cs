@@ -132,6 +132,9 @@ namespace backend_proyecto.Services
 
             // Crear la clase
             var classMapped = _mapper.Map<Class>(createClassDTO);
+
+            classMapped.ActivityName = activity.Name;
+
             await _classRepository.CreateOneAsync(classMapped);
 
             // Volver a buscar la clase con sus relaciones
@@ -179,6 +182,16 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una clase con el Id = '{id}'");
             }
 
+            var classStart = classEntity.Date.ToDateTime(classEntity.StartTime);
+
+            if (classStart <= TimeHelper.Now())
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede actualizar una clase que ya comenzó"
+                );
+            }
+
             if (updateClassDTO.ActivityId != null)
             {
                 var activity = await _activityRepository.GetOneAsync(a => a.Id == updateClassDTO.ActivityId);
@@ -186,6 +199,8 @@ namespace backend_proyecto.Services
                 {
                     throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una actividad con el Id = '{updateClassDTO.ActivityId}'");
                 }
+                classEntity.ActivityId = activity.Id;
+                classEntity.ActivityName = activity.Name;
             }
 
             if (updateClassDTO.ProfessorId != null)

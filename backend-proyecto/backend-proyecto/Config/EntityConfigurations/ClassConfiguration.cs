@@ -26,7 +26,7 @@ namespace backend_proyecto.Config.EntityConfigurations
             entity.HasOne(c => c.Activity)
                   .WithMany()
                   .HasForeignKey(c => c.ActivityId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                  .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

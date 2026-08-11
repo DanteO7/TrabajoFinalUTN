@@ -4,8 +4,7 @@ namespace backend_proyecto.Models.DTOs
 {
     public class CreateClassDTO
     {
-        [Required]
-        public int ActivityId { get; set; }
+        public int? ActivityId { get; set; }
 
         [Required]
         public int ProfessorId { get; set; }

@@ -34,7 +34,7 @@ public class ClassCleanupService : BackgroundService
                 await classRepository.DeleteOneAsync(classItem);
             }
 
-            // Espera 5 minutos
+            // Espera 10 minutos
             await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
         }
     }
