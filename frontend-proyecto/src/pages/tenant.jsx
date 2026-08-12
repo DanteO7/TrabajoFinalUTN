@@ -218,7 +218,7 @@ export default function Tenant({ id }) {
             <p className="text-gray-500 mt-1">
               Desde acá podés administrar todas las áreas de tu negocio.
             </p>
-            <div className="grid gap-4.5 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
+            <div className="grid gap-4.25 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {cards?.map((section) => (
                 <Link
                   key={section.href}

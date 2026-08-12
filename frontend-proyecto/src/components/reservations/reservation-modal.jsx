@@ -24,6 +24,16 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
   const canCancel = reservation.reservationStatus === "Pending";
 
+  const formatDateWithDay = (dateString) => {
+    const [year, month, day] = dateString.split("T")[0].split("-");
+    const date = new Date(year, month - 1, day);
+
+    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
+    const dateFormatted = date.toLocaleDateString("es-AR");
+
+    return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
+  };
+
   const deleteMutation = useMutation({
     mutationFn: () => deleteReservation(reservation.id),
 
@@ -61,8 +71,6 @@ export default function ReservationModal({ reservation, tenantId, close }) {
     },
   });
 
-  var date = new Date(classItem.date).toLocaleDateString("es-AR");
-
   return (
     <Modal open onClose={close}>
       <button
@@ -72,7 +80,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-2">{classItem.activity.name}</h2>
+      <h2 className="text-2xl font-semibold mb-2">{classItem.activityName}</h2>
 
       <p className="text-gray-600 mb-6">
         {classItem.professor.user.name} {classItem.professor.user.surname}
@@ -98,7 +106,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <div className="bg-[#efefef] rounded-xl p-4">
           <p className="text-sm text-gray-600 mb-1">Fecha</p>
 
-          <p className="font-semibold">{date}</p>
+          <p className="font-semibold">{formatDateWithDay(classItem.date)}</p>
         </div>
 
         <div className="bg-[#efefef] rounded-xl p-4">
@@ -112,7 +120,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <div className="bg-[#efefef] rounded-xl p-4">
           <p className="text-sm text-gray-600 mb-1">Actividad</p>
 
-          <p className="font-semibold">{classItem.activity.name}</p>
+          <p className="font-semibold">{classItem.activityName}</p>
         </div>
 
         <div className="bg-[#efefef] rounded-xl p-4">
@@ -145,7 +153,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
       {confirmModal && (
         <ConfirmModal
           title="¿Cancelar esta reserva?"
-          message={`Estás por cancelar la reserva del dia ${date} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
+          message={`Estás por cancelar la reserva del dia ${formatDateWithDay(classItem.date)} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

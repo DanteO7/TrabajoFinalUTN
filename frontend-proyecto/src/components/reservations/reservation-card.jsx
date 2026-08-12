@@ -2,6 +2,7 @@ import { CalendarDays, Clock3, CheckCircle2 } from "lucide-react";
 
 export default function ReservationCard({ reservation, onClick }) {
   const completed = reservation.reservationStatus === "Completed";
+  console.log(reservation);
 
   return (
     <div
@@ -11,17 +12,31 @@ export default function ReservationCard({ reservation, onClick }) {
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-xl font-semibold">
-            {reservation.class.activity?.name}
+            {reservation.class.activityName}
           </h3>
 
-          <p className="text-gray-700 font-semibold text-xl">
+          <p className="text-gray-700 text-[17px] mt-1">
             {reservation.class.professor.user.name}{" "}
             {reservation.class.professor.user.surname}
           </p>
         </div>
+      </div>
 
+      <div className="flex gap-2 mt-5 text-gray-700 justify-between items-center">
+        <div>
+          <div className="flex items-center gap-2">
+            <CalendarDays size={18} />
+            {new Date(reservation.class.date).toLocaleDateString("es-AR")}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Clock3 size={18} />
+            {reservation.class.startTime.slice(0, 5)} -{" "}
+            {reservation.class.endTime.slice(0, 5)}
+          </div>
+        </div>
         <span
-          className={`rounded-full px-3 py-1 text-sm border ${
+          className={`rounded-full px-3 py-1 text-sm border text-center flex items-center h-fit ${
             completed
               ? "border-gray-600 text-gray-600"
               : "border-green-600 text-green-600"
@@ -29,25 +44,6 @@ export default function ReservationCard({ reservation, onClick }) {
         >
           {completed ? "Completada" : "Pendiente"}
         </span>
-      </div>
-
-      <div className="flex flex-col gap-2 mt-5 text-gray-700">
-        <div className="flex items-center gap-2">
-          <CalendarDays size={18} />
-          {new Date(reservation.class.date).toLocaleDateString("es-AR")}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Clock3 size={18} />
-          {reservation.class.startTime.slice(0, 5)} -{" "}
-          {reservation.class.endTime.slice(0, 5)}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <CheckCircle2 size={18} />
-          {reservation.class.reservationsCount}/{reservation.class.maxCapacity}{" "}
-          alumnos
-        </div>
       </div>
     </div>
   );

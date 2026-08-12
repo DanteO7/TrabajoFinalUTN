@@ -368,7 +368,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
               <p className="text-sm text-gray-600 mb-1">Fecha</p>
               <p className="font-semibold text-[#333]">
                 {formatDateWithDay(currentClass.date)}
-              </p>{" "}
+              </p>
             </div>
 
             <div className="bg-[#efefef] rounded-xl p-4">
