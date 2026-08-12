@@ -1,5 +1,6 @@
 import { Play } from "lucide-react";
 import { useRef, useState } from "react";
+import BlackButton from "../buttons/black-button";
 
 export default function VideoSection() {
   const videos = [
@@ -55,12 +56,11 @@ export default function VideoSection() {
           </div>
         </div>
 
-        <button
+        <BlackButton
           onClick={() => setShowMore(!showMore)}
-          className="cursor-pointer text-[#efefef] bg-[#333] rounded-[13px] px-4 py-2 border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-        >
-          {showMore ? "Ocultar videos" : "Ver más"}
-        </button>
+          text={showMore ? "Ocultar videos" : "Ver más"}
+          wfit={true}
+        />
 
         {showMore && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-[80%] animate-fadeIn">

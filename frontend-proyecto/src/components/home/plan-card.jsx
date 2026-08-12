@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import BlackButton from "../buttons/black-button";
 
 export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
   return (
@@ -29,15 +30,14 @@ export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
           Panel administrativo
         </li>
       </ul>
-      <button
+      <BlackButton
         onClick={() => {
           onSelectedPlan(plan);
           onOpenModal(true);
         }}
-        className="text-[#efefef] bg-[#333] rounded-[14px] px-5 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-      >
-        Contratar
-      </button>
+        text="Contratar"
+        wfit={true}
+      />
     </div>
   );
 }

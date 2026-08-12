@@ -16,9 +16,13 @@ import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
 import Loading from "../components/loading";
+import { useState } from "react";
+import EditAddressModal from "../components/tenant/edit-adress-modal";
+import BlackButton from "../components/buttons/black-button";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
+  const [openEditAdressModal, setOpenEditAdressModal] = useState(false);
 
   const {
     data: tenant,
@@ -29,7 +33,7 @@ export default function Tenant({ id }) {
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
   });
-
+  console.log("id en Tenant.jsx:", id); // ← Debug
   const sections = {
     Tenant: [
       {
@@ -187,16 +191,28 @@ export default function Tenant({ id }) {
           </div>
         ) : (
           <div className="flex flex-col justify-between items-start flex-wrap gap-5">
-            <div>
+            <div className="flex flex-col gap-2">
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
                 {tenant?.name}
               </h1>
 
-              <p className="text-gray-500 mt-2">
+              <p className="text-gray-500">
                 Administrado por {tenant?.ownerUser.name}{" "}
                 {tenant?.ownerUser.surname}
               </p>
-              <div className="flex my-2 gap-2 flex-wrap">
+
+              <p className="text-gray-500 mb-1">{tenant?.address}</p>
+
+              {role.text == "Dueño" && (
+                <BlackButton
+                  text={"Editar direccion"}
+                  onClick={() => setOpenEditAdressModal(true)}
+                  textSmall={true}
+                  wfit={true}
+                />
+              )}
+
+              <div className="flex mb-2 mt-1 gap-2 flex-wrap">
                 <span
                   className={`rounded-full px-3 py-1 text-sm border
                 ${
@@ -218,13 +234,13 @@ export default function Tenant({ id }) {
             <p className="text-gray-500 mt-1">
               Desde acá podés administrar todas las áreas de tu negocio.
             </p>
-            <div className="grid gap-4.25 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
+            <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {cards?.map((section) => (
                 <Link
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className=" cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.25 max-[900px]:items-center">
+                  <div className=" cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
                     <div className="text-[#FF8A90]">{section.icon}</div>
 
                     <div>
@@ -232,7 +248,7 @@ export default function Tenant({ id }) {
                         {section.title}
                       </h3>
 
-                      <p className="text-gray-500 mt-1 max-[900px]:text-[12px]">
+                      <p className="text-gray-500 mt-1 max-[900px]:text-[13px]">
                         {section.description}
                       </p>
                     </div>
@@ -243,6 +259,12 @@ export default function Tenant({ id }) {
           </div>
         )}
       </div>
+      {openEditAdressModal && (
+        <EditAddressModal
+          tenant={tenant}
+          close={() => setOpenEditAdressModal(false)}
+        />
+      )}
     </MainLayout>
   );
 }

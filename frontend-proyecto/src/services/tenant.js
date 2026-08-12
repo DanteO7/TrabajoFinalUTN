@@ -19,14 +19,8 @@ export const createTenant = (data) => {
 
 export const deleteTenant = (id) => request("delete", `/tenants/${id}`);
 
-export const updateTenantPlan = (id, data) =>
-  request("patch", `/tenants/${id}/plan`, data);
-
-export const updateTenantActive = (id, data) =>
-  request("patch", `/tenants/${id}/active`, data);
-
-export const updateTenantStatus = (id, data) =>
-  request("patch", `/tenants/${id}/status`, data);
+export const updateTenant = (id, data) =>
+  request("put", `/tenants/${id}`, data);
 
 export const getMyTenants = () => request("get", "/tenants/my-tenants");
 

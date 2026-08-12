@@ -210,6 +210,17 @@ namespace backend_proyecto.Services
                 tenant.MonthlyFeeStatus = updateTenantDTO.MonthlyFeeStatus;
             }
 
+            if (updateTenantDTO.Address != null)
+            {
+                if (updateTenantDTO.Address.Length > 200)
+                {
+                    throw new HttpResponseError(HttpStatusCode.BadRequest,
+                        "La dirección no puede tener más de 200 caracteres");
+                }
+
+                tenant.Address = updateTenantDTO.Address;
+            }
+
             await _tenantRepository.UpdateOneAsync(tenant);
 
             return _mapper.Map<ResponseTenantDTO>(tenant);

@@ -149,7 +149,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

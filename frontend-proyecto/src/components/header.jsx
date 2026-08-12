@@ -72,7 +72,7 @@ export default function Header() {
               )}
               <Link
                 href="/tu-espacio"
-                className="min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
+                className="min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13.5px] hover:bg-[#d4d4d4] max-[900px]:mr-1"
               >
                 Tu espacio
               </Link>

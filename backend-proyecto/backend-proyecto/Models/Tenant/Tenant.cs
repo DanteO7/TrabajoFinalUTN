@@ -6,6 +6,7 @@
         public int OwnerUserId { get; set; }
         public User OwnerUser { get; set; } = null!;
         public string Name { get; set; } = null!;
+        public string? Address { get; set; }
         public bool IsActive { get; set; }
         public int TenantPlanId { get; set; }
         public TenantPlan TenantPlan { get; set; } = null!;

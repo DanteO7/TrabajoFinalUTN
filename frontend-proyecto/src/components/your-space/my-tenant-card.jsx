@@ -1,4 +1,5 @@
 import React from "react";
+import BlackButton from "../buttons/black-button";
 
 export default function MyTenantCard({ myTenant, onClick }) {
   const roleConfig = {
@@ -19,14 +20,14 @@ export default function MyTenantCard({ myTenant, onClick }) {
 
   return (
     <div className="flex flex-col border w-full cursor-pointer place-self-center p-5 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <div onClick={onClick} className=" flex justify-between">
+      <div onClick={onClick} className=" flex justify-between mb-4">
         <div>
           <h4 className="font-semibold text-[20px] lg:text-2xl">
             {myTenant.name}
           </h4>
           <span className="text-[14px]">{myTenant.ownerName}</span>
         </div>
-        <div className="flex flex-col justify-between">
+        <div className="flex flex-col justify-between text-center">
           {myTenant.isActive ? (
             <span className="border rounded-4xl px-2 text-[13px] border-green-600 text-green-600">
               Activo
@@ -44,9 +45,7 @@ export default function MyTenantCard({ myTenant, onClick }) {
           </span>
         </div>
       </div>
-      <button className=" bg-[#444] text-[#efefef] w-full py-1 px-4 rounded-xl mt-4 hover:bg-[#333] transition-all duration-200 cursor-pointer">
-        Entrar
-      </button>
+      <BlackButton text={"Entrar"} textSmall={true} />
     </div>
   );
 }
