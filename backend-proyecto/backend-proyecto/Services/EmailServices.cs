@@ -74,7 +74,7 @@ namespace backend_proyecto.Services
             message.To.Add(to);
             message.Subject = "Recuperación de contraseña";
             message.HtmlBody = $@"
-                <a href=""http://localhost:5173/resetear-contraseña?token={Uri.EscapeDataString(token)}"">
+                <a href=""http://turnofacilapp.com.ar/resetear-contraseña?token={Uri.EscapeDataString(token)}"">
                     Restablecer contraseña
                 </a>";
 
