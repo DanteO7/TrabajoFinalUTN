@@ -43,24 +43,27 @@ namespace backend_proyecto.Controllers
 
         [HttpGet]
         [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ResponseStudentDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ResponseStudentDTO>>> GetAllByTenantId([FromQuery]int? tenantId)
+        public async Task<ActionResult<List<ResponseStudentDTO>>> GetAllByTenantId(
+            [FromQuery] int? tenantId,
+            [FromQuery] int? classId,
+            [FromQuery] string? search)
         {
             try
             {
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var students = await _studentServices.GetAll(tenantId, userId);
+                var students = await _studentServices.GetAll(tenantId, classId, userId, search);
                 return Ok(students);
             }
             catch (HttpResponseError ex)
             {
-                return StatusCode((int)ex.StatusCode, ex.Message);
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = ex.Message });
             }
         }
 
@@ -108,40 +111,17 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpPatch("{id}/plan")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [HttpPut("{id}")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}, {Roles.PROFESSOR}")]
         [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseStudentDTO>> ChangePlan(int id, [FromBody] ChangePlanStudentDTO changePlanStudentDTO)
+        public async Task<ActionResult<ResponseStudentDTO>> UpdateOne(int id, [FromBody] UpdateStudentDTO updateStudentDTO)
         {
             try
             {
-                var student = await _studentServices.ChangePlan(id, changePlanStudentDTO);
-                return Ok(student);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpPatch("{id}/status")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseStudentDTO>> ChangeStatus(int id, [FromBody] ChangeStatusStudentDTO changeStatusStudentDTO)
-        {
-            try
-            {
-                var student = await _studentServices.ChangeStatus(id, changeStatusStudentDTO);
+                var student = await _studentServices.UpdateOne(id, updateStudentDTO);
                 return Ok(student);
             }
             catch (HttpResponseError ex)

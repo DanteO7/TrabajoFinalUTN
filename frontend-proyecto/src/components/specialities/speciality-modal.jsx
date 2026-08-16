@@ -8,6 +8,10 @@ import { updateSpeciality, deleteSpeciality } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
+import RedButton from "../buttons/red-button";
+import BlackButton from "../buttons/black-button";
+import { Trash2 } from "lucide-react";
+import WhiteButton from "../buttons/white-button";
 
 export default function SpecialityModal({ speciality, tenantId, close }) {
   const [editing, setEditing] = useState(false);
@@ -124,21 +128,20 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
             {currentSpeciality.description || "Sin descripción"}
           </p>
 
-          <div className="grid grid-cols-2 gap-3 mt-8 max-[360px]:text-[14px] text-center">
-            <button
+          <div className="flex gap-2 mt-8">
+            <RedButton
+              text="Eliminar"
+              disabled={deleteMutation.isPending}
               onClick={() => setConfirmModal(true)}
-              className="flex-1 rounded-xl bg-red-500 py-2.5 text-white hover:bg-red-600 transition cursor-pointer duration-200"
-            >
-              Eliminar
-            </button>
-
-            <button
+              textSmall={true}
+              img={<Trash2 size={18} />}
+            />
+            <BlackButton
+              text="Editar"
               onClick={() => setEditing(true)}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#333] py-2.5 text-white hover:bg-[#222] transition cursor-pointer duration-200"
-            >
-              <Pencil size={18} />
-              Editar
-            </button>
+              textSmall={true}
+              img={<Pencil size={18} />}
+            />
           </div>
         </>
       ) : (
@@ -158,23 +161,20 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
+            <WhiteButton
+              text="Cancelar"
               onClick={() => {
                 reset();
                 setEditing(false);
               }}
-              className="border px-4 py-2 rounded-xl"
-            >
-              Cancelar
-            </button>
-
-            <button
+              textSmall={true}
+            />
+            <BlackButton
+              text={mutation.isPending ? "Actualizando..." : "Actualizar"}
               type="submit"
-              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-            >
-              Guardar
-            </button>
+              disabled={mutation.isPending}
+              textSmall={true}
+            />
           </div>
         </form>
       )}

@@ -33,7 +33,8 @@ export default function Tenant({ id }) {
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
   });
-  console.log("id en Tenant.jsx:", id); // ← Debug
+  console.log(tenant);
+
   const sections = {
     Tenant: [
       {
@@ -205,7 +206,9 @@ export default function Tenant({ id }) {
 
               {role.text == "Dueño" && (
                 <BlackButton
-                  text={"Editar direccion"}
+                  text={
+                    tenant?.address ? "Editar direccion" : "Agregar direccion"
+                  }
                   onClick={() => setOpenEditAdressModal(true)}
                   textSmall={true}
                   wfit={true}
@@ -248,7 +251,7 @@ export default function Tenant({ id }) {
                         {section.title}
                       </h3>
 
-                      <p className="text-gray-500 mt-1 max-[900px]:text-[13px]">
+                      <p className="text-gray-500 max-[900px]:text-[13px]">
                         {section.description}
                       </p>
                     </div>

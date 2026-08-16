@@ -9,6 +9,8 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import { createActivity } from "../../services/activity";
 import { createActivitySchema } from "../../schema/activity-schema";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
 
 export default function ActivityForm({ tenantId, close }) {
   const queryClient = useQueryClient();
@@ -103,13 +105,15 @@ export default function ActivityForm({ tenantId, close }) {
             </p>
           )}
         </div>
-
-        <button
-          type="submit"
-          className="mt-2 bg-[#333] text-[#efefef] rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer"
-        >
-          Crear actividad
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <BlackButton
+            text={mutation.isPending ? "Creando..." : "Crear actividad"}
+            type="submit"
+            disabled={mutation.isPending}
+            textSmall={true}
+          />
+        </div>
       </form>
       {errorModal && (
         <ErrorModal

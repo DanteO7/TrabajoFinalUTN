@@ -1,9 +1,12 @@
-import { Trash2, Edit } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
 import { useState } from "react";
 import { deleteTenantPlan } from "../../services/tenant-plan";
+import BlackButton from "../buttons/black-button";
+import { Pencil } from "lucide-react";
+import RedButton from "../buttons/red-button";
 
 export default function TenantPlanCard({ plan, onEdit }) {
   const queryClient = useQueryClient();
@@ -62,22 +65,19 @@ export default function TenantPlanCard({ plan, onEdit }) {
         </div>
 
         <div className="flex gap-2">
-          <button
-            onClick={() => onEdit(plan)}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#333] text-white rounded-lg py-2 hover:bg-gray-700 transition cursor-pointer"
-          >
-            <Edit size={18} />
-            Editar
-          </button>
-
-          <button
-            onClick={() => setConfirmModal(true)}
+          <RedButton
+            text="Eliminar"
             disabled={deleteMutation.isPending}
-            className="flex-1 flex items-center justify-center gap-2 bg-red-500 text-white rounded-lg py-2 hover:bg-red-600 transition cursor-pointer disabled:opacity-50"
-          >
-            <Trash2 size={18} />
-            Eliminar
-          </button>
+            onClick={() => setConfirmModal(true)}
+            textSmall={true}
+            img={<Trash2 size={18} />}
+          />
+          <BlackButton
+            text="Editar"
+            onClick={() => onEdit(plan)}
+            textSmall={true}
+            img={<Pencil size={18} />}
+          />
         </div>
       </div>
 

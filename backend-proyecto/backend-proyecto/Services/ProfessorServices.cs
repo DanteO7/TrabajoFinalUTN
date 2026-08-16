@@ -110,16 +110,97 @@ namespace backend_proyecto.Services
             await _professorRepository.DeleteOneAsync(professor);
         }
 
-        public async Task<ResponseProfessorDTO> ChangeActive(int id)
+        public async Task<ResponseProfessorDTO> UpdateOne(int professorId, UpdateProfessorDTO updateProfessorDTO)
         {
-            var professor = await _professorRepository.GetOneAsync(p => p.Id == id, p => p.User);
+            var professor = await _professorRepository.Query()
+                .Include(p => p.User)
+                .Include(p => p.ProfessorSpecialities)
+                    .ThenInclude(ps => ps.Speciality)
+                .FirstOrDefaultAsync(p => p.Id == professorId);
+
             if (professor == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un profesor con el Id = '{professorId}'"
+                );
             }
 
-            professor.IsActive = !professor.IsActive;
+            if (updateProfessorDTO.IsActive.HasValue)
+            {
+                professor.IsActive = updateProfessorDTO.IsActive.Value;
+            }
+
+            if (updateProfessorDTO.SpecialityIds != null)
+            {
+                var newSpecialityIds = updateProfessorDTO.SpecialityIds
+                    .Distinct()
+                    .ToHashSet();
+
+                // Verificar que todas las especialidades existan
+                var specialities = await _specialityRepository.Query()
+                    .Where(s => newSpecialityIds.Contains(s.Id))
+                    .ToListAsync();
+
+                if (specialities.Count != newSpecialityIds.Count)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Una o más especialidades no existen"
+                    );
+                }
+
+                var invalidSpeciality = specialities.FirstOrDefault(s => s.TenantId != professor.TenantId);
+
+                if (invalidSpeciality != null)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Una o más especialidades no pertenecen al tenant del profesor"
+                    );
+                }
+
+                var currentSpecialityIds = professor.ProfessorSpecialities
+                    .Select(ps => ps.SpecialityId)
+                    .ToHashSet();
+
+                // agregar nuevas
+
+                foreach (var specialityId in newSpecialityIds)
+                {
+                    if (!currentSpecialityIds.Contains(specialityId))
+                    {
+                        professor.ProfessorSpecialities.Add(
+                            new ProfessorSpeciality
+                            {
+                                ProfessorId = professor.Id,
+                                SpecialityId = specialityId
+                            }
+                        );
+                    }
+                }
+
+                // eliminar viejas
+
+                var relationsToRemove = professor.ProfessorSpecialities
+                    .Where(ps => !newSpecialityIds.Contains(ps.SpecialityId))
+                    .ToList();
+
+                foreach (var relation in relationsToRemove)
+                {
+                    professor.ProfessorSpecialities.Remove(relation);
+                }
+            }
+
             await _professorRepository.UpdateOneAsync(professor);
+
+            // Volver a cargar para devolver las relaciones actualizadas
+            professor = await _professorRepository.Query()
+                .Include(p => p.User)
+                .Include(p => p.ProfessorSpecialities)
+                    .ThenInclude(ps => ps.Speciality)
+                .FirstAsync(p => p.Id == professorId);
+
             return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 

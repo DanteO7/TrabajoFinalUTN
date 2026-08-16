@@ -7,6 +7,7 @@ import { IoArrowBack } from "react-icons/io5";
 import SpecialityForm from "../../components/specialities/speciality-form";
 import SpecialityModal from "../../components/specialities/speciality-modal";
 import Loading from "../../components/loading";
+import BlackButton from "../../components/buttons/black-button";
 
 export default function Specialities({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -66,13 +67,14 @@ export default function Specialities({ tenantId }) {
                   placeholder="Buscar especialidad..."
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
-
-                <button
-                  onClick={() => setOpenModal(true)}
-                  className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                >
-                  + Nueva profesión
-                </button>
+                <div className="justify-self-end">
+                  <BlackButton
+                    text="+ Nueva profesión"
+                    onClick={() => setOpenModal(true)}
+                    textSmall={true}
+                    wfit={true}
+                  />
+                </div>
               </div>
             )}
 
@@ -96,13 +98,14 @@ export default function Specialities({ tenantId }) {
                   <p className="text-gray-500 mt-2 mb-6">
                     Creá tu primera profesión para comenzar.
                   </p>
-
-                  <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl transition cursor-pointer hover:bg-[#222]"
-                  >
-                    + Crear especialidad
-                  </button>
+                  <div className="flex items-center justify-center">
+                    <BlackButton
+                      text="+ Crear profesión"
+                      onClick={() => setOpenModal(true)}
+                      textSmall={true}
+                      wfit={true}
+                    />
+                  </div>
                 </div>
               )}
             </div>

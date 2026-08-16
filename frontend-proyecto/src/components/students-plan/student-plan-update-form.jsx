@@ -9,6 +9,8 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import { updateStudentPlan } from "../../services/student-plan";
 import { updateStudentPlanSchema } from "../../schema/students-plan-schema";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
 
 export default function StudentPlanUpdateForm({
   planId,
@@ -118,14 +120,15 @@ export default function StudentPlanUpdateForm({
           register={register("price")}
           error={errors.price}
         />
-
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className="mt-2 bg-[#333] text-white rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer disabled:opacity-50"
-        >
-          {mutation.isPending ? "Actualizando..." : "Actualizar plan"}
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <BlackButton
+            text={mutation.isPending ? "Actualizando..." : "Actualizar plan"}
+            disabled={mutation.isPending}
+            type="submit"
+            textSmall={true}
+          />
+        </div>
       </form>
 
       {errorModal && (

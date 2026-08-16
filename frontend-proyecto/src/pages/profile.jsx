@@ -17,6 +17,9 @@ import ChangeEmailForm from "../components/profile/change-email-form";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import { useEffect } from "react";
 import { useTenantStore } from "../store/tenant-store";
+import RedButton from "../components/buttons/red-button";
+import WhiteButton from "../components/buttons/white-button";
+import BlackButton from "../components/buttons/black-button";
 
 export default function Profile() {
   const { user, isAuthenticated, login, logout } = useAuthStore();
@@ -178,21 +181,6 @@ export default function Profile() {
                 disabled={isSubmitting || mutation.isPending}
               />
               <FormInput
-                disabled={true}
-                label="Email"
-                id="email"
-                type="email"
-                placeholder="Email"
-                register={register("email")}
-              />
-              <button
-                type="button"
-                onClick={() => setOpenChangeEmail(true)}
-                className="text-[#efefef] w-fit bg-[#333] rounded-[13px] px-5 py-2  cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-              >
-                Cambiar Email
-              </button>
-              <FormInput
                 label="Telefono"
                 id="phoneNumber"
                 type="text"
@@ -201,36 +189,49 @@ export default function Profile() {
                 error={errors.phoneNumber}
                 disabled={isSubmitting || mutation.isPending}
               />
-              <button
+              <BlackButton
+                text={mutation.isPending ? "Actualizando" : "Actualizar perfil"}
                 type="submit"
                 disabled={isSubmitting || mutation.isPending}
-                className="text-[#efefef] w-fit bg-[#333] rounded-[13px] px-5 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-              >
-                {mutation.isPending ? "Actualizando" : "Actualizar perfil"}
-              </button>
-              <button
+                textSmall={true}
+                wfit={true}
+              />
+              <FormInput
+                disabled={true}
+                label="Email"
+                id="email"
+                type="email"
+                placeholder="Email"
+                register={register("email")}
+              />
+              <BlackButton
+                text="Cambiar Email"
                 type="button"
-                onClick={handleForgotPassword}
+                onClick={() => setOpenChangeEmail(true)}
+                textSmall={true}
+                wfit={true}
+              />
+              <WhiteButton
+                type="button"
                 disabled={seconds > 0}
-                className={`w-fit rounded-[13px] px-5 py-2 border-[1.7px] border-[#333] transition-all duration-300 ${
-                  seconds > 0
-                    ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                    : "hover:bg-gray-300 hover:text-[#333] cursor-pointer"
-                }`}
-              >
-                {seconds > 0 ? `Reenviar en ${seconds}s` : "Cambiar contraseña"}
-              </button>
-              <button
+                text={
+                  seconds > 0 ? `Reenviar en ${seconds}s` : "Cambiar contraseña"
+                }
+                onClick={handleForgotPassword}
+                textSmall={true}
+                wfit={true}
+              />
+              <RedButton
+                text="Cerrar sesión"
                 onClick={() => {
+                  logout();
                   clearRoles();
                   signOut();
-                  logout();
                   setLocation("/");
                 }}
-                className="text-[#efefef] w-fit bg-[#d53b3b] rounded-[13px] px-5 py-2  cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-              >
-                Cerrar sesión
-              </button>
+                textSmall={true}
+                wfit={true}
+              />
             </form>
           ) : (
             <div className="flex flex-col mt-5 gap-3">

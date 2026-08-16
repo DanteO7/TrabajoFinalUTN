@@ -7,9 +7,12 @@ import { IoArrowBack } from "react-icons/io5";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
 import StudentModal from "../../components/students/student-modal";
+import BlackButton from "../../components/buttons/black-button";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
+  const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
   const [search, setSearch] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -21,7 +24,7 @@ export default function Students({ tenantId }) {
     isError,
   } = useQuery({
     queryKey: ["getStudents", tenantId],
-    queryFn: () => getStudents(tenantId),
+    queryFn: () => getStudents({ tenantId }),
   });
 
   const filteredStudents = students.filter((student) => {
@@ -84,13 +87,12 @@ export default function Students({ tenantId }) {
                   placeholder="Buscar alumno..."
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
-
-                <button
+                <BlackButton
+                  text="+ Invitar alumno"
                   onClick={() => setOpenModal(true)}
-                  className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                >
-                  + Invitar alumno
-                </button>
+                  textSmall={true}
+                  wfit={isSmallScreen}
+                />
               </div>
             )}
 
@@ -137,13 +139,12 @@ export default function Students({ tenantId }) {
                   <p className="text-gray-500 px-2 mt-2 mb-6">
                     Invitá tu primer alumno para comenzar.
                   </p>
-
-                  <button
+                  <BlackButton
+                    text="+ Invitar alumno"
                     onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Invitar alumno
-                  </button>
+                    textSmall={true}
+                    wfit={true}
+                  />
                 </div>
               )}
             </div>

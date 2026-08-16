@@ -58,13 +58,13 @@ export default function Header() {
                 <>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
-                    href="usuarios"
+                    href="/usuarios"
                   >
                     Usuarios
                   </Link>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
-                    href="planes"
+                    href="/planes"
                   >
                     Planes
                   </Link>

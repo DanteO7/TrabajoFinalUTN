@@ -8,6 +8,7 @@ import Loading from "../../components/loading";
 import ActivityForm from "../../components/activities/activity-form";
 import ActivityModal from "../../components/activities/activity-modal";
 import { useTenantStore } from "../../store/tenant-store";
+import BlackButton from "../../components/buttons/black-button";
 
 export default function Activities({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -77,12 +78,14 @@ export default function Activities({ tenantId }) {
                 />
 
                 {isTenant && (
-                  <button
-                    onClick={() => setOpenForm(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Nueva actividad
-                  </button>
+                  <div className="justify-self-end">
+                    <BlackButton
+                      text="+ Nueva actividad"
+                      onClick={() => setOpenForm(true)}
+                      textSmall={true}
+                      wfit={true}
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -113,12 +116,14 @@ export default function Activities({ tenantId }) {
                   </p>
 
                   {isTenant && (
-                    <button
-                      onClick={() => setOpenForm(true)}
-                      className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                    >
-                      + Crear actividad
-                    </button>
+                    <div className="flex items-center justify-center">
+                      <BlackButton
+                        text="+ Crear actividad"
+                        onClick={() => setOpenForm(true)}
+                        textSmall={true}
+                        wfit={true}
+                      />
+                    </div>
                   )}
                 </div>
               )}

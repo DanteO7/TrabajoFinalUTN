@@ -9,6 +9,8 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import { createTenantPlan } from "../../services/tenant-plan";
 import { createTenantPlanSchema } from "../../schema/tenant-plans-schema";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
 
 export default function TenantPlanForm({ close }) {
   const queryClient = useQueryClient();
@@ -116,13 +118,15 @@ export default function TenantPlanForm({ close }) {
           error={errors.maxProfessors}
         />
 
-        <button
-          type="submit"
-          disabled={mutation.isPending}
-          className="mt-2 bg-[#333] text-white rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer disabled:opacity-50"
-        >
-          {mutation.isPending ? "Creando..." : "Crear plan"}
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <BlackButton
+            text={mutation.isPending ? "Creando..." : "Crear plan"}
+            type="submit"
+            disabled={mutation.isPending}
+            textSmall={true}
+          />
+        </div>
       </form>
 
       {errorModal && (

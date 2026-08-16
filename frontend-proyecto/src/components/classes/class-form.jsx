@@ -3,17 +3,16 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import Modal from "../modals/modal";
 import FormInput from "../form-input";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-
 import { createClassSchema } from "../../schema/class-schema";
-
 import { createClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
+import BlackButton from "../buttons/black-button";
+import WhiteButton from "../buttons/white-button";
 
 export default function ClassForm({ tenantId, defaultDate, close }) {
   const queryClient = useQueryClient();
@@ -176,13 +175,11 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
           register={register("maxCapacity")}
           error={errors.maxCapacity}
         />
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
 
-        <button
-          type="submit"
-          className="mt-2 bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition cursor-pointer"
-        >
-          Crear clase
-        </button>
+          <BlackButton text="Crear clase" type="submit" textSmall={true} />
+        </div>
       </form>
 
       {errorModal && (

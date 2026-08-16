@@ -8,6 +8,7 @@ import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
 import ProfessorModal from "../../components/professors/professor-modal";
 import { useTenantStore } from "../../store/tenant-store";
+import BlackButton from "../../components/buttons/black-button";
 
 export default function Professors({ tenantId }) {
   const userRoles = useTenantStore(
@@ -144,12 +145,14 @@ export default function Professors({ tenantId }) {
                     Invitá tu primer profesor para comenzar.
                   </p>
 
-                  <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Invitar profesor
-                  </button>
+                  <div className="flex items-center justify-center">
+                    <BlackButton
+                      text="+ Invitar profesor"
+                      onClick={() => setOpenModal(true)}
+                      textSmall={true}
+                      wfit={true}
+                    />
+                  </div>
                 </div>
               )}
             </div>

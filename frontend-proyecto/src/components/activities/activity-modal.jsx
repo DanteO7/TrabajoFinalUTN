@@ -7,6 +7,10 @@ import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import ConfirmModal from "../modals/confirm-modal";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
+import RedButton from "../buttons/red-button";
+import { Trash2 } from "lucide-react";
 
 export default function ActivityModal({ activity, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -131,21 +135,20 @@ export default function ActivityModal({ activity, tenantId, close }) {
           </p>
 
           {isTenant && (
-            <div className="flex justify-end gap-3 max-[360px]:text-[13px] mt-8">
-              <button
+            <div className="flex gap-2 mt-8">
+              <RedButton
+                text="Eliminar"
+                disabled={deleteMutation.isPending}
                 onClick={() => setConfirmModal(true)}
-                className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-              >
-                Eliminar actividad
-              </button>
-
-              <button
+                textSmall={true}
+                img={<Trash2 size={18} />}
+              />
+              <BlackButton
+                text="Editar"
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-              >
-                <Pencil size={18} />
-                Editar
-              </button>
+                textSmall={true}
+                img={<Pencil size={18} />}
+              />
             </div>
           )}
         </>
@@ -180,25 +183,22 @@ export default function ActivityModal({ activity, tenantId, close }) {
             />
           </div>
 
-          <div className="flex justify-end gap-3">
-            <button
+          <div className="grid grid-cols-2 gap-3">
+            <WhiteButton
+              text="Cancelar"
               onClick={() => {
                 setEditing(false);
                 setName(currentActivity.name);
                 setDescription(currentActivity.description || "");
               }}
-              className="border px-4 py-2 rounded-xl"
-            >
-              Cancelar
-            </button>
-
-            <button
+              textSmall={true}
+            />
+            <BlackButton
+              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending}
-              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700 disabled:opacity-50"
-            >
-              {updateMutation.isPending ? "Actualizando..." : "Actualizar"}
-            </button>
+              textSmall={true}
+            />
           </div>
         </div>
       )}

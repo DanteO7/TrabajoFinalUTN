@@ -25,9 +25,9 @@ export default function MyTenantCard({ myTenant, onClick }) {
           <h4 className="font-semibold text-[20px] lg:text-2xl">
             {myTenant.name}
           </h4>
-          <span className="text-[14px]">{myTenant.ownerName}</span>
+          <span className="text-[14px]">{myTenant.address}</span>
         </div>
-        <div className="flex flex-col justify-between text-center">
+        <div className="flex flex-col gap-2.5 justify-between text-center">
           {myTenant.isActive ? (
             <span className="border rounded-4xl px-2 text-[13px] border-green-600 text-green-600">
               Activo

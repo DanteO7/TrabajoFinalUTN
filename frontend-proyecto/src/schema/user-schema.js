@@ -11,8 +11,12 @@ export const updateUserSchema = z.object({
     .max(50, "Máximo 50 caracteres"),
   phoneNumber: z
     .string()
-    .min(8, "El teléfono es demasiado corto")
-    .max(20, "El teléfono es demasiado largo")
-    .regex(/^[0-9+\-\s()]+$/, "Formato de teléfono inválido")
+    .trim()
+    .refine(
+      (val) =>
+        val === "" ||
+        (val.length >= 8 && val.length <= 20 && /^[0-9+\-\s()]+$/.test(val)),
+      "Formato de teléfono inválido",
+    )
     .optional(),
 });

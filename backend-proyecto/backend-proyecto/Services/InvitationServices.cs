@@ -89,6 +89,12 @@ namespace backend_proyecto.Services
                     "La invitación ha expirado");
             }
 
+            await ValidateBusinessRole(
+                userId,
+                invitation.TenantId,
+                invitation.Role
+            );
+
             if (invitation.Role == Roles.STUDENT)
             {
                 await AcceptAsStudent(invitation, userId, studentPlanId);
@@ -127,6 +133,60 @@ namespace backend_proyecto.Services
                 UserId = userId,
                 TenantId = invitation.TenantId
             });
+        }
+
+        private async Task ValidateBusinessRole(
+            int userId,
+            int tenantId,
+            string invitationRole)
+        {
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.OwnerUserId == userId && t.Id == tenantId
+            );
+
+            var student = await _studentRepository.GetOneAsync(
+                s => s.UserId == userId && s.TenantId == tenantId
+            );
+
+            var professor = await _professorRepository.GetOneAsync(
+                p => p.UserId == userId && p.TenantId == tenantId
+            );
+
+            // Ya es profesor y quiere entrar como alumno
+            if (invitationRole == Roles.STUDENT && professor != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya sos profesor en este negocio y no podés unirte también como alumno"
+                );
+            }
+
+            // Ya es alumno y quiere entrar como profesor
+            if (invitationRole == Roles.PROFESSOR && student != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya sos alumno en este negocio y no podés unirte también como profesor"
+                );
+            }
+
+            // Ya es alumno y quiere entrar nuevamente como alumno
+            if (invitationRole == Roles.STUDENT && student != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya sos alumno en este negocio"
+                );
+            }
+
+            // Ya es profesor y quiere entrar nuevamente como profesor
+            if (invitationRole == Roles.PROFESSOR && professor != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya sos profesor en este negocio"
+                );
+            }
         }
 
         public async Task<ResponseInvitationInfoDTO> GetInvitationInfo(Guid token)

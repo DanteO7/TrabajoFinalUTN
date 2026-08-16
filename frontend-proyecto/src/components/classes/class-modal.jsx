@@ -334,10 +334,17 @@ export default function ClassModal({ classItem, tenantId, close }) {
     updateMutation.mutate(form);
   };
 
-  const decreaseReservationCount = () => {
+  const decreaseReservationCount = (quantity) => {
     const updatedClass = {
       ...currentClass,
-      reservationsCount: currentClass.reservationsCount - 1,
+      reservationsCount: currentClass.reservationsCount - quantity,
+    };
+    setCurrentClass(updatedClass);
+  };
+  const increaseReservationCount = (quantity) => {
+    const updatedClass = {
+      ...currentClass,
+      reservationsCount: currentClass.reservationsCount + quantity,
     };
     setCurrentClass(updatedClass);
   };
@@ -603,6 +610,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
           close={() => setStudentsModal(false)}
           formatDateWithDay={formatDateWithDay}
           decreaseReservationCount={decreaseReservationCount}
+          increaseReservationCount={increaseReservationCount}
         />
       )}
     </Modal>

@@ -8,6 +8,7 @@ import MainLayout from "../layouts/main-layout";
 import TenantPlanForm from "../components/tenant-plans/tenant-plan-form";
 import TenantPlanUpdateForm from "../components/tenant-plans/tenant-plan-update-form";
 import TenantPlanCard from "../components/tenant-plans/tenant-plan-card";
+import BlackButton from "../components/buttons/black-button";
 
 export default function TenantPlans() {
   const [, setLocation] = useLocation();
@@ -65,15 +66,16 @@ export default function TenantPlans() {
           Volver
         </button>
 
-        <div className="flex justify-between items-center mb-6">
+        <div className="grid grid-cols-2 items-center mb-6">
           <h2 className="text-2xl font-semibold">Planes de negocio</h2>
-
-          <button
-            onClick={() => setOpenCreateForm(true)}
-            className="bg-[#333] min-w-35 text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-          >
-            + Nuevo plan
-          </button>
+          <div className="justify-self-end">
+            <BlackButton
+              text="+ Nuevo plan"
+              onClick={() => setOpenCreateForm(true)}
+              textSmall={true}
+              wfit={true}
+            />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

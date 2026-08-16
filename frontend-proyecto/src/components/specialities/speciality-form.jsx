@@ -9,6 +9,8 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import { createSpeciality } from "../../services/speciality";
 import { createSpecialitySchema } from "../../schema/speciality-schema";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
 
 export default function SpecialityForm({ tenantId, close }) {
   const queryClient = useQueryClient();
@@ -105,12 +107,15 @@ export default function SpecialityForm({ tenantId, close }) {
           )}
         </div>
 
-        <button
-          type="submit"
-          className="mt-2 bg-[#333] text-white rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer"
-        >
-          Crear profesión
-        </button>
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <BlackButton
+            text={mutation.isPending ? "Creando..." : "Crear profesión"}
+            type="submit"
+            disabled={mutation.isPending}
+            textSmall={true}
+          />
+        </div>
       </form>
 
       {errorModal && (

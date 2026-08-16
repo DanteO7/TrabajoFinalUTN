@@ -40,6 +40,7 @@ namespace backend_proyecto.Config
             // student
             CreateMap<AssignStudentDTO, Student>();
             CreateMap<Student, ResponseStudentDTO>();
+            CreateMap<UpdateStudentDTO, Student>();
 
             // professor
             CreateMap<AssignProfessorDTO, Professor>();

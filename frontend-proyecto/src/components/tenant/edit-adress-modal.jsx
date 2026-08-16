@@ -19,6 +19,9 @@ export default function EditAddressModal({ tenant, close }) {
       queryClient.invalidateQueries({
         queryKey: ["tenantById"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["myTenants"],
+      });
 
       setSuccessModal(true);
       setTimeout(() => {

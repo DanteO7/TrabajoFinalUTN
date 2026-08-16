@@ -6,7 +6,7 @@ namespace backend_proyecto.Repositories
 {
     public interface ISpecialityRepository : IRepository<Speciality>
     {
-        Task<bool> ExistsByName(string name);
+        Task<bool> ExistsByName(string name, int tenantId);
     }
     public class SpecialityRepository : Repository<Speciality>, ISpecialityRepository
     {
@@ -15,9 +15,11 @@ namespace backend_proyecto.Repositories
         {
             _db = db;
         }
-        public async Task<bool> ExistsByName(string name)
+        public async Task<bool> ExistsByName(string name, int tenantId)
         {
-            return await dbSet.AnyAsync(s => s.Name.ToLower() == name.ToLower());
+            return await dbSet.AnyAsync(s => 
+                s.Name.ToLower() == name.ToLower() &&
+                s.TenantId == tenantId);
         }
     }
 }

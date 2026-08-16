@@ -9,6 +9,10 @@ import {
   deleteInvitation,
   getInvitationByTenant,
 } from "../../services/invitation";
+import BlackButton from "../buttons/black-button";
+import WhiteButton from "../buttons/white-button";
+import RedButton from "../buttons/red-button";
+import { Trash2 } from "lucide-react";
 
 export default function LinkModal({ tenantId, close, role }) {
   const queryClient = useQueryClient();
@@ -80,14 +84,14 @@ export default function LinkModal({ tenantId, close, role }) {
       </button>
 
       <h2 className="text-2xl font-semibold text-center mb-6">
-        Invitar {role}
+        Invitar {role == "Student" ? "Alumno" : "Profesor"}
       </h2>
 
       {isLoading ? (
         <p className="text-center text-gray-500">Cargando...</p>
       ) : hasValidLink ? (
         <>
-          <div className="border rounded-xl p-4 bg-[#efefef]">
+          <div className="border rounded-xl p-4 bg-[#efefef] mb-4">
             <p className="font-semibold mb-3">Link de invitación activo</p>
 
             <input
@@ -96,14 +100,13 @@ export default function LinkModal({ tenantId, close, role }) {
               className="w-full border rounded-xl px-3 py-2 bg-white mb-3"
             />
 
-            <button
+            <BlackButton
+              text="Copiar link"
               onClick={() =>
                 navigator.clipboard.writeText(currentInvitation.link)
               }
-              className="cursor-pointer w-full bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition"
-            >
-              Copiar link
-            </button>
+              textSmall={true}
+            />
 
             <p className="text-sm text-gray-600 mt-2">
               Expira el:{" "}
@@ -113,22 +116,24 @@ export default function LinkModal({ tenantId, close, role }) {
             </p>
           </div>
 
-          <button
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending}
-            className="w-full mt-4 bg-gray-300 text-gray-700 rounded-xl py-2 hover:bg-gray-400 transition cursor-pointer disabled:opacity-50"
-          >
-            {mutation.isPending ? "Generando..." : "Generar nuevo link"}
-          </button>
-          {hasValidLink && (
-            <button
-              onClick={() => deleteMutation.mutate(currentInvitation.id)}
-              disabled={deleteMutation.isPending}
-              className="cursor-pointer w-full mt-2 bg-red-500 text-white rounded-xl py-2 hover:bg-red-600 transition"
-            >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar link"}
-            </button>
-          )}
+          <div className="flex flex-col gap-2">
+            <WhiteButton
+              disabled={mutation.isPending}
+              text={mutation.isPending ? "Generando..." : "Generar nuevo link"}
+              onClick={() => mutation.mutate()}
+              textSmall={true}
+            />
+            {hasValidLink && (
+              <RedButton
+                text={
+                  deleteMutation.isPending ? "Eliminando..." : "Eliminar link"
+                }
+                disabled={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate(currentInvitation.id)}
+                textSmall={true}
+              />
+            )}
+          </div>
         </>
       ) : (
         <>
@@ -138,13 +143,12 @@ export default function LinkModal({ tenantId, close, role }) {
             </p>
           )}
 
-          <button
-            onClick={() => mutation.mutate()}
+          <BlackButton
             disabled={mutation.isPending}
-            className="w-full bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition cursor-pointer disabled:opacity-50"
-          >
-            {mutation.isPending ? "Generando..." : "Generar link de invitación"}
-          </button>
+            text={mutation.isPending ? "Generando..." : "Generar nuevo link"}
+            onClick={() => mutation.mutate()}
+            textSmall={true}
+          />
         </>
       )}
 

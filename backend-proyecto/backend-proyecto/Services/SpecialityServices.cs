@@ -55,11 +55,11 @@ namespace backend_proyecto.Services
             }
             if (createSpecialityDTO.Name != null && createSpecialityDTO.Name.Length > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la profesión no puede ser nulo o tener mas de 50 caracteres");
             }
-            if(createSpecialityDTO.Name != null && await _specialityRepository.ExistsByName(createSpecialityDTO.Name))
+            if(createSpecialityDTO.Name != null && await _specialityRepository.ExistsByName(createSpecialityDTO.Name, createSpecialityDTO.TenantId))
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una especialidad con ese nombre");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una profesión con ese nombre en este negocio");
             }
 
             var speciality = _mapper.Map<Speciality>(createSpecialityDTO);
@@ -72,7 +72,7 @@ namespace backend_proyecto.Services
             var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id);
             if (speciality == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una especialidad con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una profesión con el Id = '{id}'");
             }
 
             await _specialityRepository.DeleteOneAsync(speciality);
@@ -83,12 +83,12 @@ namespace backend_proyecto.Services
             var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id, s => s.Tenant);
             if (speciality == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una especialidad con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró una profesión con el Id = '{id}'");
             }
 
             if (updateSpecialityDTO.Name != null && updateSpecialityDTO.Name.Length > 50)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede tener mas de 50 caracteres");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la profesión no puede tener mas de 50 caracteres");
             }
 
             _mapper.Map(updateSpecialityDTO, speciality);

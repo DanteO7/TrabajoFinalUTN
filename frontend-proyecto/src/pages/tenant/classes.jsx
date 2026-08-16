@@ -12,6 +12,7 @@ import ClassForm from "../../components/classes/class-form";
 import ClassModal from "../../components/classes/class-modal";
 import Loading from "../../components/loading";
 import { useTenantStore } from "../../store/tenant-store";
+import BlackButton from "../../components/buttons/black-button";
 
 export default function Classes({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -129,18 +130,20 @@ export default function Classes({ tenantId }) {
               </div>
 
               <div className="flex-1">
-                <div className="flex justify-between items-center mb-6">
+                <div className="grid grid-cols-2 items-center mb-6">
                   <h2 className="text-2xl font-semibold">
                     Clases del {selectedDate.toLocaleDateString("es-AR")}
                   </h2>
 
                   {canCreateClass && !isDateInPast && (
-                    <button
-                      onClick={() => setOpenModal(true)}
-                      className="bg-[#333] min-w-35 text-white text-[] px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                    >
-                      + Nueva clase
-                    </button>
+                    <div className="justify-self-end">
+                      <BlackButton
+                        onClick={() => setOpenModal(true)}
+                        text="+ Nueva clase"
+                        wfit={true}
+                        textSmall={true}
+                      />
+                    </div>
                   )}
                 </div>
 
@@ -213,7 +216,7 @@ export default function Classes({ tenantId }) {
                       </p>
                     </div>
                   ) : (
-                    <div className="border rounded-xl py-16 text-center">
+                    <div className="border rounded-xl py-16 text-center flex flex-col items-center">
                       <h3 className="text-xl font-semibold">
                         No hay clases este día
                       </h3>
@@ -221,13 +224,12 @@ export default function Classes({ tenantId }) {
                       <p className="text-gray-500 mt-2 mb-6">
                         Creá una nueva clase para esta fecha.
                       </p>
-
-                      <button
+                      <BlackButton
                         onClick={() => setOpenModal(true)}
-                        className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                      >
-                        + Crear clase
-                      </button>
+                        text="+ Crear clase"
+                        wfit={true}
+                        textSmall={true}
+                      />
                     </div>
                   )}
                 </div>

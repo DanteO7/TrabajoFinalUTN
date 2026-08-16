@@ -8,16 +8,13 @@ namespace backend_proyecto.Repositories
     {
         Task<bool> ExistsByName(string name, int tenantId);
     }
-
     public class ActivityRepository : Repository<Activity>, IActivityRepository
     {
         private readonly ApplicationDbContext _db;
-
         public ActivityRepository(ApplicationDbContext db) : base(db)
         {
             _db = db;
         }
-
         public async Task<bool> ExistsByName(string name, int tenantId)
         {
             return await dbSet.AnyAsync(s =>

@@ -5,12 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStudentPlans } from "../../services/student-plan";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import {
-  deleteStudent,
-  updateStudentPlan,
-  updateStudentStatus,
-} from "../../services/student";
+import { deleteStudent, updateStudent } from "../../services/student";
 import ConfirmModal from "../modals/confirm-modal";
+import BlackButton from "../buttons/black-button";
+import RedButton from "../buttons/red-button";
+import { Trash2 } from "lucide-react";
+import WhiteButton from "../buttons/white-button";
 
 export default function StudentModal({ student, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -71,9 +71,10 @@ export default function StudentModal({ student, tenantId, close }) {
     },
   });
 
-  const statusMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: () =>
-      updateStudentStatus(currentStudent.id, {
+      updateStudent(currentStudent.id, {
+        studentPlanId: selectedPlan,
         monthlyFeeStatus: selectedStatus,
       }),
 
@@ -82,9 +83,9 @@ export default function StudentModal({ student, tenantId, close }) {
         queryKey: ["getStudents", tenantId],
       });
 
-      setSuccessMessage("Estado de cuota actualizado correctamente");
+      setSuccessMessage("Estudiante actualizado correctamente");
       setSuccessModal(true);
-
+      setEditing(false);
       setCurrentStudent(updatedStudent);
 
       setTimeout(() => {
@@ -105,43 +106,6 @@ export default function StudentModal({ student, tenantId, close }) {
       setBackendError(msg);
       setErrorModal(true);
       setSelectedStatus(currentStudent.monthlyFeeStatus);
-    },
-  });
-
-  const planMutation = useMutation({
-    mutationFn: () =>
-      updateStudentPlan(currentStudent.id, {
-        studentPlanId: selectedPlan,
-      }),
-
-    onSuccess: (updatedStudent) => {
-      queryClient.invalidateQueries({
-        queryKey: ["getStudents", tenantId],
-      });
-
-      setSuccessMessage("Plan actualizado correctamente");
-      setSuccessModal(true);
-
-      setCurrentStudent(updatedStudent);
-
-      setTimeout(() => {
-        setSuccessModal(false);
-      }, 3000);
-    },
-
-    onError: (error) => {
-      const data = error?.response?.data;
-
-      let msg = "Ocurrió un error al cambiar el plan";
-
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.message) msg = data.message;
-
-      setBackendError(msg);
-      setErrorModal(true);
-      setSelectedPlan(currentStudent.studentPlanId);
     },
   });
 
@@ -234,21 +198,19 @@ export default function StudentModal({ student, tenantId, close }) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
-            <button
+          <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">
+            <RedButton
+              text="Eliminar"
+              img={<Trash2 size={18} />}
               onClick={() => setConfirmModal(true)}
-              className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-            >
-              Eliminar alumno
-            </button>
-
-            <button
+              textSmall={true}
+            />
+            <BlackButton
+              text="Editar"
+              img={<Pencil size={18} />}
               onClick={() => setEditing(true)}
-              className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-            >
-              <Pencil size={18} />
-              Editar
-            </button>
+              textSmall={true}
+            />
           </div>
         </>
       ) : (
@@ -272,16 +234,6 @@ export default function StudentModal({ student, tenantId, close }) {
                 </option>
               ))}
             </select>
-
-            {selectedPlan !== currentStudent.studentPlanId && (
-              <button
-                onClick={() => planMutation.mutate()}
-                disabled={planMutation.isPending}
-                className="w-full mt-2 bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition disabled:opacity-50"
-              >
-                {planMutation.isPending ? "Actualizando..." : "Actualizar plan"}
-              </button>
-            )}
           </div>
 
           <div>
@@ -306,31 +258,23 @@ export default function StudentModal({ student, tenantId, close }) {
                 </div>
               ))}
             </div>
-
-            {selectedStatus !== currentStudent.monthlyFeeStatus && (
-              <button
-                onClick={() => statusMutation.mutate()}
-                disabled={statusMutation.isPending}
-                className="w-full mt-4 bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition disabled:opacity-50"
-              >
-                {statusMutation.isPending
-                  ? "Actualizando..."
-                  : "Actualizar estado"}
-              </button>
-            )}
           </div>
 
           <div className="flex justify-end gap-3">
-            <button
+            <WhiteButton
+              text="Cancelar"
               onClick={() => {
                 setEditing(false);
                 setSelectedStatus(currentStudent.monthlyFeeStatus);
                 setSelectedPlan(currentStudent.studentPlanId);
               }}
-              className="border px-4 py-2 rounded-xl"
-            >
-              Cancelar
-            </button>
+              textSmall={true}
+            />
+            <BlackButton
+              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              onClick={() => updateMutation.mutate()}
+              textSmall={true}
+            />
           </div>
         </div>
       )}

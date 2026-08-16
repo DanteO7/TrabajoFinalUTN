@@ -53,6 +53,7 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
                         : "Student",
                 OwnerName = t.OwnerUser.Name + " " + t.OwnerUser.Surname,
                 IsActive = t.IsActive,
+                Address = t.Address,
             })
             .ToListAsync();
 

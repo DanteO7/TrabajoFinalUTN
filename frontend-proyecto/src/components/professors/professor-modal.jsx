@@ -1,18 +1,16 @@
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Trash2, Plus } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modals/modal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  updateProfessor,
-  addSpeciality,
-  removeSpeciality,
-  deleteProfessor,
-} from "../../services/professor";
+import { updateProfessor, deleteProfessor } from "../../services/professor";
 import { getSpecialities } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import ConfirmModal from "../modals/confirm-modal";
+import RedButton from "../buttons/red-button";
+import BlackButton from "../buttons/black-button";
+import WhiteButton from "../buttons/white-button";
 
 export default function ProfessorModal({ professor, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -20,12 +18,19 @@ export default function ProfessorModal({ professor, tenantId, close }) {
   const userRoles = useTenantStore(
     (state) => state.userRolesInTenant[tenantId],
   );
+
   const isTenant = userRoles?.roles?.includes("Tenant");
 
   const [editing, setEditing] = useState(false);
   const [currentProfessor, setCurrentProfessor] = useState(professor);
-  const [isActive, setIsActive] = useState(currentProfessor.isActive);
-  const [selectedSpeciality, setSelectedSpeciality] = useState(null);
+
+  const [isActive, setIsActive] = useState(professor.isActive);
+
+  const [selectedSpecialityIds, setSelectedSpecialityIds] = useState(
+    professor.specialities.map((spec) => spec.specialityId),
+  );
+
+  const [openSpecialityModal, setOpenSpecialityModal] = useState(false);
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -40,13 +45,35 @@ export default function ProfessorModal({ professor, tenantId, close }) {
     queryFn: () => getSpecialities(tenantId),
   });
 
-  const professorSpecialities = new Set(
-    currentProfessor.specialities.map((s) => s.specialityId),
-  );
+  const startEditing = () => {
+    setIsActive(currentProfessor.isActive);
+
+    setSelectedSpecialityIds(
+      currentProfessor.specialities.map((spec) => spec.specialityId),
+    );
+
+    setEditing(true);
+  };
 
   const availableSpecialities = specialities.filter(
-    (s) => !professorSpecialities.has(s.id),
+    (speciality) => !selectedSpecialityIds.includes(speciality.id),
   );
+
+  const addSpeciality = (specialityId) => {
+    setSelectedSpecialityIds((prev) => {
+      if (prev.includes(specialityId)) {
+        return prev;
+      }
+
+      return [...prev, specialityId];
+    });
+  };
+
+  const removeSpeciality = (specialityId) => {
+    setSelectedSpecialityIds((prev) =>
+      prev.filter((id) => id !== specialityId),
+    );
+  };
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteProfessor(currentProfessor.id),
@@ -75,27 +102,36 @@ export default function ProfessorModal({ professor, tenantId, close }) {
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
+
       setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
     },
   });
 
-  const activeMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: () =>
-      updateProfessor(currentProfessor.id, { isActive: isActive }),
+      updateProfessor(currentProfessor.id, {
+        isActive,
+        specialityIds: selectedSpecialityIds,
+      }),
 
     onSuccess: (updatedProfessor) => {
       queryClient.invalidateQueries({
         queryKey: ["getProfessors", tenantId],
       });
 
-      setSuccessMessage(
-        `Profesor ${isActive ? "activado" : "desactivado"} correctamente`,
+      setCurrentProfessor(updatedProfessor);
+
+      setIsActive(updatedProfessor.isActive);
+      setSelectedSpecialityIds(
+        updatedProfessor.specialities.map((spec) => spec.specialityId),
       );
-      setSuccessModal(true);
 
-      setCurrentProfessor(updatedProfessor);
+      setEditing(false);
+
+      setSuccessMessage("Profesor actualizado correctamente");
+      setSuccessModal(true);
 
       setTimeout(() => {
         setSuccessModal(false);
@@ -105,7 +141,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el estado";
+      let msg = "Ocurrió un error al actualizar el profesor";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -114,76 +150,12 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
       setBackendError(msg);
       setErrorModal(true);
+
       setIsActive(currentProfessor.isActive);
-    },
-  });
 
-  const addSpecialityMutation = useMutation({
-    mutationFn: () => addSpeciality(currentProfessor.id, selectedSpeciality),
-
-    onSuccess: (updatedProfessor) => {
-      queryClient.invalidateQueries({
-        queryKey: ["getProfessors", tenantId],
-      });
-
-      setSuccessMessage("Especialidad agregada correctamente");
-      setSuccessModal(true);
-
-      setCurrentProfessor(updatedProfessor);
-      setSelectedSpeciality(null);
-
-      setTimeout(() => {
-        setSuccessModal(false);
-      }, 3000);
-    },
-
-    onError: (error) => {
-      const data = error?.response?.data;
-
-      let msg = "Ocurrió un error al agregar la especialidad";
-
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.message) msg = data.message;
-
-      setBackendError(msg);
-      setErrorModal(true);
-      setSelectedSpeciality(null);
-    },
-  });
-
-  const removeSpecialityMutation = useMutation({
-    mutationFn: (specialityId) =>
-      removeSpeciality(currentProfessor.id, specialityId),
-
-    onSuccess: (updatedProfessor) => {
-      queryClient.invalidateQueries({
-        queryKey: ["getProfessors", tenantId],
-      });
-
-      setSuccessMessage("Especialidad removida correctamente");
-      setSuccessModal(true);
-
-      setCurrentProfessor(updatedProfessor);
-
-      setTimeout(() => {
-        setSuccessModal(false);
-      }, 3000);
-    },
-
-    onError: (error) => {
-      const data = error?.response?.data;
-
-      let msg = "Ocurrió un error al remover la especialidad";
-
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.message) msg = data.message;
-
-      setBackendError(msg);
-      setErrorModal(true);
+      setSelectedSpecialityIds(
+        currentProfessor.specialities.map((spec) => spec.specialityId),
+      );
     },
   });
 
@@ -207,6 +179,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           <div className="space-y-4 mb-8">
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Email</p>
+
               <p className="font-semibold text-[#333]">
                 {currentProfessor.user.email}
               </p>
@@ -215,6 +188,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             {currentProfessor.user.phoneNumber && (
               <div className="bg-[#efefef] rounded-xl p-4">
                 <p className="text-sm text-gray-600 mb-1">Teléfono</p>
+
                 <p className="font-semibold text-[#333]">
                   {currentProfessor.user.phoneNumber}
                 </p>
@@ -223,6 +197,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
 
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-2">Estado</p>
+
               <span
                 className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${
                   currentProfessor.isActive
@@ -237,6 +212,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             {currentProfessor.specialities.length > 0 && (
               <div className="bg-[#efefef] rounded-xl p-4">
                 <p className="text-sm text-gray-600 mb-3">Profesiones</p>
+
                 <div className="flex flex-wrap gap-2">
                   {currentProfessor.specialities.map((spec) => (
                     <span
@@ -252,21 +228,21 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           </div>
 
           {isTenant && (
-            <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
-              <button
+            <div className="flex gap-2 mt-8">
+              <RedButton
+                text="Eliminar"
+                disabled={deleteMutation.isPending}
                 onClick={() => setConfirmModal(true)}
-                className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-              >
-                Eliminar profesor
-              </button>
+                textSmall={true}
+                img={<Trash2 size={18} />}
+              />
 
-              <button
-                onClick={() => setEditing(true)}
-                className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-              >
-                <Pencil size={18} />
-                Editar
-              </button>
+              <BlackButton
+                text="Editar"
+                onClick={startEditing}
+                textSmall={true}
+                img={<Pencil size={18} />}
+              />
             </div>
           )}
         </>
@@ -275,14 +251,13 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           <h2 className="text-2xl font-semibold text-center">
             Editar profesor
           </h2>
-
           <div>
             <label className="block text-sm font-semibold mb-3">Estado</label>
 
             <div className="space-y-2">
               {[true, false].map((status) => (
                 <div
-                  key={status}
+                  key={status.toString()}
                   onClick={() => setIsActive(status)}
                   className={`p-3 rounded-xl border-2 cursor-pointer transition ${
                     isActive === status
@@ -296,111 +271,116 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                 </div>
               ))}
             </div>
-
-            {isActive !== currentProfessor.isActive && (
-              <button
-                onClick={() => activeMutation.mutate()}
-                disabled={activeMutation.isPending}
-                className="w-full mt-4 bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition disabled:opacity-50"
-              >
-                {activeMutation.isPending
-                  ? "Actualizando..."
-                  : "Actualizar estado"}
-              </button>
-            )}
           </div>
-
           <div>
             <label className="block text-sm font-semibold mb-3">
               Profesiones
             </label>
 
-            {currentProfessor.specialities.length > 0 && (
+            {selectedSpecialityIds.length > 0 ? (
               <div className="mb-4 p-3 bg-[#efefef] rounded-xl">
-                <p className="text-xs text-gray-600 mb-2">
-                  Profesiones actuales
-                </p>
                 <div className="flex flex-wrap gap-2">
-                  {currentProfessor.specialities.map((spec) => (
-                    <button
-                      key={spec.specialityId}
-                      onClick={() =>
-                        removeSpecialityMutation.mutate(spec.specialityId)
-                      }
-                      disabled={removeSpecialityMutation.isPending}
-                      className="bg-[#333] text-white text-sm rounded-full px-3 py-1 hover:bg-red-600 transition disabled:opacity-50"
-                    >
-                      {spec.name} ✕
-                    </button>
-                  ))}
+                  {selectedSpecialityIds.map((specialityId) => {
+                    const speciality = specialities.find(
+                      (s) => s.id === specialityId,
+                    );
+
+                    if (!speciality) return null;
+
+                    return (
+                      <span
+                        key={specialityId}
+                        className="bg-[#333] text-white text-sm rounded-full px-3 py-1 flex items-center gap-2"
+                      >
+                        {speciality.name}
+
+                        <button
+                          type="button"
+                          onClick={() => removeSpeciality(specialityId)}
+                          className="hover:text-red-300 transition cursor-pointer"
+                        >
+                          <X size={14} />
+                        </button>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
+            ) : (
+              <p className="text-sm text-gray-500 mb-4">
+                Este profesor no tiene profesiones asignadas.
+              </p>
             )}
 
-            {availableSpecialities.length > 0 && (
-              <>
-                <select
-                  value={selectedSpeciality || ""}
-                  onChange={(e) =>
-                    setSelectedSpeciality(parseInt(e.target.value))
-                  }
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333] mb-2"
-                >
-                  <option value="">Selecciona una especialidad...</option>
-                  {availableSpecialities.map((spec) => (
-                    <option key={spec.id} value={spec.id}>
-                      {spec.name}
-                    </option>
-                  ))}
-                </select>
-
-                {selectedSpeciality && (
-                  <button
-                    onClick={() => addSpecialityMutation.mutate()}
-                    disabled={addSpecialityMutation.isPending}
-                    className="w-full bg-[#333] text-white rounded-xl py-2 hover:bg-gray-700 transition disabled:opacity-50"
-                  >
-                    {addSpecialityMutation.isPending
-                      ? "Agregando..."
-                      : "Agregar especialidad"}
-                  </button>
-                )}
-              </>
-            )}
-
-            {availableSpecialities.length === 0 &&
-              currentProfessor.specialities.length > 0 && (
-                <p className="text-sm text-gray-500">
-                  Todas las profesiones están asignadas
-                </p>
-              )}
+            <BlackButton
+              text="Agregar profesiones"
+              textSmall={true}
+              img={<Plus size={18} />}
+              onClick={() => setOpenSpecialityModal(true)}
+              disabled={availableSpecialities.length === 0}
+            />
           </div>
-
-          <div className="flex justify-end gap-3">
-            <button
+          <div className="grid grid-cols-2 gap-3">
+            <WhiteButton
+              text="Cancelar"
               onClick={() => {
                 setEditing(false);
                 setIsActive(currentProfessor.isActive);
-                setSelectedSpeciality(null);
+
+                setSelectedSpecialityIds(
+                  currentProfessor.specialities.map(
+                    (spec) => spec.specialityId,
+                  ),
+                );
               }}
-              className="border px-4 py-2 rounded-xl"
-            >
-              Cancelar
-            </button>
+              textSmall={true}
+            />
+
+            <BlackButton
+              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending}
+              textSmall={true}
+            />
           </div>
         </div>
       )}
+      {openSpecialityModal && (
+        <Modal open onClose={() => setOpenSpecialityModal(false)}>
+          <h2 className="text-2xl font-semibold mb-5">Agregar profesiones</h2>
 
+          {availableSpecialities.length > 0 ? (
+            <div className="space-y-2">
+              {availableSpecialities.map((speciality) => (
+                <button
+                  key={speciality.id}
+                  type="button"
+                  onClick={() => {
+                    addSpeciality(speciality.id);
+                    setOpenSpecialityModal(false);
+                  }}
+                  className="w-full text-left p-3 rounded-xl border border-gray-200 hover:border-[#333] hover:bg-[#efefef] transition cursor-pointer"
+                >
+                  <p className="font-semibold">{speciality.name}</p>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">
+              No hay profesiones disponibles para agregar.
+            </p>
+          )}
+        </Modal>
+      )}
       {confirmModal && (
         <ConfirmModal
-          title="Eliminar este profesor?"
-          message={`Estás por eliminar el alumno "${currentProfessor.user.name} ${currentProfessor.user.surname} ". Esta acción no se puede deshacer.`}
+          title="¿Eliminar este profesor?"
+          message={`Estás por eliminar el profesor "${currentProfessor.user.name} ${currentProfessor.user.surname}". Esta acción no se puede deshacer.`}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}
         />
       )}
-
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -408,7 +388,6 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           isSuccesOrError={true}
         />
       )}
-
       {successModal && (
         <SuccessModal
           close={() => setSuccessModal(false)}

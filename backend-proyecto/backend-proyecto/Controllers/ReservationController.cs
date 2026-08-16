@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.STUDENT}")]
+        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.TENANT}, {Roles.PROFESSOR}")]
         [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
