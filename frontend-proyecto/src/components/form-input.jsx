@@ -15,7 +15,7 @@ export default function FormInput({
   const isPassword = type === "password";
 
   return (
-    <div>
+    <div className="w-full">
       {label && (
         <div className="mb-2 block">
           <label className="text-black" htmlFor={id}>

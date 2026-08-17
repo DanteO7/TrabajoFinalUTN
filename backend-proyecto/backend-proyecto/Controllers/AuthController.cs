@@ -143,6 +143,8 @@ namespace backend_proyecto.Controllers
                 Surname = user.Surname,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                Age = user.Age,
+                Weight = user.Weight,
                 Roles = roles
             };
 

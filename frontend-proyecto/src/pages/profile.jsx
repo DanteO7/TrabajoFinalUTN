@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../schema/user-schema";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateUser } from "../services/user";
 import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
@@ -22,6 +22,8 @@ import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 
 export default function Profile() {
+  const queryClient = useQueryClient();
+
   const { user, isAuthenticated, login, logout } = useAuthStore();
 
   const [backendError, setBackendError] = useState();
@@ -51,6 +53,8 @@ export default function Profile() {
       surname: user?.surname || "",
       email: user?.email || "",
       phoneNumber: user?.phoneNumber || "",
+      age: user?.age || "",
+      weight: user?.weight || "",
     },
   });
 
@@ -79,6 +83,8 @@ export default function Profile() {
   });
 
   const onSubmit = (data) => {
+    console.log(data);
+
     setBackendError(null);
     mutation.mutate({ id: user.id, data });
   };
@@ -189,6 +195,26 @@ export default function Profile() {
                 error={errors.phoneNumber}
                 disabled={isSubmitting || mutation.isPending}
               />
+              <div className="flex gap-2">
+                <FormInput
+                  label="Edad"
+                  id="age"
+                  type="number"
+                  placeholder="Entre 1-120"
+                  register={register("age")}
+                  error={errors.age}
+                  disabled={isSubmitting || mutation.isPending}
+                />
+                <FormInput
+                  label="Peso"
+                  id="weight"
+                  type="number"
+                  placeholder="Entre 1-300"
+                  register={register("weight")}
+                  error={errors.weight}
+                  disabled={isSubmitting || mutation.isPending}
+                />
+              </div>
               <BlackButton
                 text={mutation.isPending ? "Actualizando" : "Actualizar perfil"}
                 type="submit"
@@ -225,8 +251,16 @@ export default function Profile() {
                 text="Cerrar sesión"
                 onClick={() => {
                   logout();
+                  signOut(); // Limpiar React Query cache
+                  queryClient.clear();
+
+                  // Limpiar token si lo guardas en localStorage
+                  localStorage.removeItem("token");
+
+                  // Limpiar cookies (si la API usa cookies)
+                  document.cookie =
+                    "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                   clearRoles();
-                  signOut();
                   setLocation("/");
                 }}
                 textSmall={true}

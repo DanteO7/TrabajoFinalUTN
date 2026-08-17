@@ -194,6 +194,26 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                 </p>
               </div>
             )}
+            {(currentProfessor.user.weight || currentProfessor.user.age) && (
+              <div className="flex gap-4">
+                {currentProfessor.user.age && (
+                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                    <p className="text-sm text-gray-600 mb-1">Edad</p>
+                    <p className="font-semibold text-[#333]">
+                      {currentProfessor.user.age} Años
+                    </p>
+                  </div>
+                )}
+                {currentProfessor.user.weight && (
+                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                    <p className="text-sm text-gray-600 mb-1">Peso</p>
+                    <p className="font-semibold text-[#333]">
+                      {currentProfessor.user.weight} Kg
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-2">Estado</p>

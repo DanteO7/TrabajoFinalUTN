@@ -169,6 +169,26 @@ export default function StudentModal({ student, tenantId, close }) {
               </div>
             )}
 
+            {(currentStudent.user.weight || currentStudent.user.age) && (
+              <div className="flex gap-4">
+                {currentStudent.user.age && (
+                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                    <p className="text-sm text-gray-600 mb-1">Edad</p>
+                    <p className="font-semibold text-[#333]">
+                      {currentStudent.user.age} Años
+                    </p>
+                  </div>
+                )}
+                {currentStudent.user.weight && (
+                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                    <p className="text-sm text-gray-600 mb-1">Peso</p>
+                    <p className="font-semibold text-[#333]">
+                      {currentStudent.user.weight} Kg
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Plan</p>
               <div className="flex justify-between items-start">

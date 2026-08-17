@@ -121,6 +121,8 @@ namespace backend_proyecto.Services
                 Surname = user.Surname,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                Age = user.Age,
+                Weight = user.Weight,
                 Roles = roles
             };
         }

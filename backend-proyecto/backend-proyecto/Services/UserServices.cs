@@ -151,6 +151,12 @@ namespace backend_proyecto.Services
 
         public async Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser)
         {
+            var user = await _repo.GetOneAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+            }
+
             if (updatedUser.Name != null && updatedUser.Name.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del usuario no puede tener mas de 50 caracteres");
@@ -163,10 +169,13 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El numero de teléfono del usuario no puede tener mas de 20 caracteres");
             }
-            var user = await _repo.GetOneAsync(u => u.Id == id);
-            if (user == null)
+            if (updatedUser.PhoneNumber != null && updatedUser.Age > 120 || updatedUser.Age < 1)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La edad tiene que ser entre 1 y 120");
+            }
+            if (updatedUser.PhoneNumber != null && updatedUser.Weight > 300 || updatedUser.Weight < 1)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"El peso tiene que ser entre 1 y 300");
             }
 
             if (updatedUser.Name != null)
@@ -175,6 +184,11 @@ namespace backend_proyecto.Services
                 user.Surname = updatedUser.Surname;
             if (updatedUser.PhoneNumber != null)
                 user.PhoneNumber = updatedUser.PhoneNumber;
+            if (updatedUser.Age != null)
+                user.Age = updatedUser.Age;
+            if (updatedUser.Weight != null)
+                user.Weight = updatedUser.Weight;
+
             await _repo.UpdateOneAsync(user);
 
             return _mapper.Map<UserWithoutPassDTO>(user);

@@ -19,4 +19,22 @@ export const updateUserSchema = z.object({
       "Formato de teléfono inválido",
     )
     .optional(),
+  age: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? undefined : Number(val)))
+    .refine(
+      (val) => val === undefined || (val >= 1 && val <= 120),
+      "La edad debe estar entre 1 y 120",
+    )
+    .optional(),
+  weight: z
+    .string()
+    .trim()
+    .transform((val) => (val === "" ? undefined : Number(val)))
+    .refine(
+      (val) => val === undefined || (val >= 1 && val <= 300),
+      "El peso debe estar entre 1 y 300",
+    )
+    .optional(),
 });

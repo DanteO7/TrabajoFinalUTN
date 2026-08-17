@@ -32,6 +32,8 @@ export default function SignIn() {
     mutationFn: signIn,
     onSuccess: (data) => {
       clearRoles();
+      console.log(data);
+
       login(data);
 
       if (data?.roles?.length > 0) {
