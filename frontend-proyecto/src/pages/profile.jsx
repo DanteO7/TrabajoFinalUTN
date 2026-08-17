@@ -10,7 +10,7 @@ import { updateUser } from "../services/user";
 import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import Navbar from "../components/navbar";
-import { forgotPassword, signOut } from "../services/auth";
+import { forgotPassword, me, signOut } from "../services/auth";
 import { useLocation } from "wouter";
 import SuccessModal from "../components/modals/success-modal";
 import ChangeEmailForm from "../components/profile/change-email-form";
@@ -61,11 +61,16 @@ export default function Profile() {
   const mutation = useMutation({
     mutationKey: ["updateUser", user?.id],
     mutationFn: updateUser,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setSuccessMessage("Perfil actualizado correctamente");
       setSuccesModal(true);
       setBackendError(null);
-      login(data);
+      try {
+        const completeUser = await me();
+        login(completeUser);
+      } catch (error) {
+        login(data);
+      }
       setTimeout(() => {
         setSuccesModal(false);
       }, 3000);
@@ -83,8 +88,6 @@ export default function Profile() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
-
     setBackendError(null);
     mutation.mutate({ id: user.id, data });
   };
@@ -249,18 +252,32 @@ export default function Profile() {
               />
               <RedButton
                 text="Cerrar sesión"
-                onClick={() => {
-                  logout();
-                  signOut(); // Limpiar React Query cache
+                onClick={async () => {
+                  // 1. Limpiar React Query primero
                   queryClient.clear();
 
-                  // Limpiar token si lo guardas en localStorage
+                  // 2. Limpiar localStorage
                   localStorage.removeItem("token");
+                  localStorage.removeItem("pendingSignUp");
 
-                  // Limpiar cookies (si la API usa cookies)
+                  // 3. Limpiar cookies
                   document.cookie =
                     "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+                  // 4. Limpiar roles
                   clearRoles();
+
+                  // 5. Logout en la store
+                  logout();
+
+                  // 6. Llamar signOut en el backend (sin esperar)
+                  try {
+                    await signOut();
+                  } catch (error) {
+                    console.log("Error en signOut:", error);
+                  }
+
+                  // 7. Redirigir al final
                   setLocation("/");
                 }}
                 textSmall={true}

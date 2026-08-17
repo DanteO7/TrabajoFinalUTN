@@ -20,18 +20,23 @@ export const updateUserSchema = z.object({
     )
     .optional(),
   age: z
-    .string()
-    .trim()
-    .transform((val) => (val === "" ? undefined : Number(val)))
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      if (val === "" || val === null || val === undefined) return undefined;
+      return Number(val);
+    })
     .refine(
       (val) => val === undefined || (val >= 1 && val <= 120),
       "La edad debe estar entre 1 y 120",
     )
     .optional(),
+
   weight: z
-    .string()
-    .trim()
-    .transform((val) => (val === "" ? undefined : Number(val)))
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      if (val === "" || val === null || val === undefined) return undefined;
+      return Number(val);
+    })
     .refine(
       (val) => val === undefined || (val >= 1 && val <= 300),
       "El peso debe estar entre 1 y 300",
