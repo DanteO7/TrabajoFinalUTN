@@ -72,6 +72,7 @@ builder.Services.AddScoped<PermissionServices>();
 builder.Services.AddScoped<EmailServices>(); 
 builder.Services.AddScoped<InvitationServices>();
 builder.Services.AddScoped<WaitlistServices>();
+builder.Services.AddScoped<NewsServices>();
 
 builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
 builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();
@@ -91,6 +92,9 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>(); 
 builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
+
 
 // Backgound Services
 builder.Services.AddHostedService<ClassCleanupService>();

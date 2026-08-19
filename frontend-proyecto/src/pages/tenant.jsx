@@ -9,6 +9,7 @@ import {
   FaBookOpen,
   FaClipboardList,
   FaTags,
+  FaBell,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -19,6 +20,7 @@ import Loading from "../components/loading";
 import { useState } from "react";
 import EditAddressModal from "../components/tenant/edit-adress-modal";
 import BlackButton from "../components/buttons/black-button";
+import { getUnreadNewsCount } from "../services/news";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
@@ -33,10 +35,15 @@ export default function Tenant({ id }) {
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
   });
-  console.log(tenant);
 
   const sections = {
     Tenant: [
+      {
+        title: "Novedades",
+        description: "Mira las novedades del negocio y de la app.",
+        icon: <FaBell size={35} />,
+        href: "novedades",
+      },
       {
         title: "Clases",
         description: "Administrá las clases.",
@@ -89,6 +96,12 @@ export default function Tenant({ id }) {
 
     Professor: [
       {
+        title: "Novedades",
+        description: "Mira las novedades del negocio y de la app.",
+        icon: <FaBell size={35} />,
+        href: "novedades",
+      },
+      {
         title: "Clases",
         description: "Tus clases.",
         icon: <FaCalendarAlt size={35} />,
@@ -121,6 +134,12 @@ export default function Tenant({ id }) {
     ],
 
     Student: [
+      {
+        title: "Novedades",
+        description: "Mira las novedades del negocio y de la app.",
+        icon: <FaBell size={35} />,
+        href: "novedades",
+      },
       {
         title: "Clases",
         description: "Clases disponibles.",
@@ -171,6 +190,15 @@ export default function Tenant({ id }) {
   const role = roleConfig[tenant?.role];
 
   const cards = sections[tenant?.role];
+
+  const { data: unreadCount } = useQuery({
+    queryKey: ["unreadCount", tenant?.id],
+    queryFn: () => getUnreadNewsCount(tenant?.id),
+    enabled: !!tenant?.id,
+  });
+
+  const newsCard = cards?.find((c) => c.href === "novedades");
+  const otherCards = cards?.filter((c) => c.href !== "novedades");
 
   return (
     <MainLayout>
@@ -238,19 +266,40 @@ export default function Tenant({ id }) {
               Desde acá podés administrar todas las áreas de tu negocio.
             </p>
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
-              {cards?.map((section) => (
+              {/* Card de Novedades con badge */}
+              {newsCard && (
+                <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
+                  <div className="relative cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
+                    {unreadCount?.unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
+                        {unreadCount.unreadCount}
+                      </span>
+                    )}
+                    <div className="text-[#FF8A90]">{newsCard.icon}</div>
+                    <div>
+                      <h3 className="font-semibold text-[19px]">
+                        {newsCard.title}
+                      </h3>
+                      <p className="text-gray-500 max-[900px]:text-[13px]">
+                        {newsCard.description}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Otras cards */}
+              {otherCards?.map((section) => (
                 <Link
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className=" cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
+                  <div className="cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
                     <div className="text-[#FF8A90]">{section.icon}</div>
-
                     <div>
                       <h3 className="font-semibold text-[19px]">
                         {section.title}
                       </h3>
-
                       <p className="text-gray-500 max-[900px]:text-[13px]">
                         {section.description}
                       </p>

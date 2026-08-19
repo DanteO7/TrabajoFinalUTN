@@ -100,6 +100,11 @@ namespace backend_proyecto.Config
 
             // waitlist
             CreateMap<Waitlist, ResponseWaitlistDTO>();
+
+            // news
+            CreateMap<CreateNewsDTO, News>();
+            CreateMap<UpdateNewsDTO, News>();
+            CreateMap<News, ResponseNewsDTO>();
         }
     }
 }

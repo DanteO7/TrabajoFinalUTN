@@ -68,7 +68,7 @@ export default function Profile() {
       try {
         const completeUser = await me();
         login(completeUser);
-      } catch (error) {
+      } catch {
         login(data);
       }
       setTimeout(() => {
@@ -253,31 +253,15 @@ export default function Profile() {
               <RedButton
                 text="Cerrar sesión"
                 onClick={async () => {
-                  // 1. Limpiar React Query primero
                   queryClient.clear();
-
-                  // 2. Limpiar localStorage
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("pendingSignUp");
-
-                  // 3. Limpiar cookies
-                  document.cookie =
-                    "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-                  // 4. Limpiar roles
                   clearRoles();
-
-                  // 5. Logout en la store
                   logout();
 
-                  // 6. Llamar signOut en el backend (sin esperar)
                   try {
                     await signOut();
                   } catch (error) {
                     console.log("Error en signOut:", error);
                   }
-
-                  // 7. Redirigir al final
                   setLocation("/");
                 }}
                 textSmall={true}

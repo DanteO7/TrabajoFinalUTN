@@ -34,7 +34,6 @@ export default function Classes({ tenantId }) {
   );
   const canCreateClass =
     userRoles?.roles?.includes("Tenant") || userRoles?.roles?.includes("Admin");
-  console.log(userRoles);
 
   const {
     data: classes = [],
