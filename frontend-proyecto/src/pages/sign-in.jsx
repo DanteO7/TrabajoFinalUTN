@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorModal from "../components/modals/error-modal";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import { useTenantStore } from "../store/tenant-store";
+import BlackButton from "../components/buttons/black-button";
+import WhiteButton from "../components/buttons/white-button";
 
 export default function SignIn() {
   const { login } = useAuthStore();
@@ -75,7 +77,7 @@ export default function SignIn() {
       <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
-          className="flex max-w flex-col gap-3.5"
+          className="flex max-w flex-col gap-3.5 text-[14px]"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
@@ -105,13 +107,12 @@ export default function SignIn() {
             />
           </div>
 
-          <button
-            type="submit"
+          <BlackButton
+            text={mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
             disabled={isSubmitting || mutation.isPending}
-            className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-          >
-            {mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
-          </button>
+            type="submit"
+            textSmall={true}
+          />
           {/* <button
             type="button"
             className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
@@ -130,11 +131,13 @@ export default function SignIn() {
             <span className="text-gray-500">si no tenes cuenta</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
-          <Link
-            href="/registrarse"
-            className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-          >
-            <p className="text-center">Registrate</p>
+          <Link href="/registrarse">
+            <WhiteButton
+              text="Registrate"
+              disabled={isSubmitting || mutation.isPending}
+              type="submit"
+              textSmall={true}
+            />
           </Link>
         </form>
       </div>

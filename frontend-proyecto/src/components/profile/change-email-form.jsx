@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import FormInput from "../form-input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changeEmailSchema } from "../../schema/change-email-schema";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { useAuthStore } from "../../store/auth-store";
 import { sendRegisterCode } from "../../services/auth";
 import { changeEmail } from "../../services/user";
@@ -12,6 +11,8 @@ import Modal from "../modals/modal";
 import { X } from "lucide-react";
 import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
+import BlackButton from "../buttons/black-button";
+import WhiteButton from "../buttons/white-button";
 
 export default function ChangeEmailForm({ user, close }) {
   const { login } = useAuthStore();
@@ -21,6 +22,7 @@ export default function ChangeEmailForm({ user, close }) {
   const [succesModal, setSuccesModal] = useState(false);
   const [succesMessage, setSuccessMessage] = useState();
   const [codeSent, setCodeSent] = useState(false);
+  const [seconds, setSeconds] = useState(0);
 
   const {
     register,
@@ -32,11 +34,21 @@ export default function ChangeEmailForm({ user, close }) {
     mode: "onTouched",
   });
 
+  // Timer para countdown
+  useEffect(() => {
+    if (seconds > 0) {
+      const interval = setInterval(() => {
+        setSeconds((s) => s - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [seconds]);
+
   const mutation = useMutation({
     mutationKey: ["changeEmail", user?.id],
     mutationFn: changeEmail,
     onSuccess: (data) => {
-      setSuccessMessage("Perfil actualizado correctamente");
+      setSuccessMessage("Email cambiado correctamente");
       setSuccesModal(true);
       setBackendError(null);
       login(data);
@@ -46,7 +58,7 @@ export default function ChangeEmailForm({ user, close }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al iniciar sesión";
+      let msg = "Ocurrió un error";
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -57,7 +69,7 @@ export default function ChangeEmailForm({ user, close }) {
   });
 
   const handleSendCode = async () => {
-    const email = getValues("email");
+    const email = getValues("newEmail");
 
     if (!email) {
       setBackendError("Ingresa un email");
@@ -66,12 +78,15 @@ export default function ChangeEmailForm({ user, close }) {
     }
 
     try {
-      sendRegisterCode({
-        email: getValues("email"),
-      });
+      await sendRegisterCode({ email });
       setCodeSent(true);
+      setSeconds(60); // ← Inicia countdown
     } catch (error) {
-      setBackendError(`Error enviando código: ${error}`);
+      const data = error?.response?.data;
+      let msg = "Error al enviar código";
+      if (typeof data === "string") msg = data;
+      else if (data?.message) msg = data.message;
+      setBackendError(msg);
       setErrorModal(true);
     }
   };
@@ -109,9 +124,6 @@ export default function ChangeEmailForm({ user, close }) {
           error={errors.newEmail}
           disabled={isSubmitting || mutation.isPending}
         />
-        <button type="button" onClick={handleSendCode}>
-          Enviar código
-        </button>
         {codeSent && (
           <div>
             <FormInput
@@ -124,12 +136,24 @@ export default function ChangeEmailForm({ user, close }) {
           </div>
         )}
         <button
-          type="submit"
-          disabled={isSubmitting || mutation.isPending}
-          className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+          type="button"
+          onClick={handleSendCode}
+          disabled={seconds > 0}
+          className={`rounded-[13px] px-3 py-2 border-[1.7px] border-[#333] transition-all duration-300 ${
+            seconds > 0
+              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+              : "hover:bg-gray-300 hover:text-[#333] cursor-pointer text-[#333]"
+          }`}
         >
-          {mutation.isPending ? "Cambiando..." : "Cambiar email"}
+          {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
         </button>
+
+        <BlackButton
+          type="submit"
+          disabled={isSubmitting || mutation.isPending || !codeSent}
+          text={mutation.isPending ? "Cambiando..." : "Cambiar email"}
+          textSmall={true}
+        />
       </form>
       {errorModal && (
         <ErrorModal

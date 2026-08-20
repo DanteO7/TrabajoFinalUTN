@@ -118,7 +118,7 @@ export default function News({ tenantId }) {
                         </p>
                       </div>
                       {!novedad.isRead && (
-                        <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                        <span className="w-2 h-2 bg-red-[#fc697b] rounded-full"></span>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-2">

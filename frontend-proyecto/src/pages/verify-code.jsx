@@ -7,6 +7,8 @@ import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import { useForm } from "react-hook-form";
 import { useTenantStore } from "../store/tenant-store";
+import WhiteButton from "../components/buttons/white-button";
+import BlackButton from "../components/buttons/black-button";
 
 export default function VerifyCode() {
   const [, setLocation] = useLocation();
@@ -101,7 +103,7 @@ export default function VerifyCode() {
       <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 text-[14px]"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
@@ -149,14 +151,14 @@ export default function VerifyCode() {
           >
             {seconds > 0 ? `Reenviar en ${seconds}s` : "Reenviar código"}
           </button>
-
-          <button
+          <BlackButton
             type="submit"
+            text={
+              signUpMutation.isPending ? "Creando cuenta..." : "Crear cuenta"
+            }
             disabled={signUpMutation.isPending}
-            className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300 disabled:opacity-50"
-          >
-            {signUpMutation.isPending ? "Creando cuenta..." : "Crear cuenta"}
-          </button>
+            textSmall={true}
+          />
 
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
@@ -164,11 +166,8 @@ export default function VerifyCode() {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          <Link
-            href="/registrarse"
-            className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 text-center transition duration-300"
-          >
-            Volver
+          <Link href="/registrarse">
+            <WhiteButton textSmall={true} text="Volver" />
           </Link>
         </form>
       </div>

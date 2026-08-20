@@ -45,7 +45,7 @@ export default function ConfirmModal({
           <button
             onClick={onConfirm}
             disabled={isPending}
-            className="flex-1 rounded-xl bg-red-500 py-2.5 text-white hover:bg-red-600 transition cursor-pointer disabled:opacity-50"
+            className="flex-1 rounded-xl bg-[#fc697b] py-2.5 text-white hover:bg-red-600 transition cursor-pointer disabled:opacity-50"
           >
             {isPending ? "Eliminando..." : confirmText}
           </button>

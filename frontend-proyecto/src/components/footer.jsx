@@ -6,9 +6,11 @@ export default function Footer() {
   return (
     <footer className="p-6 mx-auto lg:px-[10%] flex flex-col gap-3">
       <div className="flex justify-between items-center flex-col-reverse gap-4 lg:gap-15 md:flex-row">
-        <div>
-          <p className="m-2 text-center md:text-left ">
-            Teléfono:(+54) 3400-532514 | Email: contacto@turnofacilapp.com.ar
+        <div className="max-[900px]:text-[15.3px]">
+          <p className="m-2 text-center md:text-left max-[900px]:flex max-[900px]:flex-col">
+            <span>Teléfono:(+54) 3400-532514 </span>{" "}
+            <span className="max-[900px]:hidden">| </span>
+            <span>Email: contacto@turnofacilapp.com.ar</span>
           </p>
           <p className="m-2 text-center md:text-left">
             &copy;2026 Turno Facil. Todos los derechos reservados.

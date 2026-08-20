@@ -73,7 +73,10 @@ export default function TargetAudience() {
                 style={{ width: `${100 / visible}%` }}
                 className="shrink-0 flex flex-col items-center gap-2"
               >
-                <Icon size={visible == 3 ? 30 : 45} className="text-[#333] " />
+                <Icon
+                  size={visible == 3 ? 30 : 45}
+                  className="text-[#fc697b] "
+                />
                 <p
                   className={`${visible == 3 ? "text-[13px]" : "text-lg"} font-semibold`}
                 >

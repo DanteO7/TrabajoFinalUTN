@@ -4,6 +4,8 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { updateTenant } from "../../services/tenant";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
 
 export default function EditAddressModal({ tenant, close }) {
   const queryClient = useQueryClient();
@@ -49,18 +51,14 @@ export default function EditAddressModal({ tenant, close }) {
 
       <p className="text-sm text-gray-500 mb-4">{address.length}/200</p>
 
-      <div className="flex justify-end gap-3">
-        <button onClick={close} className="border px-4 py-2 rounded-xl">
-          Cancelar
-        </button>
-
-        <button
+      <div className="grid grid-cols-2 gap-3">
+        <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+        <BlackButton
+          text={mutation.isPending ? "Guardando..." : "Guardar"}
           onClick={() => mutation.mutate()}
           disabled={mutation.isPending}
-          className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700 disabled:opacity-50"
-        >
-          {mutation.isPending ? "Guardando..." : "Guardar"}
-        </button>
+          textSmall={true}
+        />
       </div>
 
       {successModal && (

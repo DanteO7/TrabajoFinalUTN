@@ -230,7 +230,9 @@ export default function Tenant({ id }) {
                 {tenant?.ownerUser.surname}
               </p>
 
-              <p className="text-gray-500 mb-1">{tenant?.address}</p>
+              {tenant.address && (
+                <p className="text-gray-500 mb-1">{tenant?.address}</p>
+              )}
 
               {role.text == "Dueño" && (
                 <BlackButton
@@ -266,16 +268,15 @@ export default function Tenant({ id }) {
               Desde acá podés administrar todas las áreas de tu negocio.
             </p>
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
-              {/* Card de Novedades con badge */}
               {newsCard && (
                 <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
                   <div className="relative cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
                     {unreadCount?.unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
+                      <span className="absolute -top-2 -right-2 bg-red-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
                         {unreadCount.unreadCount}
                       </span>
                     )}
-                    <div className="text-[#FF8A90]">{newsCard.icon}</div>
+                    <div className="text-[#fa7282]">{newsCard.icon}</div>
                     <div>
                       <h3 className="font-semibold text-[19px]">
                         {newsCard.title}
@@ -288,14 +289,13 @@ export default function Tenant({ id }) {
                 </Link>
               )}
 
-              {/* Otras cards */}
               {otherCards?.map((section) => (
                 <Link
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
                   <div className="cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
-                    <div className="text-[#FF8A90]">{section.icon}</div>
+                    <div className="text-[#fa7282]">{section.icon}</div>
                     <div>
                       <h3 className="font-semibold text-[19px]">
                         {section.title}

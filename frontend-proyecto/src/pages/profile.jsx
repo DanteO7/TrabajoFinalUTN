@@ -38,11 +38,14 @@ export default function Profile() {
 
   const [openChangeEmail, setOpenChangeEmail] = useState(false);
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const [seconds, setSeconds] = useState(0);
 
   const {
     register,
     getValues,
+    reset,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -178,7 +181,7 @@ export default function Profile() {
                 placeholder="Nombre"
                 register={register("name")}
                 error={errors.name}
-                disabled={isSubmitting || mutation.isPending}
+                disabled={isSubmitting || mutation.isPending || !isEditing}
               />
               <FormInput
                 label="Apellido"
@@ -187,7 +190,7 @@ export default function Profile() {
                 placeholder="Apellido"
                 register={register("surname")}
                 error={errors.surname}
-                disabled={isSubmitting || mutation.isPending}
+                disabled={isSubmitting || mutation.isPending || !isEditing}
               />
               <FormInput
                 label="Telefono"
@@ -196,7 +199,7 @@ export default function Profile() {
                 placeholder="XX XXXX XXXXXX"
                 register={register("phoneNumber")}
                 error={errors.phoneNumber}
-                disabled={isSubmitting || mutation.isPending}
+                disabled={isSubmitting || mutation.isPending || !isEditing}
               />
               <div className="flex gap-2">
                 <FormInput
@@ -206,7 +209,7 @@ export default function Profile() {
                   placeholder="Entre 1-120"
                   register={register("age")}
                   error={errors.age}
-                  disabled={isSubmitting || mutation.isPending}
+                  disabled={isSubmitting || mutation.isPending || !isEditing}
                 />
                 <FormInput
                   label="Peso"
@@ -215,16 +218,39 @@ export default function Profile() {
                   placeholder="Entre 1-300"
                   register={register("weight")}
                   error={errors.weight}
-                  disabled={isSubmitting || mutation.isPending}
+                  disabled={isSubmitting || mutation.isPending || !isEditing}
                 />
               </div>
-              <BlackButton
-                text={mutation.isPending ? "Actualizando" : "Actualizar perfil"}
-                type="submit"
-                disabled={isSubmitting || mutation.isPending}
-                textSmall={true}
-                wfit={true}
-              />
+              {isEditing ? (
+                <div className="flex gap-4">
+                  <WhiteButton
+                    type="button"
+                    text="Cancelar"
+                    onClick={() => {
+                      reset();
+                      setIsEditing(false);
+                    }}
+                    textSmall={true}
+                    wfit={true}
+                  />
+                  <BlackButton
+                    text={
+                      mutation.isPending ? "Actualizando" : "Actualizar perfil"
+                    }
+                    type="submit"
+                    disabled={isSubmitting || mutation.isPending}
+                    textSmall={true}
+                    wfit={true}
+                  />
+                </div>
+              ) : (
+                <BlackButton
+                  text="Editar perfil"
+                  onClick={() => setIsEditing(true)}
+                  textSmall={true}
+                  wfit={true}
+                />
+              )}
               <FormInput
                 disabled={true}
                 label="Email"

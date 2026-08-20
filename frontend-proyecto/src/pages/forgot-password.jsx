@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import z from "zod/v3";
 import { zodResolver } from "@hookform/resolvers/zod";
 import EmailSentModal from "../components/modals/email-sent-modal";
+import BlackButton from "../components/buttons/black-button";
+import WhiteButton from "../components/buttons/white-button";
 
 const forgotPasswordSchema = z.object({
   email: z
@@ -80,7 +82,7 @@ export default function ForgotPassword() {
       <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-4 text-[14px]"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
@@ -107,24 +109,16 @@ export default function ForgotPassword() {
             />
           </div>
 
-          <button
+          <BlackButton
             type="button"
+            text={seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar mail"}
             onClick={() => resendMutation.mutate()}
             disabled={seconds > 0 || resendMutation.isPending}
-            className={`rounded-[13px] px-3 py-2 border-[1.7px] border-[#333] transition-all duration-300 ${
-              seconds > 0
-                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                : "hover:bg-gray-300 hover:text-[#333] cursor-pointer text-[#333]"
-            }`}
-          >
-            {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar mail"}
-          </button>
+            textSmall={true}
+          />
 
-          <Link
-            href="/iniciar-sesion"
-            className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 text-center transition duration-300"
-          >
-            Volver
+          <Link href="/iniciar-sesion">
+            <WhiteButton textSmall={true} text="Volver" />
           </Link>
         </form>
       </div>

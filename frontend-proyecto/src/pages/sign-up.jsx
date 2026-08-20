@@ -7,6 +7,8 @@ import { useState } from "react";
 import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import { signUpSchema } from "../schema/auth-schema";
+import WhiteButton from "../components/buttons/white-button";
+import BlackButton from "../components/buttons/black-button";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
@@ -53,7 +55,7 @@ export default function SignUp() {
       <div className="text-black p-5 mt-10 mx-auto min-[900px]:my-auto w-11/12 md:w-1/2 lg:w-[22%]">
         <form
           noValidate
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-3 text-[14px]"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-center text-2xl font-bold min-[900px]:hidden">
@@ -118,13 +120,12 @@ export default function SignUp() {
             />
           </div>
 
-          <button
+          <BlackButton
             type="submit"
+            text={mutation.isPending ? "Enviando..." : "Continuar"}
             disabled={isSubmitting || mutation.isPending}
-            className="text-[#efefef] bg-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300 disabled:opacity-50"
-          >
-            {mutation.isPending ? "Enviando..." : "Continuar"}
-          </button>
+            textSmall={true}
+          />
 
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
@@ -132,11 +133,8 @@ export default function SignUp() {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          <Link
-            href="/iniciar-sesion"
-            className="bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-          >
-            <p className="text-center">Inicia sesión</p>
+          <Link href="/iniciar-sesion">
+            <WhiteButton textSmall={true} text="Inicia sesión" />
           </Link>
         </form>
       </div>
