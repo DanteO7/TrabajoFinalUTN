@@ -12,7 +12,7 @@ export default function BlackButton({
       disabled={disabled}
       type={type}
       onClick={onClick}
-      className={`bg-[#333] text-[#efefef] px-4.5 rounded-xl hover:bg-[#222] transition-all duration-200 cursor-pointer flex justify-center items-center gap-1 ${wfit ? "w-fit" : "w-full"} ${textSmall ? "text-[15px] py-1.75 " : "text-xl py-2"}`}
+      className={`bg-[#333] text-[#efefef] px-4.5 rounded-xl hover:bg-[#222] transition-all duration-200 cursor-pointer flex justify-center items-center gap-1 ${wfit ? "w-fit" : "w-full"} ${textSmall ? "text-[15px] py-1.75 " : "text-xl py-2"} ${disabled && "bg-[#888]"}`}
     >
       {img}
       {text}

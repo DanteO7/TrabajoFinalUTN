@@ -207,7 +207,7 @@ export default function Tenant({ id }) {
           onClick={() => setLocation("/tu-espacio")}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack />
+          <IoArrowBack color="fc697b" />
           Tu espacio
         </button>
         {isLoading ? (
@@ -270,9 +270,11 @@ export default function Tenant({ id }) {
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {newsCard && (
                 <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
-                  <div className="relative cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
+                  <div
+                    className={`relative cursor-pointer rounded-xl ${unreadCount?.unreadCount > 0 && "bg-red-100"} border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center`}
+                  >
                     {unreadCount?.unreadCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
+                      <span className="absolute -top-2 -right-2 bg-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
                         {unreadCount.unreadCount}
                       </span>
                     )}

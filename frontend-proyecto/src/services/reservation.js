@@ -1,7 +1,7 @@
 import { request } from "./api";
 
 export const createReservation = (data) =>
-  request("post", "/reservations", data);
+  request("post", "/reservations/bulk", data);
 
 export const getReservationById = (id) => request("get", `/reservations/${id}`);
 

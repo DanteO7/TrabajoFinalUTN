@@ -20,18 +20,18 @@ namespace backend_proyecto.Controllers
             _reservationServices = reservationServices;
         }
 
-        [HttpPost]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.TENANT}, {Roles.PROFESSOR}")]
-        [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status201Created)]
+        [HttpPost("bulk")]
+        [Authorize(Roles = $"{Roles.TENANT}, {Roles.PROFESSOR}, {Roles.ADMIN}")]
+        [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ResponseReservationDTO>> CreateOne([FromBody] CreateReservationDTO createReservationDTO)
+        public async Task<ActionResult<List<ResponseReservationDTO>>> CreateMultiple([FromBody] BulkCreateReservationDTO bulkDTO)
         {
             try
             {
-                var reservation = await _reservationServices.CreateOne(createReservationDTO);
-                return Created("Reservation created", reservation);
+                var reservations = await _reservationServices.CreateMultiple(bulkDTO);
+                return Ok(reservations);
             }
             catch (HttpResponseError ex)
             {

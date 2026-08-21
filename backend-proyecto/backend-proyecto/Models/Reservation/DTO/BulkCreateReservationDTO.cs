@@ -2,7 +2,7 @@
 
 namespace backend_proyecto.Models.DTOs
 {
-    public class CreateReservationDTO
+    public class BulkCreateReservationDTO
     {
         [Required]
         public int ClassId { get; set; }
@@ -11,9 +11,7 @@ namespace backend_proyecto.Models.DTOs
         public int TenantId { get; set; }
 
         [Required]
-        public int StudentId { get; set; }
-
-        [Required]
-        public DateTime ReservationDate { get; set; }
+        [MinLength(1)]
+        public List<int> StudentIds { get; set; } = new();
     }
 }

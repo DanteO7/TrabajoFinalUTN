@@ -8,6 +8,8 @@ import SuccessModal from "../modals/success-modal";
 
 import { deleteReservation } from "../../services/reservation";
 import ConfirmModal from "../modals/confirm-modal";
+import RedButton from "../buttons/red-button";
+import WhiteButton from "../buttons/white-button";
 
 export default function ReservationModal({ reservation, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -130,30 +132,25 @@ export default function ReservationModal({ reservation, tenantId, close }) {
             {classItem.professor.user.name} {classItem.professor.user.surname}
           </p>
         </div>
-
-        <div className="bg-[#efefef] rounded-xl p-4">
-          <p className="text-sm text-gray-600 mb-1">Cupos</p>
-
-          <p className="font-semibold">
-            {classItem.reservationsCount} / {classItem.maxCapacity}
-          </p>
-        </div>
       </div>
 
       {canCancel && (
-        <button
-          onClick={() => setConfirmModal(true)}
-          disabled={deleteMutation.isPending}
-          className="w-full mt-8 bg-red-600 text-white rounded-xl py-3 hover:bg-red-700 disabled:opacity-50 cursor-pointer transition"
-        >
-          {deleteMutation.isPending ? "Cancelando..." : "Cancelar reserva"}
-        </button>
+        <div className="mt-8">
+          <RedButton
+            text={
+              deleteMutation.isPending ? "Saliendo..." : "Salir de la clase"
+            }
+            onClick={() => setConfirmModal(true)}
+            disabled={deleteMutation.isPending}
+            textSmall={true}
+          />
+        </div>
       )}
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Cancelar esta reserva?"
-          message={`Estás por cancelar la reserva del dia ${formatDateWithDay(classItem.date)} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
+          title="Salir de esta clase?"
+          message={`Estás por salir de la clase del dia ${formatDateWithDay(classItem.date)} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

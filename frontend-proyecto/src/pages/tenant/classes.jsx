@@ -62,7 +62,7 @@ export default function Classes({ tenantId }) {
           onClick={() => setLocation(`/tu-espacio/${tenantId}`)}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack />
+          <IoArrowBack color="fc697b" />
           Volver
         </button>
 
@@ -154,7 +154,7 @@ export default function Classes({ tenantId }) {
                         onClick={() => setSelectedClass(classItem)}
                         className="cursor-pointer rounded-xl border p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                       >
-                        <div className="flex justify-between items-center">
+                        <div className="grid grid-cols-2 items-center">
                           <div>
                             <h3 className="text-xl font-semibold">
                               {classItem.activityName}

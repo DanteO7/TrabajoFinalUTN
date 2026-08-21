@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
             onClick={handleBack}
             className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer "
           >
-            <IoArrowBack />
+            <IoArrowBack color="fc697b" />
             Volver
           </button>
           <h2 className="text-4xl font-semibold">Política de Privacidad</h2>

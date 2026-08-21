@@ -232,6 +232,10 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no puede ser menor o igual a 0");
             }
+            if (updateClassDTO.MaxCapacity != null && updateClassDTO.MaxCapacity < classEntity.Reservations.Count)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"La capacidad máxima no puede ser menor a las reservas ya creadas");
+            }
 
             if (updateClassDTO.ProfessorId != null ||
                 updateClassDTO.Date != null ||

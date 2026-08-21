@@ -43,7 +43,7 @@ export default function Users() {
           onClick={() => setLocation("/")}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack />
+          <IoArrowBack color="fc697b" />
           Volver
         </button>
         <h1 className="text-4xl min-[900px]:text-5xl font-bold mb-2">

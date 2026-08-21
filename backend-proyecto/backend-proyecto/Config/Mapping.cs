@@ -86,7 +86,6 @@ namespace backend_proyecto.Config
                     o => o.MapFrom(s => s.ReservationStatus));
 
             // reservation
-            CreateMap<CreateReservationDTO, Reservation>();
             CreateMap<Reservation, ResponseReservationDTO>();
 
             // tenant

@@ -8,12 +8,19 @@ export default function Footer() {
       <div className="flex justify-between items-center flex-col-reverse gap-4 lg:gap-15 md:flex-row">
         <div className="max-[900px]:text-[15.3px]">
           <p className="m-2 text-center md:text-left max-[900px]:flex max-[900px]:flex-col">
-            <span>Teléfono:(+54) 3400-532514 </span>{" "}
+            <span>
+              <span className="text-[#fc697b]">Teléfono: </span>(+54)
+              3400-532514
+            </span>{" "}
             <span className="max-[900px]:hidden">| </span>
-            <span>Email: contacto@turnofacilapp.com.ar</span>
+            <span>
+              <span className="text-[#fc6476]">Email:</span>{" "}
+              contacto@turnofacilapp.com.ar
+            </span>
           </p>
           <p className="m-2 text-center md:text-left">
-            &copy;2026 Turno Facil. Todos los derechos reservados.
+            <span className="text-[#fc6476]">&copy;2026 Turno Facil.</span>{" "}
+            Todos los derechos reservados.
           </p>
         </div>
         <div className="flex gap-5 text-3xl">

@@ -26,6 +26,10 @@ import {
   deleteWaitlist,
   getWaitlistByStudentId,
 } from "../../services/waitlist";
+import WhiteButton from "../buttons/white-button";
+import BlackButton from "../buttons/black-button";
+import RedButton from "../buttons/red-button";
+import { Trash2 } from "lucide-react";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -201,8 +205,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       createReservation({
         classId: currentClass.id,
         tenantId: tenantId,
-        studentId: currentStudent.id,
-        reservationDate: new Date().toISOString(),
+        studentIds: [currentStudent.id],
       }),
 
     onSuccess: () => {
@@ -348,7 +351,6 @@ export default function ClassModal({ classItem, tenantId, close }) {
     };
     setCurrentClass(updatedClass);
   };
-  console.log(currentClass);
 
   return (
     <Modal open onClose={close}>
@@ -386,8 +388,12 @@ export default function ClassModal({ classItem, tenantId, close }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
-              <p className="text-sm text-gray-600 mb-1">Disponibilidad</p>
+            <div
+              className={`bg-[#efefef] rounded-xl p-4 ${isFull && "bg-red-100"}`}
+            >
+              <p className="text-sm text-gray-600 mb-1">
+                {isFull ? "Lleno" : "Disponibilidad"}
+              </p>
 
               <div className="flex justify-between items-center gap-3">
                 <p className="font-semibold text-[14px] min-[900px]:text-[16px] text-[#333]">
@@ -404,33 +410,26 @@ export default function ClassModal({ classItem, tenantId, close }) {
                       Ver alumnos
                     </button>
                   )}
-
-                  {isFull && (
-                    <span className="bg-red-100 text-red-700 text-xs rounded-full px-2 py-1">
-                      Llena
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
           </div>
 
           {canEdit ? (
-            <div className="flex justify-end gap-3 max-[360px]:text-[13px]">
-              <button
+            <div className="flex gap-2 mt-8">
+              <RedButton
+                text="Eliminar"
+                disabled={deleteMutation.isPending}
                 onClick={() => setConfirmModal(true)}
-                className="text-red-600 border border-red-600 rounded-xl px-4 py-2 hover:bg-red-600 hover:text-white transition cursor-pointer"
-              >
-                Eliminar clase
-              </button>
-
-              <button
+                textSmall={true}
+                img={<Trash2 size={18} />}
+              />
+              <BlackButton
+                text="Editar"
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-2 bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700"
-              >
-                <Pencil size={18} />
-                Editar
-              </button>
+                textSmall={true}
+                img={<Pencil size={18} />}
+              />
             </div>
           ) : isStudent ? (
             classStarted ? (
@@ -468,15 +467,16 @@ export default function ClassModal({ classItem, tenantId, close }) {
                   : "Lista de espera"}
               </button>
             ) : (
-              <button
+              <BlackButton
                 onClick={() => reservationMutation.mutate()}
                 disabled={reservationMutation.isPending || !currentStudent}
-                className="w-full py-3 rounded-xl font-semibold bg-[#333] text-white hover:bg-gray-700 disabled:opacity-50 cursor-pointer"
-              >
-                {reservationMutation.isPending
-                  ? "Procesando..."
-                  : "Entrar a la clase"}
-              </button>
+                text={
+                  reservationMutation.isPending
+                    ? "Procesando..."
+                    : "Entrar a la clase"
+                }
+                textSmall={true}
+              />
             )
           ) : null}
         </>
@@ -555,23 +555,19 @@ export default function ClassModal({ classItem, tenantId, close }) {
             register={register("maxCapacity")}
             error={errors.maxCapacity}
           />
-
-          <div className="flex justify-end gap-3">
-            <button
+          <div className="grid grid-cols-2 gap-3">
+            <WhiteButton
               type="button"
+              text="Cancelar"
               onClick={() => setEditing(false)}
-              className="border px-4 py-2 rounded-xl"
-            >
-              Cancelar
-            </button>
-
-            <button
+              textSmall={true}
+            />
+            <BlackButton
+              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
               type="submit"
               disabled={updateMutation.isPending}
-              className="bg-[#333] text-white px-4 py-2 rounded-xl hover:bg-gray-700 disabled:opacity-50"
-            >
-              {updateMutation.isPending ? "Actualizando..." : "Actualizar"}
-            </button>
+              textSmall={true}
+            />
           </div>
         </form>
       )}

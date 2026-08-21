@@ -38,56 +38,36 @@ namespace backend_proyecto.Services
             _mapper = mapper;
             _waitlistSubject = waitlistSubject;
         }
-
-        public async Task<ResponseReservationDTO> CreateOne(CreateReservationDTO createReservationDTO)
+        public async Task<List<ResponseReservationDTO>> CreateMultiple(BulkCreateReservationDTO bulkDTO)
         {
-            // Validar existencia de entidades
-            var student = await _studentRepository.GetOneAsync(s => s.Id == createReservationDTO.StudentId);
-            if (student == null)
-            {
-                throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró un estudiante con el Id = '{createReservationDTO.StudentId}'");
-            }
-
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createReservationDTO.TenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == bulkDTO.TenantId);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró un tenant con el Id = '{createReservationDTO.TenantId}'");
+                    $"No se encontró un tenant con el Id = '{bulkDTO.TenantId}'");
             }
 
             var classEntity = await _classRepository.GetOneAsync(
-                c => c.Id == createReservationDTO.ClassId,
+                c => c.Id == bulkDTO.ClassId,
                 c => c.Activity
             );
             if (classEntity == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró una clase con el Id = '{createReservationDTO.ClassId}'");
-            }
-
-            // Validar que el estudiante pertenezca al tenant
-            if (student.TenantId != createReservationDTO.TenantId)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "El estudiante no pertenece al tenant especificado");
+                    $"No se encontró una clase con el Id = '{bulkDTO.ClassId}'");
             }
 
             // Validar que la clase no sea en el pasado
             var nowLocal = TimeHelper.Now();
-            var classDate = classEntity.Date;
-            var classTime = classEntity.StartTime;
-
-            if (classDate < DateOnly.FromDateTime(nowLocal))
+            if (classEntity.Date < DateOnly.FromDateTime(nowLocal))
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     "No puedes reservar clases pasadas");
             }
 
-            // Si la clase es hoy, verificar que no haya pasado
-            if (classDate == DateOnly.FromDateTime(nowLocal))
+            if (classEntity.Date == DateOnly.FromDateTime(nowLocal))
             {
-                var classDateTime = classDate.ToDateTime(classTime);
+                var classDateTime = classEntity.Date.ToDateTime(classEntity.StartTime);
                 if (classDateTime < nowLocal)
                 {
                     throw new HttpResponseError(HttpStatusCode.BadRequest,
@@ -95,69 +75,113 @@ namespace backend_proyecto.Services
                 }
             }
 
-            // Validar que no haya reserva duplicada
-            var existingReservation = await _reservationRepository.GetOneAsync(r =>
-                r.ClassId == createReservationDTO.ClassId &&
-                r.StudentId == createReservationDTO.StudentId);
-
-            if (existingReservation != null)
+            if (bulkDTO.StudentIds == null || bulkDTO.StudentIds.Count == 0)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "El estudiante ya tiene una reserva activa para esta clase");
+                    "Debe haber al menos un estudiante");
             }
 
-            // Validar capacidad de la clase
-            var reservationsCount = await _reservationRepository.CountAsync(r =>
-                r.ClassId == createReservationDTO.ClassId);
+            var reservations = new List<Reservation>();
+            var errors = new List<string>();
 
-            if (reservationsCount >= classEntity.MaxCapacity)
+            foreach (var studentId in bulkDTO.StudentIds)
+            {
+                var student = await _studentRepository.GetOneAsync(s => s.Id == studentId);
+                if (student == null)
+                {
+                    errors.Add($"Estudiante {studentId}: No encontrado");
+                    continue;
+                }
+
+                if (student.TenantId != bulkDTO.TenantId)
+                {
+                    errors.Add($"Estudiante {student.Id}: No pertenece a este tenant");
+                    continue;
+                }
+
+                // Validar que no haya reserva duplicada
+                var existingReservation = await _reservationRepository.GetOneAsync(r =>
+                    r.ClassId == bulkDTO.ClassId &&
+                    r.StudentId == studentId);
+
+                if (existingReservation != null)
+                {
+                    errors.Add($"Estudiante {student.Id}: Ya tiene una reserva en esta clase");
+                    continue;
+                }
+
+                // Validar capacidad
+                var reservationsCount = await _reservationRepository.CountAsync(r =>
+                    r.ClassId == bulkDTO.ClassId);
+
+                if (reservationsCount >= classEntity.MaxCapacity)
+                {
+                    errors.Add($"Estudiante {student.Id}: La clase está llena");
+                    continue;
+                }
+
+                // Validar plan
+                var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == student.StudentPlanId);
+                if (studentPlan == null)
+                {
+                    errors.Add($"Estudiante {student.Id}: No tiene plan activo");
+                    continue;
+                }
+
+                // Validar pago
+                if (student.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
+                {
+                    errors.Add($"Estudiante {student.Id}: No tiene la cuota al día");
+                    continue;
+                }
+
+                // Validar límite mensual
+                var startOfMonth = new DateTime(classEntity.Date.Year, classEntity.Date.Month, 1);
+                var endOfMonth = startOfMonth.AddMonths(1);
+
+                var reservationsThisMonth = await _reservationRepository.CountAsync(r =>
+                    r.StudentId == student.Id &&
+                    r.Class.Date >= DateOnly.FromDateTime(startOfMonth) &&
+                    r.Class.Date < DateOnly.FromDateTime(endOfMonth));
+
+                if (reservationsThisMonth >= studentPlan.ClassesPerMonth)
+                {
+                    errors.Add($"Estudiante {student.Id}: Alcanzó el límite de clases del mes");
+                    continue;
+                }
+
+                // Agregar reserva válida
+                reservations.Add(new Reservation
+                {
+                    ClassId = bulkDTO.ClassId,
+                    TenantId = bulkDTO.TenantId,
+                    StudentId = studentId,
+                    ReservationDate = DateTime.UtcNow,
+                    ReservationStatus = ReservationStatus.PENDING
+                });
+            }
+
+            // Si hay errores, lanzar excepción
+            if (errors.Any())
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "La clase no tiene cupos disponibles");
+                    string.Join(" | ", errors));
             }
 
-            // Validar plan del estudiante
-            var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == student.StudentPlanId);
-            if (studentPlan == null)
+            // Si no hay reservas válidas
+            if (!reservations.Any())
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "El estudiante no tiene un plan activo");
+                    "No se pudo agregar ningún estudiante");
             }
 
-            // Validar estado de pago
-            if (student.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
+            // Crear todas las reservas
+            foreach (var reservation in reservations)
             {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "El estudiante no tiene la cuota al día");
+                await _reservationRepository.CreateOneAsync(reservation);
             }
 
-            // Validar límite de clases del mes
-            var startOfMonth = new DateTime(classDate.Year, classDate.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1);
-
-            var reservationsThisMonth = await _reservationRepository.CountAsync(r =>
-                r.StudentId == student.Id &&
-                r.Class.Date >= DateOnly.FromDateTime(startOfMonth) &&
-                r.Class.Date < DateOnly.FromDateTime(endOfMonth));
-
-            if (reservationsThisMonth >= studentPlan.ClassesPerMonth)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "Ya alcanzaste el límite de clases de tu plan para este mes");
-            }
-
-            // Crear reserva
-            var reservation = new Reservation
-            {
-                ClassId = createReservationDTO.ClassId,
-                TenantId = createReservationDTO.TenantId,
-                StudentId = createReservationDTO.StudentId,
-                ReservationDate = DateTime.UtcNow,
-                ReservationStatus = ReservationStatus.PENDING
-            };
-
-            await _reservationRepository.CreateOneAsync(reservation);
-            return _mapper.Map<ResponseReservationDTO>(reservation);
+            return _mapper.Map<List<ResponseReservationDTO>>(reservations);
         }
 
         public async Task UpdateCompletedReservations()
