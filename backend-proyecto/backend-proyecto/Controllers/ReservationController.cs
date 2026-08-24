@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost("bulk")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.PROFESSOR}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
