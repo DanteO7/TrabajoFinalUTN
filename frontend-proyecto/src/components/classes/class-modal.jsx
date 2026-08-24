@@ -405,7 +405,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
                   {canEdit && (
                     <button
                       onClick={() => setStudentsModal(true)}
-                      className="bg-[#333] text-[12px] min-[900px]:text-[16px] text-white px-3 min-[900px]:px-4 py-1.5 rounded-lg text-sm hover:bg-gray-700 transition cursor-pointer"
+                      className="bg-[#333] text-[12px] min-[900px]:text-[16px] text-white px-3 min-[900px]:px-4 py-1.5 rounded-lg text-sm hover:bg-[#222] transition cursor-pointer"
                     >
                       Ver alumnos
                     </button>
@@ -437,46 +437,65 @@ export default function ClassModal({ classItem, tenantId, close }) {
                 No disponible
               </div>
             ) : isReserved ? (
-              <button
-                onClick={() => cancelReservationMutation.mutate()}
-                disabled={cancelReservationMutation.isPending}
-                className="w-full py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
-              >
-                {cancelReservationMutation.isPending
-                  ? "Saliendo..."
-                  : "Salir de la clase"}
-              </button>
+              <div className="flex gap-3">
+                <WhiteButton
+                  type="button"
+                  text="Cancelar"
+                  onClick={close}
+                  textSmall={true}
+                />
+                <RedButton
+                  onClick={() => cancelReservationMutation.mutate()}
+                  disabled={cancelReservationMutation.isPending}
+                  text={
+                    cancelReservationMutation.isPending
+                      ? "Saliendo..."
+                      : "Salir de la clase"
+                  }
+                  textSmall={true}
+                />
+              </div>
             ) : isInWaitlist ? (
-              <button
-                onClick={() => deleteWaitlistMutation.mutate()}
-                disabled={deleteWaitlistMutation.isPending}
-                className="w-full py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
-              >
-                {deleteWaitlistMutation.isPending
-                  ? "Saliendo..."
-                  : "Salir de lista de espera"}
-              </button>
-            ) : isFull ? (
-              <button
-                onClick={() => waitlistMutation.mutate()}
-                disabled={waitlistMutation.isPending || !currentStudent}
-                className="w-full py-3 rounded-xl font-semibold bg-[#333] text-white hover:bg-gray-700 disabled:opacity-50 cursor-pointer"
-              >
-                {waitlistMutation.isPending
-                  ? "Agregando..."
-                  : "Lista de espera"}
-              </button>
-            ) : (
-              <BlackButton
-                onClick={() => reservationMutation.mutate()}
-                disabled={reservationMutation.isPending || !currentStudent}
+              <RedButton
                 text={
-                  reservationMutation.isPending
-                    ? "Procesando..."
-                    : "Entrar a la clase"
+                  deleteWaitlistMutation.isPending
+                    ? "Saliendo..."
+                    : "Salir de lista de espera"
                 }
                 textSmall={true}
+                onClick={() => deleteWaitlistMutation.mutate()}
+                disabled={deleteWaitlistMutation.isPending}
               />
+            ) : isFull ? (
+              <BlackButton
+                text={
+                  waitlistMutation.isPending
+                    ? "Agregando..."
+                    : "Entrar en lista de espera"
+                }
+                textSmall={true}
+                onClick={() => waitlistMutation.mutate()}
+                disabled={waitlistMutation.isPending || !currentStudent}
+              />
+            ) : (
+              <div className="flex gap-3">
+                <WhiteButton
+                  type="button"
+                  text="Cancelar"
+                  onClick={close}
+                  textSmall={true}
+                />
+                <BlackButton
+                  onClick={() => reservationMutation.mutate()}
+                  disabled={reservationMutation.isPending || !currentStudent}
+                  text={
+                    reservationMutation.isPending
+                      ? "Procesando..."
+                      : "Entrar a la clase"
+                  }
+                  textSmall={true}
+                />
+              </div>
             )
           ) : null}
         </>

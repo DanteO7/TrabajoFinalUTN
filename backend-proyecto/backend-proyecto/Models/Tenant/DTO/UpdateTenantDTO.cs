@@ -13,6 +13,7 @@ namespace backend_proyecto.Models.DTOs
 
         [MaxLength(200)]
         public string? Address { get; set; }
+        public Dictionary<string, string>? SocialNetworks { get; set; }
 
         public string? MonthlyFeeStatus { get; set; }
     }

@@ -221,6 +221,41 @@ namespace backend_proyecto.Services
                 tenant.Address = updateTenantDTO.Address;
             }
 
+            if (updateTenantDTO.SocialNetworks != null)
+            {
+                var validPlatforms = new[] { "facebook", "instagram", "tiktok", "x", "linkedin", "youtube", "whatsapp" };
+
+                foreach (var (platform, url) in updateTenantDTO.SocialNetworks)
+                {
+                    if (!validPlatforms.Contains(platform.ToLower()))
+                    {
+                        throw new HttpResponseError(HttpStatusCode.BadRequest,
+                            $"Red social '{platform}' no válida");
+                    }
+
+                    if (platform.ToLower() == "whatsapp")
+                    {
+                        if (!long.TryParse(url, out _))
+                        {
+                            throw new HttpResponseError(HttpStatusCode.BadRequest,
+                                "WhatsApp: Ingresa solo el número de teléfono (sin símbolos)");
+                        }
+
+                        updateTenantDTO.SocialNetworks[platform] = $"https://wa.me/{url}";
+                    }
+                    else
+                    {
+                        if (!Uri.TryCreate(url, UriKind.Absolute, out _))
+                        {
+                            throw new HttpResponseError(HttpStatusCode.BadRequest,
+                                $"URL inválida para {platform}");
+                        }
+                    }
+                }
+
+                tenant.SocialNetworks = updateTenantDTO.SocialNetworks;
+            }
+
             await _tenantRepository.UpdateOneAsync(tenant);
 
             return _mapper.Map<ResponseTenantDTO>(tenant);

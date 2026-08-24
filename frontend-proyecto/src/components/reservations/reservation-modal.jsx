@@ -84,10 +84,6 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
       <h2 className="text-2xl font-semibold mb-2">{classItem.activityName}</h2>
 
-      <p className="text-gray-600 mb-6">
-        {classItem.professor.user.name} {classItem.professor.user.surname}
-      </p>
-
       <div className="space-y-4">
         <div className="bg-[#efefef] rounded-xl p-4">
           <p className="text-sm text-gray-600 mb-1">Estado</p>

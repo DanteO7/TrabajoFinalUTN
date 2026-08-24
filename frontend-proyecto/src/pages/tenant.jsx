@@ -4,8 +4,6 @@ import {
   FaChalkboardTeacher,
   FaCalendarAlt,
   FaRunning,
-  FaMoneyBillWave,
-  FaUserShield,
   FaBookOpen,
   FaClipboardList,
   FaTags,
@@ -18,9 +16,18 @@ import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
 import Loading from "../components/loading";
 import { useState } from "react";
-import EditAddressModal from "../components/tenant/edit-adress-modal";
 import BlackButton from "../components/buttons/black-button";
 import { getUnreadNewsCount } from "../services/news";
+import EditTenantModal from "../components/tenant/edit-tenant-modal";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaTiktok,
+  FaTwitter,
+  FaLinkedin,
+  FaYoutube,
+  FaWhatsapp,
+} from "react-icons/fa";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
@@ -35,6 +42,16 @@ export default function Tenant({ id }) {
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
   });
+
+  const PLATFORM_ICONS = {
+    facebook: FaFacebook,
+    instagram: FaInstagram,
+    tiktok: FaTiktok,
+    x: FaTwitter,
+    linkedin: FaLinkedin,
+    youtube: FaYoutube,
+    whatsapp: FaWhatsapp,
+  };
 
   const sections = {
     Tenant: [
@@ -230,15 +247,34 @@ export default function Tenant({ id }) {
                 {tenant?.ownerUser.surname}
               </p>
 
-              {tenant.address && (
+              {tenant?.socialNetworks &&
+                Object.keys(tenant.socialNetworks).length > 0 && (
+                  <div className="flex gap-3 text-3xl">
+                    {Object.entries(tenant.socialNetworks).map(
+                      ([platform, url]) => {
+                        const Icon = PLATFORM_ICONS[platform];
+                        if (!Icon) return null;
+
+                        return (
+                          <Icon
+                            key={platform}
+                            size={30}
+                            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+                            onClick={() => window.open(url, "_blank")}
+                          />
+                        );
+                      },
+                    )}
+                  </div>
+                )}
+
+              {tenant?.address && (
                 <p className="text-gray-500 mb-1">{tenant?.address}</p>
               )}
 
               {role.text == "Dueño" && (
                 <BlackButton
-                  text={
-                    tenant?.address ? "Editar direccion" : "Agregar direccion"
-                  }
+                  text="Editar datos"
                   onClick={() => setOpenEditAdressModal(true)}
                   textSmall={true}
                   wfit={true}
@@ -314,7 +350,7 @@ export default function Tenant({ id }) {
         )}
       </div>
       {openEditAdressModal && (
-        <EditAddressModal
+        <EditTenantModal
           tenant={tenant}
           close={() => setOpenEditAdressModal(false)}
         />
