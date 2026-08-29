@@ -153,16 +153,6 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var groupServices = scope.ServiceProvider
-        .GetRequiredService<GroupServices>();
-
-    await groupServices.CreateDefaultGroupsForAllTenants();
-
-    await groupServices.AssignDefaultGroupsToExistingUsers();
-}
-
-using (var scope = app.Services.CreateScope())
-{
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     try
@@ -175,6 +165,16 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine(ex.ToString());
         throw;
     }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var groupServices = scope.ServiceProvider
+        .GetRequiredService<GroupServices>();
+
+    await groupServices.CreateDefaultGroupsForAllTenants();
+
+    await groupServices.AssignDefaultGroupsToExistingUsers();
 }
 
 var allowedOrigins = builder.Configuration
