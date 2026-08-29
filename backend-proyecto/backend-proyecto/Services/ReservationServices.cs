@@ -20,6 +20,7 @@ namespace backend_proyecto.Services
         private readonly IStudentPlanRepository _studentPlanRepository;
         private readonly IMapper _mapper;
         private readonly IWaitlistSubject _waitlistSubject;
+        private readonly PermissionServices _permissionServices;
 
         public ReservationServices(
              IReservationRepository reservationRepository,
@@ -28,7 +29,8 @@ namespace backend_proyecto.Services
              ITenantRepository tenantRepository,
              IStudentPlanRepository studentPlanRepository,
              IMapper mapper,
-             IWaitlistSubject waitlistSubject)
+             IWaitlistSubject waitlistSubject,
+             PermissionServices permissionServices)
         {
             _reservationRepository = reservationRepository;
             _classRepository = classRepository;
@@ -36,10 +38,13 @@ namespace backend_proyecto.Services
             _tenantRepository = tenantRepository;
             _studentPlanRepository = studentPlanRepository;
             _mapper = mapper;
-            _waitlistSubject = waitlistSubject;
+            _waitlistSubject = waitlistSubject; 
+            _permissionServices = permissionServices;
         }
         public async Task<List<ResponseReservationDTO>> CreateMultiple(BulkCreateReservationDTO bulkDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_CREATE);
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == bulkDTO.TenantId);
             if (tenant == null)
             {
@@ -161,21 +166,18 @@ namespace backend_proyecto.Services
                 });
             }
 
-            // Si hay errores, lanzar excepción
             if (errors.Any())
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     string.Join(" | ", errors));
             }
 
-            // Si no hay reservas válidas
             if (!reservations.Any())
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     "No se pudo agregar ningún estudiante");
             }
 
-            // Crear todas las reservas
             foreach (var reservation in reservations)
             {
                 await _reservationRepository.CreateOneAsync(reservation);
@@ -184,7 +186,7 @@ namespace backend_proyecto.Services
             return _mapper.Map<List<ResponseReservationDTO>>(reservations);
         }
 
-        public async Task UpdateCompletedReservations()
+        private async Task UpdateCompletedReservations()
         {
             var now = TimeHelper.Now();
             var today = DateOnly.FromDateTime(now);
@@ -217,6 +219,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseReservationDTO> GetById(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_READ);
+
             await UpdateCompletedReservations();
 
             var reservation = await _reservationRepository.GetOneAsync(
@@ -237,6 +241,8 @@ namespace backend_proyecto.Services
 
         public async Task<List<ResponseReservationDTO>> GetByClassId(int classId)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_READ);
+
             await UpdateCompletedReservations();
 
             var reservations = await _reservationRepository.Query()
@@ -251,6 +257,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseReservationDTO> GetByClassAndStudent(int classId, int studentId)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_READ);
+
             await UpdateCompletedReservations();
 
             var reservation = await _reservationRepository.GetOneAsync(
@@ -271,6 +279,8 @@ namespace backend_proyecto.Services
 
         public async Task<List<ResponseReservationDTO>> GetByStudentId(int studentId)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_READ);
+
             await UpdateCompletedReservations();
 
             var reservations = await _reservationRepository.Query()
@@ -288,6 +298,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.RESERVATION_DELETE);
+
             var reservation = await _reservationRepository.GetOneAsync(
                     r => r.Id == id,
                     r => r.Class

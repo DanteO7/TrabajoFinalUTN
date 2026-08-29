@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(PagedResponse<UserWithoutPassDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PagedResponse<UserWithoutPassDTO>>> GetUsers(
@@ -52,7 +52,7 @@ namespace backend_proyecto.Controllers
 
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -74,7 +74,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -96,7 +96,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.STUDENT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -119,7 +119,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPatch("email/{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.STUDENT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

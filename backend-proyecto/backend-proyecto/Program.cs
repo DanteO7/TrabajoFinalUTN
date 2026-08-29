@@ -1,5 +1,6 @@
 using Auth.Utils.Filters;
 using backend_proyecto.Config;
+using backend_proyecto.Middlewares;
 using backend_proyecto.Repositories;
 using backend_proyecto.Services;
 using backend_proyecto.Services.Observer;
@@ -73,9 +74,16 @@ builder.Services.AddScoped<EmailServices>();
 builder.Services.AddScoped<InvitationServices>();
 builder.Services.AddScoped<WaitlistServices>();
 builder.Services.AddScoped<NewsServices>();
+builder.Services.AddScoped<CurrentTenantService>();
+builder.Services.AddScoped<ProfessorPermissionServices>();
+builder.Services.AddScoped<ExerciseServices>();
+builder.Services.AddScoped<RoutineServices>();
 
 builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
 builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();
+
+builder.Services.AddHttpContextAccessor();
+
 
 // Repositories
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
@@ -94,6 +102,8 @@ builder.Services.AddScoped<IInvitationRepository, InvitationRepository>();
 builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddScoped<IRoutineRepository, RoutineRepository>();
 
 
 // Backgound Services
@@ -143,6 +153,16 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var groupServices = scope.ServiceProvider
+        .GetRequiredService<GroupServices>();
+
+    await groupServices.CreateDefaultGroupsForAllTenants();
+
+    await groupServices.AssignDefaultGroupsToExistingUsers();
+}
+
+using (var scope = app.Services.CreateScope())
+{
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     try
@@ -187,6 +207,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.UseMiddleware<TenantMiddleware>();
 
 app.UseAuthorization();
 

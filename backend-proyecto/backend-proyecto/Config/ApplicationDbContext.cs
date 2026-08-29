@@ -28,6 +28,10 @@ namespace backend_proyecto.Config
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Admin> Admin { get; set; }
         public DbSet<Waitlist> Waitlists { get; set; }
+        public DbSet<ProfessorPermission> ProfessorPermissions { get; set; }
+        public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<Routine> Routines { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -195,7 +195,7 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
       {confirmModal && (
         <ConfirmModal
           title="¿Eliminar esta profesión?"
-          message={`Estás por eliminar la profesion "${news.name}". Esta acción no se puede deshacer.`}
+          message={`Estás por eliminar la profesion "${news.title}". Esta acción no se puede deshacer.`}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

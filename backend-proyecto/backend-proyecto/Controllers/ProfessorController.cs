@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost("assign")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -44,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}, {Roles.STUDENT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -67,7 +67,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -89,7 +89,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -111,7 +111,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseProfessorDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

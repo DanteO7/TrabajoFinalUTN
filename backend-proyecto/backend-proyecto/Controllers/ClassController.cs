@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}/{date}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.PROFESSOR}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseClassDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -44,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseClassDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -67,7 +67,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -89,7 +89,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseClassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -119,7 +119,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{classId}/students")]
-        [Authorize(Roles = $"{Roles.TENANT},{Roles.PROFESSOR}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<ResponseClassStudentDTO>>> GetStudentsByClass(int classId)

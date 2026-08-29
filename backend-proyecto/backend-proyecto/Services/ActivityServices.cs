@@ -29,6 +29,8 @@ namespace backend_proyecto.Services
         
         public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.ACTIVITY_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -56,6 +58,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseActivityDTO> GetOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.ACTIVITY_READ);
+
             var activity = await _activityRepository.GetOneAsync(a => a.Id == id, a => a.Tenant);
             if (activity == null)
             {
@@ -64,9 +68,9 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseActivityDTO>(activity);
         }
 
-        public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO, int userId)
+        public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO)
         {
-            await _permissionServices.CheckPermission(userId, createActivityDTO.TenantId, Permissions.ACTIVITY_CREATE);
+            await _permissionServices.CheckPermission(Permissions.ACTIVITY_CREATE);
 
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createActivityDTO.TenantId);
             if (tenant == null)
@@ -89,6 +93,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.ACTIVITY_DELETE);
+
             var activity = await _activityRepository.GetOneAsync(a => a.Id == id);
 
             if (activity == null)
@@ -118,6 +124,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseActivityDTO> UpdateOne(int id, UpdateActivityDTO updateActivityDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.ACTIVITY_UPDATE);
+
             var activity = await _activityRepository.GetOneAsync(a => a.Id == id, a => a.Tenant);
             if (activity == null)
             {

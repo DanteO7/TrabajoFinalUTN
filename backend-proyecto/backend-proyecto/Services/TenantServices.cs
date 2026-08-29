@@ -17,6 +17,8 @@ namespace backend_proyecto.Services
         private readonly IStudentRepository _studentRepository;
         private readonly IProfessorRepository _professorRepository;
         private readonly IMapper _mapper;
+        private readonly IAdminRepository _adminRepository;
+        private readonly PermissionServices _permissionServices;
 
         public TenantServices(
             ITenantRepository tenantRepository,
@@ -24,7 +26,9 @@ namespace backend_proyecto.Services
             IUserRepository userRepository,
             IStudentRepository studentRepository,
             IProfessorRepository professorRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IAdminRepository adminRepository,
+            PermissionServices permissionServices)
         {
             _tenantRepository = tenantRepository;
             _tenantPlanRepository = tenantPlanRepository;
@@ -32,16 +36,29 @@ namespace backend_proyecto.Services
             _studentRepository = studentRepository;
             _professorRepository = professorRepository;
             _mapper = mapper;
+            _adminRepository = adminRepository; 
+            _permissionServices = permissionServices;
         }
 
-        public async Task<List<ResponseTenantDTO>> GetAll()
+        public async Task<List<ResponseTenantDTO>> GetAll(int userId)
         {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede buscar todos los negocio"
+                );
+            }
             var tenants = await _tenantRepository.GetAllAsync(null, t => t.OwnerUser, t => t.TenantPlan);
             return _mapper.Map<List<ResponseTenantDTO>>(tenants);
         }
 
         public async Task<ResponseTenantDTO> GetById(int id, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.TENANT_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == id,
                 t => t.OwnerUser,
@@ -77,10 +94,24 @@ namespace backend_proyecto.Services
             return response;
         }
 
-        public async Task<List<ResponseTenantDTO>> GetAllByOwnerId(int ownerId)
+        public async Task<List<ResponseMyTenantDTO>> GetAllByUserId(
+             int targetUserId,
+             int userId)
         {
-            var tenants = await _tenantRepository.GetAllAsync(t => t.OwnerUserId == ownerId, t => t.OwnerUser, t => t.TenantPlan);
-            return _mapper.Map<List<ResponseTenantDTO>>(tenants);
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede consultar los negocios de un usuario"
+                );
+            }
+
+            return await _tenantRepository.GetMyTenants(
+                targetUserId,
+                null
+            );
         }
 
         public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO)
@@ -120,7 +151,7 @@ namespace backend_proyecto.Services
 
             await _tenantRepository.CreateOneAsync(tenant);
 
-            // ← Crear automáticamente el Professor para el dueño
+            // Crear automáticamente el Professor para el dueño
             var professor = new Professor
             {
                 UserId = createTenantDTO.OwnerUserId,
@@ -133,8 +164,18 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseTenantDTO>(tenant);
         }
 
-        public async Task DeleteOne(int id)
+        public async Task DeleteOne(int id, int userId)
         {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede eliminar un negocio"
+                );
+            }
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id);
             if(tenant == null)
             {
@@ -145,6 +186,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseTenantDTO> UpdateOne(int id, UpdateTenantDTO updateTenantDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.TENANT_UPDATE);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == id,
                 t => t.OwnerUser,
@@ -279,6 +322,8 @@ namespace backend_proyecto.Services
 
         public async Task<UserTenantRolesDTO> GetUserRolesInTenant(int userId, int tenantId)
         {
+            await _permissionServices.CheckPermission(Permissions.TENANT_READ, tenantId);
+
             var roles = new List<string>();
 
             if (await _professorRepository.ExistsByUserAndTenant(userId, tenantId))

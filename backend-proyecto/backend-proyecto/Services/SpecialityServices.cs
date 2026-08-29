@@ -12,15 +12,20 @@ namespace backend_proyecto.Services
         private readonly ISpecialityRepository _specialityRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
-        public SpecialityServices(ISpecialityRepository specialityRepository, ITenantRepository tenantRepository, IMapper mapper)
+        private readonly PermissionServices _permissionServices;
+
+        public SpecialityServices(ISpecialityRepository specialityRepository, ITenantRepository tenantRepository, IMapper mapper, PermissionServices permissionServices)
         {
             _specialityRepository = specialityRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
+            _permissionServices = permissionServices;
         }
         
         public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.SPECIALITY_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -48,6 +53,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseSpecialityDTO> CreateOne(CreateSpecialityDTO createSpecialityDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.SPECIALITY_CREATE);
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createSpecialityDTO.TenantId);
             if (tenant == null)
             {
@@ -69,6 +76,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.SPECIALITY_DELETE);
+
             var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id);
             if (speciality == null)
             {
@@ -80,6 +89,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseSpecialityDTO> UpdateOne(int id, UpdateSpecialityDTO updateSpecialityDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.SPECIALITY_UPDATE);
+
             var speciality = await _specialityRepository.GetOneAsync(s => s.Id == id, s => s.Tenant);
             if (speciality == null)
             {

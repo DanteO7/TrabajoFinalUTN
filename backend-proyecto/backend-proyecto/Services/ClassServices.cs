@@ -16,8 +16,10 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IActivityRepository _activityRepository;
         private readonly IProfessorRepository _professorRepository;
-        private readonly IReservationRepository _reservationRepository;
-        public ClassServices(IClassRepository classRepository, ITenantRepository tenantRepository, IMapper mapper, IActivityRepository activityRepository, IProfessorRepository professorRepository, IReservationRepository reservationRepository)
+        private readonly IReservationRepository _reservationRepository; 
+        private readonly PermissionServices _permissionServices;
+
+        public ClassServices(IClassRepository classRepository, ITenantRepository tenantRepository, IMapper mapper, IActivityRepository activityRepository, IProfessorRepository professorRepository, IReservationRepository reservationRepository, PermissionServices permissionServices)
         {
             _classRepository = classRepository;
             _tenantRepository = tenantRepository;
@@ -25,10 +27,13 @@ namespace backend_proyecto.Services
             _activityRepository = activityRepository;
             _professorRepository = professorRepository;
             _reservationRepository = reservationRepository;
+            _permissionServices = permissionServices;
         }
 
         public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.CLASS_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -64,7 +69,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseClassDTO> CreateOne(CreateClassDTO createClassDTO)
         {
-            // Validar existencia de entidades
+            await _permissionServices.CheckPermission(Permissions.CLASS_CREATE);
+
             var activity = await _activityRepository.GetOneAsync(a => a.Id == createClassDTO.ActivityId);
             if (activity == null)
             {
@@ -97,7 +103,6 @@ namespace backend_proyecto.Services
                     $"No se puede crear una clase para un día anterior = '{createClassDTO.Date}'");
             }
 
-            // Si la clase es hoy, verificar que no haya pasado
             if (classDate == DateOnly.FromDateTime(now))
             {
                 var classDateTime = classDate.ToDateTime(classTime);
@@ -108,14 +113,12 @@ namespace backend_proyecto.Services
                 }
             }
 
-            // Validar horarios
             if (createClassDTO.StartTime >= createClassDTO.EndTime)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
                     $"La hora de inicio debe ser menor a la hora del fin = Hora inicio: '{createClassDTO.StartTime}', Hora fin: '{createClassDTO.EndTime}'");
             }
 
-            // Validar capacidad
             if (createClassDTO.MaxCapacity <= 0)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
@@ -130,7 +133,6 @@ namespace backend_proyecto.Services
                     $"El profesor ya tiene una clase en ese horario");
             }
 
-            // Crear la clase
             var classMapped = _mapper.Map<Class>(createClassDTO);
 
             classMapped.ActivityName = activity.Name;
@@ -150,6 +152,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.CLASS_DELETE);
+
             var classModel = await _classRepository.GetOneAsync(c => c.Id == id, c => c.Reservations);
             if(classModel == null)
             {
@@ -176,6 +180,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseClassDTO> UpdateOne(int id, UpdateClassDTO updateClassDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.CLASS_UPDATE);
+
             var classEntity = await _classRepository.GetOneAsync(c => c.Id == id, c => c.Activity, c => c.Professor, c => c.Reservations);
             if (classEntity == null)
             {
@@ -275,6 +281,8 @@ namespace backend_proyecto.Services
         }
         public async Task<List<ResponseClassStudentDTO>> GetStudentsByClass(int classId)
         {
+            await _permissionServices.CheckPermission(Permissions.CLASS_READ);
+
             var classEntity = await _classRepository.GetOneAsync(c => c.Id == classId);
 
             if (classEntity == null)

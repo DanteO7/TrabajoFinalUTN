@@ -18,7 +18,9 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly ISpecialityRepository _specialityRepository;
         private readonly ApplicationDbContext _context;
-        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IMapper mapper, ISpecialityRepository specialityRepository, ApplicationDbContext context)
+        private readonly GroupServices _groupServices;
+        private readonly PermissionServices _permissionServices;
+        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IMapper mapper, ISpecialityRepository specialityRepository, ApplicationDbContext context, GroupServices groupServices, PermissionServices permissionServices)
         {
             _professorRepository = professorRepository;
             _userRepository = userRepository;
@@ -26,6 +28,8 @@ namespace backend_proyecto.Services
             _mapper = mapper;
             _specialityRepository = specialityRepository;
             _context = context;
+            _groupServices = groupServices;
+            _permissionServices = permissionServices;
         }
 
         public async Task<ResponseProfessorDTO> AssignOne(AssignProfessorDTO assignProfessorDTO)
@@ -46,11 +50,20 @@ namespace backend_proyecto.Services
             professor.IsActive = false;
 
             await _professorRepository.CreateOneAsync(professor);
+
+            await _groupServices.AssignUserToGroupIfNotExists(
+                assignProfessorDTO.UserId,
+                assignProfessorDTO.TenantId,
+                "BASIC_PROFESSOR"
+            );
+
             return _mapper.Map<ResponseProfessorDTO>(professor);
         }
 
         public async Task<List<ResponseProfessorDTO>> GetAll (int? tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -91,6 +104,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseProfessorDTO> GetOneById(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_READ);
+
             var professor = await _professorRepository.GetOneAsync(p => p.Id == id, p => p.User);
             if (professor == null)
             {
@@ -102,6 +117,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_DELETE);
+
             var professor = await _professorRepository.GetOneAsync(p => p.Id == id);
             if (professor == null)
             {
@@ -112,6 +129,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseProfessorDTO> UpdateOne(int professorId, UpdateProfessorDTO updateProfessorDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_UPDATE);
+
             var professor = await _professorRepository.Query()
                 .Include(p => p.User)
                 .Include(p => p.ProfessorSpecialities)
@@ -206,6 +225,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseProfessorDTO> AssignSpeciality(int professorId, int specialityId)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_ASSIGN_SPECIALITY);
+
             var professor = await _professorRepository.GetOneAsync(p => p.Id == professorId, p => p.User);
             if (professor == null)
             {
@@ -241,6 +262,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseProfessorDTO> RemoveSpeciality(int professorId, int specialityId)
         {
+            await _permissionServices.CheckPermission(Permissions.PROFESSOR_REMOVE_SPECIALITY);
+
             var professor = await _professorRepository.GetOneAsync(p => p.Id == professorId, p => p.User, p => p.Tenant);
             if (professor == null)
             {

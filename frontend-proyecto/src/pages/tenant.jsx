@@ -8,6 +8,7 @@ import {
   FaClipboardList,
   FaTags,
   FaBell,
+  FaDumbbell,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -28,6 +29,7 @@ import {
   FaYoutube,
   FaWhatsapp,
 } from "react-icons/fa";
+import { FaListCheck } from "react-icons/fa6";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
@@ -91,6 +93,18 @@ export default function Tenant({ id }) {
         icon: <FaBookOpen size={35} />,
         href: "profesiones",
       },
+      {
+        title: "Rutinas",
+        description: "Configurá rutinas de entrenamiento.",
+        icon: <FaListCheck size={35} />,
+        href: "rutinas",
+      },
+      {
+        title: "Ejercicios",
+        description: "Gestioná ejercicios.",
+        icon: <FaDumbbell size={35} />,
+        href: "ejercicios",
+      },
       // {
       //   title: "Pagos",
       //   description: "Consultá pagos.",
@@ -104,10 +118,10 @@ export default function Tenant({ id }) {
         href: "planes",
       },
       // {
-      //   title: "Grupos",
+      //   title: "Roles",
       //   description: "Administrá roles y permisos.",
       //   icon: <FaUserShield size={35} />,
-      //   href: "grupos",
+      //   href: "roles",
       // },
     ],
 
@@ -141,6 +155,18 @@ export default function Tenant({ id }) {
         description: "Configurá profesiones.",
         icon: <FaBookOpen size={35} />,
         href: "profesiones",
+      },
+      {
+        title: "Rutinas",
+        description: "Configurá rutinas de entrenamiento.",
+        icon: <FaListCheck size={35} />,
+        href: "rutinas",
+      },
+      {
+        title: "Ejercicios",
+        description: "Gestioná ejercicios.",
+        icon: <FaDumbbell size={35} />,
+        href: "ejercicios",
       },
       // {
       //   title: "Pagos",
@@ -180,6 +206,12 @@ export default function Tenant({ id }) {
         description: "Tus proximas clases.",
         icon: <FaClipboardList size={35} />,
         href: "reservas",
+      },
+      {
+        title: "Rutinas",
+        description: "Configurá rutinas de entrenamiento.",
+        icon: <FaListCheck size={35} />,
+        href: "rutinas",
       },
       // {
       //   title: "Pagos",

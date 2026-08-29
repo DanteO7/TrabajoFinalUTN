@@ -30,7 +30,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseTenantDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -38,7 +38,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var tenants = await _tenantServices.GetAll();
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var tenants = await _tenantServices.GetAll(userId);
                 return Ok(tenants);
             }
             catch (HttpResponseError ex)
@@ -52,7 +53,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}, {Roles.STUDENT}")]
+        [Authorize]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -61,7 +62,6 @@ namespace backend_proyecto.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirst("id")!.Value);
-                
                 var tenant = await _tenantServices.GetById(id, userId);
                 return Ok(tenant);
             }
@@ -75,16 +75,17 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpGet("owner/{ownerId}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
-        [ProducesResponseType(typeof(List<ResponseTenantDTO>), StatusCodes.Status200OK)]
+        [HttpGet("user/{targetUserId}")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<ResponseMyTenantDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ResponseTenantDTO>>> GetAllByOwnerId(int ownerId)
+        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetAllByOwnerId(int targetUserId)
         {
             try
             {
-                var tenants = await _tenantServices.GetAllByOwnerId(ownerId);
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+                var tenants = await _tenantServices.GetAllByUserId(targetUserId, userId);
                 return Ok(tenants);
             }
             catch (HttpResponseError ex)
@@ -127,7 +128,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -135,7 +136,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                await _tenantServices.DeleteOne(id);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                await _tenantServices.DeleteOne(id, userId);
                 return Ok("Tenant Successfully Deleted");
             }
             catch (HttpResponseError ex)
@@ -149,7 +151,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -199,13 +201,6 @@ namespace backend_proyecto.Controllers
             {
                 return StatusCode((int)ex.StatusCode, new { message = ex.Message });
             }
-        }
-
-        [HttpGet("user/{userId}")]
-        [Authorize(Roles = Roles.ADMIN)]
-        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetUserTenants(int userId)
-        {
-            return Ok(await _tenantServices.GetMyTenants(userId, userId));
         }
     }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import BlackButton from "../buttons/black-button";
 
-export default function MyTenantCard({ myTenant, onClick }) {
+export default function MyTenantCard({ myTenant }) {
   const roleConfig = {
     Owner: {
       text: "Dueño",
@@ -20,7 +20,7 @@ export default function MyTenantCard({ myTenant, onClick }) {
 
   return (
     <div className="flex flex-col border w-full cursor-pointer place-self-center p-5 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-      <div onClick={onClick} className=" flex justify-between mb-4">
+      <div className=" flex justify-between mb-4">
         <div>
           <h4 className="font-semibold text-[20px] lg:text-2xl">
             {myTenant.name}

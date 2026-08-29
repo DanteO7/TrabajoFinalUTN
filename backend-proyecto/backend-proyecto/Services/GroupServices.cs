@@ -15,19 +15,195 @@ namespace backend_proyecto.Services
             _context = context;
         }
 
-        public async Task<Group> CreateGroup(string name, int tenantId)
+        // CREAR GRUPOS PREDEFINIDOS
+        public async Task CreateDefaultGroups(int tenantId)
         {
-            var tenantExists = await _context.Tenants.AnyAsync(t => t.Id == tenantId);
+            var tenantExists = await _context.Tenants
+                .AnyAsync(t => t.Id == tenantId);
+
             if (!tenantExists)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Tenant no encontrado");
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Tenant no encontrado"
+                );
+            }
 
-            var exists = await _context.Groups
-                .AnyAsync(g => g.Name == name && g.TenantId == tenantId);
+            var student = await CreateGroupIfNotExists(
+                "STUDENT",
+                tenantId
+            );
 
-            if (exists)
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe un grupo con nombre '{name}'");
+            var basicProfessor = await CreateGroupIfNotExists(
+                "BASIC_PROFESSOR",
+                tenantId
+            );
 
-            var group = new Group
+            var advancedProfessor = await CreateGroupIfNotExists(
+                "ADVANCED_PROFESSOR",
+                tenantId
+            );
+
+            // STUDENT
+            await AssignPermissionsToGroup(
+                student.Id,
+                new[]
+                {
+            Permissions.TENANT_READ,
+            Permissions.NEWS_READ,
+            Permissions.CLASS_READ,
+            Permissions.PROFESSOR_READ,
+            Permissions.ACTIVITY_READ,
+            Permissions.RESERVATION_READ,
+            Permissions.RESERVATION_CREATE,
+            Permissions.RESERVATION_DELETE,
+            Permissions.STUDENT_PLAN_READ,
+            Permissions.PAYMENT_READ,
+            Permissions.EXERCISE_READ,
+            Permissions.ROUTINE_READ,
+                }
+            );
+
+            // BASIC PROFESSOR
+            await AssignPermissionsToGroup(
+                basicProfessor.Id,
+                new[]
+                {            
+            Permissions.TENANT_READ,
+            Permissions.NEWS_READ,
+            Permissions.CLASS_READ,
+            Permissions.PROFESSOR_READ,
+            Permissions.ACTIVITY_READ,
+            Permissions.SPECIALITY_READ,
+            Permissions.STUDENT_READ,
+            Permissions.RESERVATION_READ,
+            Permissions.PAYMENT_READ,
+            Permissions.STUDENT_PLAN_READ,
+            Permissions.EXERCISE_READ,
+            Permissions.ROUTINE_READ,
+                }
+            );
+
+            // ADVANCED PROFESSOR
+            await AssignPermissionsToGroup(
+                advancedProfessor.Id,
+                new[]
+                {
+            Permissions.TENANT_READ,
+
+            // STUDENTS
+            Permissions.STUDENT_READ,
+            Permissions.STUDENT_CREATE,
+            Permissions.STUDENT_UPDATE,
+            Permissions.STUDENT_DELETE,
+
+            // PROFESSORS
+            Permissions.PROFESSOR_READ,
+
+            // ACTIVITIES
+            Permissions.ACTIVITY_READ,
+            Permissions.ACTIVITY_CREATE,
+            Permissions.ACTIVITY_UPDATE,
+            Permissions.ACTIVITY_DELETE,
+
+            // SPECIALITIES
+            Permissions.SPECIALITY_READ,
+            Permissions.SPECIALITY_CREATE,
+            Permissions.SPECIALITY_UPDATE,
+            Permissions.SPECIALITY_DELETE,
+
+            // CLASSES
+            Permissions.CLASS_READ,
+            Permissions.CLASS_CREATE,
+            Permissions.CLASS_UPDATE,
+            Permissions.CLASS_DELETE,
+
+            // RESERVATIONS
+            Permissions.RESERVATION_READ,
+            Permissions.RESERVATION_CREATE,
+            Permissions.RESERVATION_DELETE,
+            Permissions.RESERVATION_CHANGE_STATUS,
+
+            // PAYMENTS
+            Permissions.PAYMENT_READ,
+            Permissions.PAYMENT_CREATE,
+            Permissions.PAYMENT_UPDATE,
+            Permissions.PAYMENT_DELETE,
+
+            // STUDENT PLANS
+            Permissions.STUDENT_PLAN_READ,
+            Permissions.STUDENT_PLAN_CREATE,
+            Permissions.STUDENT_PLAN_UPDATE,
+            Permissions.STUDENT_PLAN_DELETE,
+
+            // NEWS
+            Permissions.NEWS_READ,
+            Permissions.NEWS_CREATE,
+            Permissions.NEWS_UPDATE,
+            Permissions.NEWS_DELETE,
+
+            // EXERCISES
+            Permissions.EXERCISE_READ,
+            Permissions.EXERCISE_CREATE,
+            Permissions.EXERCISE_UPDATE,
+            Permissions.EXERCISE_DELETE,
+
+            // ROUTINES
+            Permissions.ROUTINE_READ,
+            Permissions.ROUTINE_CREATE,
+            Permissions.ROUTINE_UPDATE,
+            Permissions.ROUTINE_DELETE,
+
+            // GROUPS
+            Permissions.GROUP_READ,
+            
+            // INVITATIONS
+            Permissions.INVITATION_READ,
+            Permissions.INVITATION_CREATE,
+            Permissions.INVITATION_DELETE,
+                }
+            );
+        }
+
+        public async Task CreateDefaultGroupsForAllTenants()
+        {
+            var tenantIds = await _context.Tenants
+                .Select(t => t.Id)
+                .ToListAsync();
+
+            Console.WriteLine($"TENANTS ENCONTRADOS: {tenantIds.Count}");
+
+            foreach (var tenantId in tenantIds)
+            {
+                Console.WriteLine($"ACTUALIZANDO TENANT: {tenantId}");
+
+                await CreateDefaultGroups(tenantId);
+            }
+        }
+
+        private async Task<Group> CreateGroupIfNotExists(
+            string name,
+            int tenantId)
+        {
+            Console.WriteLine($"BUSCANDO {name} - TENANT {tenantId}");
+
+            var group = await _context.Groups
+                .Include(g => g.GroupPermissions)
+                .FirstOrDefaultAsync(g =>
+                    g.Name == name &&
+                    g.TenantId == tenantId
+                );
+
+            Console.WriteLine(
+                $"RESULTADO {name}: {(group == null ? "NO EXISTE" : $"EXISTE ID={group.Id}")}"
+            );
+
+            if (group != null)
+                return group;
+
+            Console.WriteLine($"CREANDO {name}");
+
+            group = new Group
             {
                 Name = name,
                 TenantId = tenantId
@@ -36,212 +212,268 @@ namespace backend_proyecto.Services
             _context.Groups.Add(group);
             await _context.SaveChangesAsync();
 
+            Console.WriteLine($"CREADO {name} ID={group.Id}");
+
             return group;
         }
 
-        public async Task CreateDefaultGroups(int tenantId, int ownerUserId)
-        {
-            var tenantExists = await _context.Tenants.AnyAsync(t => t.Id == tenantId);
-            if (!tenantExists)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Tenant no encontrado");
-
-            var tenantGroup = await CreateGroup("TENANT", tenantId);
-            var professorBasic = await CreateGroup("PROFESSOR_BASIC", tenantId);
-            var professorAdvanced = await CreateGroup("PROFESSOR_ADVANCED", tenantId);
-            var studentGroup = await CreateGroup("STUDENT", tenantId);
-
-            await AssignPermissionsToGroup(tenantGroup.Id, new[]
-            {
-                Permissions.TENANT_READ,
-                Permissions.TENANT_UPDATE,
-
-                Permissions.USER_READ,
-                Permissions.USER_CREATE,
-                Permissions.USER_UPDATE,
-                Permissions.USER_DELETE,
-
-                Permissions.STUDENT_READ,
-                Permissions.STUDENT_CREATE,
-                Permissions.STUDENT_UPDATE,
-                Permissions.STUDENT_DELETE,
-
-                Permissions.PROFESSOR_READ,
-                Permissions.PROFESSOR_CREATE,
-                Permissions.PROFESSOR_UPDATE,
-                Permissions.PROFESSOR_DELETE,
-                Permissions.PROFESSOR_ASSIGN_SPECIALITY,
-                Permissions.PROFESSOR_REMOVE_SPECIALITY,
-
-                Permissions.ACTIVITY_READ,
-                Permissions.ACTIVITY_CREATE,
-                Permissions.ACTIVITY_UPDATE,
-                Permissions.ACTIVITY_DELETE,
-
-                Permissions.SPECIALITY_READ,
-                Permissions.SPECIALITY_CREATE,
-                Permissions.SPECIALITY_UPDATE,
-                Permissions.SPECIALITY_DELETE,
-
-                Permissions.CLASS_READ,
-                Permissions.CLASS_CREATE,
-                Permissions.CLASS_UPDATE,
-                Permissions.CLASS_DELETE,
-
-                Permissions.RESERVATION_READ,
-                Permissions.RESERVATION_CREATE,
-                Permissions.RESERVATION_DELETE,
-                Permissions.RESERVATION_CHANGE_STATUS,
-
-                Permissions.PAYMENT_READ,
-                Permissions.PAYMENT_CREATE,
-                Permissions.PAYMENT_UPDATE,
-                Permissions.PAYMENT_DELETE,
-
-                Permissions.GROUP_READ,
-                Permissions.GROUP_CREATE,
-                Permissions.GROUP_UPDATE,
-                Permissions.GROUP_DELETE,
-                Permissions.GROUP_ASSIGN_USER,
-                Permissions.GROUP_REMOVE_USER,
-                Permissions.GROUP_ASSIGN_PERMISSION
-            });
-
-            await AssignPermissionsToGroup(professorBasic.Id, new[]
-            {
-                Permissions.CLASS_READ,
-                Permissions.RESERVATION_READ
-            });
-
-            await AssignPermissionsToGroup(professorAdvanced.Id, new[]
-            {
-                Permissions.CLASS_READ,
-                Permissions.CLASS_CREATE,
-                Permissions.CLASS_UPDATE,
-                Permissions.RESERVATION_READ
-            });
-
-            await AssignPermissionsToGroup(studentGroup.Id, new[]
-            {
-                Permissions.RESERVATION_CREATE,
-                Permissions.RESERVATION_READ,
-                Permissions.PAYMENT_CREATE,
-                Permissions.PAYMENT_READ
-            });
-
-            await AssignUserToGroup(ownerUserId, tenantGroup.Id);
-        }
-
-        public async Task AssignPermissionsToGroup(int groupId, string[] permissions)
+        // PERMISOS DEL GRUPO
+        public async Task AssignPermissionsToGroup(
+            int groupId,
+            string[] permissions)
         {
             var group = await _context.Groups
                 .Include(g => g.GroupPermissions)
                 .FirstOrDefaultAsync(g => g.Id == groupId);
 
             if (group == null)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Grupo no encontrado");
-
-            foreach (var permissionName in permissions)
             {
-                var permission = await _context.Permissions
-                    .FirstOrDefaultAsync(p => p.Name == permissionName);
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Grupo no encontrado"
+                );
+            }
 
-                if (permission == null)
-                    throw new HttpResponseError(HttpStatusCode.NotFound, $"Permiso '{permissionName}' no existe");
+            var permissionIds = await _context.Permissions
+                .Where(p => permissions.Contains(p.Name))
+                .Select(p => p.Id)
+                .ToListAsync();
 
-                var exists = group.GroupPermissions
-                    .Any(gp => gp.PermissionId == permission.Id);
+            // Verificar que todos los permisos existan
+            if (permissionIds.Count != permissions.Length)
+            {
+                var existingPermissionNames = await _context.Permissions
+                    .Where(p => permissions.Contains(p.Name))
+                    .Select(p => p.Name)
+                    .ToListAsync();
 
-                if (!exists)
+                var missingPermissions = permissions
+                    .Except(existingPermissionNames)
+                    .ToList();
+
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"Los siguientes permisos no existen: {string.Join(", ", missingPermissions)}"
+                );
+            }
+
+            // Eliminar permisos que ya no deberían pertenecer al grupo
+            var permissionsToRemove = group.GroupPermissions
+                .Where(gp => !permissionIds.Contains(gp.PermissionId))
+                .ToList();
+
+            foreach (var groupPermission in permissionsToRemove)
+            {
+                group.GroupPermissions.Remove(groupPermission);
+            }
+
+            // Agregar permisos que faltan
+            var existingPermissionIds = group.GroupPermissions
+                .Select(gp => gp.PermissionId)
+                .ToHashSet();
+
+            foreach (var permissionId in permissionIds)
+            {
+                if (!existingPermissionIds.Contains(permissionId))
                 {
-                    group.GroupPermissions.Add(new GroupPermission
-                    {
-                        GroupId = groupId,
-                        PermissionId = permission.Id
-                    });
+                    group.GroupPermissions.Add(
+                        new GroupPermission
+                        {
+                            GroupId = groupId,
+                            PermissionId = permissionId
+                        }
+                    );
                 }
             }
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task AssignUserToGroup(int userId, int groupId)
+        // REMOVER USUARIO DE GRUPO
+        public async Task RemoveUserFromGroup(
+            int userId,
+            int groupId)
+        {
+            var relation = await _context.UserGroups
+                .FirstOrDefaultAsync(ug =>
+                    ug.UserId == userId &&
+                    ug.GroupId == groupId
+                );
+
+            if (relation == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "El usuario no pertenece al grupo"
+                );
+            }
+
+            _context.UserGroups.Remove(relation);
+
+            await _context.SaveChangesAsync();
+        }
+
+        // OBTENER GRUPOS DEL TENANT
+        public async Task<List<Group>> GetGroupsByTenant(
+            int tenantId)
+        {
+            var tenantExists = await _context.Tenants
+                .AnyAsync(t => t.Id == tenantId);
+
+            if (!tenantExists)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Tenant no encontrado"
+                );
+            }
+
+            return await _context.Groups
+                .Where(g => g.TenantId == tenantId)
+                .Include(g => g.GroupPermissions)
+                    .ThenInclude(gp => gp.Permission)
+                .ToListAsync();
+        }
+
+        // REMOVER PERMISO DE GRUPO
+        public async Task RemovePermissionFromGroup(
+            int groupId,
+            string permissionName)
+        {
+            var permission = await _context.Permissions
+                .FirstOrDefaultAsync(p =>
+                    p.Name == permissionName
+                );
+
+            if (permission == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Permiso no encontrado"
+                );
+            }
+
+            var relation = await _context.GroupPermissions
+                .FirstOrDefaultAsync(gp =>
+                    gp.GroupId == groupId &&
+                    gp.PermissionId == permission.Id
+                );
+
+            if (relation == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El grupo no tiene ese permiso"
+                );
+            }
+
+            _context.GroupPermissions.Remove(relation);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AssignUserToGroupIfNotExists(
+            int userId,
+            int tenantId,
+            string groupName)
         {
             var group = await _context.Groups
-                .FirstOrDefaultAsync(g => g.Id == groupId);
+                .FirstOrDefaultAsync(g =>
+                    g.TenantId == tenantId &&
+                    g.Name == groupName
+                );
 
             if (group == null)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Grupo no encontrado");
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No existe el grupo '{groupName}' para este tenant"
+                );
+            }
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Usuario no encontrado");
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Usuario no encontrado"
+                );
+            }
 
             var exists = await _context.UserGroups
-                .AnyAsync(ug => ug.UserId == userId && ug.GroupId == groupId);
+                .AnyAsync(ug =>
+                    ug.UserId == userId &&
+                    ug.GroupId == group.Id
+                );
 
             if (exists)
-                throw new HttpResponseError(HttpStatusCode.BadRequest, "El usuario ya pertenece al grupo");
+                return;
 
             _context.UserGroups.Add(new UserGroup
             {
                 UserId = userId,
-                GroupId = groupId
+                GroupId = group.Id
             });
 
             await _context.SaveChangesAsync();
         }
-
-        public async Task RemoveUserFromGroup(int userId, int groupId)
+        public async Task AssignDefaultGroupsToExistingUsers()
         {
-            var relation = await _context.UserGroups
-                .FirstOrDefaultAsync(ug => ug.UserId == userId && ug.GroupId == groupId);
+            Console.WriteLine(
+                "========== ASIGNANDO GRUPOS A USUARIOS EXISTENTES =========="
+            );
 
-            if (relation == null)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "El usuario no pertenece al grupo");
-
-            _context.UserGroups.Remove(relation);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<Group>> GetGroupsByTenant(int tenantId)
-        {
-            var tenantExists = await _context.Tenants.AnyAsync(t => t.Id == tenantId);
-            if (!tenantExists)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Tenant no encontrado");
-
-            return await _context.Groups
-                .Where(g => g.TenantId == tenantId)
-                .Include(g => g.GroupPermissions)
-                .ThenInclude(gp => gp.Permission)
+            var students = await _context.Students
                 .ToListAsync();
-        }
 
-        public async Task RemovePermissionFromGroup(int groupId, string permissionName)
-        {
-            var groupExists = await _context.Groups
-                .AnyAsync(g => g.Id == groupId);
+            foreach (var student in students)
+            {
+                await AssignUserToGroupIfNotExists(
+                    student.UserId,
+                    student.TenantId,
+                    "STUDENT"
+                );
 
-            if (!groupExists)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Grupo no encontrado");
+                Console.WriteLine(
+                    $"Student UserId={student.UserId} → STUDENT Tenant={student.TenantId}"
+                );
+            }
 
-            var permission = await _context.Permissions
-                .FirstOrDefaultAsync(p => p.Name == permissionName);
+            var professors = await _context.Professors
+                .ToListAsync();
 
-            if (permission == null)
-                throw new HttpResponseError(HttpStatusCode.NotFound, "Permiso no encontrado");
+            foreach (var professor in professors)
+            {
+                // Verificar si es dueño del tenant
+                var tenant = await _context.Tenants
+                    .FirstOrDefaultAsync(t =>
+                        t.Id == professor.TenantId
+                    );
 
-            var relation = await _context.Set<GroupPermission>()
-                .FirstOrDefaultAsync(gp =>
-                    gp.GroupId == groupId &&
-                    gp.PermissionId == permission.Id);
+                if (tenant == null)
+                    continue;
 
-            if (relation == null)
-                throw new HttpResponseError(HttpStatusCode.BadRequest, "El grupo no tiene ese permiso");
+                var groupName =
+                    tenant.OwnerUserId == professor.UserId
+                        ? "ADVANCED_PROFESSOR"
+                        : "BASIC_PROFESSOR";
 
-            _context.Remove(relation);
-            await _context.SaveChangesAsync();
+                await AssignUserToGroupIfNotExists(
+                    professor.UserId,
+                    professor.TenantId,
+                    groupName
+                );
+
+                Console.WriteLine(
+                    $"Professor UserId={professor.UserId} → {groupName} Tenant={professor.TenantId}"
+                );
+            }
+
+            Console.WriteLine(
+                "========== FINALIZÓ ASIGNACIÓN DE GRUPOS =========="
+            );
         }
     }
 }

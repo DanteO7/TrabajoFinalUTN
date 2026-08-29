@@ -30,7 +30,6 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly ApplicationDbContext _db;
 
-
         public AuthServices(IUserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository, ApplicationDbContext db)
         {
             _userServices = userServices;
@@ -146,25 +145,17 @@ namespace backend_proyecto.Services
         public async Task<string> GenerateJwt(UserWithoutPassDTO user)
         {
             var key = Encoding.UTF8.GetBytes(_secret);
+
             var credentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature
             );
 
             var claims = new ClaimsIdentity();
-            claims.AddClaim(new Claim("id", user.Id.ToString()));
 
-            var isStudent = await _studentRepo.ExistsByUserId(user.Id);
-            Console.WriteLine($"UserId: {user.Id}, IsStudent: {isStudent}");
-
-            if (await _professorRepo.ExistsByUserId(user.Id))
-                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.PROFESSOR));
-            if (await _studentRepo.ExistsByUserId(user.Id))
-                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.STUDENT));
-            if (await _adminRepository.ExistsByUserId(user.Id))
-                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.ADMIN));
-            if (await _tenantRepository.ExistsByUserId(user.Id))
-                claims.AddClaim(new Claim(ClaimTypes.Role, Roles.TENANT));
+            claims.AddClaim(
+                new Claim("id", user.Id.ToString())
+            );
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -174,7 +165,10 @@ namespace backend_proyecto.Services
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
+
+            return tokenHandler.WriteToken(
+                tokenHandler.CreateToken(tokenDescriptor)
+            );
         }
     }
 }

@@ -42,7 +42,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseStudentPlanDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -65,7 +65,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -87,7 +87,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseStudentPlanDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

@@ -17,7 +17,7 @@ namespace backend_proyecto.Services
         private readonly IStudentPlanRepository _studentPlanRepository;
         private readonly StudentServices _studentServices;
         private readonly ProfessorServices _professorServices;
-
+        private readonly PermissionServices _permissionServices;
 
         public InvitationServices(
             IInvitationRepository invitationRepository,
@@ -27,7 +27,8 @@ namespace backend_proyecto.Services
             ITenantRepository tenantRepository,
             IStudentPlanRepository studentPlanRepository,
             StudentServices studentServices,
-            ProfessorServices professorServices
+            ProfessorServices professorServices, 
+            PermissionServices permissionServices
             )
         {
             _invitationRepository = invitationRepository;
@@ -38,10 +39,13 @@ namespace backend_proyecto.Services
             _studentPlanRepository = studentPlanRepository;
             _studentServices = studentServices;
             _professorServices = professorServices;
+            _permissionServices = permissionServices;
         }
 
         public async Task<ResponseInvitationDTO> CreateInvitation(CreateInvitationDTO dto)
         {
+            await _permissionServices.CheckPermission(Permissions.INVITATION_CREATE);
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == dto.TenantId);
             if (tenant == null)
             {
@@ -191,6 +195,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseInvitationInfoDTO> GetInvitationInfo(Guid token)
         {
+            await _permissionServices.CheckPermission(Permissions.INVITATION_READ);
+
             var invitation = await _invitationRepository.GetOneAsync(
                 i => i.Token == token,
                 i => i.Tenant);
@@ -218,6 +224,8 @@ namespace backend_proyecto.Services
         }
         public async Task DeleteInvitation(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.ROUTINE_DELETE);
+
             var invitation = await _invitationRepository.GetOneAsync(i => i.Id == id);
             if (invitation == null)
             {

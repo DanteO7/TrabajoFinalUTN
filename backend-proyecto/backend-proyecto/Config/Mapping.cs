@@ -104,6 +104,31 @@ namespace backend_proyecto.Config
             CreateMap<CreateNewsDTO, News>();
             CreateMap<UpdateNewsDTO, News>();
             CreateMap<News, ResponseNewsDTO>();
+
+            // exersice
+            CreateMap<CreateExerciseDTO, Exercise>();
+            CreateMap<UpdateExerciseDTO, Exercise>();
+            CreateMap<Exercise, ResponseExerciseDTO>();
+
+            // routine
+            CreateMap<CreateRoutineDTO, Routine>()
+                .ForMember(
+                    dest => dest.RoutineExercises,
+                    opt => opt.Ignore()
+                );
+            CreateMap<UpdateRoutineDTO, Routine>()
+                .ForMember(
+                    dest => dest.RoutineExercises,
+                    opt => opt.Ignore()
+                );
+            CreateMap<Routine, ResponseRoutineDTO>()
+                .ForMember(
+                    dest => dest.Exercises,
+                    opt => opt.MapFrom(src => src.RoutineExercises)
+                );
+
+            // routine exercise
+            CreateMap<RoutineExercise, ResponseRoutineExerciseDTO>();
         }
     }
 }

@@ -18,19 +18,23 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IAdminRepository _adminRepository;
+        private readonly PermissionServices _permissionServices;
 
         public NewsServices(
-            INewsRepository newsRepository,ITenantRepository tenantRepository,IMapper mapper, IUserRepository userRepository, IAdminRepository adminRepository)
+            INewsRepository newsRepository,ITenantRepository tenantRepository,IMapper mapper, IUserRepository userRepository, IAdminRepository adminRepository, PermissionServices permissionServices)
         {
             _newsRepository = newsRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _adminRepository = adminRepository;
+            _permissionServices = permissionServices;
         }
 
         public async Task<ResponseNewsDTO> CreateOne(CreateNewsDTO dto, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_CREATE);
+
             var user = await _userRepository.GetOneAsync(u => u.Id == userId);
             if (user == null)
             {
@@ -75,6 +79,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseNewsDTO> UpdateOne(int newsId, UpdateNewsDTO dto, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_UPDATE);
+
             var news = await _newsRepository.GetOneAsync(n => n.Id == newsId);
             if (news == null)
             {
@@ -134,6 +140,8 @@ namespace backend_proyecto.Services
 
         public async Task<List<ResponseNewsDTO>> GetNews(int? tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_READ);
+
             var user = await _userRepository.GetOneAsync(u => u.Id == userId);
             if (user == null)
             {
@@ -188,6 +196,8 @@ namespace backend_proyecto.Services
 
         public async Task<int> GetUnreadCount(int? tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_READ);
+
             var user = await _userRepository.GetOneAsync(u => u.Id == userId);
             if (user == null)
             {
@@ -230,6 +240,8 @@ namespace backend_proyecto.Services
 
         public async Task MarkAsRead(int NewsId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_READ);
+
             var News = await _newsRepository.GetOneAsync(n => n.Id == NewsId);
             if (News == null)
             {
@@ -253,6 +265,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int newsId, int tenantId, int userId)
         {
+            await _permissionServices.CheckPermission(Permissions.NEWS_DELETE);
+
             var news = await _newsRepository.GetOneAsync(n => n.Id == newsId);
             if (news == null)
             {

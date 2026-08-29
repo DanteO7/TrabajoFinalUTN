@@ -21,7 +21,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<Group>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -42,53 +42,31 @@ namespace backend_proyecto.Controllers
             }
         }
 
-        [HttpPost]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(Group), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Group>> CreateOne([FromBody] CreateGroupDTO dto)
-        {
-            try
-            {
-                var group = await _groupServices.CreateGroup(dto.Name, dto.TenantId);
-                return Created("Group created", group);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpPost("{groupId}/users/{userId}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> AssignUser(int groupId, int userId)
-        {
-            try
-            {
-                await _groupServices.AssignUserToGroup(userId, groupId);
-                return Ok("User assigned to group");
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
+        //[HttpPost("{groupId}/users/{userId}")]
+        //[Authorize]
+        //[ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        //public async Task<ActionResult> AssignUser(int groupId, int userId)
+        //{
+        //    try
+        //    {
+        //        await _groupServices.AssignUserToGroupIfNotExists(userId, groupId);
+        //        return Ok("User assigned to group");
+        //    }
+        //    catch (HttpResponseError ex)
+        //    {
+        //        return StatusCode((int)ex.StatusCode, ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
         [HttpDelete("{groupId}/users/{userId}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -110,7 +88,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost("{groupId}/permissions")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -133,7 +111,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{groupId}/permissions/{permissionName}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]

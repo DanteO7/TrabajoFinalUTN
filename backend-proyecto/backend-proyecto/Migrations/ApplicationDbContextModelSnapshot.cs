@@ -58,6 +58,34 @@ namespace backend_proyecto.Migrations
                     b.ToTable("EmailVerifications");
                 });
 
+            modelBuilder.Entity("Exercise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Exercises");
+                });
+
             modelBuilder.Entity("Group", b =>
                 {
                     b.Property<int>("Id")
@@ -130,248 +158,333 @@ namespace backend_proyecto.Migrations
                         new
                         {
                             Id = 3,
-                            Name = "USER_READ"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "USER_CREATE"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "USER_UPDATE"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "USER_DELETE"
-                        },
-                        new
-                        {
-                            Id = 7,
                             Name = "STUDENT_READ"
                         },
                         new
                         {
-                            Id = 8,
+                            Id = 4,
                             Name = "STUDENT_CREATE"
                         },
                         new
                         {
-                            Id = 9,
+                            Id = 5,
                             Name = "STUDENT_UPDATE"
                         },
                         new
                         {
-                            Id = 10,
+                            Id = 6,
                             Name = "STUDENT_DELETE"
                         },
                         new
                         {
-                            Id = 11,
+                            Id = 8,
                             Name = "PROFESSOR_READ"
                         },
                         new
                         {
-                            Id = 12,
+                            Id = 9,
                             Name = "PROFESSOR_CREATE"
                         },
                         new
                         {
-                            Id = 13,
+                            Id = 10,
                             Name = "PROFESSOR_UPDATE"
                         },
                         new
                         {
-                            Id = 14,
+                            Id = 11,
                             Name = "PROFESSOR_DELETE"
                         },
                         new
                         {
-                            Id = 15,
+                            Id = 12,
                             Name = "PROFESSOR_ASSIGN_SPECIALITY"
                         },
                         new
                         {
-                            Id = 16,
+                            Id = 13,
                             Name = "PROFESSOR_REMOVE_SPECIALITY"
                         },
                         new
                         {
-                            Id = 17,
+                            Id = 15,
                             Name = "ACTIVITY_READ"
                         },
                         new
                         {
-                            Id = 18,
+                            Id = 16,
                             Name = "ACTIVITY_CREATE"
                         },
                         new
                         {
-                            Id = 19,
+                            Id = 17,
                             Name = "ACTIVITY_UPDATE"
                         },
                         new
                         {
-                            Id = 20,
+                            Id = 18,
                             Name = "ACTIVITY_DELETE"
                         },
                         new
                         {
-                            Id = 21,
+                            Id = 19,
                             Name = "SPECIALITY_READ"
                         },
                         new
                         {
-                            Id = 22,
+                            Id = 20,
                             Name = "SPECIALITY_CREATE"
                         },
                         new
                         {
-                            Id = 23,
+                            Id = 21,
                             Name = "SPECIALITY_UPDATE"
                         },
                         new
                         {
-                            Id = 24,
+                            Id = 22,
                             Name = "SPECIALITY_DELETE"
                         },
                         new
                         {
-                            Id = 25,
+                            Id = 23,
                             Name = "CLASS_READ"
                         },
                         new
                         {
-                            Id = 26,
+                            Id = 24,
                             Name = "CLASS_CREATE"
                         },
                         new
                         {
-                            Id = 27,
+                            Id = 25,
                             Name = "CLASS_UPDATE"
                         },
                         new
                         {
-                            Id = 28,
+                            Id = 26,
                             Name = "CLASS_DELETE"
                         },
                         new
                         {
-                            Id = 29,
+                            Id = 27,
                             Name = "RESERVATION_READ"
                         },
                         new
                         {
-                            Id = 30,
+                            Id = 28,
                             Name = "RESERVATION_CREATE"
                         },
                         new
                         {
-                            Id = 31,
+                            Id = 29,
                             Name = "RESERVATION_DELETE"
                         },
                         new
                         {
-                            Id = 32,
+                            Id = 30,
                             Name = "RESERVATION_CHANGE_STATUS"
                         },
                         new
                         {
-                            Id = 33,
+                            Id = 31,
                             Name = "PAYMENT_READ"
                         },
                         new
                         {
-                            Id = 34,
+                            Id = 32,
                             Name = "PAYMENT_CREATE"
                         },
                         new
                         {
-                            Id = 35,
+                            Id = 33,
                             Name = "PAYMENT_UPDATE"
                         },
                         new
                         {
-                            Id = 36,
+                            Id = 34,
                             Name = "PAYMENT_DELETE"
                         },
                         new
                         {
-                            Id = 37,
+                            Id = 35,
                             Name = "STUDENT_PLAN_READ"
                         },
                         new
                         {
-                            Id = 38,
+                            Id = 36,
                             Name = "STUDENT_PLAN_CREATE"
                         },
                         new
                         {
-                            Id = 39,
+                            Id = 37,
                             Name = "STUDENT_PLAN_UPDATE"
                         },
                         new
                         {
-                            Id = 40,
+                            Id = 38,
                             Name = "STUDENT_PLAN_DELETE"
                         },
                         new
                         {
+                            Id = 39,
+                            Name = "NEWS_READ"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Name = "NEWS_CREATE"
+                        },
+                        new
+                        {
                             Id = 41,
-                            Name = "TENANT_PLAN_READ"
+                            Name = "NEWS_UPDATE"
                         },
                         new
                         {
                             Id = 42,
-                            Name = "TENANT_PLAN_CREATE"
+                            Name = "NEWS_DELETE"
                         },
                         new
                         {
                             Id = 43,
-                            Name = "TENANT_PLAN_UPDATE"
+                            Name = "WAITLIST_READ"
                         },
                         new
                         {
                             Id = 44,
-                            Name = "TENANT_PLAN_DELETE"
+                            Name = "WAITLIST_CREATE"
                         },
                         new
                         {
                             Id = 45,
-                            Name = "GROUP_READ"
+                            Name = "WAITLIST_DELETE"
                         },
                         new
                         {
                             Id = 46,
-                            Name = "GROUP_CREATE"
+                            Name = "GROUP_READ"
                         },
                         new
                         {
                             Id = 47,
-                            Name = "GROUP_UPDATE"
+                            Name = "EXERCISE_READ"
                         },
                         new
                         {
                             Id = 48,
-                            Name = "GROUP_DELETE"
+                            Name = "EXERCISE_CREATE"
                         },
                         new
                         {
                             Id = 49,
-                            Name = "GROUP_ASSIGN_USER"
+                            Name = "EXERCISE_UPDATE"
                         },
                         new
                         {
                             Id = 50,
-                            Name = "GROUP_REMOVE_USER"
+                            Name = "EXERCISE_DELETE"
                         },
                         new
                         {
                             Id = 51,
-                            Name = "GROUP_ASSIGN_PERMISSION"
+                            Name = "ROUTINE_READ"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Name = "ROUTINE_CREATE"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            Name = "ROUTINE_UPDATE"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            Name = "ROUTINE_DELETE"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            Name = "INVITATION_READ"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            Name = "INVITATION_CREATE"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            Name = "INVITATION_DELETE"
                         });
+                });
+
+            modelBuilder.Entity("Routine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Routines");
+                });
+
+            modelBuilder.Entity("RoutineExercise", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Repetitions")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoutineId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Sets")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("Weight")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("RoutineId", "Order")
+                        .IsUnique();
+
+                    b.ToTable("RoutineExercise");
                 });
 
             modelBuilder.Entity("UserGroup", b =>
@@ -678,6 +791,24 @@ namespace backend_proyecto.Migrations
                     b.ToTable("Professors");
                 });
 
+            modelBuilder.Entity("backend_proyecto.Models.ProfessorPermission", b =>
+                {
+                    b.Property<int>("ProfessorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsAllowed")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("ProfessorId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("ProfessorPermissions");
+                });
+
             modelBuilder.Entity("backend_proyecto.Models.ProfessorSpeciality", b =>
                 {
                     b.Property<int>("ProfessorId")
@@ -958,6 +1089,17 @@ namespace backend_proyecto.Migrations
                     b.ToTable("Waitlists");
                 });
 
+            modelBuilder.Entity("Exercise", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("Group", b =>
                 {
                     b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
@@ -986,6 +1128,36 @@ namespace backend_proyecto.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Permission");
+                });
+
+            modelBuilder.Entity("Routine", b =>
+                {
+                    b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("RoutineExercise", b =>
+                {
+                    b.HasOne("Exercise", "Exercise")
+                        .WithMany("RoutineExercises")
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Routine", "Routine")
+                        .WithMany("RoutineExercises")
+                        .HasForeignKey("RoutineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("Routine");
                 });
 
             modelBuilder.Entity("UserGroup", b =>
@@ -1141,6 +1313,25 @@ namespace backend_proyecto.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("backend_proyecto.Models.ProfessorPermission", b =>
+                {
+                    b.HasOne("Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend_proyecto.Models.Professor", "Professor")
+                        .WithMany("ProfessorPermissions")
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Professor");
+                });
+
             modelBuilder.Entity("backend_proyecto.Models.ProfessorSpeciality", b =>
                 {
                     b.HasOne("backend_proyecto.Models.Professor", "Professor")
@@ -1274,6 +1465,11 @@ namespace backend_proyecto.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Exercise", b =>
+                {
+                    b.Navigation("RoutineExercises");
+                });
+
             modelBuilder.Entity("Group", b =>
                 {
                     b.Navigation("GroupPermissions");
@@ -1284,6 +1480,11 @@ namespace backend_proyecto.Migrations
             modelBuilder.Entity("Permission", b =>
                 {
                     b.Navigation("GroupPermissions");
+                });
+
+            modelBuilder.Entity("Routine", b =>
+                {
+                    b.Navigation("RoutineExercises");
                 });
 
             modelBuilder.Entity("backend_proyecto.Models.Class", b =>
@@ -1300,6 +1501,8 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Professor", b =>
                 {
+                    b.Navigation("ProfessorPermissions");
+
                     b.Navigation("ProfessorSpecialities");
                 });
 

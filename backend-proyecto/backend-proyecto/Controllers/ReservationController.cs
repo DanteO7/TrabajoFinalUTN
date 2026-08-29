@@ -44,7 +44,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -66,7 +66,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("class/{classId}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -88,7 +88,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("class/{classId}/student/{studentId}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.PROFESSOR}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseReservationDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -110,7 +110,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("student/{studentId}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -132,7 +132,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.STUDENT}, {Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]

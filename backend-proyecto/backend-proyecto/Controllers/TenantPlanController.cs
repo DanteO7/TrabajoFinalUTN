@@ -37,7 +37,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseTenantPlanDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -45,7 +45,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var tenantPlan = await _tenantPlanServices.CreateOne(createTenantPlanDTO);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var tenantPlan = await _tenantPlanServices.CreateOne(createTenantPlanDTO, userId);
                 return Created("Created", tenantPlan);
             }
             catch (HttpResponseError ex)
@@ -59,7 +60,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -67,7 +68,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                await _tenantPlanServices.DeleteOne(id);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                await _tenantPlanServices.DeleteOne(id, userId);
                 return Ok("Tenant Plan Successfully Deleted");
             }
             catch (HttpResponseError ex)
@@ -81,7 +83,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseTenantPlanDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -90,7 +92,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var tenantPlan = await _tenantPlanServices.UpdateOne(id, updateTenantPlan);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var tenantPlan = await _tenantPlanServices.UpdateOne(id, updateTenantPlan, userId);
                 return Ok(tenantPlan);
             }
             catch (HttpResponseError ex)

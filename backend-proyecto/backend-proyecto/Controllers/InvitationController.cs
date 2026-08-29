@@ -22,7 +22,7 @@ namespace backend_proyecto.Controllers
         // POST /api/invitation
         // El tenant crea una invitación y obtiene el link
         [HttpPost]
-        [Authorize(Roles = Roles.TENANT)]
+        [Authorize]
         public async Task<ActionResult<ResponseInvitationDTO>> CreateInvitation([FromBody] CreateInvitationDTO dto)
         {
             try
@@ -87,7 +87,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = Roles.TENANT)]
+        [Authorize]
         public async Task<ActionResult> DeleteInvitation(int id)
         {
             try
@@ -106,7 +106,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("tenant/{tenantId}/{role}")]
-        [Authorize(Roles = Roles.TENANT)]
+        [Authorize]
         public async Task<ActionResult<ResponseInvitationDTO>> GetInvitationByTenant(int tenantId, string role)
         {
             try

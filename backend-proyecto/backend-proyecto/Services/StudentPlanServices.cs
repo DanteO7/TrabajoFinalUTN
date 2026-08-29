@@ -13,17 +13,21 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
         private readonly IStudentRepository _studentRepository;
+        private readonly PermissionServices _permissionServices;
 
-        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository )
+        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository, PermissionServices permissionServices)
         {
             _studentPlanRepository = studentPlanRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
             _studentRepository = studentRepository;
+            _permissionServices = permissionServices;
         }
 
         public async Task<List<ResponseStudentPlanDTO>> GetAllByTenantId(int tenantId)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -41,6 +45,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseStudentPlanDTO> CreateOne(CreateStudentPlanDTO createStudentPlanDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_CREATE);
+
             var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createStudentPlanDTO.TenantId);
             if(tenant == null)
             {
@@ -66,6 +72,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_DELETE);
+
             var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == id);
             if(studentPlan == null)
             {
@@ -84,6 +92,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseStudentPlanDTO> UpdateOne(int id, UpdateStudentPlanDTO updateStudentPlanDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_UPDATE);
+
             var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == id);
             if(studentPlan == null)
             {

@@ -39,6 +39,8 @@ const Users = lazy(() => import("./pages/users"));
 const Reservations = lazy(() => import("./pages/tenant/reservations"));
 const TenantPlans = lazy(() => import("./pages/tenant-plans"));
 const News = lazy(() => import("./pages/tenant/news"));
+const Exercises = lazy(() => import("./pages/tenant/exercises"));
+const Routines = lazy(() => import("./pages/tenant/routines"));
 
 const queryClient = new QueryClient();
 
@@ -179,6 +181,14 @@ export default function App() {
 
             <ProtectedRoute path="/tu-espacio/:id/novedades">
               {(params) => <News tenantId={params.id} />}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/ejercicios">
+              {(params) => <Exercises tenantId={params.id} />}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/rutinas">
+              {(params) => <Routines tenantId={params.id} />}
             </ProtectedRoute>
 
             <ProtectedRoute path="/invitacion/:token">

@@ -12,12 +12,14 @@ namespace backend_proyecto.Services
         private readonly ITenantPlanRepository _tenantPlanRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
+        private readonly IAdminRepository _adminRepository;
 
-        public TenantPlanServices(ITenantPlanRepository tenantPlanRepository, IMapper mapper, ITenantRepository tenantRepository)
+        public TenantPlanServices(ITenantPlanRepository tenantPlanRepository, IMapper mapper, ITenantRepository tenantRepository, IAdminRepository adminRepository)
         {
             _tenantPlanRepository = tenantPlanRepository;
             _mapper = mapper;
             _tenantRepository = tenantRepository;
+            _adminRepository = adminRepository;
         }
 
         public async Task<List<ResponseTenantPlanDTO>> GetAll()
@@ -26,9 +28,19 @@ namespace backend_proyecto.Services
             return _mapper.Map<List<ResponseTenantPlanDTO>>(tenantPlans);
         }
 
-        public async Task<ResponseTenantPlanDTO> CreateOne(CreateTenantPlanDTO createTenantPlanDTO)
+        public async Task<ResponseTenantPlanDTO> CreateOne(CreateTenantPlanDTO createTenantPlanDTO, int userId)
         {
-            if(createTenantPlanDTO.Name != null && createTenantPlanDTO.Name.Length > 50)
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede crear un plan de negocio"
+                );
+            }
+
+            if (createTenantPlanDTO.Name != null && createTenantPlanDTO.Name.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre del plan no puede ser nulo o tener mas de 50 caracteres");
             }
@@ -49,8 +61,17 @@ namespace backend_proyecto.Services
             return _mapper.Map<ResponseTenantPlanDTO>(tenantPlan);
         }
 
-        public async Task DeleteOne(int id)
+        public async Task DeleteOne(int id, int userId)
         {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede eliminar un plan de negocio"
+                );
+            }
             var tenantPlan = await _tenantPlanRepository.GetOneAsync(p => p.Id == id);
             if(tenantPlan == null)
             {
@@ -67,8 +88,18 @@ namespace backend_proyecto.Services
             await _tenantPlanRepository.DeleteOneAsync(tenantPlan);
         }
 
-        public async Task<ResponseTenantPlanDTO> UpdateOne(int id, UpdateTenantPlanDTO updateTenantPlan)
+        public async Task<ResponseTenantPlanDTO> UpdateOne(int id, UpdateTenantPlanDTO updateTenantPlan, int userId)
         {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede actualizar un plan de negocio"
+                );
+            }
+
             var tenantPlan = await _tenantPlanRepository.GetOneAsync(p => p.Id == id);
             if (tenantPlan == null)
             {

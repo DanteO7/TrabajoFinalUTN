@@ -4,12 +4,6 @@
     public const string TENANT_READ = "TENANT_READ";
     public const string TENANT_UPDATE = "TENANT_UPDATE";
 
-    // USERS
-    public const string USER_READ = "USER_READ";
-    public const string USER_CREATE = "USER_CREATE";
-    public const string USER_UPDATE = "USER_UPDATE";
-    public const string USER_DELETE = "USER_DELETE";
-
     // STUDENTS
     public const string STUDENT_READ = "STUDENT_READ";
     public const string STUDENT_CREATE = "STUDENT_CREATE";
@@ -54,24 +48,40 @@
     public const string PAYMENT_UPDATE = "PAYMENT_UPDATE";
     public const string PAYMENT_DELETE = "PAYMENT_DELETE";
 
-    // STUDENT PLAN
+    // STUDENT PLANS
     public const string STUDENT_PLAN_READ = "STUDENT_PLAN_READ";
     public const string STUDENT_PLAN_CREATE = "STUDENT_PLAN_CREATE";
     public const string STUDENT_PLAN_UPDATE = "STUDENT_PLAN_UPDATE";
     public const string STUDENT_PLAN_DELETE = "STUDENT_PLAN_DELETE";
 
-    // TENANT PLAN
-    public const string TENANT_PLAN_READ = "TENANT_PLAN_READ";
-    public const string TENANT_PLAN_CREATE = "TENANT_PLAN_CREATE";
-    public const string TENANT_PLAN_UPDATE = "TENANT_PLAN_UPDATE";
-    public const string TENANT_PLAN_DELETE = "TENANT_PLAN_DELETE";
+    // NEWS
+    public const string NEWS_READ = "NEWS_READ";
+    public const string NEWS_CREATE = "NEWS_CREATE";
+    public const string NEWS_UPDATE = "NEWS_UPDATE";
+    public const string NEWS_DELETE = "NEWS_DELETE";
+
+    // WAITLIST
+    public const string WAITLIST_READ = "WAITLIST_READ";
+    public const string WAITLIST_CREATE = "WAITLIST_CREATE";
+    public const string WAITLIST_DELETE = "WAITLIST_DELETE";
 
     // GROUPS
     public const string GROUP_READ = "GROUP_READ";
-    public const string GROUP_CREATE = "GROUP_CREATE";
-    public const string GROUP_UPDATE = "GROUP_UPDATE";
-    public const string GROUP_DELETE = "GROUP_DELETE";
-    public const string GROUP_ASSIGN_USER = "GROUP_ASSIGN_USER";
-    public const string GROUP_REMOVE_USER = "GROUP_REMOVE_USER";
-    public const string GROUP_ASSIGN_PERMISSION = "GROUP_ASSIGN_PERMISSION";
+
+    // EXERCISES
+    public const string EXERCISE_READ = "EXERCISE_READ";
+    public const string EXERCISE_CREATE = "EXERCISE_CREATE";
+    public const string EXERCISE_UPDATE = "EXERCISE_UPDATE";
+    public const string EXERCISE_DELETE = "EXERCISE_DELETE";
+
+    // ROUTINES
+    public const string ROUTINE_READ = "ROUTINE_READ";
+    public const string ROUTINE_CREATE = "ROUTINE_CREATE";
+    public const string ROUTINE_UPDATE = "ROUTINE_UPDATE";
+    public const string ROUTINE_DELETE = "ROUTINE_DELETE";
+    
+    // INVITATIONS
+    public const string INVITATION_READ = "INVITATION_READ";
+    public const string INVITATION_CREATE = "INVITATION_CREATE";
+    public const string INVITATION_DELETE = "INVITATION_DELETE";
 }

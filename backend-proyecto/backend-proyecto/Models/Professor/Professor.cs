@@ -9,5 +9,6 @@
         public Tenant Tenant { get; set; } = null!;
         public bool IsActive { get; set; }
         public ICollection<ProfessorSpeciality> ProfessorSpecialities { get; set; } = new List<ProfessorSpeciality>();
+        public ICollection<ProfessorPermission> ProfessorPermissions { get; set; } = new List<ProfessorPermission>();
     }
 }

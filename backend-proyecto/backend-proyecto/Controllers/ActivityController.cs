@@ -19,7 +19,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpGet("{tenantId}")]
-        [Authorize(Roles = $"{Roles.PROFESSOR}, {Roles.TENANT}, {Roles.ADMIN}, {Roles.STUDENT}")]
+        [Authorize]
         [ProducesResponseType(typeof(List<ResponseActivityDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -42,7 +42,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = $"{Roles.ADMIN}, {Roles.TENANT}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseActivityDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -52,7 +52,7 @@ namespace backend_proyecto.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var activity = await _activityServices.CreateOne(createActivityDTO, userId);
+                var activity = await _activityServices.CreateOne(createActivityDTO);
                 return Created("Activity created", activity);
             }
             catch (HttpResponseError ex)
@@ -66,7 +66,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
@@ -88,7 +88,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = $"{Roles.TENANT}, {Roles.ADMIN}")]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseActivityDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]

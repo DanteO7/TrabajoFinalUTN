@@ -19,8 +19,10 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IProfessorRepository _professorRepository; 
         private readonly IReservationRepository _reservationRepository;
+        private readonly PermissionServices _permissionServices;
+        private readonly GroupServices _groupServices;
 
-        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper, IProfessorRepository professorRepository, IReservationRepository reservationRepository)
+        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper, IProfessorRepository professorRepository, IReservationRepository reservationRepository, PermissionServices permissionServices, GroupServices groupServices)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
@@ -29,6 +31,8 @@ namespace backend_proyecto.Services
             _mapper = mapper;
             _professorRepository = professorRepository;
             _reservationRepository = reservationRepository;
+            _permissionServices = permissionServices;
+            _groupServices = groupServices;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -76,16 +80,24 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError( HttpStatusCode.BadRequest,$"El usuario ya es el administrador de este negocio.");
             }
 
-
             var student = _mapper.Map<Student>(assignStudentDTO);
             student.MonthlyFeeStatus = MonthlyFeeStatus.PENDING;
 
             await _studentRepository.CreateOneAsync(student);
+
+            await _groupServices.AssignUserToGroupIfNotExists(
+                assignStudentDTO.UserId,
+                assignStudentDTO.TenantId,
+                "STUDENT"
+            );
+
             return _mapper.Map<ResponseStudentDTO>(student);
         }
 
         public async Task<List<ResponseStudentDTO>> GetAll(int? tenantId, int? classId, int userId, string? search)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_READ);
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,
@@ -146,6 +158,8 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseStudentDTO> GetOneById(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_READ);
+
             var student = await _studentRepository.GetOneAsync(s => s.Id == id, s => s.StudentPlan, s => s.User);
             if (student == null)
             {
@@ -156,6 +170,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_DELETE);
+
             var student = await _studentRepository.GetOneAsync(s => s.Id == id);
             if (student == null)
             {
@@ -165,6 +181,8 @@ namespace backend_proyecto.Services
         }
         public async Task<ResponseStudentDTO> UpdateOne(int id, UpdateStudentDTO updateStudentDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_UPDATE);
+
             var studentPlanId = updateStudentDTO.StudentPlanId;
             var status = updateStudentDTO.MonthlyFeeStatus;
 
