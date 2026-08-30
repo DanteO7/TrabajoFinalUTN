@@ -1,6 +1,8 @@
 import { X, Trash2, Plus } from "lucide-react";
-
 import { useState } from "react";
+
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -10,30 +12,45 @@ import SuccessModal from "../modals/success-modal";
 
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import RedButton from "../buttons/red-button";
 
 import { getExercises } from "../../services/exercise";
 import { createRoutine } from "../../services/routine";
+import { createRoutineSchema } from "../../schema/routine-schema";
+import FormInput from "../form-input";
+import AddExerciseModal from "./add-exercise-modal";
 
 export default function RoutineForm({ tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
-
-  const [sets, setSets] = useState(3);
-  const [repetitions, setRepetitions] = useState(10);
-  const [weight, setWeight] = useState("");
-  const [order, setOrder] = useState(1);
-
-  const [routineExercises, setRoutineExercises] = useState([]);
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
+
+  const [openAddExerciseModal, setOpenAddExerciseModal] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(createRoutineSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      exercises: [],
+    },
+    mode: "onTouched",
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "exercises",
+  });
 
   const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["getExercises", tenantId],
@@ -76,7 +93,7 @@ export default function RoutineForm({ tenantId, close }) {
     },
   });
 
-  const addExercise = () => {
+  const handleAddExercise = () => {
     if (!selectedExerciseId) {
       setBackendError("Seleccioná un ejercicio");
       setErrorModal(true);
@@ -87,61 +104,41 @@ export default function RoutineForm({ tenantId, close }) {
 
     if (!exercise) return;
 
-    if (routineExercises.some((e) => e.exerciseId === exercise.id)) {
-      setBackendError("Ese ejercicio ya fue agregado a la rutina");
-      setErrorModal(true);
-      return;
-    }
+    const nextOrder =
+      fields.length > 0
+        ? Math.max(...fields.map((e) => Number(e.order))) + 1
+        : 1;
 
-    if (routineExercises.some((e) => e.order === Number(order))) {
-      setBackendError("Ya existe un ejercicio con ese orden");
-      setErrorModal(true);
-      return;
-    }
-
-    setRoutineExercises((prev) => [
-      ...prev,
-      {
-        exerciseId: exercise.id,
-        exercise: exercise,
-        sets: Number(sets),
-        repetitions: Number(repetitions),
-        weight: weight === "" ? null : Number(weight),
-        order: Number(order),
-      },
-    ]);
+    append({
+      exerciseId: String(exercise.id),
+      exercise: exercise,
+      sets: 3,
+      repetitions: 10,
+      weight: "",
+      order: nextOrder,
+    });
 
     setSelectedExerciseId("");
-    setSets(3);
-    setRepetitions(10);
-    setWeight("");
-
-    setOrder((prev) => Number(prev) + 1);
   };
 
-  const removeExercise = (exerciseId) => {
-    setRoutineExercises((prev) =>
-      prev.filter((e) => e.exerciseId !== exerciseId),
-    );
+  const handleRemoveExercise = (index) => {
+    remove(index);
   };
 
-  const onSubmit = () => {
-    if (!name.trim()) {
-      setBackendError("El nombre de la rutina es obligatorio");
-      setErrorModal(true);
-      return;
-    }
-
+  const onSubmit = (data) => {
     mutation.mutate({
-      name: name.trim(),
-      description: description || null,
+      name: data.name.trim(),
+      description: data.description?.trim() || null,
 
-      exercises: routineExercises.map((exercise) => ({
-        exerciseId: exercise.exerciseId,
-        sets: exercise.sets,
-        repetitions: exercise.repetitions,
-        weight: exercise.weight,
-        order: exercise.order,
+      exercises: data.exercises.map((exercise) => ({
+        exerciseId: Number(exercise.exerciseId),
+        sets: Number(exercise.sets),
+        repetitions: Number(exercise.repetitions),
+        weight:
+          exercise.weight === "" || exercise.weight === undefined
+            ? null
+            : Number(exercise.weight),
+        order: Number(exercise.order),
       })),
     });
   };
@@ -155,195 +152,144 @@ export default function RoutineForm({ tenantId, close }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-6 text-center">
-        Crear una rutina
-      </h2>
+      <form onSubmit={handleSubmit(onSubmit)} className=" space-y-6">
+        <h2 className="text-2xl font-semibold text-center">Crear una rutina</h2>
 
-      <div className="flex flex-col gap-5 max-h-[75vh] overflow-y-auto pr-1">
-        <div>
-          <label className="block text-sm font-semibold mb-2">Nombre</label>
-
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ej: Rutina de fuerza"
-            maxLength={50}
-            className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
-          />
-        </div>
+        <FormInput
+          label="Nombre de la rutina"
+          id="name"
+          placeholder="Ej: Rutina de pecho"
+          register={register("name")}
+          error={errors.name}
+        />
 
         <div>
-          <label className="block text-sm font-semibold mb-2">
+          <label htmlFor="description" className="block mb-2">
             Descripción (opcional)
           </label>
-
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            maxLength={300}
+            id="description"
+            rows={4}
             placeholder="Descripción de la rutina..."
-            className="w-full rounded-xl px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
+            {...register("description")}
+            className="w-full rounded-[13px] px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
           />
-        </div>
 
-        <div className="border-t pt-5">
-          <h3 className="font-semibold text-lg mb-4">Agregar ejercicios</h3>
-
-          <div className="flex flex-col gap-3">
-            <div>
-              <label className="block text-sm font-semibold mb-2">
-                Ejercicio
-              </label>
-
-              <select
-                value={selectedExerciseId}
-                onChange={(e) => setSelectedExerciseId(e.target.value)}
-                disabled={exercisesLoading}
-                className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
-              >
-                <option value="">
-                  {exercisesLoading
-                    ? "Cargando ejercicios..."
-                    : "Seleccionar ejercicio"}
-                </option>
-
-                {exercises
-                  .filter(
-                    (exercise) =>
-                      !routineExercises.some(
-                        (re) => re.exerciseId === exercise.id,
-                      ),
-                  )
-                  .map((exercise) => (
-                    <option key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Series
-                </label>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={sets}
-                  onChange={(e) => setSets(e.target.value)}
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Repeticiones
-                </label>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={repetitions}
-                  onChange={(e) => setRepetitions(e.target.value)}
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">Peso</label>
-
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="Opcional"
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Orden
-                </label>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={order}
-                  onChange={(e) => setOrder(e.target.value)}
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-              </div>
-            </div>
-
-            <BlackButton
-              text="Agregar ejercicio"
-              onClick={addExercise}
-              textSmall={true}
-              img={<Plus size={18} />}
-              disabled={!selectedExerciseId}
-            />
-          </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-lg mb-3">
-            Ejercicios de la rutina
-          </h3>
-
-          {routineExercises.length === 0 ? (
-            <div className="border rounded-xl p-5 text-center text-gray-500">
-              Todavía no agregaste ejercicios.
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {[...routineExercises]
-                .sort((a, b) => a.order - b.order)
-                .map((exercise) => (
-                  <div
-                    key={exercise.exerciseId}
-                    className="border rounded-xl p-4 flex items-center justify-between gap-4"
-                  >
-                    <div className="min-w-0">
-                      <h4 className="font-semibold">
-                        {exercise.order}. {exercise.exercise.name}
-                      </h4>
-
-                      <p className="text-sm text-gray-500 mt-1">
-                        {exercise.sets} series × {exercise.repetitions} reps
-                        {exercise.weight !== null && ` · ${exercise.weight} kg`}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => removeExercise(exercise.exerciseId)}
-                      className="text-red-500 hover:text-red-700 cursor-pointer shrink-0"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                ))}
-            </div>
+          {errors.description && (
+            <p className="text-red-500 text-[13px] mt-1">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+        <div className="border-t pt-5">
+          <div className="flex items-center mb-3 justify-between">
+            <h3 className="font-semibold text-lg ">Ejercicios</h3>
+            <BlackButton
+              type={"button"}
+              text={"+ Agregar"}
+              textSmall={true}
+              wfit={true}
+              onClick={() => setOpenAddExerciseModal(true)}
+            />
+          </div>
+          {fields.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {fields
+                .map((field, index) => ({ ...field, originalIndex: index }))
+                .sort((a, b) => Number(a.order) - Number(b.order))
+                .map((exercise) => {
+                  const index = exercise.originalIndex;
+
+                  return (
+                    <div key={exercise.id} className="border rounded-xl p-4">
+                      <div className="flex justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">
+                              {exercise.order}. {exercise.exercise?.name}
+                            </h4>
+                            <RedButton
+                              text=""
+                              onClick={() => handleRemoveExercise(index)}
+                              img={<Trash2 size={18} />}
+                              wfit={true}
+                              textSmall={true}
+                            />
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 mt-3">
+                            <FormInput
+                              label="Series"
+                              id={`sets-${exercise.id}`}
+                              type="number"
+                              register={register(`exercises.${index}.sets`)}
+                              error={errors.exercises?.[index]?.sets}
+                            />
+
+                            <FormInput
+                              label="Reps"
+                              id={`repetitions-${exercise.id}`}
+                              type="number"
+                              register={register(
+                                `exercises.${index}.repetitions`,
+                              )}
+                              error={errors.exercises?.[index]?.repetitions}
+                            />
+
+                            <FormInput
+                              label="Peso"
+                              id={`weight-${exercise.id}`}
+                              type="number"
+                              placeholder="Opcional"
+                              register={register(`exercises.${index}.weight`)}
+                              error={errors.exercises?.[index]?.weight}
+                            />
+                          </div>
+
+                          <div className="mt-2 flex">
+                            <FormInput
+                              label="Orden"
+                              id={`order-${exercise.id}`}
+                              type="number"
+                              register={register(`exercises.${index}.order`)}
+                              error={errors.exercises?.[index]?.order}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          ) : (
+            <div className="border rounded-xl p-5 text-center text-gray-500">
+              Todavía no agregaste ejercicios.
+            </div>
+          )}
+
+          {errors.exercises?.message && (
+            <p className="text-red-500 text-[13px] mt-2">
+              {errors.exercises.message}
+            </p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <WhiteButton
+            text="Cancelar"
+            onClick={close}
+            textSmall={true}
+            type="button"
+          />
 
           <BlackButton
             text={mutation.isPending ? "Creando..." : "Crear rutina"}
-            onClick={onSubmit}
+            type="submit"
             disabled={mutation.isPending}
             textSmall={true}
           />
         </div>
-      </div>
+      </form>
 
       {errorModal && (
         <ErrorModal
@@ -358,6 +304,17 @@ export default function RoutineForm({ tenantId, close }) {
           close={() => setSuccessModal(false)}
           message={successMessage}
           isSuccesOrError={true}
+        />
+      )}
+
+      {openAddExerciseModal && (
+        <AddExerciseModal
+          close={() => setOpenAddExerciseModal(false)}
+          selectedExerciseId={selectedExerciseId}
+          setSelectedExerciseId={setSelectedExerciseId}
+          exercisesLoading={exercisesLoading}
+          exercises={exercises}
+          handleAddExercise={handleAddExercise}
         />
       )}
     </Modal>

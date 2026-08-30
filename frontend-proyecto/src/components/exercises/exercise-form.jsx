@@ -16,7 +16,7 @@ import { createExercise } from "../../services/exercise";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createActivitySchema } from "../../schema/activity-schema";
+import { createExerciseSchema } from "../../schema/exercise-schema";
 
 export default function ExerciseForm({ tenantId, close }) {
   const queryClient = useQueryClient();
@@ -26,7 +26,7 @@ export default function ExerciseForm({ tenantId, close }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createActivitySchema),
+    resolver: zodResolver(createExerciseSchema),
     defaultValues: {
       name: "",
       description: "",

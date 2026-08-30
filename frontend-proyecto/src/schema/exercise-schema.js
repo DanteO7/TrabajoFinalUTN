@@ -20,9 +20,7 @@ export const updateExerciseSchema = z.object({
   name: z
     .string()
     .min(1, "El nombre del ejercicio es obligatorio")
-    .max(50, "El nombre del ejercicio no puede tener más de 50 caracteres")
-    .optional()
-    .or(z.literal("")),
+    .max(50, "El nombre del ejercicio no puede tener más de 50 caracteres"),
 
   description: z
     .string()

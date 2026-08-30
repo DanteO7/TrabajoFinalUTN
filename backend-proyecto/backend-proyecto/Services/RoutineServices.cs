@@ -308,18 +308,6 @@ namespace backend_proyecto.Services
                     "No puede haber dos ejercicios con el mismo Order en una rutina"
                 );
             }
-
-            var duplicateExercises = exercises
-                .GroupBy(e => e.ExerciseId)
-                .Any(g => g.Count() > 1);
-
-            if (duplicateExercises)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "No se puede agregar el mismo ejercicio más de una vez a una rutina"
-                );
-            }
         }
     }
 }

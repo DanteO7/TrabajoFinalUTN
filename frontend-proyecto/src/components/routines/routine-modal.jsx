@@ -1,36 +1,31 @@
-import { X, Pencil, Trash2, Plus } from "lucide-react";
-
+import { X, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { useForm } from "react-hook-form";
-
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Modal from "../modals/modal";
 
 import { updateRoutine, deleteRoutine } from "../../services/routine";
-
 import { getExercises } from "../../services/exercise";
 
 import SuccessModal from "../modals/success-modal";
-
 import ErrorModal from "../modals/error-modal";
-
 import ConfirmModal from "../modals/confirm-modal";
 
 import { useTenantStore } from "../../store/tenant-store";
 
 import WhiteButton from "../buttons/white-button";
-
 import BlackButton from "../buttons/black-button";
-
 import RedButton from "../buttons/red-button";
 
 import FormInput from "../form-input";
 
 import { updateRoutineSchema } from "../../schema/routine-schema";
+
+import AddExerciseModal from "./add-exercise-modal";
 
 export default function RoutineModal({ routine, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -42,19 +37,9 @@ export default function RoutineModal({ routine, tenantId, close }) {
   const isTenant = userRoles?.roles?.includes("Tenant");
 
   const [editing, setEditing] = useState(false);
-
   const [currentRoutine, setCurrentRoutine] = useState(routine);
 
-  // Lista de ejercicios que se está editando localmente
-  const [routineExercises, setRoutineExercises] = useState(
-    routine.exercises || [],
-  );
-
-  // Datos del nuevo ejercicio que queremos agregar
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
-  const [sets, setSets] = useState(3);
-  const [repetitions, setRepetitions] = useState(10);
-  const [weight, setWeight] = useState("");
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -64,10 +49,13 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
   const [confirmModal, setConfirmModal] = useState(false);
 
+  const [openAddExerciseModal, setOpenAddExerciseModal] = useState(false);
+
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(updateRoutineSchema),
@@ -75,12 +63,21 @@ export default function RoutineModal({ routine, tenantId, close }) {
     defaultValues: {
       name: routine.name || "",
       description: routine.description || "",
+      exercises: (routine.exercises || []).map((exercise) => ({
+        ...exercise,
+        exerciseId: String(exercise.exerciseId),
+      })),
     },
 
     mode: "onTouched",
   });
 
-  const { data: exercises = [] } = useQuery({
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "exercises",
+  });
+
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["getExercises", tenantId],
     queryFn: () => getExercises(tenantId),
   });
@@ -114,6 +111,8 @@ export default function RoutineModal({ routine, tenantId, close }) {
         msg = Object.values(data.errors).flat().join(" - ");
       } else if (data?.message) {
         msg = data.message;
+      } else if (data?.title) {
+        msg = data.title;
       }
 
       setConfirmModal(false);
@@ -125,19 +124,24 @@ export default function RoutineModal({ routine, tenantId, close }) {
   const updateMutation = useMutation({
     mutationFn: (data) =>
       updateRoutine(currentRoutine.id, {
-        name: data.name,
-        description: data.description || null,
+        name: data.name.trim(),
 
-        exercises: routineExercises.map((exercise) => ({
-          exerciseId: exercise.exerciseId,
+        description: data.description?.trim() || null,
+
+        exercises: (data.exercises || []).map((exercise) => ({
+          exerciseId: Number(exercise.exerciseId),
+
           sets: Number(exercise.sets),
+
           repetitions: Number(exercise.repetitions),
+
           weight:
-            exercise.weight === null ||
+            exercise.weight === "" ||
             exercise.weight === undefined ||
-            exercise.weight === ""
+            exercise.weight === null
               ? null
               : Number(exercise.weight),
+
           order: Number(exercise.order),
         })),
       }),
@@ -149,11 +153,15 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
       setCurrentRoutine(updatedRoutine);
 
-      setRoutineExercises(updatedRoutine.exercises || []);
-
       reset({
         name: updatedRoutine.name || "",
+
         description: updatedRoutine.description || "",
+
+        exercises: (updatedRoutine.exercises || []).map((exercise) => ({
+          ...exercise,
+          exerciseId: String(exercise.exerciseId),
+        })),
       });
 
       setEditing(false);
@@ -177,6 +185,8 @@ export default function RoutineModal({ routine, tenantId, close }) {
         msg = Object.values(data.errors).flat().join(" - ");
       } else if (data?.message) {
         msg = data.message;
+      } else if (data?.title) {
+        msg = data.title;
       }
 
       setBackendError(msg);
@@ -184,42 +194,40 @@ export default function RoutineModal({ routine, tenantId, close }) {
     },
   });
 
-  const handleUpdate = (data) => {
-    updateMutation.mutate(data);
-  };
-
-  const handleCancelEdit = () => {
-    setEditing(false);
-
-    reset({
-      name: currentRoutine.name || "",
-      description: currentRoutine.description || "",
-    });
-
-    // Restauramos los ejercicios originales
-    setRoutineExercises(currentRoutine.exercises || []);
-
-    setSelectedExerciseId("");
-    setSets(3);
-    setRepetitions(10);
-    setWeight("");
-  };
-
   const handleStartEditing = () => {
     reset({
       name: currentRoutine.name || "",
+
       description: currentRoutine.description || "",
+
+      exercises: (currentRoutine.exercises || []).map((exercise) => ({
+        ...exercise,
+        exerciseId: String(exercise.exerciseId),
+      })),
     });
 
-    // Copiamos la lista para editarla localmente
-    setRoutineExercises(currentRoutine.exercises || []);
-
     setSelectedExerciseId("");
-    setSets(3);
-    setRepetitions(10);
-    setWeight("");
+    setOpenAddExerciseModal(false);
 
     setEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    reset({
+      name: currentRoutine.name || "",
+
+      description: currentRoutine.description || "",
+
+      exercises: (currentRoutine.exercises || []).map((exercise) => ({
+        ...exercise,
+        exerciseId: String(exercise.exerciseId),
+      })),
+    });
+
+    setSelectedExerciseId("");
+    setOpenAddExerciseModal(false);
+
+    setEditing(false);
   };
 
   const handleAddExercise = () => {
@@ -237,67 +245,35 @@ export default function RoutineModal({ routine, tenantId, close }) {
       return;
     }
 
-    const newOrder = routineExercises.length + 1;
+    const nextOrder =
+      fields.length > 0
+        ? Math.max(...fields.map((exercise) => Number(exercise.order))) + 1
+        : 1;
 
-    const newRoutineExercise = {
-      // ID temporal para React
-      id: `new-${Date.now()}`,
-
-      exerciseId: selectedExercise.id,
+    append({
+      exerciseId: String(selectedExercise.id),
 
       exercise: selectedExercise,
 
-      sets: Number(sets),
-      repetitions: Number(repetitions),
+      sets: 3,
 
-      weight: weight === "" ? null : Number(weight),
+      repetitions: 10,
 
-      order: newOrder,
-    };
+      weight: "",
 
-    setRoutineExercises((prev) => [...prev, newRoutineExercise]);
+      order: nextOrder,
+    });
 
-    // Limpiamos solamente los datos del nuevo ejercicio
     setSelectedExerciseId("");
-    setSets(3);
-    setRepetitions(10);
-    setWeight("");
+    setOpenAddExerciseModal(false);
   };
 
-  const handleRemoveExercise = (routineExerciseId) => {
-    setRoutineExercises((prev) =>
-      prev.filter((exercise) => exercise.id !== routineExerciseId),
-    );
-  };
-
-  const handleOrderChange = (routineExerciseId, newOrder) => {
-    setRoutineExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === routineExerciseId
-          ? {
-              ...exercise,
-              order: Number(newOrder),
-            }
-          : exercise,
-      ),
-    );
-  };
-
-  const handleExerciseFieldChange = (routineExerciseId, field, value) => {
-    setRoutineExercises((prev) =>
-      prev.map((exercise) =>
-        exercise.id === routineExerciseId
-          ? {
-              ...exercise,
-              [field]: value,
-            }
-          : exercise,
-      ),
-    );
+  const handleUpdate = (data) => {
+    updateMutation.mutate(data);
   };
 
   return (
-    <Modal open onClose={close}>
+    <Modal open={true} onClose={close}>
       <button
         onClick={close}
         className="absolute top-4 right-4 text-gray-500 hover:text-black transition duration-200 cursor-pointer"
@@ -362,7 +338,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
           )}
         </>
       ) : (
-        <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(handleUpdate)}
+          className="space-y-6 max-h-[80vh] overflow-y-auto pr-1"
+        >
           <h2 className="text-2xl font-semibold text-center">Editar rutina</h2>
 
           <FormInput
@@ -383,7 +362,9 @@ export default function RoutineModal({ routine, tenantId, close }) {
               rows={4}
               placeholder="Descripción de la rutina..."
               {...register("description")}
-              className="w-full rounded-[13px] px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
+              className={`w-full rounded-[13px] px-3 py-2 border ${
+                errors.description ? "border-red-500" : "border-gray-300"
+              } bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]`}
             />
 
             {errors.description && (
@@ -393,179 +374,112 @@ export default function RoutineModal({ routine, tenantId, close }) {
             )}
           </div>
 
-          {/* EJERCICIOS DE LA RUTINA */}
           <div className="border-t pt-5">
-            <h3 className="font-semibold text-lg mb-3">Ejercicios</h3>
+            <div className="flex items-center mb-3 justify-between">
+              <h3 className="font-semibold text-lg">Ejercicios</h3>
 
-            {routineExercises.length > 0 ? (
+              <BlackButton
+                type="button"
+                text="+ Agregar"
+                textSmall={true}
+                wfit={true}
+                onClick={() => setOpenAddExerciseModal(true)}
+              />
+            </div>
+
+            {fields.length > 0 ? (
               <div className="flex flex-col gap-3">
-                {[...routineExercises]
-                  .sort((a, b) => a.order - b.order)
-                  .map((exercise) => (
-                    <div key={exercise.id} className="border rounded-xl p-4">
-                      <div className="flex justify-between gap-4">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">
-                            {exercise.order}. {exercise.exercise?.name}
-                          </h4>
+                {fields
+                  .map((field, index) => ({
+                    ...field,
+                    originalIndex: index,
+                  }))
+                  .sort((a, b) => Number(a.order) - Number(b.order))
+                  .map((exercise) => {
+                    const index = exercise.originalIndex;
 
-                          <div className="grid grid-cols-3 gap-2 mt-3">
-                            <input
-                              type="number"
-                              min="1"
-                              value={exercise.sets}
-                              onChange={(e) =>
-                                handleExerciseFieldChange(
-                                  exercise.id,
-                                  "sets",
-                                  Number(e.target.value),
-                                )
-                              }
-                              className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                              placeholder="Series"
-                            />
+                    return (
+                      <div key={exercise.id} className="border rounded-xl p-4">
+                        <div className="flex justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3">
+                              <h4 className="font-semibold">
+                                {exercise.order}. {exercise.exercise?.name}
+                              </h4>
 
-                            <input
-                              type="number"
-                              min="1"
-                              value={exercise.repetitions}
-                              onChange={(e) =>
-                                handleExerciseFieldChange(
-                                  exercise.id,
-                                  "repetitions",
-                                  Number(e.target.value),
-                                )
-                              }
-                              className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                              placeholder="Reps"
-                            />
+                              <RedButton
+                                text=""
+                                type="button"
+                                onClick={() => remove(index)}
+                                img={<Trash2 size={18} />}
+                                wfit={true}
+                                textSmall={true}
+                              />
+                            </div>
 
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={exercise.weight ?? ""}
-                              onChange={(e) =>
-                                handleExerciseFieldChange(
-                                  exercise.id,
-                                  "weight",
-                                  e.target.value === ""
-                                    ? null
-                                    : Number(e.target.value),
-                                )
-                              }
-                              className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                              placeholder="Peso"
-                            />
-                          </div>
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                              <FormInput
+                                label="Series"
+                                id={`sets-${exercise.id}`}
+                                type="number"
+                                register={register(`exercises.${index}.sets`)}
+                                error={errors.exercises?.[index]?.sets}
+                              />
 
-                          <div className="mt-2">
-                            <input
-                              type="number"
-                              min="1"
-                              value={exercise.order}
-                              onChange={(e) =>
-                                handleOrderChange(exercise.id, e.target.value)
-                              }
-                              className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                              placeholder="Orden"
-                            />
+                              <FormInput
+                                label="Reps"
+                                id={`repetitions-${exercise.id}`}
+                                type="number"
+                                register={register(
+                                  `exercises.${index}.repetitions`,
+                                )}
+                                error={errors.exercises?.[index]?.repetitions}
+                              />
+
+                              <FormInput
+                                label="Peso"
+                                id={`weight-${exercise.id}`}
+                                type="number"
+                                placeholder="Opcional"
+                                register={register(`exercises.${index}.weight`)}
+                                error={errors.exercises?.[index]?.weight}
+                              />
+                            </div>
+
+                            <div className="mt-2">
+                              <FormInput
+                                label="Orden"
+                                id={`order-${exercise.id}`}
+                                type="number"
+                                register={register(`exercises.${index}.order`)}
+                                error={errors.exercises?.[index]?.order}
+                              />
+                            </div>
                           </div>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveExercise(exercise.id)}
-                          className="text-red-500 hover:text-red-700 cursor-pointer shrink-0"
-                        >
-                          <Trash2 size={18} />
-                        </button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
               </div>
             ) : (
               <div className="border rounded-xl p-5 text-center text-gray-500">
                 Esta rutina no tiene ejercicios.
               </div>
             )}
+
+            {errors.exercises?.message && (
+              <p className="text-red-500 text-[13px] mt-2">
+                {errors.exercises.message}
+              </p>
+            )}
           </div>
 
-          {/* AGREGAR EJERCICIO */}
-          <div className="border-t pt-5">
-            <h3 className="font-semibold text-lg mb-4">Agregar ejercicio</h3>
-
-            <div className="flex flex-col gap-3">
-              <select
-                value={selectedExerciseId}
-                onChange={(e) => setSelectedExerciseId(e.target.value)}
-                className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-              >
-                <option value="">Seleccionar ejercicio</option>
-
-                {/* TODOS los ejercicios */}
-                {exercises.map((exercise) => (
-                  <option key={exercise.id} value={exercise.id}>
-                    {exercise.name}
-                  </option>
-                ))}
-              </select>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  value={sets}
-                  onChange={(e) => setSets(e.target.value)}
-                  placeholder="Series"
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-
-                <input
-                  type="number"
-                  min="1"
-                  value={repetitions}
-                  onChange={(e) => setRepetitions(e.target.value)}
-                  placeholder="Reps"
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="Peso"
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                />
-
-                <input
-                  type="number"
-                  min="1"
-                  value={routineExercises.length + 1}
-                  disabled
-                  className="w-full border rounded-xl px-3 py-2 bg-[#efefef]"
-                  placeholder="Orden"
-                />
-              </div>
-
-              <BlackButton
-                text="Agregar ejercicio"
-                onClick={handleAddExercise}
-                disabled={!selectedExerciseId}
-                textSmall={true}
-                img={<Plus size={18} />}
-              />
-            </div>
-          </div>
-
-          {/* BOTONES */}
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
               text="Cancelar"
               onClick={handleCancelEdit}
               textSmall={true}
+              type="button"
             />
 
             <BlackButton
@@ -601,6 +515,17 @@ export default function RoutineModal({ routine, tenantId, close }) {
           close={() => setSuccessModal(false)}
           message={successMessage}
           isSuccesOrError={true}
+        />
+      )}
+
+      {openAddExerciseModal && (
+        <AddExerciseModal
+          close={() => setOpenAddExerciseModal(false)}
+          selectedExerciseId={selectedExerciseId}
+          setSelectedExerciseId={setSelectedExerciseId}
+          exercisesLoading={exercisesLoading}
+          exercises={exercises}
+          handleAddExercise={handleAddExercise}
         />
       )}
     </Modal>
