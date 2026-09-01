@@ -3,11 +3,21 @@
     public static class TimeHelper
     {
         private static readonly TimeZoneInfo Argentina =
-            TimeZoneInfo.FindSystemTimeZoneById("America/Argentina/Buenos_Aires");
+            TimeZoneInfo.FindSystemTimeZoneById(
+                "America/Argentina/Buenos_Aires"
+            );
 
         public static DateTime Now()
         {
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Argentina);
+            return TimeZoneInfo.ConvertTimeFromUtc(
+                DateTime.UtcNow,
+                Argentina
+            );
+        }
+
+        public static DateTime UtcNow()
+        {
+            return DateTime.UtcNow;
         }
     }
 }

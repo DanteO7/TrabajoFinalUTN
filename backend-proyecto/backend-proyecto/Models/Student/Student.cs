@@ -10,6 +10,7 @@
         public int StudentPlanId { get; set; }
         public StudentPlan StudentPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
+        public DateTime? MonthlyFeeStatusUpdatedAt { get; set; }
         public ICollection<Waitlist> Waitlists { get; set; } = new List<Waitlist>();
     }
 }

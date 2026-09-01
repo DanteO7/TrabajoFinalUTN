@@ -1,4 +1,5 @@
 ﻿using backend_proyecto.Config;
+using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,15 @@ public interface IStudentRepository : IRepository<Student>
     Task<bool> ExistsByUserId(int userId);
     Task<bool> ExistsByUserAndTenant(int userId, int tenantId);
     Task<int> CountAsync(Expression<Func<Student, bool>> predicate);
+    Task ResetMonthlyFeeStatusAsync(
+            DateTime date,
+            CancellationToken cancellationToken = default
+        );
+
+    Task SetPendingToOverdueAsync(
+        DateTime date,
+        CancellationToken cancellationToken = default
+    );
 }
 
 public class StudentRepository : Repository<Student>, IStudentRepository
@@ -32,5 +42,45 @@ public class StudentRepository : Repository<Student>, IStudentRepository
     public async Task<int> CountAsync(Expression<Func<Student, bool>> predicate)
     {
         return await _db.Students.CountAsync(predicate);
+    }
+    public async Task ResetMonthlyFeeStatusAsync(
+            DateTime date,
+            CancellationToken cancellationToken = default)
+    {
+        await _db.Students
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(
+                        s => s.MonthlyFeeStatus,
+                        MonthlyFeeStatus.PENDING
+                    )
+                    .SetProperty(
+                        s => s.MonthlyFeeStatusUpdatedAt,
+                        date
+                    ),
+                cancellationToken
+            );
+    }
+
+    public async Task SetPendingToOverdueAsync(
+        DateTime date,
+        CancellationToken cancellationToken = default)
+    {
+        await _db.Students
+            .Where(s =>
+                s.MonthlyFeeStatus == MonthlyFeeStatus.PENDING
+            )
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(
+                        s => s.MonthlyFeeStatus,
+                        MonthlyFeeStatus.OVERDUE
+                    )
+                    .SetProperty(
+                        s => s.MonthlyFeeStatusUpdatedAt,
+                        date
+                    ),
+                cancellationToken
+            );
     }
 }

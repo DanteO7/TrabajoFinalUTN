@@ -83,7 +83,7 @@ namespace backend_proyecto.Services
             if (bulkDTO.StudentIds == null || bulkDTO.StudentIds.Count == 0)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "Debe haber al menos un estudiante");
+                    "Debe haber al menos un Alumno");
             }
 
             var reservations = new List<Reservation>();
@@ -91,16 +91,16 @@ namespace backend_proyecto.Services
 
             foreach (var studentId in bulkDTO.StudentIds)
             {
-                var student = await _studentRepository.GetOneAsync(s => s.Id == studentId);
+                var student = await _studentRepository.GetOneAsync(s => s.Id == studentId, s => s.User);
                 if (student == null)
                 {
-                    errors.Add($"Estudiante {studentId}: No encontrado");
+                    errors.Add($"Alumno {studentId}: No encontrado");
                     continue;
                 }
 
                 if (student.TenantId != bulkDTO.TenantId)
                 {
-                    errors.Add($"Estudiante {student.Id}: No pertenece a este tenant");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: No pertenece a este tenant");
                     continue;
                 }
 
@@ -111,7 +111,7 @@ namespace backend_proyecto.Services
 
                 if (existingReservation != null)
                 {
-                    errors.Add($"Estudiante {student.Id}: Ya tiene una reserva en esta clase");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: Ya tiene una reserva en esta clase");
                     continue;
                 }
 
@@ -121,7 +121,7 @@ namespace backend_proyecto.Services
 
                 if (reservationsCount >= classEntity.MaxCapacity)
                 {
-                    errors.Add($"Estudiante {student.Id}: La clase está llena");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: La clase está llena");
                     continue;
                 }
 
@@ -129,14 +129,14 @@ namespace backend_proyecto.Services
                 var studentPlan = await _studentPlanRepository.GetOneAsync(p => p.Id == student.StudentPlanId);
                 if (studentPlan == null)
                 {
-                    errors.Add($"Estudiante {student.Id}: No tiene plan activo");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: No tiene plan activo");
                     continue;
                 }
 
                 // Validar pago
                 if (student.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
                 {
-                    errors.Add($"Estudiante {student.Id}: No tiene la cuota al día");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: No tiene la cuota al día");
                     continue;
                 }
 
@@ -151,7 +151,7 @@ namespace backend_proyecto.Services
 
                 if (reservationsThisMonth >= studentPlan.ClassesPerMonth)
                 {
-                    errors.Add($"Estudiante {student.Id}: Alcanzó el límite de clases del mes");
+                    errors.Add($"Alumno {student.User.Name} {student.User.Surname}: Alcanzó el límite de clases del mes");
                     continue;
                 }
 
@@ -175,7 +175,7 @@ namespace backend_proyecto.Services
             if (!reservations.Any())
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest,
-                    "No se pudo agregar ningún estudiante");
+                    "No se pudo agregar ningún alumno");
             }
 
             foreach (var reservation in reservations)
@@ -271,7 +271,7 @@ namespace backend_proyecto.Services
             if (reservation == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
-                    "El estudiante no tiene una reserva en esta clase");
+                    "El alumno no tiene una reserva en esta clase");
             }
 
             return _mapper.Map<ResponseReservationDTO>(reservation);
