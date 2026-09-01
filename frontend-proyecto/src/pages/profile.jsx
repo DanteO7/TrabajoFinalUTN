@@ -2,17 +2,12 @@ import { Link } from "wouter";
 import MainLayout from "../layouts/main-layout";
 import { useAuthStore } from "../store/auth-store";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { updateUserSchema } from "../schema/user-schema";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateUser } from "../services/user";
+import { useQueryClient } from "@tanstack/react-query";
 import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import Navbar from "../components/navbar";
-import { forgotPassword, me, signOut } from "../services/auth";
+import { forgotPassword, signOut } from "../services/auth";
 import { useLocation } from "wouter";
-import SuccessModal from "../components/modals/success-modal";
 import ChangeEmailForm from "../components/profile/change-email-form";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import { useEffect } from "react";
@@ -20,17 +15,18 @@ import { useTenantStore } from "../store/tenant-store";
 import RedButton from "../components/buttons/red-button";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
+import EditProfileModal from "../components/profile/edit-profile-modal";
 
 export default function Profile() {
   const queryClient = useQueryClient();
 
-  const { user, isAuthenticated, login, logout } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
+  console.log(user);
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-  const [succesModal, setSuccesModal] = useState(false);
-  const [succesMessage, setSuccessMessage] = useState();
 
+  const [openEditProfileModal, setOpenEditProfileModal] = useState(false);
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
 
   const [, setLocation] = useLocation();
@@ -38,63 +34,7 @@ export default function Profile() {
 
   const [openChangeEmail, setOpenChangeEmail] = useState(false);
 
-  const [isEditing, setIsEditing] = useState(false);
-
   const [seconds, setSeconds] = useState(0);
-
-  const {
-    register,
-    getValues,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(updateUserSchema),
-    mode: "onTouched",
-    values: {
-      name: user?.name || "",
-      surname: user?.surname || "",
-      email: user?.email || "",
-      phoneNumber: user?.phoneNumber || "",
-      age: user?.age || "",
-      weight: user?.weight || "",
-    },
-  });
-
-  const mutation = useMutation({
-    mutationKey: ["updateUser", user?.id],
-    mutationFn: updateUser,
-    onSuccess: async (data) => {
-      setSuccessMessage("Perfil actualizado correctamente");
-      setSuccesModal(true);
-      setBackendError(null);
-      try {
-        const completeUser = await me();
-        login(completeUser);
-      } catch {
-        login(data);
-      }
-      setTimeout(() => {
-        setSuccesModal(false);
-      }, 3000);
-    },
-    onError: (error) => {
-      const data = error?.response?.data;
-      let msg = "Ocurrió un error al iniciar sesión";
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
-      setBackendError(msg);
-      setErrorModal(true);
-    },
-  });
-
-  const onSubmit = (data) => {
-    setBackendError(null);
-    mutation.mutate({ id: user.id, data });
-  };
-
   useEffect(() => {
     if (seconds <= 0) return;
 
@@ -135,7 +75,7 @@ export default function Profile() {
   const handleForgotPassword = async () => {
     try {
       await forgotPassword({
-        email: getValues("email"),
+        email: user?.email,
       });
 
       const endTime = Date.now() + 60_000;
@@ -169,105 +109,68 @@ export default function Profile() {
         <div className="w-full lg:max-w-120">
           <h3 className="text-2xl font-semibold">Datos personales</h3>
           {isAuthenticated ? (
-            <form
-              noValidate
-              className="flex max-w flex-col gap-4 mt-4"
-              onSubmit={handleSubmit(onSubmit)}
-            >
+            <div className="flex max-w flex-col gap-4 mt-4">
               <FormInput
                 label="Nombre"
                 id="name"
                 type="text"
-                placeholder="Nombre"
-                register={register("name")}
-                error={errors.name}
-                disabled={isSubmitting || mutation.isPending || !isEditing}
+                value={user?.name || ""}
+                disabled={true}
               />
+
               <FormInput
                 label="Apellido"
                 id="surname"
                 type="text"
-                placeholder="Apellido"
-                register={register("surname")}
-                error={errors.surname}
-                disabled={isSubmitting || mutation.isPending || !isEditing}
+                value={user?.surname || ""}
+                disabled={true}
               />
+
               <FormInput
                 label="Telefono"
                 id="phoneNumber"
                 type="text"
-                placeholder="XX XXXX XXXXXX"
-                register={register("phoneNumber")}
-                error={errors.phoneNumber}
-                disabled={isSubmitting || mutation.isPending || !isEditing}
+                value={user?.phoneNumber || ""}
+                disabled={true}
               />
+
               <div className="flex gap-2">
                 <FormInput
                   label="Edad"
                   id="age"
                   type="number"
-                  placeholder="Entre 1-120"
-                  register={register("age")}
-                  error={errors.age}
-                  disabled={isSubmitting || mutation.isPending || !isEditing}
+                  value={user?.age || ""}
+                  disabled={true}
                 />
+
                 <FormInput
                   label="Peso"
                   id="weight"
                   type="number"
-                  placeholder="Entre 1-300"
-                  register={register("weight")}
-                  error={errors.weight}
-                  disabled={isSubmitting || mutation.isPending || !isEditing}
+                  value={user?.weight || ""}
+                  disabled={true}
                 />
               </div>
-              {isEditing ? (
-                <div className="flex gap-4">
-                  <WhiteButton
-                    type="button"
-                    text="Cancelar"
-                    onClick={() => {
-                      reset();
-                      setIsEditing(false);
-                    }}
-                    textSmall={true}
-                    wfit={true}
-                  />
-                  <BlackButton
-                    text={
-                      mutation.isPending ? "Actualizando" : "Actualizar perfil"
-                    }
-                    type="submit"
-                    disabled={isSubmitting || mutation.isPending}
-                    textSmall={true}
-                    wfit={true}
-                  />
-                </div>
-              ) : (
-                <BlackButton
-                  text="Editar perfil"
-                  onClick={() => setIsEditing(true)}
-                  textSmall={true}
-                  wfit={true}
-                />
-              )}
+              <BlackButton
+                text="Editar perfil"
+                onClick={() => setOpenEditProfileModal(true)}
+                textSmall={true}
+                wfit={true}
+              />
               <FormInput
                 disabled={true}
                 label="Email"
                 id="email"
                 type="email"
-                placeholder="Email"
-                register={register("email")}
+                value={user?.email || ""}
               />
               <BlackButton
                 text="Cambiar Email"
-                type="button"
                 onClick={() => setOpenChangeEmail(true)}
                 textSmall={true}
                 wfit={true}
               />
               <WhiteButton
-                type="button"
                 disabled={seconds > 0}
                 text={
                   seconds > 0 ? `Reenviar en ${seconds}s` : "Cambiar contraseña"
@@ -293,7 +196,7 @@ export default function Profile() {
                 textSmall={true}
                 wfit={true}
               />
-            </form>
+            </div>
           ) : (
             <div className="flex flex-col mt-5 gap-3">
               <span>No tienes iniciada la sesion</span>
@@ -314,13 +217,6 @@ export default function Profile() {
           isSuccesOrError={true}
         />
       )}
-      {succesModal && (
-        <SuccessModal
-          close={() => setSuccesModal(false)}
-          message={succesMessage}
-          isSuccesOrError={true}
-        />
-      )}
       {openChangeEmail && (
         <ChangeEmailForm user={user} close={() => setOpenChangeEmail(false)} />
       )}
@@ -332,6 +228,9 @@ export default function Profile() {
           sendAgain={handleForgotPassword}
           seconds={seconds}
         />
+      )}
+      {openEditProfileModal && (
+        <EditProfileModal close={() => setOpenEditProfileModal(false)} />
       )}
     </MainLayout>
   );
