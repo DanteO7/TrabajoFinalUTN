@@ -50,7 +50,7 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

@@ -47,7 +47,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
     onError: (error) => {
       const data = error?.response?.data;

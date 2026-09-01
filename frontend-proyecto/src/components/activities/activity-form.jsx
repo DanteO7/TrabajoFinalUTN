@@ -40,7 +40,7 @@ export default function ActivityForm({ tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
     onError: (error) => {
       const data = error?.response?.data;

@@ -70,7 +70,7 @@ export default function RoutineForm({ tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

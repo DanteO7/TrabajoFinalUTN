@@ -49,7 +49,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {
@@ -87,7 +87,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
       setTimeout(() => {
         setSuccessModal(false);
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

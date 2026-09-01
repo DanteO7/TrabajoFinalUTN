@@ -5,15 +5,15 @@ export default function MyTenantCard({ myTenant }) {
   const roleConfig = {
     Owner: {
       text: "Dueño",
-      className: "border-purple-600 text-purple-600",
+      className: "bg-purple-300 text-purple-600",
     },
     Professor: {
       text: "Profesor",
-      className: "border-blue-600 text-blue-600",
+      className: "bg-blue-300 text-blue-600",
     },
     Student: {
       text: "Alumno",
-      className: "border-yellow-600 text-yellow-600",
+      className: "bg-orange-200 text-yellow-600",
     },
   };
   const role = roleConfig[myTenant.role];
@@ -29,17 +29,17 @@ export default function MyTenantCard({ myTenant }) {
         </div>
         <div className="flex flex-col gap-2.5 justify-between text-center">
           {myTenant.isActive ? (
-            <span className="border rounded-4xl px-2 text-[13px] border-green-600 text-green-600">
+            <span className="flex items-center justify-center rounded-full px-2.25 py-px text-[13px] bg-[#a1f3be] text-green-600">
               Activo
             </span>
           ) : (
-            <span className="border rounded-4xl px-2 text-[13px] border-red-600 text-red-600">
+            <span className="flex items-center justify-center rounded-full px-2.25 py-px text-[13px] bg-red-300 text-red-600">
               Inactivo
             </span>
           )}
 
           <span
-            className={`border rounded-4xl px-2 text-[13px] ${role.className}`}
+            className={`flex items-center justify-center rounded-full px-2.25 py-px text-[13px] ${role.className}`}
           >
             {role.text}
           </span>

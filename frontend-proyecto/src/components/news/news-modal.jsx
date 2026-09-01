@@ -54,7 +54,7 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {
@@ -92,7 +92,7 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
 
       setTimeout(() => {
         setSuccessModal(false);
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

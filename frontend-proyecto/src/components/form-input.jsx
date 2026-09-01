@@ -9,6 +9,7 @@ export default function FormInput({
   register,
   error,
   disabled = false,
+  value,
 }) {
   const [show, setShow] = useState(false);
 
@@ -34,6 +35,7 @@ export default function FormInput({
           placeholder={placeholder}
           disabled={disabled}
           {...register}
+          value={value}
         />
 
         {isPassword && (

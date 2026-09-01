@@ -225,15 +225,15 @@ export default function Tenant({ id }) {
   const roleConfig = {
     Tenant: {
       text: "Dueño",
-      className: "border-purple-600 text-purple-600",
+      className: "bg-purple-300 text-purple-600",
     },
     Professor: {
       text: "Profesor",
-      className: "border-blue-600 text-blue-600",
+      className: "bg-blue-300 text-blue-600",
     },
     Student: {
       text: "Alumno",
-      className: "border-yellow-600 text-yellow-600",
+      className: "bg-orange-200 text-yellow-600",
     },
   };
   const role = roleConfig[tenant?.role];
@@ -315,18 +315,18 @@ export default function Tenant({ id }) {
 
               <div className="flex mb-2 mt-1 gap-2 flex-wrap">
                 <span
-                  className={`rounded-full px-3 py-1 text-sm border
+                  className={`rounded-full px-3 py-1 text-sm
                 ${
                   tenant?.isActive
-                    ? "border-green-600 text-green-600"
-                    : "border-red-600 text-red-600"
+                    ? "bg-[#a1f3be] text-green-600"
+                    : "bg-red-300 text-red-600"
                 }`}
                 >
                   {tenant?.isActive ? "Activo" : "Inactivo"}
                 </span>
 
                 <span
-                  className={`rounded-full px-3 py-1 text-sm border ${role?.className}`}
+                  className={`flex items-center justify-center rounded-full px-3 py-1 text-sm ${role?.className}`}
                 >
                   {role?.text}
                 </span>

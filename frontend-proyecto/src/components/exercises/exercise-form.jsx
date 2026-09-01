@@ -57,7 +57,7 @@ export default function ExerciseForm({ tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

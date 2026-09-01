@@ -48,7 +48,7 @@ export default function NewsForm({ tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

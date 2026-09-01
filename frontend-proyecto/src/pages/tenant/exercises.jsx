@@ -15,8 +15,11 @@ import ExerciseModal from "../../components/exercises/exercise-modal";
 import { useTenantStore } from "../../store/tenant-store";
 
 import BlackButton from "../../components/buttons/black-button";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Exercises({ tenantId }) {
+  const isSmallScreen = useMediaQuery("(min-width: 900px)");
+
   const [, setLocation] = useLocation();
 
   const [search, setSearch] = useState("");
@@ -90,7 +93,7 @@ export default function Exercises({ tenantId }) {
                       text="+ Nuevo ejercicio"
                       onClick={() => setOpenForm(true)}
                       textSmall={true}
-                      wfit={true}
+                      wfit={isSmallScreen}
                     />
                   </div>
                 )}

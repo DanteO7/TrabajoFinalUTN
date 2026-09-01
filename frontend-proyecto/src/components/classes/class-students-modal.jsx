@@ -61,7 +61,7 @@ export default function ClassStudentsModal({
 
       setTimeout(() => {
         setSuccessModal(false);
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

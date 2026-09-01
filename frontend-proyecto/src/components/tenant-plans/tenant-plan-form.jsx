@@ -44,7 +44,7 @@ export default function TenantPlanForm({ close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

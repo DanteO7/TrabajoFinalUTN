@@ -68,7 +68,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {
@@ -120,7 +120,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       setTimeout(() => {
         setSuccessModal(false);
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

@@ -58,7 +58,7 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

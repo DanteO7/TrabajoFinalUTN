@@ -54,7 +54,7 @@ export default function StudentPlanUpdateForm({
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {

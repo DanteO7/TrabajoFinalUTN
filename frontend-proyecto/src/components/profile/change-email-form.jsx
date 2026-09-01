@@ -54,7 +54,7 @@ export default function ChangeEmailForm({ user, close }) {
       login(data);
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
     onError: (error) => {
       const data = error?.response?.data;
@@ -80,7 +80,7 @@ export default function ChangeEmailForm({ user, close }) {
     try {
       await sendRegisterCode({ email });
       setCodeSent(true);
-      setSeconds(60); // ← Inicia countdown
+      setSeconds(60);
     } catch (error) {
       const data = error?.response?.data;
       let msg = "Error al enviar código";
@@ -139,7 +139,7 @@ export default function ChangeEmailForm({ user, close }) {
           type="button"
           onClick={handleSendCode}
           disabled={seconds > 0}
-          className={`rounded-[13px] px-3 py-2 border-[1.7px] border-[#333] transition-all duration-300 ${
+          className={`rounded-[13px] px-3 py-1.5 border-[1.7px] border-[#333] transition-all duration-300 ${
             seconds > 0
               ? "bg-gray-400 text-gray-200 cursor-not-allowed"
               : "hover:bg-gray-300 hover:text-[#333] cursor-pointer text-[#333]"
@@ -148,12 +148,14 @@ export default function ChangeEmailForm({ user, close }) {
           {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
         </button>
 
-        <BlackButton
-          type="submit"
-          disabled={isSubmitting || mutation.isPending || !codeSent}
-          text={mutation.isPending ? "Cambiando..." : "Cambiar email"}
-          textSmall={true}
-        />
+        {codeSent && (
+          <BlackButton
+            type="submit"
+            disabled={isSubmitting || mutation.isPending || !codeSent}
+            text={mutation.isPending ? "Cambiando..." : "Cambiar email"}
+            textSmall={true}
+          />
+        )}
       </form>
       {errorModal && (
         <ErrorModal

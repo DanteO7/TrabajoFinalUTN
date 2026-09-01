@@ -51,7 +51,7 @@ export default function StudentModal({ student, tenantId, close }) {
 
       setTimeout(() => {
         close();
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {
@@ -90,7 +90,7 @@ export default function StudentModal({ student, tenantId, close }) {
 
       setTimeout(() => {
         setSuccessModal(false);
-      }, 3000);
+      }, 2000);
     },
 
     onError: (error) => {
