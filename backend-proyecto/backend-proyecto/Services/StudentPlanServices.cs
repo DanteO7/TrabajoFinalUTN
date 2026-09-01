@@ -26,8 +26,6 @@ namespace backend_proyecto.Services
 
         public async Task<List<ResponseStudentPlanDTO>> GetAllByTenantId(int tenantId)
         {
-            await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_READ);
-
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
                 t => t.Students,

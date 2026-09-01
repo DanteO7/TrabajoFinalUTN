@@ -195,8 +195,6 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseInvitationInfoDTO> GetInvitationInfo(Guid token)
         {
-            await _permissionServices.CheckPermission(Permissions.INVITATION_READ);
-
             var invitation = await _invitationRepository.GetOneAsync(
                 i => i.Token == token,
                 i => i.Tenant);
