@@ -1,5 +1,3 @@
-import React from "react";
-import Header from "../components/header";
 import Footer from "../components/footer";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -7,8 +5,8 @@ import { getMyTenants } from "../services/tenant";
 import { useTenantStore } from "../store/tenant-store";
 
 export default function MainLayout({ children }) {
-  const fetchUserRolesInTenant = useTenantStore(
-    (state) => state.fetchUserRolesInTenant,
+  const fetchUserPermissionsInTenant = useTenantStore(
+    (state) => state.fetchUserPermissionsInTenant,
   );
 
   const { data: myTenants } = useQuery({
@@ -18,11 +16,10 @@ export default function MainLayout({ children }) {
 
   useEffect(() => {
     if (!myTenants) return;
-
     myTenants.forEach((tenant) => {
-      fetchUserRolesInTenant(tenant.id);
+      fetchUserPermissionsInTenant(tenant.id);
     });
-  }, [myTenants, fetchUserRolesInTenant]);
+  }, [myTenants, fetchUserPermissionsInTenant]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -33,7 +30,6 @@ export default function MainLayout({ children }) {
       <main className="flex-1 flex flex-col items-center gap-26 pb-17 px-5">
         {children}
       </main>
-
       <Footer />
     </div>
   );

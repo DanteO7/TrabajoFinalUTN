@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -17,10 +17,9 @@ export default function Activities({ tenantId }) {
   const [openForm, setOpenForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canCreateActivity = hasPermission(tenantId, "ACTIVITY_CREATE");
 
   const {
     data: activities = [],
@@ -77,7 +76,7 @@ export default function Activities({ tenantId }) {
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
-                {isTenant && (
+                {canCreateActivity && (
                   <div className="justify-self-end">
                     <BlackButton
                       text="+ Nueva actividad"
@@ -115,7 +114,7 @@ export default function Activities({ tenantId }) {
                     Creá tu primera actividad para comenzar.
                   </p>
 
-                  {isTenant && (
+                  {canCreateActivity && (
                     <div className="flex items-center justify-center">
                       <BlackButton
                         text="+ Crear actividad"

@@ -127,7 +127,7 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Actualizando..." : "Actualizar plan"}
+            text={mutation.isPending ? "Actualizando..." : "Actualizar"}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

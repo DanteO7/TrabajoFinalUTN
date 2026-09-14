@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
-import { FaBook, FaHome } from "react-icons/fa";
+import { FaBook, FaHome, FaMoneyBillWave } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { Link, useLocation } from "wouter";
@@ -58,6 +58,12 @@ export default function Header() {
                 <>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
+                    href="/pagos-app"
+                  >
+                    Pagos
+                  </Link>
+                  <Link
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="/usuarios"
                   >
                     Usuarios
@@ -75,6 +81,12 @@ export default function Header() {
                 className="min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13.5px] hover:bg-[#d4d4d4] max-[900px]:mr-1"
               >
                 Tu espacio
+              </Link>
+              <Link
+                href="/mis-pagos"
+                className="hidden min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13.5px] hover:bg-[#d4d4d4] max-[900px]:mr-1"
+              >
+                Mis pagos
               </Link>
             </div>
           )}
@@ -133,7 +145,6 @@ export default function Header() {
               >
                 Inicio
               </MenuItem>
-
               <MenuItem
                 href="/perfil"
                 icon={FaUser}
@@ -141,7 +152,6 @@ export default function Header() {
               >
                 Perfil
               </MenuItem>
-
               <MenuItem
                 href="/tu-espacio"
                 icon={MdSpaceDashboard}
@@ -149,8 +159,14 @@ export default function Header() {
               >
                 Tu espacio
               </MenuItem>
-
-              {user?.roles?.includes("Admin") && (
+              <MenuItem
+                href="/mis-pagos"
+                icon={FaMoneyBillWave}
+                onClick={() => setMenu(false)}
+              >
+                Mis pagos
+              </MenuItem>
+              {isAdmin && (
                 <>
                   <MenuItem
                     href="/usuarios"
@@ -166,6 +182,13 @@ export default function Header() {
                     onClick={() => setMenu(false)}
                   >
                     Planes
+                  </MenuItem>
+                  <MenuItem
+                    href="/pagos-app"
+                    icon={FaMoneyBillWave}
+                    onClick={() => setMenu(false)}
+                  >
+                    Pagos
                   </MenuItem>
                 </>
               )}

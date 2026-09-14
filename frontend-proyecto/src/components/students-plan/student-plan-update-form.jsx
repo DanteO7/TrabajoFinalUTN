@@ -123,7 +123,7 @@ export default function StudentPlanUpdateForm({
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Actualizando..." : "Actualizar plan"}
+            text={mutation.isPending ? "Actualizando..." : "Actualizar"}
             disabled={mutation.isPending}
             type="submit"
             textSmall={true}

@@ -24,7 +24,7 @@ export const updateTenant = (id, data) =>
 
 export const getMyTenants = () => request("get", "/tenants/my-tenants");
 
-export const getUserRolesInTenant = (tenantId) =>
-  request("get", `/tenants/${tenantId}/user-roles`);
+export const getMyPermissionInTenant = (tenantId) =>
+  request("get", `/tenants/${tenantId}/my-permissions`);
 
 export const getUserTenants = (id) => request("get", `/tenants/user/${id}`);

@@ -1,41 +1,32 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
 import MainLayout from "../../layouts/main-layout";
-
 import { useAuthStore } from "../../store/auth-store";
 import { useTenantStore } from "../../store/tenant-store";
-
 import { getStudentByUser } from "../../services/student";
 import { getReservationsByStudentId } from "../../services/reservation";
-
 import ReservationCard from "../../components/reservations/reservation-card";
 import ReservationModal from "../../components/reservations/reservation-modal";
 import ReservationFilter from "../../components/reservations/reservation-filter";
 import ReservationEmpty from "../../components/reservations/reservation-empty";
-
 import Loader from "../../components/loading";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 
 export default function Reservations({ tenantId }) {
   const [, setLocation] = useLocation();
-
   const { user } = useAuthStore();
-
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [filter, setFilter] = useState("pending");
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isStudent = userRoles?.roles?.includes("Student");
+  const canReadReservations = hasPermission(tenantId, "RESERVATION_READ");
 
   const { data: student } = useQuery({
     queryKey: ["getStudentByUser", tenantId],
     queryFn: () => getStudentByUser(tenantId),
-    enabled: isStudent && !!user,
+    enabled: canReadReservations && !!user,
   });
 
   const { data: reservations = [], isLoading } = useQuery({
@@ -76,6 +67,7 @@ export default function Reservations({ tenantId }) {
           <IoArrowBack color="fc697b" />
           Volver
         </button>
+
         <div className="flex justify-between items-center flex-wrap gap-5">
           <div>
             <h1 className="text-4xl min-[900px]:text-5xl font-bold">

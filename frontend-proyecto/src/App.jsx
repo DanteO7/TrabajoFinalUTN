@@ -41,6 +41,10 @@ const TenantPlans = lazy(() => import("./pages/tenant-plans"));
 const News = lazy(() => import("./pages/tenant/news"));
 const Exercises = lazy(() => import("./pages/tenant/exercises"));
 const Routines = lazy(() => import("./pages/tenant/routines"));
+const AppPayments = lazy(() => import("./pages/app-payments"));
+const MercadoPagoResult = lazy(() => import("./pages/mercado-pago-result"));
+const PaymentsResult = lazy(() => import("./pages/payments-result"));
+const MyPayments = lazy(() => import("./pages/my-payments"));
 
 const queryClient = new QueryClient();
 
@@ -135,12 +139,28 @@ export default function App() {
               <Terms />
             </Route>
 
+            <Route path={"/mercado-pago"}>
+              <MercadoPagoResult />
+            </Route>
+
+            <Route path={"/pagos/resultado"}>
+              <PaymentsResult />
+            </Route>
+
+            <Route path={"/mis-pagos"}>
+              <MyPayments />
+            </Route>
+
             <AdminRoute path={"/usuarios"}>
               <Users />
             </AdminRoute>
 
             <AdminRoute path={"/planes"}>
               <TenantPlans />
+            </AdminRoute>
+
+            <AdminRoute path={"/pagos-app"}>
+              <AppPayments />
             </AdminRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/alumnos">

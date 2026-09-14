@@ -15,3 +15,6 @@ export const updateStudent = (id, data) =>
 
 export const getStudentByUser = (tenantId) =>
   request("get", `/students/me/${tenantId}`);
+
+export const GetPendingPaymentStudents = (tenantId) =>
+  request("get", `/students/pending-payment/${tenantId}`);

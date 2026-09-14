@@ -1,33 +1,24 @@
 import React, { useState } from "react";
-
 import MainLayout from "../../layouts/main-layout";
-
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-
 import { getRoutines } from "../../services/routine";
-
 import Loading from "../../components/loading";
 import RoutineForm from "../../components/routines/routine-form";
 import RoutineModal from "../../components/routines/routine-modal";
-
 import { useTenantStore } from "../../store/tenant-store";
-
 import BlackButton from "../../components/buttons/black-button";
 
 export default function Routines({ tenantId }) {
   const [, setLocation] = useLocation();
-
   const [search, setSearch] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canCreateRoutine = hasPermission(tenantId, "ROUTINE_CREATE");
 
   const {
     data: routines = [],
@@ -85,7 +76,7 @@ export default function Routines({ tenantId }) {
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
-                {isTenant && (
+                {canCreateRoutine && (
                   <div className="justify-self-end">
                     <BlackButton
                       text="+ Nueva rutina"
@@ -142,7 +133,7 @@ export default function Routines({ tenantId }) {
                     Creá tu primera rutina para comenzar.
                   </p>
 
-                  {isTenant && (
+                  {canCreateRoutine && (
                     <div className="flex items-center justify-center">
                       <BlackButton
                         text="+ Crear rutina"

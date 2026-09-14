@@ -15,7 +15,7 @@ import WhiteButton from "../components/buttons/white-button";
 
 export default function SignIn() {
   const { login } = useAuthStore();
-  const clearRoles = useTenantStore((state) => state.clearRoles);
+  const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [, setLocation] = useLocation();
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -33,7 +33,7 @@ export default function SignIn() {
     mutationKey: ["signin"],
     mutationFn: signIn,
     onSuccess: (data) => {
-      clearRoles();
+      clearPermissions();
       console.log(data);
 
       login(data);

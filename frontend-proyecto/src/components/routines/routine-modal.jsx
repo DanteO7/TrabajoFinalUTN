@@ -1,54 +1,39 @@
 import { X, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
-
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
 import Modal from "../modals/modal";
-
 import { updateRoutine, deleteRoutine } from "../../services/routine";
 import { getExercises } from "../../services/exercise";
-
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
-
 import { useTenantStore } from "../../store/tenant-store";
-
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
-
 import FormInput from "../form-input";
-
 import { updateRoutineSchema } from "../../schema/routine-schema";
-
 import AddExerciseModal from "./add-exercise-modal";
 
 export default function RoutineModal({ routine, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canUpdateRoutine = hasPermission(tenantId, "ROUTINE_UPDATE");
+
+  const canDeleteRoutine = hasPermission(tenantId, "ROUTINE_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentRoutine, setCurrentRoutine] = useState(routine);
-
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
-
   const [confirmModal, setConfirmModal] = useState(false);
-
   const [openAddExerciseModal, setOpenAddExerciseModal] = useState(false);
 
   const {
@@ -59,7 +44,6 @@ export default function RoutineModal({ routine, tenantId, close }) {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(updateRoutineSchema),
-
     defaultValues: {
       name: routine.name || "",
       description: routine.description || "",
@@ -68,7 +52,6 @@ export default function RoutineModal({ routine, tenantId, close }) {
         exerciseId: String(exercise.exerciseId),
       })),
     },
-
     mode: "onTouched",
   });
 
@@ -91,7 +74,6 @@ export default function RoutineModal({ routine, tenantId, close }) {
       });
 
       setConfirmModal(false);
-
       setSuccessMessage("Rutina eliminada correctamente");
       setSuccessModal(true);
 
@@ -125,23 +107,17 @@ export default function RoutineModal({ routine, tenantId, close }) {
     mutationFn: (data) =>
       updateRoutine(currentRoutine.id, {
         name: data.name.trim(),
-
         description: data.description?.trim() || null,
-
         exercises: (data.exercises || []).map((exercise) => ({
           exerciseId: Number(exercise.exerciseId),
-
           sets: Number(exercise.sets),
-
           repetitions: Number(exercise.repetitions),
-
           weight:
             exercise.weight === "" ||
             exercise.weight === undefined ||
             exercise.weight === null
               ? null
               : Number(exercise.weight),
-
           order: Number(exercise.order),
         })),
       }),
@@ -155,9 +131,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
       reset({
         name: updatedRoutine.name || "",
-
         description: updatedRoutine.description || "",
-
         exercises: (updatedRoutine.exercises || []).map((exercise) => ({
           ...exercise,
           exerciseId: String(exercise.exerciseId),
@@ -165,7 +139,6 @@ export default function RoutineModal({ routine, tenantId, close }) {
       });
 
       setEditing(false);
-
       setSuccessMessage("Rutina actualizada correctamente");
       setSuccessModal(true);
 
@@ -197,9 +170,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
   const handleStartEditing = () => {
     reset({
       name: currentRoutine.name || "",
-
       description: currentRoutine.description || "",
-
       exercises: (currentRoutine.exercises || []).map((exercise) => ({
         ...exercise,
         exerciseId: String(exercise.exerciseId),
@@ -208,16 +179,13 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
     setSelectedExerciseId("");
     setOpenAddExerciseModal(false);
-
     setEditing(true);
   };
 
   const handleCancelEdit = () => {
     reset({
       name: currentRoutine.name || "",
-
       description: currentRoutine.description || "",
-
       exercises: (currentRoutine.exercises || []).map((exercise) => ({
         ...exercise,
         exerciseId: String(exercise.exerciseId),
@@ -226,7 +194,6 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
     setSelectedExerciseId("");
     setOpenAddExerciseModal(false);
-
     setEditing(false);
   };
 
@@ -252,15 +219,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
     append({
       exerciseId: String(selectedExercise.id),
-
       exercise: selectedExercise,
-
       sets: 3,
-
       repetitions: 10,
-
       weight: "",
-
       order: nextOrder,
     });
 
@@ -318,22 +280,26 @@ export default function RoutineModal({ routine, tenantId, close }) {
             )}
           </div>
 
-          {isTenant && (
+          {(canUpdateRoutine || canDeleteRoutine) && (
             <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
+              {canDeleteRoutine && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
 
-              <BlackButton
-                text="Editar"
-                onClick={handleStartEditing}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
+              {canUpdateRoutine && (
+                <BlackButton
+                  text="Editar"
+                  onClick={handleStartEditing}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
             </div>
           )}
         </>

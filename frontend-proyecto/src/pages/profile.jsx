@@ -30,7 +30,7 @@ export default function Profile() {
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
 
   const [, setLocation] = useLocation();
-  const clearRoles = useTenantStore((state) => state.clearRoles);
+  const clearPermissions = useTenantStore((state) => state.clearPermissions);
 
   const [openChangeEmail, setOpenChangeEmail] = useState(false);
 
@@ -130,6 +130,7 @@ export default function Profile() {
                 label="Telefono"
                 id="phoneNumber"
                 type="text"
+                placeholder="XX XXXX XXXXXX"
                 value={user?.phoneNumber || ""}
                 disabled={true}
               />
@@ -139,6 +140,7 @@ export default function Profile() {
                   label="Edad"
                   id="age"
                   type="number"
+                  placeholder="Entre 1-120 años"
                   value={user?.age || ""}
                   disabled={true}
                 />
@@ -147,6 +149,7 @@ export default function Profile() {
                   label="Peso"
                   id="weight"
                   type="number"
+                  placeholder="Entre 1-300kg"
                   value={user?.weight || ""}
                   disabled={true}
                 />
@@ -183,7 +186,7 @@ export default function Profile() {
                 text="Cerrar sesión"
                 onClick={async () => {
                   queryClient.clear();
-                  clearRoles();
+                  clearPermissions();
                   logout();
 
                   try {

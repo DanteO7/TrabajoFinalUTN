@@ -7,7 +7,6 @@ import { useLocation } from "wouter";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import "../../css/day-picker.css";
-
 import ClassForm from "../../components/classes/class-form";
 import ClassModal from "../../components/classes/class-modal";
 import Loading from "../../components/loading";
@@ -29,11 +28,9 @@ export default function Classes({ tenantId }) {
     return `${year}-${month}-${day}`;
   };
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
-  const canCreateClass =
-    userRoles?.roles?.includes("Tenant") || userRoles?.roles?.includes("Admin");
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canCreateClass = hasPermission(tenantId, "CLASS_CREATE");
 
   const {
     data: classes = [],
@@ -49,6 +46,7 @@ export default function Classes({ tenantId }) {
     return classes.filter((c) => {
       const classDateString = c.date.split("T")[0];
       const selectedDateString = formatLocalDate(selectedDate);
+
       return classDateString === selectedDateString;
     });
   }, [classes, selectedDate]);
@@ -104,6 +102,7 @@ export default function Classes({ tenantId }) {
                         "Vie",
                         "Sáb",
                       ];
+
                       return days[date.getDay()];
                     },
                     formatCaption: (date) => {
@@ -121,6 +120,7 @@ export default function Classes({ tenantId }) {
                         "Noviembre",
                         "Diciembre",
                       ];
+
                       return `${months[date.getMonth()]} ${date.getFullYear()}`;
                     },
                   }}
@@ -223,6 +223,7 @@ export default function Classes({ tenantId }) {
                       <p className="text-gray-500 mt-2 mb-6">
                         Creá una nueva clase para esta fecha.
                       </p>
+
                       <BlackButton
                         onClick={() => setOpenModal(true)}
                         text="+ Crear clase"

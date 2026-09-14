@@ -1,4 +1,3 @@
-import React from "react";
 import MainLayout from "../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { getMyTenants } from "../services/tenant";

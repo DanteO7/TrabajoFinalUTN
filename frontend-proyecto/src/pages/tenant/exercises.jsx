@@ -1,36 +1,26 @@
 import { useState } from "react";
-
 import MainLayout from "../../layouts/main-layout";
-
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-
 import { getExercises } from "../../services/exercise";
-
 import Loading from "../../components/loading";
 import ExerciseForm from "../../components/exercises/exercise-form";
 import ExerciseModal from "../../components/exercises/exercise-modal";
-
 import { useTenantStore } from "../../store/tenant-store";
-
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Exercises({ tenantId }) {
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
-
   const [, setLocation] = useLocation();
-
   const [search, setSearch] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canCreateExercise = hasPermission(tenantId, "EXERCISE_CREATE");
 
   const {
     data: exercises = [],
@@ -87,7 +77,7 @@ export default function Exercises({ tenantId }) {
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
-                {isTenant && (
+                {canCreateExercise && (
                   <div className="justify-self-end">
                     <BlackButton
                       text="+ Nuevo ejercicio"
@@ -137,7 +127,7 @@ export default function Exercises({ tenantId }) {
                     Creá tu primer ejercicio para comenzar.
                   </p>
 
-                  {isTenant && (
+                  {canCreateExercise && (
                     <div className="flex items-center justify-center">
                       <BlackButton
                         text="+ Crear ejercicio"

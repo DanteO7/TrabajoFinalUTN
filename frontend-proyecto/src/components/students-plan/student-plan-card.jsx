@@ -1,4 +1,4 @@
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
@@ -6,18 +6,22 @@ import { useState } from "react";
 import { deleteStudentPlan } from "../../services/student-plan";
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
-import { Pencil } from "lucide-react";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function StudentPlanCard({ plan, tenantId, onEdit }) {
   const queryClient = useQueryClient();
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
 
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canUpdateStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_UPDATE");
+
+  const canDeleteStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_DELETE");
+
   const deleteMutation = useMutation({
     mutationFn: () => deleteStudentPlan(plan.id),
-
     onSuccess: () => {
       setConfirmModal(false);
 
@@ -25,12 +29,10 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
         queryKey: ["getStudentPlans", tenantId],
       });
     },
-
     onError: (error) => {
       setConfirmModal(false);
 
       const data = error?.response?.data;
-
       let msg = "Error al eliminar el plan";
 
       if (typeof data === "string") {
@@ -46,8 +48,8 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
 
   return (
     <>
-      <div className="border rounded-2xl p-5 shadow-sm">
-        <div className="flex justify-between items-start mb-5">
+      <div className="border rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+        <div className="flex justify-between items-start">
           <div>
             <h3 className="text-xl font-semibold text-[#333]">{plan.name}</h3>
 
@@ -63,21 +65,28 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <RedButton
-            text="Eliminar"
-            disabled={deleteMutation.isPending}
-            onClick={() => setConfirmModal(true)}
-            textSmall={true}
-            img={<Trash2 size={18} />}
-          />
-          <BlackButton
-            text="Editar"
-            onClick={() => onEdit(plan)}
-            textSmall={true}
-            img={<Pencil size={18} />}
-          />
-        </div>
+        {(canDeleteStudentPlan || canUpdateStudentPlan) && (
+          <div className="flex gap-2">
+            {canDeleteStudentPlan && (
+              <RedButton
+                text="Eliminar"
+                disabled={deleteMutation.isPending}
+                onClick={() => setConfirmModal(true)}
+                textSmall={true}
+                img={<Trash2 size={18} />}
+              />
+            )}
+
+            {canUpdateStudentPlan && (
+              <BlackButton
+                text="Editar"
+                onClick={() => onEdit(plan)}
+                textSmall={true}
+                img={<Pencil size={18} />}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {confirmModal && (

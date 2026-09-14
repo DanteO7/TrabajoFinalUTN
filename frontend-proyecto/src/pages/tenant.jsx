@@ -9,6 +9,7 @@ import {
   FaTags,
   FaBell,
   FaDumbbell,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -30,6 +31,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { FaListCheck } from "react-icons/fa6";
+import { useTenantStore } from "../store/tenant-store";
 
 export default function Tenant({ id }) {
   const [, setLocation] = useLocation();
@@ -55,174 +57,103 @@ export default function Tenant({ id }) {
     whatsapp: FaWhatsapp,
   };
 
-  const sections = {
-    Tenant: [
-      {
-        title: "Novedades",
-        description: "Mira las novedades del negocio y de la app.",
-        icon: <FaBell size={35} />,
-        href: "novedades",
-      },
-      {
-        title: "Clases",
-        description: "Administrá las clases.",
-        icon: <FaCalendarAlt size={35} />,
-        href: "clases",
-      },
-      {
-        title: "Alumnos",
-        description: "Administrá los alumnos del espacio.",
-        icon: <FaUsers size={35} />,
-        href: "alumnos",
-      },
-      {
-        title: "Profesores",
-        description: "Visualizá y gestioná profesores.",
-        icon: <FaChalkboardTeacher size={35} />,
-        href: "profesores",
-      },
-      {
-        title: "Actividades",
-        description: "Gestioná actividades.",
-        icon: <FaRunning size={35} />,
-        href: "actividades",
-      },
-      {
-        title: "Profesiones",
-        description: "Configurá profesiones.",
-        icon: <FaBookOpen size={35} />,
-        href: "profesiones",
-      },
-      {
-        title: "Rutinas",
-        description: "Configurá rutinas de entrenamiento.",
-        icon: <FaListCheck size={35} />,
-        href: "rutinas",
-      },
-      {
-        title: "Ejercicios",
-        description: "Gestioná ejercicios.",
-        icon: <FaDumbbell size={35} />,
-        href: "ejercicios",
-      },
-      // {
-      //   title: "Pagos",
-      //   description: "Consultá pagos.",
-      //   icon: <FaMoneyBillWave size={35} />,
-      //   href: "pagos",
-      // },
-      {
-        title: "Planes de Alumnos",
-        description: "Administrá los planes de tus alumnos.",
-        icon: <FaTags size={35} />,
-        href: "planes",
-      },
-      // {
-      //   title: "Roles",
-      //   description: "Administrá roles y permisos.",
-      //   icon: <FaUserShield size={35} />,
-      //   href: "roles",
-      // },
-    ],
+  const sections = [
+    {
+      title: "Novedades",
+      description: "Mira las novedades del negocio y de la app.",
+      icon: <FaBell size={35} />,
+      href: "novedades",
+      permission: "NEWS_READ",
+    },
+    {
+      title: "Clases",
+      description: "Administrá las clases.",
+      icon: <FaCalendarAlt size={35} />,
+      href: "clases",
+      permission: "CLASS_READ",
+    },
+    {
+      title: "Alumnos",
+      description: "Administrá los alumnos del espacio.",
+      icon: <FaUsers size={35} />,
+      href: "alumnos",
+      permission: "STUDENT_READ",
+    },
+    {
+      title: "Profesores",
+      description: "Visualizá y gestioná profesores.",
+      icon: <FaChalkboardTeacher size={35} />,
+      href: "profesores",
+      permission: "PROFESSOR_READ",
+    },
+    {
+      title: "Actividades",
+      description: "Gestioná actividades.",
+      icon: <FaRunning size={35} />,
+      href: "actividades",
+      permission: "ACTIVITY_READ",
+    },
+    {
+      title: "Profesiones",
+      description: "Configurá profesiones.",
+      icon: <FaBookOpen size={35} />,
+      href: "profesiones",
+      permission: "SPECIALITY_READ",
+    },
+    {
+      title: "Rutinas",
+      description: "Configurá rutinas de entrenamiento.",
+      icon: <FaListCheck size={35} />,
+      href: "rutinas",
+      permission: "ROUTINE_READ",
+    },
+    {
+      title: "Ejercicios",
+      description: "Gestioná ejercicios.",
+      icon: <FaDumbbell size={35} />,
+      href: "ejercicios",
+      permission: "EXERCISE_READ",
+    },
+    {
+      title: "Pagos",
+      description: "Consultá pagos.",
+      icon: <FaMoneyBillWave size={35} />,
+      href: "pagos",
+      permission: "PAYMENT_READ",
+    },
+    {
+      title: "Planes de Alumnos",
+      description: "Administrá los planes de tus alumnos.",
+      icon: <FaTags size={35} />,
+      href: "planes",
+      permission: "STUDENT_PLAN_READ",
+    },
+    {
+      title: "Reservas",
+      description: "Tus próximas clases.",
+      icon: <FaClipboardList size={35} />,
+      href: "reservas",
+      permission: "RESERVATION_READ",
+    },
+  ];
 
-    Professor: [
-      {
-        title: "Novedades",
-        description: "Mira las novedades del negocio y de la app.",
-        icon: <FaBell size={35} />,
-        href: "novedades",
-      },
-      {
-        title: "Clases",
-        description: "Tus clases.",
-        icon: <FaCalendarAlt size={35} />,
-        href: "clases",
-      },
-      {
-        title: "Profesores",
-        description: "Ver profesores.",
-        icon: <FaChalkboardTeacher size={35} />,
-        href: "profesores",
-      },
-      {
-        title: "Actividades",
-        description: "Actividades disponibles.",
-        icon: <FaRunning size={35} />,
-        href: "actividades",
-      },
-      {
-        title: "Profesiones",
-        description: "Configurá profesiones.",
-        icon: <FaBookOpen size={35} />,
-        href: "profesiones",
-      },
-      {
-        title: "Rutinas",
-        description: "Configurá rutinas de entrenamiento.",
-        icon: <FaListCheck size={35} />,
-        href: "rutinas",
-      },
-      {
-        title: "Ejercicios",
-        description: "Gestioná ejercicios.",
-        icon: <FaDumbbell size={35} />,
-        href: "ejercicios",
-      },
-      // {
-      //   title: "Pagos",
-      //   description: "Tus pagos.",
-      //   icon: <FaMoneyBillWave size={35} />,
-      //   href: "pagos",
-      // },
-    ],
+  const userPermissions = useTenantStore((state) =>
+    state.getUserPermissions(id),
+  );
 
-    Student: [
-      {
-        title: "Novedades",
-        description: "Mira las novedades del negocio y de la app.",
-        icon: <FaBell size={35} />,
-        href: "novedades",
-      },
-      {
-        title: "Clases",
-        description: "Clases disponibles.",
-        icon: <FaCalendarAlt size={35} />,
-        href: "clases",
-      },
-      {
-        title: "Profesores",
-        description: "Conocé a tus profesores.",
-        icon: <FaChalkboardTeacher size={35} />,
-        href: "profesores",
-      },
-      {
-        title: "Actividades",
-        description: "Actividades disponibles.",
-        icon: <FaRunning size={35} />,
-        href: "actividades",
-      },
-      {
-        title: "Reservas",
-        description: "Tus proximas clases.",
-        icon: <FaClipboardList size={35} />,
-        href: "reservas",
-      },
-      {
-        title: "Rutinas",
-        description: "Configurá rutinas de entrenamiento.",
-        icon: <FaListCheck size={35} />,
-        href: "rutinas",
-      },
-      // {
-      //   title: "Pagos",
-      //   description: "Consultá tus pagos.",
-      //   icon: <FaMoneyBillWave size={35} />,
-      //   href: "pagos",
-      // },
-    ],
-  };
+  const cards = userPermissions
+    ? sections.filter((section) =>
+        userPermissions.permissions.includes(section.permission),
+      )
+    : [];
+
+  const userRoles = useTenantStore((state) => state.getUserRoles(id));
 
   const roleConfig = {
+    Admin: {
+      text: "Administrador",
+      className: "bg-red-300 text-red-600",
+    },
     Tenant: {
       text: "Dueño",
       className: "bg-purple-300 text-purple-600",
@@ -236,9 +167,12 @@ export default function Tenant({ id }) {
       className: "bg-orange-200 text-yellow-600",
     },
   };
-  const role = roleConfig[tenant?.role];
 
-  const cards = sections[tenant?.role];
+  const role = userRoles.map((role) => roleConfig[role]).find(Boolean);
+
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canUpdateTenant = hasPermission(id, "TENANT_UPDATE");
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unreadCount", tenant?.id],
@@ -304,7 +238,7 @@ export default function Tenant({ id }) {
                 <p className="text-gray-500 mb-1">{tenant?.address}</p>
               )}
 
-              {role.text == "Dueño" && (
+              {canUpdateTenant && (
                 <BlackButton
                   text="Editar datos"
                   onClick={() => setOpenEditAdressModal(true)}

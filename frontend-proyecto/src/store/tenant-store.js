@@ -1,40 +1,40 @@
 import { create } from "zustand";
-import { getUserRolesInTenant } from "../services/tenant";
+import { getMyPermissionInTenant } from "../services/tenant";
+
+const EMPTY_ARRAY = [];
 
 export const useTenantStore = create((set) => ({
-  userRolesInTenant: {},
-  loadingRoles: {},
+  userPermissionsInTenant: {},
+  loadingPermissions: {},
 
-  fetchUserRolesInTenant: async (tenantId) => {
+  fetchUserPermissionsInTenant: async (tenantId) => {
     const state = useTenantStore.getState();
 
-    // Ya están cargados
-    if (state.userRolesInTenant[tenantId]) {
+    if (state.userPermissionsInTenant[tenantId]) {
       return;
     }
 
-    // Ya se están cargando
-    if (state.loadingRoles[tenantId]) {
+    if (state.loadingPermissions[tenantId]) {
       return;
     }
 
     set((state) => ({
-      loadingRoles: {
-        ...state.loadingRoles,
+      loadingPermissions: {
+        ...state.loadingPermissions,
         [tenantId]: true,
       },
     }));
 
     try {
-      const roles = await getUserRolesInTenant(tenantId);
+      const userData = await getMyPermissionInTenant(tenantId);
 
       set((state) => ({
-        userRolesInTenant: {
-          ...state.userRolesInTenant,
-          [tenantId]: roles,
+        userPermissionsInTenant: {
+          ...state.userPermissionsInTenant,
+          [tenantId]: userData,
         },
-        loadingRoles: {
-          ...state.loadingRoles,
+        loadingPermissions: {
+          ...state.loadingPermissions,
           [tenantId]: false,
         },
       }));
@@ -42,22 +42,39 @@ export const useTenantStore = create((set) => ({
       console.error(error);
 
       set((state) => ({
-        loadingRoles: {
-          ...state.loadingRoles,
+        loadingPermissions: {
+          ...state.loadingPermissions,
           [tenantId]: false,
         },
       }));
     }
   },
 
-  getUserRoles: (tenantId) => {
+  getUserPermissions: (tenantId) => {
     const state = useTenantStore.getState();
-    return state.userRolesInTenant[tenantId];
+    return state.userPermissionsInTenant[tenantId];
   },
 
-  clearRoles: () =>
+  getUserRoles: (tenantId) => {
+    const state = useTenantStore.getState();
+    return state.userPermissionsInTenant[tenantId]?.roles || EMPTY_ARRAY;
+  },
+
+  hasPermission: (tenantId, permission) => {
+    const state = useTenantStore.getState();
+
+    const userData = state.userPermissionsInTenant[tenantId];
+
+    if (!userData) {
+      return false;
+    }
+
+    return userData.permissions.includes(permission);
+  },
+
+  clearPermissions: () =>
     set({
-      userRolesInTenant: {},
-      loadingRoles: {},
+      userPermissionsInTenant: {},
+      loadingPermissions: {},
     }),
 }));

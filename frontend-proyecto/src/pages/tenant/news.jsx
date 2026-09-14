@@ -13,10 +13,12 @@ import NewsModal from "../../components/news/news-modal";
 export default function News({ tenantId }) {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-
   const [openCreateModal, setOpenCreateModal] = useState();
-
   const [selectedNews, setSelectedNews] = useState(null);
+
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canCreateNews = hasPermission(tenantId, "NEWS_CREATE");
 
   const {
     data: news = [],
@@ -29,21 +31,17 @@ export default function News({ tenantId }) {
 
   const markMutation = useMutation({
     mutationFn: (novedadId) => markNewsAsRead(novedadId),
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["news", tenantId],
       });
+
       queryClient.invalidateQueries({
         queryKey: ["unreadCount", tenantId],
       });
     },
   });
-
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
-  const canCreateNews =
-    userRoles?.roles?.includes("Tenant") || userRoles?.roles?.includes("Admin");
 
   return (
     <MainLayout>
@@ -55,6 +53,7 @@ export default function News({ tenantId }) {
           <IoArrowBack color="fc697b" />
           Volver
         </button>
+
         {isLoading ? (
           <Loading />
         ) : isError ? (
@@ -84,6 +83,7 @@ export default function News({ tenantId }) {
                     </>
                   )}
                 </p>
+
                 {canCreateNews && (
                   <div className="h-fit min-[900px]:justify-self-end">
                     <BlackButton
@@ -104,7 +104,10 @@ export default function News({ tenantId }) {
                     key={novedad.id}
                     onClick={() => {
                       setSelectedNews(novedad);
-                      if (!novedad.isRead) markMutation.mutate(novedad.id);
+
+                      if (!novedad.isRead) {
+                        markMutation.mutate(novedad.id);
+                      }
                     }}
                     className={`cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
                       !novedad.isRead && "bg-red-100"
@@ -112,15 +115,20 @@ export default function News({ tenantId }) {
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold">{novedad.title}</h3>
+                        <h3 className="font-semibold text-xl">
+                          {novedad.title}
+                        </h3>
+
                         <p className="text-gray-600 text-sm mt-1">
                           {novedad.content}
                         </p>
                       </div>
+
                       {!novedad.isRead && (
                         <span className="w-2 h-2 bg-red-[#fc697b] rounded-full"></span>
                       )}
                     </div>
+
                     <p className="text-xs text-gray-500 mt-2">
                       {new Date(novedad.createdAt).toLocaleDateString("es-AR")}
                     </p>
@@ -131,11 +139,13 @@ export default function News({ tenantId }) {
                   <h3 className="text-xl font-semibold">
                     Todavía no hay noticias
                   </h3>
+
                   {canCreateNews ? (
                     <>
                       <p className="text-gray-500 mt-2 mb-6">
                         Creá noticias para avisar a tus alumnos.
                       </p>
+
                       <div className="flex items-center justify-center">
                         <BlackButton
                           text="+ Crear Noticia"
@@ -156,9 +166,11 @@ export default function News({ tenantId }) {
           </>
         )}
       </div>
+
       {openCreateModal && (
         <NewsForm tenantId={tenantId} close={() => setOpenCreateModal(false)} />
       )}
+
       {selectedNews && (
         <NewsModal
           news={selectedNews}

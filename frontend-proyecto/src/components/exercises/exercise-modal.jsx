@@ -18,21 +18,18 @@ import { updateExerciseSchema } from "../../schema/exercise-schema";
 export default function ExerciseModal({ exercise, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canUpdateExercise = hasPermission(tenantId, "EXERCISE_UPDATE");
+
+  const canDeleteExercise = hasPermission(tenantId, "EXERCISE_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentExercise, setCurrentExercise] = useState(exercise);
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
-
   const [confirmModal, setConfirmModal] = useState(false);
 
   const {
@@ -62,7 +59,6 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
       });
 
       setConfirmModal(false);
-
       setSuccessMessage("Ejercicio eliminado correctamente");
       setSuccessModal(true);
 
@@ -114,7 +110,6 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
       });
 
       setEditing(false);
-
       setSuccessMessage("Ejercicio actualizado correctamente");
       setSuccessModal(true);
 
@@ -173,29 +168,33 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
             {currentExercise.description || "Sin descripción"}
           </p>
 
-          {isTenant && (
+          {(canUpdateExercise || canDeleteExercise) && (
             <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
+              {canDeleteExercise && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
 
-              <BlackButton
-                text="Editar"
-                onClick={() => {
-                  reset({
-                    name: currentExercise.name || "",
-                    description: currentExercise.description || "",
-                  });
+              {canUpdateExercise && (
+                <BlackButton
+                  text="Editar"
+                  onClick={() => {
+                    reset({
+                      name: currentExercise.name || "",
+                      description: currentExercise.description || "",
+                    });
 
-                  setEditing(true);
-                }}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
+                    setEditing(true);
+                  }}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
             </div>
           )}
         </>

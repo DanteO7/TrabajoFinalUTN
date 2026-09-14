@@ -11,14 +11,11 @@ import { useTenantStore } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 
 export default function Professors({ tenantId }) {
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles.includes("Tenant");
+  const canCreateInvitation = hasPermission(tenantId, "INVITATION_CREATE");
 
   const [, setLocation] = useLocation();
-
   const [search, setSearch] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedProfessor, setSelectedProfessor] = useState(null);
@@ -79,7 +76,8 @@ export default function Professors({ tenantId }) {
                   placeholder="Buscar profesor..."
                   className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
-                {isTenant && (
+
+                {canCreateInvitation && (
                   <button
                     onClick={() => setOpenModal(true)}
                     className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
@@ -121,6 +119,7 @@ export default function Professors({ tenantId }) {
                         <p className="text-xs text-gray-600 mb-2">
                           Profesiones:
                         </p>
+
                         <div className="flex flex-wrap gap-1">
                           {professor.specialities.map((spec) => (
                             <span
@@ -141,18 +140,26 @@ export default function Professors({ tenantId }) {
                     Todavía no hay profesores
                   </h3>
 
-                  <p className="text-gray-500 px-2 mt-2 mb-6">
-                    Invitá tu primer profesor para comenzar.
-                  </p>
+                  {canCreateInvitation ? (
+                    <>
+                      <p className="text-gray-500 px-2 mt-2 mb-6">
+                        Invitá tu primer profesor para comenzar.
+                      </p>
 
-                  <div className="flex items-center justify-center">
-                    <BlackButton
-                      text="+ Invitar profesor"
-                      onClick={() => setOpenModal(true)}
-                      textSmall={true}
-                      wfit={true}
-                    />
-                  </div>
+                      <div className="flex items-center justify-center">
+                        <BlackButton
+                          text="+ Invitar profesor"
+                          onClick={() => setOpenModal(true)}
+                          textSmall={true}
+                          wfit={true}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-gray-500 px-2 mt-2 mb-6">
+                      Todavía no hay profesores.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

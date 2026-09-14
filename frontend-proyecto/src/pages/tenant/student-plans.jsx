@@ -9,13 +9,17 @@ import MainLayout from "../../layouts/main-layout";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import BlackButton from "../../components/buttons/black-button";
+import { useTenantStore } from "../../store/tenant-store";
 
 export default function StudentPlans({ tenantId }) {
   const [, setLocation] = useLocation();
-
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canCreateStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_CREATE");
 
   const {
     data: plans = [],
@@ -69,14 +73,16 @@ export default function StudentPlans({ tenantId }) {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Planes de alumno</h2>
 
-          <div className="justify-self-end">
-            <BlackButton
-              text="+ Nuevo plan"
-              onClick={() => setOpenCreateForm(true)}
-              textSmall={true}
-              wfit={true}
-            />
-          </div>
+          {canCreateStudentPlan && (
+            <div className="justify-self-end">
+              <BlackButton
+                text="+ Nuevo plan"
+                onClick={() => setOpenCreateForm(true)}
+                textSmall={true}
+                wfit={true}
+              />
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -92,17 +98,21 @@ export default function StudentPlans({ tenantId }) {
           ) : (
             <div className="col-span-full border rounded-xl py-16 text-center">
               <h3 className="text-xl font-semibold">No hay planes</h3>
+
               <p className="text-gray-500 mt-2 mb-6">
                 Creá un nuevo plan para comenzar.
               </p>
-              <div className="flex items-center justify-center">
-                <BlackButton
-                  text="+ Crear plan"
-                  onClick={() => setOpenCreateForm(true)}
-                  textSmall={true}
-                  wfit={true}
-                />
-              </div>
+
+              {canCreateStudentPlan && (
+                <div className="flex items-center justify-center">
+                  <BlackButton
+                    text="+ Crear plan"
+                    onClick={() => setOpenCreateForm(true)}
+                    textSmall={true}
+                    wfit={true}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

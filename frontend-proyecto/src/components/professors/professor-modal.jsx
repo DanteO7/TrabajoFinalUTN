@@ -15,29 +15,23 @@ import WhiteButton from "../buttons/white-button";
 export default function ProfessorModal({ professor, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canUpdateProfessor = hasPermission(tenantId, "PROFESSOR_UPDATE");
+
+  const canDeleteProfessor = hasPermission(tenantId, "PROFESSOR_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentProfessor, setCurrentProfessor] = useState(professor);
-
   const [isActive, setIsActive] = useState(professor.isActive);
-
   const [selectedSpecialityIds, setSelectedSpecialityIds] = useState(
     professor.specialities.map((spec) => spec.specialityId),
   );
-
   const [openSpecialityModal, setOpenSpecialityModal] = useState(false);
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
-
   const [confirmModal, setConfirmModal] = useState(false);
 
   const { data: specialities = [] } = useQuery({
@@ -84,7 +78,6 @@ export default function ProfessorModal({ professor, tenantId, close }) {
       });
 
       setConfirmModal(false);
-
       setSuccessMessage("Profesor eliminado correctamente");
       setSuccessModal(true);
 
@@ -122,14 +115,13 @@ export default function ProfessorModal({ professor, tenantId, close }) {
       });
 
       setCurrentProfessor(updatedProfessor);
-
       setIsActive(updatedProfessor.isActive);
+
       setSelectedSpecialityIds(
         updatedProfessor.specialities.map((spec) => spec.specialityId),
       );
 
       setEditing(false);
-
       setSuccessMessage("Profesor actualizado correctamente");
       setSuccessModal(true);
 
@@ -194,19 +186,23 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                 </p>
               </div>
             )}
+
             {(currentProfessor.user.weight || currentProfessor.user.age) && (
               <div className="flex gap-4">
                 {currentProfessor.user.age && (
                   <div className="bg-[#efefef] rounded-xl p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">Edad</p>
+
                     <p className="font-semibold text-[#333]">
                       {currentProfessor.user.age} Años
                     </p>
                   </div>
                 )}
+
                 {currentProfessor.user.weight && (
                   <div className="bg-[#efefef] rounded-xl p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">Peso</p>
+
                     <p className="font-semibold text-[#333]">
                       {currentProfessor.user.weight} Kg
                     </p>
@@ -247,22 +243,26 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             )}
           </div>
 
-          {isTenant && (
+          {(canUpdateProfessor || canDeleteProfessor) && (
             <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
+              {canDeleteProfessor && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
 
-              <BlackButton
-                text="Editar"
-                onClick={startEditing}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
+              {canUpdateProfessor && (
+                <BlackButton
+                  text="Editar"
+                  onClick={startEditing}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
             </div>
           )}
         </>
@@ -271,6 +271,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           <h2 className="text-2xl font-semibold text-center">
             Editar profesor
           </h2>
+
           <div>
             <label className="block text-sm font-semibold mb-3">Estado</label>
 
@@ -292,6 +293,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
               ))}
             </div>
           </div>
+
           <div>
             <label className="block text-sm font-semibold mb-3">
               Profesiones
@@ -340,13 +342,13 @@ export default function ProfessorModal({ professor, tenantId, close }) {
               disabled={availableSpecialities.length === 0}
             />
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
               text="Cancelar"
               onClick={() => {
                 setEditing(false);
                 setIsActive(currentProfessor.isActive);
-
                 setSelectedSpecialityIds(
                   currentProfessor.specialities.map(
                     (spec) => spec.specialityId,
@@ -365,6 +367,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           </div>
         </div>
       )}
+
       {openSpecialityModal && (
         <Modal open onClose={() => setOpenSpecialityModal(false)}>
           <h2 className="text-2xl font-semibold mb-5">Agregar profesiones</h2>
@@ -392,6 +395,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           )}
         </Modal>
       )}
+
       {confirmModal && (
         <ConfirmModal
           title="¿Eliminar este profesor?"
@@ -401,6 +405,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           isPending={deleteMutation.isPending}
         />
       )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}
@@ -408,6 +413,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           isSuccesOrError={true}
         />
       )}
+
       {successModal && (
         <SuccessModal
           close={() => setSuccessModal(false)}

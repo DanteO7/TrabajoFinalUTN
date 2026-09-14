@@ -13,7 +13,7 @@ import BlackButton from "../components/buttons/black-button";
 export default function VerifyCode() {
   const [, setLocation] = useLocation();
   const { login } = useAuthStore();
-  const clearRoles = useTenantStore((state) => state.clearRoles);
+  const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [seconds, setSeconds] = useState(0);
   const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
@@ -48,7 +48,7 @@ export default function VerifyCode() {
     mutationFn: signUp,
     onSuccess: (data) => {
       localStorage.removeItem("pendingSignUp");
-      clearRoles();
+      clearPermissions();
       login(data);
 
       if (data?.roles?.length > 0) {

@@ -119,7 +119,7 @@ export default function EditProfileModal({ close }) {
             label="Edad"
             id="age"
             type="number"
-            placeholder="Entre 1-120"
+            placeholder="Entre 1-120 años"
             register={register("age")}
             error={errors.age}
             disabled={isSubmitting || mutation.isPending}
@@ -128,7 +128,7 @@ export default function EditProfileModal({ close }) {
             label="Peso"
             id="weight"
             type="number"
-            placeholder="Entre 1-300"
+            placeholder="Entre 1-300 kg"
             register={register("weight")}
             error={errors.weight}
             disabled={isSubmitting || mutation.isPending}

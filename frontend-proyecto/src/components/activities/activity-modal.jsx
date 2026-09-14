@@ -18,11 +18,11 @@ import FormInput from "../form-input";
 export default function ActivityModal({ activity, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
+  const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const isTenant = userRoles?.roles?.includes("Tenant");
+  const canUpdateActivity = hasPermission(tenantId, "ACTIVITY_UPDATE");
+
+  const canDeleteActivity = hasPermission(tenantId, "ACTIVITY_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentActivity, setCurrentActivity] = useState(activity);
@@ -173,23 +173,27 @@ export default function ActivityModal({ activity, tenantId, close }) {
             {currentActivity.description || "Sin descripción"}
           </p>
 
-          {isTenant && (
-            <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
+          {(canUpdateActivity || canDeleteActivity) && (
+            <>
+              {canDeleteActivity && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
 
-              <BlackButton
-                text="Editar"
-                onClick={() => setEditing(true)}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
-            </div>
+              {canUpdateActivity && (
+                <BlackButton
+                  text="Editar"
+                  onClick={() => setEditing(true)}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
+            </>
           )}
         </>
       ) : (

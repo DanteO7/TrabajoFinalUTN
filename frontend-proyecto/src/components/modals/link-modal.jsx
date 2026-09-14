@@ -13,6 +13,8 @@ import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 import RedButton from "../buttons/red-button";
 import { Trash2 } from "lucide-react";
+import { Copy } from "lucide-react";
+import { Check } from "lucide-react";
 
 export default function LinkModal({ tenantId, close, role }) {
   const queryClient = useQueryClient();
@@ -20,6 +22,21 @@ export default function LinkModal({ tenantId, close, role }) {
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
 
+  const [copied, setCopied] = useState(false);
+
+  const copyPaymentData = async (value) => {
+    try {
+      await navigator.clipboard.writeText(value);
+
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("No se pudo copiar:", error);
+    }
+  };
   const { data: currentInvitation, isLoading } = useQuery({
     queryKey: ["invitation", tenantId, role],
     queryFn: () => getInvitationByTenant(tenantId, role),
@@ -51,7 +68,6 @@ export default function LinkModal({ tenantId, close, role }) {
       setErrorModal(true);
     },
   });
-  console.log(currentInvitation);
 
   const deleteMutation = useMutation({
     mutationFn: (id) => deleteInvitation(id),
@@ -101,11 +117,12 @@ export default function LinkModal({ tenantId, close, role }) {
             />
 
             <BlackButton
-              text="Copiar link"
-              onClick={() =>
-                navigator.clipboard.writeText(currentInvitation.link)
-              }
-              textSmall={true}
+              type="button"
+              text={copied ? "Copiado" : "Copiar"}
+              textSmall
+              img={copied ? <Check size={16} /> : <Copy size={16} />}
+              onClick={() => copyPaymentData(currentInvitation.link)}
+              className="flex items-center gap-2 shrink-0 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-black hover:bg-white transition cursor-pointer"
             />
 
             <p className="text-sm text-gray-600 mt-2">

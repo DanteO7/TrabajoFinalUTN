@@ -1,4 +1,4 @@
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,31 +29,31 @@ import {
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
-import { Trash2 } from "lucide-react";
 
 export default function ClassModal({ classItem, tenantId, close }) {
   const queryClient = useQueryClient();
+
   const { user } = useAuthStore();
 
-  const userRoles = useTenantStore(
-    (state) => state.userRolesInTenant[tenantId],
-  );
-  const canEdit =
-    userRoles?.roles?.includes("Tenant") ||
-    userRoles?.roles?.includes("Professor");
-  const isStudent = userRoles?.roles?.includes("Student");
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canUpdateClass = hasPermission(tenantId, "CLASS_UPDATE");
+
+  const canDeleteClass = hasPermission(tenantId, "CLASS_DELETE");
+
+  const canReadStudents = hasPermission(tenantId, "STUDENT_READ");
+
+  const canCreateReservation = hasPermission(tenantId, "RESERVATION_CREATE");
+
+  const canDeleteReservation = hasPermission(tenantId, "RESERVATION_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentClass, setCurrentClass] = useState(classItem);
-
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
-
   const [successMessage, setSuccessMessage] = useState();
   const [successModal, setSuccessModal] = useState(false);
-
   const [studentsModal, setStudentsModal] = useState(false);
-
   const [confirmModal, setConfirmModal] = useState(false);
 
   const classStart = new Date(
@@ -64,9 +64,13 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const formatDateWithDay = (dateString) => {
     const [year, month, day] = dateString.split("T")[0].split("-");
+
     const date = new Date(year, month - 1, day);
 
-    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
+    const dayName = date.toLocaleDateString("es-AR", {
+      weekday: "long",
+    });
+
     const dateFormatted = date.toLocaleDateString("es-AR");
 
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
@@ -102,7 +106,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const { data: currentStudent } = useQuery({
     queryKey: ["getStudentByUser", tenantId, user?.id],
     queryFn: () => getStudentByUser(tenantId),
-    enabled: isStudent && !!user?.id,
+    enabled: canCreateReservation && !!user?.id,
   });
 
   const { data: reservations = [] } = useQuery({
@@ -122,6 +126,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const isInWaitlist = !!currentWaitlist;
 
   const isFull = currentClass.reservationsCount >= currentClass.maxCapacity;
+
   const currentReservation = reservations.find(
     (r) => r.classId === currentClass.id,
   );
@@ -147,12 +152,14 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al eliminar la clase";
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.message) msg = data.message;
+
       setConfirmModal(false);
       setBackendError(msg);
       setErrorModal(true);
@@ -163,10 +170,15 @@ export default function ClassModal({ classItem, tenantId, close }) {
     mutationFn: (form) =>
       updateClass(currentClass.id, {
         activityId: form.activityId ? Number(form.activityId) : undefined,
+
         professorId: form.professorId ? Number(form.professorId) : undefined,
+
         date: form.date || undefined,
+
         startTime: form.startTime ? `${form.startTime}:00` : undefined,
+
         endTime: form.endTime ? `${form.endTime}:00` : undefined,
+
         maxCapacity: form.maxCapacity ? Number(form.maxCapacity) : undefined,
       }),
 
@@ -177,7 +189,6 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
       setSuccessMessage("Clase actualizada correctamente");
       setSuccessModal(true);
-
       setCurrentClass(updatedClass);
       setEditing(false);
 
@@ -188,6 +199,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al actualizar la clase";
 
       if (typeof data === "string") msg = data;
@@ -223,6 +235,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al unirse a la clase";
 
       if (typeof data === "string") msg = data;
@@ -248,6 +261,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       });
 
       setSuccessMessage("Te agregaste a la lista de espera correctamente.");
+
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -257,6 +271,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al entrar a la lista de espera";
 
       if (typeof data === "string") msg = data;
@@ -278,6 +293,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
       });
 
       setSuccessMessage("Saliste de la lista de espera correctamente.");
+
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -287,6 +303,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al salir de la lista de espera";
 
       if (typeof data === "string") msg = data;
@@ -321,6 +338,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al salir de la clase";
 
       if (typeof data === "string") msg = data;
@@ -342,13 +360,16 @@ export default function ClassModal({ classItem, tenantId, close }) {
       ...currentClass,
       reservationsCount: currentClass.reservationsCount - quantity,
     };
+
     setCurrentClass(updatedClass);
   };
+
   const increaseReservationCount = (quantity) => {
     const updatedClass = {
       ...currentClass,
       reservationsCount: currentClass.reservationsCount + quantity,
     };
+
     setCurrentClass(updatedClass);
   };
 
@@ -375,6 +396,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
           <div className="space-y-4 mb-8">
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Fecha</p>
+
               <p className="font-semibold text-[#333]">
                 {formatDateWithDay(currentClass.date)}
               </p>
@@ -382,6 +404,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">Horario</p>
+
               <p className="font-semibold text-[#333]">
                 {currentClass.startTime.slice(0, 5)} -{" "}
                 {currentClass.endTime.slice(0, 5)}
@@ -389,7 +412,9 @@ export default function ClassModal({ classItem, tenantId, close }) {
             </div>
 
             <div
-              className={`bg-[#efefef] rounded-xl p-4 ${isFull && "bg-red-100"}`}
+              className={`bg-[#efefef] rounded-xl p-4 ${
+                isFull && "bg-red-100"
+              }`}
             >
               <p className="text-sm text-gray-600 mb-1">
                 {isFull ? "Lleno" : "Disponibilidad"}
@@ -402,7 +427,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
                 </p>
 
                 <div className="flex items-center gap-2">
-                  {canEdit && (
+                  {canReadStudents && (
                     <button
                       onClick={() => setStudentsModal(true)}
                       className="bg-[#333] text-[12px] min-[900px]:text-[16px] text-white px-3 min-[900px]:px-4 py-1.5 rounded-lg text-sm hover:bg-[#222] transition cursor-pointer"
@@ -415,23 +440,28 @@ export default function ClassModal({ classItem, tenantId, close }) {
             </div>
           </div>
 
-          {canEdit ? (
+          {canUpdateClass || canDeleteClass ? (
             <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
-              <BlackButton
-                text="Editar"
-                onClick={() => setEditing(true)}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
+              {canDeleteClass && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
+
+              {canUpdateClass && (
+                <BlackButton
+                  text="Editar"
+                  onClick={() => setEditing(true)}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
             </div>
-          ) : isStudent ? (
+          ) : canCreateReservation ? (
             classStarted ? (
               <div className="w-full py-3 rounded-xl text-center bg-gray-200 text-gray-600 font-semibold">
                 No disponible
@@ -444,16 +474,19 @@ export default function ClassModal({ classItem, tenantId, close }) {
                   onClick={close}
                   textSmall={true}
                 />
-                <RedButton
-                  onClick={() => cancelReservationMutation.mutate()}
-                  disabled={cancelReservationMutation.isPending}
-                  text={
-                    cancelReservationMutation.isPending
-                      ? "Saliendo..."
-                      : "Salir de la clase"
-                  }
-                  textSmall={true}
-                />
+
+                {canDeleteReservation && (
+                  <RedButton
+                    onClick={() => cancelReservationMutation.mutate()}
+                    disabled={cancelReservationMutation.isPending}
+                    text={
+                      cancelReservationMutation.isPending
+                        ? "Saliendo..."
+                        : "Salir de la clase"
+                    }
+                    textSmall={true}
+                  />
+                )}
               </div>
             ) : isInWaitlist ? (
               <RedButton
@@ -485,6 +518,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
                   onClick={close}
                   textSmall={true}
                 />
+
                 <BlackButton
                   onClick={() => reservationMutation.mutate()}
                   disabled={reservationMutation.isPending || !currentStudent}
@@ -509,17 +543,20 @@ export default function ClassModal({ classItem, tenantId, close }) {
             <label className="block text-sm font-semibold mb-2">
               Actividad
             </label>
+
             <select
               {...register("activityId")}
               className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
             >
               <option value="">Selecciona una actividad</option>
+
               {activities.map((activity) => (
                 <option key={activity.id} value={activity.id}>
                   {activity.name}
                 </option>
               ))}
             </select>
+
             {errors.activityId && (
               <p className="text-red-500 text-[13px] mt-1">
                 {errors.activityId.message}
@@ -529,17 +566,20 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
           <div>
             <label className="block text-sm font-semibold mb-2">Profesor</label>
+
             <select
               {...register("professorId")}
               className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
             >
               <option value="">Selecciona un profesor</option>
+
               {professors.map((professor) => (
                 <option key={professor.id} value={professor.id}>
                   {professor.user.name} {professor.user.surname}
                 </option>
               ))}
             </select>
+
             {errors.professorId && (
               <p className="text-red-500 text-[13px] mt-1">
                 {errors.professorId.message}
@@ -574,6 +614,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
             register={register("maxCapacity")}
             error={errors.maxCapacity}
           />
+
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
               type="button"
@@ -581,6 +622,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
               onClick={() => setEditing(false)}
               textSmall={true}
             />
+
             <BlackButton
               text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
               type="submit"
@@ -594,7 +636,12 @@ export default function ClassModal({ classItem, tenantId, close }) {
       {confirmModal && (
         <ConfirmModal
           title="¿Eliminar esta clase?"
-          message={`Estás por eliminar la clase del dia ${formatDateWithDay(currentClass.date)} a las ${currentClass.startTime.slice(0, 5)} - ${currentClass.endTime.slice(0, 5)}.`}
+          message={`Estás por eliminar la clase del dia ${formatDateWithDay(
+            currentClass.date,
+          )} a las ${currentClass.startTime.slice(
+            0,
+            5,
+          )} - ${currentClass.endTime.slice(0, 5)}.`}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}
