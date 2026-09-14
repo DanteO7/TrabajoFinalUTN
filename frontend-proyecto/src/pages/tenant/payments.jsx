@@ -318,8 +318,8 @@ export default function Payments({ tenantId }) {
                               Tenés una cuota pendiente de pago.
                             </p>
 
-                            {myTenantStatus?.mercadoPagoConnected && (
-                              <div className="flex max-[550px]:flex-col gap-3 mt-5 min-[600px]:max-w-116">
+                            <div className="flex max-[550px]:flex-col gap-3 mt-5 min-[600px]:max-w-116">
+                              {myTenantStatus?.mercadoPagoConnected && (
                                 <BlackButton
                                   text={
                                     mercadoPagoMutation.isPending
@@ -331,15 +331,13 @@ export default function Payments({ tenantId }) {
                                   onClick={mercadoPagoMutation.mutate}
                                   disabled={mercadoPagoMutation.isPending}
                                 />
-
-                                <BlackButton
-                                  text="Ver datos para transferir"
-                                  textSmall={true}
-                                  onClick={() => setOpenModal(true)}
-                                  disabled={mercadoPagoMutation.isPending}
-                                />
-                              </div>
-                            )}
+                              )}
+                              <BlackButton
+                                text="Ver datos para transferir"
+                                textSmall={true}
+                                onClick={() => setOpenModal(true)}
+                              />
+                            </div>
 
                             {!myTenantStatus?.mercadoPagoConnected && (
                               <p className="text-gray-500 mt-4">
