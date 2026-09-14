@@ -31,6 +31,8 @@ namespace backend_proyecto.Config
         public DbSet<ProfessorPermission> ProfessorPermissions { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Routine> Routines { get; set; }
+        public DbSet<News> News { get; set; }
+        public DbSet<NewsRead> NewsRead { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

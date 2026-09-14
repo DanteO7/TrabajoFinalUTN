@@ -17,16 +17,18 @@ namespace backend_proyecto.Controllers
     public class TenantController : ControllerBase
     {
         private readonly TenantServices _tenantServices;
+        private readonly PermissionServices _permissionServices;
         private readonly IUserServices _userServices;
         private readonly AuthServices _authServices;
         private readonly IMapper _mapper;
 
-        public TenantController(TenantServices tenantServices, IUserServices userServices, AuthServices authServices, IMapper mapper)
+        public TenantController(TenantServices tenantServices, IUserServices userServices, AuthServices authServices, IMapper mapper, PermissionServices permissionServices)
         {
             _tenantServices = tenantServices;
             _userServices = userServices;
             _authServices = authServices;
             _mapper = mapper;
+            _permissionServices = permissionServices;
         }
 
         [HttpGet]
@@ -187,20 +189,22 @@ namespace backend_proyecto.Controllers
             return Ok(tenants);
         }
 
-        [HttpGet("{tenantId}/user-roles")]
+        [HttpGet("{tenantId}/my-permissions")]
         [Authorize]
-        public async Task<ActionResult<UserTenantRolesDTO>> GetUserRolesInTenant(int tenantId)
+        public async Task<IActionResult> GetMyPermissionsInTenant(
+            int tenantId)
         {
-            try
-            {
-                var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var roles = await _tenantServices.GetUserRolesInTenant(userId, tenantId);
-                return Ok(roles);
-            }
-            catch (HttpResponseError ex)
-            {
-                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
-            }
+            var userId = int.Parse(
+                User.FindFirst("id")?.Value!
+            );
+
+            var result =
+                await _permissionServices.GetUserPermissionsInTenant(
+                    userId,
+                    tenantId
+                );
+
+            return Ok(result);
         }
     }
 }

@@ -5,7 +5,6 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -21,8 +20,19 @@ namespace backend_proyecto.Services
         private readonly IReservationRepository _reservationRepository;
         private readonly PermissionServices _permissionServices;
         private readonly GroupServices _groupServices;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public StudentServices(IStudentRepository studentRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IStudentPlanRepository studentPlanRepository, IMapper mapper, IProfessorRepository professorRepository, IReservationRepository reservationRepository, PermissionServices permissionServices, GroupServices groupServices)
+        public StudentServices(
+            IStudentRepository studentRepository,
+            IUserRepository userRepository,
+            ITenantRepository tenantRepository,
+            IStudentPlanRepository studentPlanRepository,
+            IMapper mapper,
+            IProfessorRepository professorRepository,
+            IReservationRepository reservationRepository,
+            PermissionServices permissionServices,
+            GroupServices groupServices,
+            IPaymentRepository paymentRepository)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
@@ -33,6 +43,7 @@ namespace backend_proyecto.Services
             _reservationRepository = reservationRepository;
             _permissionServices = permissionServices;
             _groupServices = groupServices;
+            _paymentRepository = paymentRepository;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -223,6 +234,77 @@ namespace backend_proyecto.Services
             }
 
             return _mapper.Map<ResponseStudentDTO>(student);
+        }
+        public async Task<List<ResponseStudentDTO>> GetPendingPaymentStudents(int tenantId,int userId)
+        {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_READ);
+
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un tenant con el Id = '{tenantId}'"
+                );
+            }
+
+            var hasAccess =
+                tenant.OwnerUserId == userId ||
+                tenant.Professors.Any(p => p.UserId == userId) ||
+                tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "No tenés acceso a este tenant"
+                );
+            }
+
+            var now = DateTime.UtcNow;
+
+            var startOfMonth = new DateTime(
+                now.Year,
+                now.Month,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc
+            );
+
+            var startOfNextMonth = startOfMonth.AddMonths(1);
+
+            var paidUserIds = await _paymentRepository
+                .Query()
+                .Where(p =>
+                    p.TenantId == tenantId &&
+                    p.PlanType == PlanType.STUDENT &&
+                    p.PaymentDate >= startOfMonth &&
+                    p.PaymentDate < startOfNextMonth &&
+                    p.Status != PaymentStatus.CANCELLED &&
+                    p.Status != PaymentStatus.REJECTED
+                )
+                .Select(p => p.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            var students = await _studentRepository
+                .Query()
+                .Include(s => s.User)
+                .Include(s => s.StudentPlan)
+                .Where(s =>
+                    s.TenantId == tenantId &&
+                    !paidUserIds.Contains(s.UserId)
+                )
+                .ToListAsync();
+
+            return _mapper.Map<List<ResponseStudentDTO>>(students);
         }
     }
 }

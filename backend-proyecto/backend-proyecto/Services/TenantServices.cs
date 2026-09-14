@@ -5,6 +5,7 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -299,6 +300,16 @@ namespace backend_proyecto.Services
                 tenant.SocialNetworks = updateTenantDTO.SocialNetworks;
             }
 
+            if (updateTenantDTO.Alias != null)
+            {
+                tenant.Alias = updateTenantDTO.Alias.Trim();
+            }
+
+            if (updateTenantDTO.CBU != null)
+            {
+                tenant.CBU = updateTenantDTO.CBU.Trim();
+            }
+
             await _tenantRepository.UpdateOneAsync(tenant);
 
             return _mapper.Map<ResponseTenantDTO>(tenant);
@@ -320,26 +331,11 @@ namespace backend_proyecto.Services
             return Roles.STUDENT;
         }
 
-        public async Task<UserTenantRolesDTO> GetUserRolesInTenant(int userId, int tenantId)
+        public async Task<List<ResponseTenantDTO>> GetMyOwnedTenants(int userId)
         {
-            await _permissionServices.CheckPermission(Permissions.TENANT_READ, tenantId);
+            var tenants = await _tenantRepository.GetMyOwnedTenants(userId);
 
-            var roles = new List<string>();
-
-            if (await _professorRepository.ExistsByUserAndTenant(userId, tenantId))
-                roles.Add(Roles.PROFESSOR);
-
-            if (await _studentRepository.ExistsByUserAndTenant(userId, tenantId))
-                roles.Add(Roles.STUDENT);
-
-            if (await _tenantRepository.ExistsByOwnerAndId(userId, tenantId))
-                roles.Add(Roles.TENANT);
-
-            return new UserTenantRolesDTO
-            {
-                Roles = roles,
-                HasAccessToTenant = roles.Count > 0
-            };
+            return _mapper.Map<List<ResponseTenantDTO>>(tenants);
         }
     }
 }

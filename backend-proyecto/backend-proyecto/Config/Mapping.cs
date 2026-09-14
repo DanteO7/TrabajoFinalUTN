@@ -59,8 +59,13 @@ namespace backend_proyecto.Config
 
             // payment
             CreateMap<CreatePaymentDTO, Payment>();
-            CreateMap<UpdateActivityDTO, Payment>();
-            CreateMap<Payment, ResponsePaymentDTO>();
+            CreateMap<UpdatePaymentDTO, Payment>()
+            .ForAllMembers(opts =>
+                opts.Condition((src, dest, srcMember) => srcMember != null)
+            );
+            CreateMap<Payment, ResponsePaymentDTO>()
+                .ForMember(dest => dest.TenantName,
+                    opt => opt.MapFrom(src => src.Tenant.Name));
 
             // class
             CreateMap<CreateClassDTO, Class>();

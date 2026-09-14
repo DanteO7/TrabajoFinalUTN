@@ -21,6 +21,12 @@ namespace backend_proyecto.Config.EntityConfigurations
                   .WithMany()
                   .HasForeignKey(p => p.UserId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(p => p.Status)
+                  .IsRequired();
+
+            entity.Property(p => p.ExternalPaymentId)
+                  .IsRequired(false);
         }
     }
 }

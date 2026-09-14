@@ -16,5 +16,11 @@ namespace backend_proyecto.Models.DTOs
         public Dictionary<string, string>? SocialNetworks { get; set; }
 
         public string? MonthlyFeeStatus { get; set; }
+
+        [MaxLength(100)]
+        public string? Alias { get; set; }
+
+        [MaxLength(22)]
+        public string? CBU { get; set; }
     }
 }

@@ -34,6 +34,18 @@ namespace backend_proyecto.Config.EntityConfigurations
                   .OnDelete(DeleteBehavior.Restrict); ;
 
             entity.HasIndex(t => new { t.OwnerUserId, t.Name }).IsUnique();
+
+            entity.Property(t => t.MercadoPagoAccessToken)
+                  .IsRequired(false);
+
+            entity.Property(t => t.MercadoPagoRefreshToken)
+                  .IsRequired(false);
+
+            entity.Property(t => t.MercadoPagoTokenExpiresAt)
+                  .IsRequired(false);
+
+            entity.Property(t => t.MercadoPagoUserId)
+                  .IsRequired(false);
         }
     }
 }

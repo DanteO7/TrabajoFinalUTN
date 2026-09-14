@@ -13,5 +13,7 @@
         public string Role { get; set; } = null!;
         public ResponseTenantPlanDTO TenantPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
+        public string? Alias { get; set; }
+        public string? CBU { get; set; }
     }
 }

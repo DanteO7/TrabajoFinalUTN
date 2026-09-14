@@ -13,6 +13,17 @@
         public TenantPlan TenantPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
         public DateTime? MonthlyFeeStatusUpdatedAt { get; set; }
+
+        // Mercado Pago
+        public string? MercadoPagoAccessToken { get; set; }
+        public string? MercadoPagoRefreshToken { get; set; }
+        public DateTime? MercadoPagoTokenExpiresAt { get; set; }
+        public string? MercadoPagoUserId { get; set; }
+
+        // Transferencia
+        public string? Alias { get; set; }
+        public string? CBU { get; set; }
+
         public ICollection<Professor> Professors { get; set; } = new List<Professor>();
         public ICollection<Student> Students { get; set; } = new List<Student>();
     }

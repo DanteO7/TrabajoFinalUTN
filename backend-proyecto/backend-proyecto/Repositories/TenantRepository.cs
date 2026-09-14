@@ -21,6 +21,10 @@ public interface ITenantRepository : IRepository<Tenant>
         DateTime date,
         CancellationToken cancellationToken = default
     );
+    Task<Tenant?> GetByMercadoPagoUserIdAsync(
+    string mercadoPagoUserId);
+
+    Task<List<Tenant>> GetMyOwnedTenants(int userId);
 }
 
 public class TenantRepository : Repository<Tenant>, ITenantRepository
@@ -112,5 +116,20 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
                     ),
                 cancellationToken
             );
+    }
+    public async Task<Tenant?> GetByMercadoPagoUserIdAsync(
+    string mercadoPagoUserId)
+    {
+        return await _db.Tenants
+            .FirstOrDefaultAsync(
+                t => t.MercadoPagoUserId == mercadoPagoUserId
+            );
+    }
+    public async Task<List<Tenant>> GetMyOwnedTenants(int userId)
+    {
+        return await _db.Tenants
+            .Where(t => t.OwnerUserId == userId)
+            .Include(t => t.TenantPlan)
+            .ToListAsync();
     }
 }

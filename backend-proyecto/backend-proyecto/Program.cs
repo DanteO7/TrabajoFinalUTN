@@ -78,6 +78,7 @@ builder.Services.AddScoped<CurrentTenantService>();
 builder.Services.AddScoped<ProfessorPermissionServices>();
 builder.Services.AddScoped<ExerciseServices>();
 builder.Services.AddScoped<RoutineServices>();
+builder.Services.AddScoped<MercadoPagoServices>();
 
 builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
 builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();
@@ -149,6 +150,12 @@ builder.Services.Configure<ResendClientOptions>(options =>
     options.ApiToken = builder.Configuration.GetSection("Resend:ApiKey")?.Value?.ToString() ?? string.Empty;
 });
 
+builder.Services.AddHttpClient();
+
+builder.Services.Configure<MercadoPagoSettings>(
+    builder.Configuration.GetSection("MercadoPago")
+);
+
 builder.Services.AddTransient<IResend, ResendClient>();
 
 var app = builder.Build();
@@ -167,16 +174,6 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine(ex.ToString());
         throw;
     }
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    var groupServices = scope.ServiceProvider
-        .GetRequiredService<GroupServices>();
-
-    await groupServices.CreateDefaultGroupsForAllTenants();
-
-    await groupServices.AssignDefaultGroupsToExistingUsers();
 }
 
 var allowedOrigins = builder.Configuration

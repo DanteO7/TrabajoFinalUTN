@@ -151,5 +151,35 @@ namespace backend_proyecto.Controllers
                 return StatusCode((int)ex.StatusCode, new { message = ex.Message });
             }
         }
+
+        [HttpGet("pending-payment/{tenantId}")]
+        [Authorize]
+        [ProducesResponseType(typeof(List<ResponseStudentDTO>),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage),StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage),StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage),StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<ResponseStudentDTO>>> GetPendingPaymentStudents(int tenantId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+
+                var students =
+                    await _studentServices.GetPendingPaymentStudents(
+                        tenantId,
+                        userId
+                    );
+
+                return Ok(students);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

@@ -165,28 +165,10 @@ namespace backend_proyecto.Services
             );
         }
 
-        public async Task CreateDefaultGroupsForAllTenants()
-        {
-            var tenantIds = await _context.Tenants
-                .Select(t => t.Id)
-                .ToListAsync();
-
-            Console.WriteLine($"TENANTS ENCONTRADOS: {tenantIds.Count}");
-
-            foreach (var tenantId in tenantIds)
-            {
-                Console.WriteLine($"ACTUALIZANDO TENANT: {tenantId}");
-
-                await CreateDefaultGroups(tenantId);
-            }
-        }
-
         private async Task<Group> CreateGroupIfNotExists(
             string name,
             int tenantId)
         {
-            Console.WriteLine($"BUSCANDO {name} - TENANT {tenantId}");
-
             var group = await _context.Groups
                 .Include(g => g.GroupPermissions)
                 .FirstOrDefaultAsync(g =>
@@ -194,14 +176,8 @@ namespace backend_proyecto.Services
                     g.TenantId == tenantId
                 );
 
-            Console.WriteLine(
-                $"RESULTADO {name}: {(group == null ? "NO EXISTE" : $"EXISTE ID={group.Id}")}"
-            );
-
             if (group != null)
                 return group;
-
-            Console.WriteLine($"CREANDO {name}");
 
             group = new Group
             {
@@ -211,8 +187,6 @@ namespace backend_proyecto.Services
 
             _context.Groups.Add(group);
             await _context.SaveChangesAsync();
-
-            Console.WriteLine($"CREADO {name} ID={group.Id}");
 
             return group;
         }
@@ -418,62 +392,6 @@ namespace backend_proyecto.Services
             });
 
             await _context.SaveChangesAsync();
-        }
-        public async Task AssignDefaultGroupsToExistingUsers()
-        {
-            Console.WriteLine(
-                "========== ASIGNANDO GRUPOS A USUARIOS EXISTENTES =========="
-            );
-
-            var students = await _context.Students
-                .ToListAsync();
-
-            foreach (var student in students)
-            {
-                await AssignUserToGroupIfNotExists(
-                    student.UserId,
-                    student.TenantId,
-                    "STUDENT"
-                );
-
-                Console.WriteLine(
-                    $"Student UserId={student.UserId} → STUDENT Tenant={student.TenantId}"
-                );
-            }
-
-            var professors = await _context.Professors
-                .ToListAsync();
-
-            foreach (var professor in professors)
-            {
-                // Verificar si es dueño del tenant
-                var tenant = await _context.Tenants
-                    .FirstOrDefaultAsync(t =>
-                        t.Id == professor.TenantId
-                    );
-
-                if (tenant == null)
-                    continue;
-
-                var groupName =
-                    tenant.OwnerUserId == professor.UserId
-                        ? "ADVANCED_PROFESSOR"
-                        : "BASIC_PROFESSOR";
-
-                await AssignUserToGroupIfNotExists(
-                    professor.UserId,
-                    professor.TenantId,
-                    groupName
-                );
-
-                Console.WriteLine(
-                    $"Professor UserId={professor.UserId} → {groupName} Tenant={professor.TenantId}"
-                );
-            }
-
-            Console.WriteLine(
-                "========== FINALIZÓ ASIGNACIÓN DE GRUPOS =========="
-            );
         }
     }
 }
