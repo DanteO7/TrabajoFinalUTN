@@ -1,29 +1,18 @@
 import { X, Pencil, Trash2 } from "lucide-react";
-
 import { useState } from "react";
-
 import Modal from "../modals/modal";
-
 import { useForm } from "react-hook-form";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
-
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
-
 import { deletePayment, updatePayment } from "../../services/payment";
+import { useTenantStore } from "../../store/tenant-store";
 
-export default function PaymentModal({
-  payment,
-  tenantId,
-  close,
-  canManagePayments,
-}) {
+export default function PaymentModal({ payment, tenantId, close }) {
   const [editing, setEditing] = useState(false);
 
   const [backendError, setBackendError] = useState();
@@ -35,6 +24,12 @@ export default function PaymentModal({
   const [confirmModal, setConfirmModal] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const hasPermission = useTenantStore((state) => state.hasPermission);
+
+  const canUpdatePayment = hasPermission(tenantId, "PAYMENT_UPDATE");
+
+  const canDeletePayment = hasPermission(tenantId, "PAYMENT_DELETE");
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -309,7 +304,6 @@ export default function PaymentModal({
               </span>
             </div>
 
-            {/* ID MERCADO PAGO */}
             {payment.externalPaymentId && (
               <div className="bg-[#efefef] rounded-xl p-4">
                 <p className="text-sm text-gray-600 mb-1">ID de Mercado Pago</p>
@@ -321,22 +315,26 @@ export default function PaymentModal({
             )}
           </div>
 
-          {canManagePayments && (
+          {(canUpdatePayment || canDeletePayment) && (
             <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">
-              <RedButton
-                text="Eliminar"
-                img={<Trash2 size={18} />}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                disabled={deleteMutation.isPending}
-              />
+              {canDeletePayment && (
+                <RedButton
+                  text="Eliminar"
+                  img={<Trash2 size={18} />}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  disabled={deleteMutation.isPending}
+                />
+              )}
 
-              <BlackButton
-                text="Editar"
-                img={<Pencil size={18} />}
-                onClick={() => setEditing(true)}
-                textSmall={true}
-              />
+              {canUpdatePayment && (
+                <BlackButton
+                  text="Editar"
+                  img={<Pencil size={18} />}
+                  onClick={() => setEditing(true)}
+                  textSmall={true}
+                />
+              )}
             </div>
           )}
         </>
@@ -344,7 +342,6 @@ export default function PaymentModal({
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">Editar pago</h2>
 
-          {/* INFORMACIÓN DEL PAGO */}
           <div className="bg-[#efefef] rounded-xl p-4">
             <p className="text-sm text-gray-600 mb-1">Pago</p>
 
@@ -361,7 +358,6 @@ export default function PaymentModal({
             </p>
           </div>
 
-          {/* MÉTODO DE PAGO */}
           <div>
             <label className="block text-sm font-semibold mb-3">
               Método de pago

@@ -882,6 +882,8 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int id)
         {
+            await _permissionServices.CheckPermission(Permissions.PAYMENT_DELETE);
+
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == id
             );
@@ -905,6 +907,8 @@ namespace backend_proyecto.Services
              int id,
              UpdatePaymentDTO updatePaymentDTO)
         {
+            await _permissionServices.CheckPermission(Permissions.PAYMENT_UPDATE);
+
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == id,
                 p => p.User,

@@ -99,7 +99,6 @@ export default function PaymentCard({ payment, showUser, tenantId }) {
           tenantId={tenantId}
           payment={payment}
           close={() => setOpenModal(false)}
-          canManagePayments
         />
       )}
     </div>
