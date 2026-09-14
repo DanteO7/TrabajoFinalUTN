@@ -424,6 +424,11 @@ export default function Payments({ tenantId }) {
         <PaymentDataModal
           tenantId={tenantId}
           close={() => setOpenModal(false)}
+          price={
+            canManageBusiness
+              ? tenantPayments[0]?.tenantPlan?.price
+              : myTenantStatus?.planPrice
+          }
         />
       )}
     </MainLayout>

@@ -9,7 +9,7 @@ import { getTenantById } from "../../services/tenant";
 import { useQuery } from "@tanstack/react-query";
 import BlackButton from "../buttons/black-button";
 
-export default function PaymentDataModal({ close, tenantId }) {
+export default function PaymentDataModal({ close, tenantId, price }) {
   const [copied, setCopied] = useState(false);
 
   const {
@@ -70,7 +70,7 @@ export default function PaymentDataModal({ close, tenantId }) {
               <p className="text-sm text-gray-600 mb-1">Importe a transferir</p>
 
               <p className="text-2xl font-bold text-[#333]">
-                ${tenant.tenantPlan?.price?.toLocaleString("es-AR")}
+                ${price?.toLocaleString("es-AR")}
               </p>
             </div>
 
