@@ -84,6 +84,7 @@ export default function ResetPassword() {
             register={register("newPassword")}
             error={errors.newPassword}
             disabled={isSubmitting || mutation.isPending}
+            isPassword
           />
           <FormInput
             label="Confirmar contraseña"
@@ -93,6 +94,7 @@ export default function ResetPassword() {
             register={register("confirmNewPassword")}
             error={errors.confirmNewPassword}
             disabled={isSubmitting || mutation.isPending}
+            isPassword
           />
           <button
             type="submit"

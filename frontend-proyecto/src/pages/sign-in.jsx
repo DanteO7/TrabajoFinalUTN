@@ -104,6 +104,7 @@ export default function SignIn() {
               register={register("password")}
               error={errors.password}
               disabled={isSubmitting || mutation.isPending}
+              isPassword
             />
           </div>
 

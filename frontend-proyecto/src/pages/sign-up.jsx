@@ -106,6 +106,7 @@ export default function SignUp() {
               register={register("password")}
               error={errors.password}
               disabled={isSubmitting || mutation.isPending}
+              isPassword
             />
           </div>
 
@@ -117,6 +118,7 @@ export default function SignUp() {
               register={register("confirmPassword")}
               error={errors.confirmPassword}
               disabled={isSubmitting || mutation.isPending}
+              isPassword
             />
           </div>
 
