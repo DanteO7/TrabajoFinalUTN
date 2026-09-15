@@ -8,3 +8,7 @@ export const connectMercadoPago = async (tenantId) => {
 
   window.location.href = response.url;
 };
+
+export const disconnectMercadoPago = async (tenantId) => {
+  await request("delete", `/mercadopago/disconnect/${tenantId}`);
+};

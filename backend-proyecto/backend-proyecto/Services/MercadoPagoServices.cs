@@ -642,5 +642,32 @@ namespace backend_proyecto.Services
                     tenant.MercadoPagoUserId
             };
         }
+        public async Task Disconnect(int tenantId, int userId)
+        {
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId
+            );
+
+            if (tenant == null)
+            {
+                throw new InvalidOperationException(
+                    "No se encontró el gimnasio."
+                );
+            }
+
+            if (tenant.OwnerUserId != userId)
+            {
+                throw new UnauthorizedAccessException(
+                    "No tenés permisos para desvincular Mercado Pago de este gimnasio."
+                );
+            }
+
+            tenant.MercadoPagoAccessToken = null;
+            tenant.MercadoPagoRefreshToken = null;
+            tenant.MercadoPagoUserId = null;
+            tenant.MercadoPagoTokenExpiresAt = null;
+
+            await _tenantRepository.UpdateOneAsync(tenant);
+        }
     }
 }

@@ -6,6 +6,7 @@ using backend_proyecto.Services;
 using backend_proyecto.Services.Observer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -157,6 +158,13 @@ builder.Services.Configure<MercadoPagoSettings>(
 );
 
 builder.Services.AddTransient<IResend, ResendClient>();
+
+builder.Services
+    .AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo("/root/.aspnet/DataProtection-Keys")
+    )
+    .SetApplicationName("TurnoFacil");
 
 var app = builder.Build();
 

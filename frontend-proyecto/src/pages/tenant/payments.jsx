@@ -2,9 +2,10 @@ import { IoArrowBack } from "react-icons/io5";
 import { Link as LinkIcon } from "lucide-react";
 import MainLayout from "../../layouts/main-layout";
 import { useLocation } from "wouter";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   connectMercadoPago,
+  disconnectMercadoPago,
   getMercadoPagoStatus,
 } from "../../services/mercado-pago";
 import Loading from "../../components/loading";
@@ -23,6 +24,9 @@ import PaymentCard from "../../components/payments/payment-card";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import PaymentDataModal from "../../components/payments/payment-data-modal";
+import RedButton from "../../components/buttons/red-button";
+import SuccessModal from "../../components/modals/success-modal";
+import ErrorModal from "../../components/modals/error-modal";
 
 const MONTHS = [
   "Enero",
@@ -40,8 +44,10 @@ const MONTHS = [
 ];
 
 export default function Payments({ tenantId }) {
+  const queryClient = useQueryClient();
+
   const [, setLocation] = useLocation();
-  const isSmallScreen = useMediaQuery("(min-width: 900px)");
+  const isSmallScreen = useMediaQuery("(min-width: 700px)");
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const now = new Date();
@@ -59,7 +65,40 @@ export default function Payments({ tenantId }) {
 
   const hasAccessToTenant = userTenantPermissions?.hasAccessToTenant === true;
 
-  const canManageBusiness = hasPermission(tenantId, "PAYMENT_CREATE");
+  const canManageBusiness =
+    userTenantPermissions?.roles?.includes("TENANT") ||
+    hasPermission(tenantId, "PAYMENT_CREATE");
+
+  const [backendError, setBackendError] = useState();
+  const [errorModal, setErrorModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState();
+  const [successModal, setSuccessModal] = useState(false);
+
+  const disconnectMutation = useMutation({
+    mutationKey: ["disconnectMercadoPago"],
+    mutationFn: () => disconnectMercadoPago(tenantId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["mercadoPagoStatus", tenantId]);
+      setSuccessMessage("Cuenta de Mercado Pago desvinculada correctamente");
+      setSuccessModal(true);
+      setBackendError(null);
+      setTimeout(() => {
+        setSuccessModal(false);
+      }, 2000);
+    },
+    onError: (error) => {
+      const data = error?.response?.data;
+      let msg = "Ocurrió un error al desvincular Mercado Pago";
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.title) msg = data.title;
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
 
   const {
     data: tenantPayments = [],
@@ -178,20 +217,18 @@ export default function Payments({ tenantId }) {
                 {canManageBusiness && (
                   <>
                     <div className="mt-8 rounded-xl border p-6 shadow-md">
-                      <div className="flex flex-col min-[700px]:flex-row items-center min-[700px]:justify-between gap-5">
+                      <div className="flex flex-col min-[700px]:grid min-[700px]:grid-cols-2 items-center min-[700px]:justify-between gap-5">
                         <div className="flex gap-5 items-center">
                           <SiMercadopago
                             className="hidden min-[900px]:flex"
                             size={40}
                           />
-
                           <div>
                             <div className="flex gap-3 items-center">
                               <SiMercadopago
                                 className="flex min-[900px]:hidden"
                                 size={40}
                               />
-
                               <h2 className="text-xl font-semibold">
                                 Mercado Pago
                               </h2>
@@ -210,18 +247,39 @@ export default function Payments({ tenantId }) {
                           </div>
                         </div>
 
-                        <BlackButton
-                          text={
-                            mercadoPagoStatus?.connected
-                              ? "Cuenta vinculada"
-                              : "Vincular Mercado Pago"
-                          }
-                          img={<LinkIcon size={18} />}
-                          textSmall={true}
-                          wfit={isSmallScreen}
-                          disabled={mercadoPagoStatus?.connected}
-                          onClick={() => connectMercadoPago(tenantId)}
-                        />
+                        {mercadoPagoStatus?.connected ? (
+                          <div className="flex gap-3 max-[700px]:flex-col justify-self-end max-[700px]:w-full">
+                            <BlackButton
+                              text="Cuenta vinculada"
+                              img={<LinkIcon size={18} />}
+                              textSmall={true}
+                              wfit={isSmallScreen}
+                              disabled={true}
+                            />
+
+                            <RedButton
+                              text={
+                                disconnectMutation.isPending
+                                  ? "Desvinculando..."
+                                  : "Desvincular"
+                              }
+                              textSmall={true}
+                              wfit={isSmallScreen}
+                              disabled={disconnectMutation.isPending}
+                              onClick={() => disconnectMutation.mutate()}
+                            />
+                          </div>
+                        ) : (
+                          <div className="justify-self-end max-[700px]:w-full">
+                            <BlackButton
+                              text="Vincular Mercado Pago"
+                              img={<LinkIcon size={18} />}
+                              textSmall={true}
+                              wfit={isSmallScreen}
+                              onClick={() => connectMercadoPago(tenantId)}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -429,6 +487,21 @@ export default function Payments({ tenantId }) {
               ? tenantPayments[0]?.tenantPlan?.price
               : myTenantStatus?.planPrice
           }
+        />
+      )}
+      {errorModal && (
+        <ErrorModal
+          close={() => setErrorModal(false)}
+          message={backendError}
+          isSuccesOrError={true}
+        />
+      )}
+
+      {successModal && (
+        <SuccessModal
+          close={() => setSuccessModal(false)}
+          message={successMessage}
+          isSuccesOrError={true}
         />
       )}
     </MainLayout>

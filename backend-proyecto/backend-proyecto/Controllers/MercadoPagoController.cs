@@ -138,5 +138,31 @@ namespace backend_proyecto.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpDelete("disconnect/{tenantId}")]
+        [Authorize]
+        public async Task<IActionResult> Disconnect(int tenantId)
+        {
+            var userId =
+                int.Parse(User.FindFirst("id")?.Value!);
+
+            try
+            {
+                await _mercadoPagoServices.Disconnect(
+                    tenantId,
+                    userId
+                );
+
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
