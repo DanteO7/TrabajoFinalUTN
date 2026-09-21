@@ -67,24 +67,43 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
                 {
                     Id = t.Id,
                     Name = t.Name,
+
                     Role = t.OwnerUserId == userId
                         ? "Owner"
                         : t.Professors.Any(p => p.UserId == userId)
                             ? "Professor"
                             : "Student",
+
                     OwnerName =
                         t.OwnerUser.Name + " " +
                         t.OwnerUser.Surname,
+
                     IsActive = t.IsActive,
                     Address = t.Address,
                     Alias = t.Alias,
                     CBU = t.CBU,
-                    MonthlyFeeStatus = t.MonthlyFeeStatus,
-                    PaymentDueDate = t.PaymentDueDate,
+
+                    MonthlyFeeStatus =
+                        t.OwnerUserId == userId
+                            ? t.MonthlyFeeStatus
+                            : t.Students
+                                .Where(s => s.UserId == userId)
+                                .Select(s => s.MonthlyFeeStatus)
+                                .FirstOrDefault(),
+
+                    PaymentDueDate =
+                        t.OwnerUserId == userId
+                            ? t.PaymentDueDate
+                            : t.Students
+                                .Where(s => s.UserId == userId)
+                                .Select(s => s.PaymentDueDate)
+                                .FirstOrDefault(),
+
                     MercadoPagoConnected =
                         !string.IsNullOrWhiteSpace(
                             t.MercadoPagoAccessToken
                         ),
+
                     PlanPrice = t.TenantPlan.Price
                 })
                 .ToListAsync();
