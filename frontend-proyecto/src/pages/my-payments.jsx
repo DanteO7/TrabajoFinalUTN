@@ -204,10 +204,21 @@ export default function MyPayments() {
 
       {openModal && selectedTenant && (
         <PaymentDataModal
-          name="TurnoFácil"
+          name={
+            selectedTenant.role === "Student"
+              ? selectedTenant.name
+              : "TurnoFácil"
+          }
           close={closeTransferModal}
           price={selectedTenant.planPrice}
-          paymentData={turnoFacilPaymentData}
+          paymentData={
+            selectedTenant.role === "Student"
+              ? {
+                  alias: selectedTenant.alias,
+                  cbu: selectedTenant.cbu,
+                }
+              : turnoFacilPaymentData
+          }
         />
       )}
     </MainLayout>

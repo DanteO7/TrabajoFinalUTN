@@ -42,6 +42,14 @@ export default function TenantPaymentCard({
     });
   };
 
+  const paymentData =
+    tenant.role === "Student"
+      ? {
+          alias: tenant.alias,
+          cbu: tenant.cbu,
+        }
+      : turnoFacilPaymentData;
+
   return (
     <div className="rounded-xl border p-6 shadow-md">
       <div className="flex flex-col gap-5">
@@ -120,7 +128,7 @@ export default function TenantPaymentCard({
               />
             )}
 
-            {(turnoFacilPaymentData?.alias || turnoFacilPaymentData?.cbu) && (
+            {(paymentData?.alias || paymentData?.cbu) && (
               <BlackButton
                 text="Ver datos para transferir"
                 textSmall={true}
@@ -129,13 +137,11 @@ export default function TenantPaymentCard({
               />
             )}
 
-            {!tenant.mercadoPagoConnected &&
-              !turnoFacilPaymentData?.alias &&
-              !turnoFacilPaymentData?.cbu && (
-                <p className="text-gray-500 text-sm">
-                  TurnoFácil no tiene datos de transferencia configurados.
-                </p>
-              )}
+            {!paymentData?.alias && !paymentData?.cbu && (
+              <p className="text-gray-500 text-sm">
+                No hay datos de transferencia configurados.
+              </p>
+            )}
           </div>
         )}
       </div>
