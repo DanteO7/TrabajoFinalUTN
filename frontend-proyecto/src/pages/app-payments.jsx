@@ -139,7 +139,12 @@ export default function AppPayments() {
                 <div className="grid gap-6 mt-8 sm:grid-cols-2 xl:grid-cols-3">
                   {payments.length > 0 ? (
                     payments.map((payment) => (
-                      <PaymentCard key={payment.id} payment={payment} />
+                      <PaymentCard
+                        key={payment.id}
+                        payment={payment}
+                        tenantId={payment.tenantId}
+                        isAdmin
+                      />
                     ))
                   ) : (
                     <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">

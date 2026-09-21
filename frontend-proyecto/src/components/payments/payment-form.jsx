@@ -75,10 +75,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
     mutationFn: createPayment,
 
     onSuccess: () => {
-      /*
-       * Si el pago es de un alumno:
-       * actualizamos los pagos del negocio.
-       */
       if (!isAdmin) {
         queryClient.invalidateQueries({
           queryKey: ["tenantPayments", tenantId],
@@ -89,10 +85,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         });
       }
 
-      /*
-       * Si el pago es de un negocio:
-       * actualizamos la lista de pagos del administrador.
-       */
       if (isAdmin) {
         queryClient.invalidateQueries({
           queryKey: ["getTenantPaymentsForAdmin"],
@@ -130,10 +122,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
   });
 
   const onSubmit = (data) => {
-    /*
-     * ADMIN
-     * Negocio -> TurnoFácil
-     */
     if (isAdmin) {
       const tenant = tenants.find(
         (tenant) => String(tenant.id) === data.selectedId,
@@ -152,10 +140,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
       return;
     }
 
-    /*
-     * TENANT
-     * Alumno -> Negocio
-     */
     const student = students.find(
       (student) => String(student.id) === data.selectedId,
     );
@@ -205,7 +189,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        {/* ALUMNO / NEGOCIO */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
             {isAdmin ? "Negocio" : "Alumno"}
@@ -251,7 +234,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
           )}
         </div>
 
-        {/* INFORMACIÓN DEL PLAN DEL ALUMNO */}
         {!isAdmin && selectedStudent && (
           <div className="rounded-[13px] p-4 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px]">
             <p className="text-xs font-medium tracking-wide text-gray-500">
@@ -270,7 +252,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
           </div>
         )}
 
-        {/* INFORMACIÓN DEL PLAN DEL NEGOCIO */}
         {isAdmin && selectedTenant && (
           <div className="rounded-[13px] p-4 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px]">
             <p className="text-xs font-medium tracking-wide text-gray-500">
@@ -289,7 +270,6 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
           </div>
         )}
 
-        {/* MÉTODO DE PAGO */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
             Método de pago
@@ -303,7 +283,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
 
             <option value="Cash">Efectivo</option>
 
-            <option value="Bank Transfer">Transferencia bancaria</option>
+            <option value="Bank Transfer">Transferencia</option>
 
             <option value="Debit Card">Tarjeta de débito</option>
           </select>

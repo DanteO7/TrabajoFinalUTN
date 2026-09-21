@@ -11,7 +11,7 @@ export default function MainLayout({ children }) {
 
   const { data: myTenants } = useQuery({
     queryKey: ["myTenants"],
-    queryFn: getMyTenants,
+    queryFn: () => getMyTenants(false),
   });
 
   useEffect(() => {

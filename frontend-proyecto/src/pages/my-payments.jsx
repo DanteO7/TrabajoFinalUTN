@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import MainLayout from "../layouts/main-layout";
 import Loading from "../components/loading";
 import PaymentCard from "../components/payments/payment-card";
-import { getMyPayments } from "../services/payment";
+import PaymentDataModal from "../components/payments/payment-data-modal";
+import {
+  createMercadoPagoTenantPayment,
+  getMyPayments,
+  getTurnoFacilPaymentData,
+} from "../services/payment";
+import { getMyTenants } from "../services/tenant";
+import TenantPaymentCard from "../components/payments/tenant-payment-card";
+import ToggleInput from "../components/toggle-input";
 
 const MONTHS = [
   "Enero",
@@ -28,6 +36,11 @@ export default function MyPayments() {
 
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedTenant, setSelectedTenant] = useState(null);
+
+  const [showInactive, setShowInactive] = useState(false);
+
   const {
     data: myPayments = [],
     isLoading,
@@ -35,6 +48,28 @@ export default function MyPayments() {
   } = useQuery({
     queryKey: ["myPayments", selectedYear, selectedMonth],
     queryFn: () => getMyPayments(selectedYear, selectedMonth),
+  });
+
+  const { data: turnoFacilPaymentData } = useQuery({
+    queryKey: ["turnoFacilPaymentData"],
+    queryFn: getTurnoFacilPaymentData,
+  });
+
+  const { data: myTenants = [], isLoading: isLoadingTenants } = useQuery({
+    queryKey: ["myOwnedTenants"],
+    queryFn: () => getMyTenants(false),
+  });
+
+  const mercadoPagoMutation = useMutation({
+    mutationFn: (tenantId) => createMercadoPagoTenantPayment(tenantId),
+
+    onSuccess: (data) => {
+      window.location.href = data.checkoutUrl;
+    },
+
+    onError: (error) => {
+      console.error("Error al crear el pago con Mercado Pago:", error);
+    },
   });
 
   const goToPreviousMonth = () => {
@@ -55,9 +90,19 @@ export default function MyPayments() {
     }
   };
 
+  const openTransferModal = (tenant) => {
+    setSelectedTenant(tenant);
+    setOpenModal(true);
+  };
+
+  const closeTransferModal = () => {
+    setOpenModal(false);
+    setSelectedTenant(null);
+  };
+
   return (
     <MainLayout>
-      <div className="w-full max-w-6xl mt-12">
+      <div className="w-full max-w-6xl mt-12 flex-col flex gap-7">
         <div>
           <h1 className="text-4xl min-[900px]:text-5xl font-bold">Mis pagos</h1>
 
@@ -65,6 +110,40 @@ export default function MyPayments() {
             Consultá el historial de todos tus pagos.
           </p>
         </div>
+
+        {myTenants?.some((t) => t.isActive === false) && (
+          <ToggleInput
+            state={showInactive}
+            setState={setShowInactive}
+            text="Mostrar inactivos:"
+            gap={4}
+          />
+        )}
+
+        {isLoadingTenants ? (
+          <Loading />
+        ) : (
+          myTenants.length > 0 && (
+            <div>
+              <h2 className="text-2xl font-semibold">Mis negocios</h2>
+
+              <div className="grid gap-6 mt-6 sm:grid-cols-2">
+                {myTenants
+                  ?.filter((t) => t.isActive || showInactive)
+                  .filter((t) => t.role !== "Professor")
+                  .map((tenant) => (
+                    <TenantPaymentCard
+                      key={tenant.id}
+                      tenant={tenant}
+                      turnoFacilPaymentData={turnoFacilPaymentData}
+                      mercadoPagoMutation={mercadoPagoMutation}
+                      openTransferModal={openTransferModal}
+                    />
+                  ))}
+              </div>
+            </div>
+          )
+        )}
 
         <div className="flex items-center justify-center gap-4 mt-10">
           <button
@@ -122,6 +201,15 @@ export default function MyPayments() {
           </>
         )}
       </div>
+
+      {openModal && selectedTenant && (
+        <PaymentDataModal
+          name="TurnoFácil"
+          close={closeTransferModal}
+          price={selectedTenant.planPrice}
+          paymentData={turnoFacilPaymentData}
+        />
+      )}
     </MainLayout>
   );
 }

@@ -49,7 +49,6 @@ export default function UserModal({ user, close }) {
             </div>
           </div>
 
-          {/* Negocios */}
           {tenants.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">

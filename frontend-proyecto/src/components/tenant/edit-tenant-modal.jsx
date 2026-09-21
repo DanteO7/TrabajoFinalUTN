@@ -29,6 +29,7 @@ const PLATFORMS = [
 
 export default function EditTenantModal({ tenant, close }) {
   const queryClient = useQueryClient();
+  console.log(tenant);
 
   const [networks, setNetworks] = useState(tenant.socialNetworks || {});
 

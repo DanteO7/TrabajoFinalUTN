@@ -265,9 +265,21 @@ export default function Tenant({ id }) {
                   {role?.text}
                 </span>
               </div>
+              {tenant?.role == "Tenant" && (
+                <p>
+                  Vencimiento:{" "}
+                  {tenant?.paymentDueDate
+                    ? new Date(tenant.paymentDueDate).toLocaleDateString(
+                        "es-AR",
+                      )
+                    : "-"}
+                </p>
+              )}
             </div>
             <p className="text-gray-500 mt-1">
-              Desde acá podés administrar todas las áreas de tu negocio.
+              {tenant?.role == "Student"
+                ? "Desde acá podés gestionar tus clases, reservas y pagos."
+                : "Desde acá podés administrar todas las áreas de tu negocio."}
             </p>
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {newsCard && (

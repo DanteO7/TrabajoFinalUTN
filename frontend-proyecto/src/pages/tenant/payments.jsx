@@ -283,7 +283,31 @@ export default function Payments({ tenantId }) {
                       </div>
                     </div>
 
-                    <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-4 mt-8">
+                    <div className="flex items-center justify-center gap-4 mt-11">
+                      <button
+                        onClick={goToPreviousMonth}
+                        className="p-2 rounded-full transition cursor-pointer"
+                        aria-label="Mes anterior"
+                      >
+                        <FaChevronLeft size={22} color="fc697b" />
+                      </button>
+
+                      <div className="min-w-47.5 text-center">
+                        <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
+                          {MONTHS[selectedMonth - 1]} {selectedYear}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={goToNextMonth}
+                        className="p-2 rounded-full transition cursor-pointer"
+                        aria-label="Mes siguiente"
+                      >
+                        <FaChevronRight size={22} color="fc697b" />
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-4 mt-4">
                       <div>
                         <h2 className="text-2xl font-semibold">
                           Pagos recibidos
@@ -408,7 +432,7 @@ export default function Payments({ tenantId }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center gap-4 mt-10">
+                    <div className="flex items-center justify-center gap-4 mt-11">
                       <button
                         onClick={goToPreviousMonth}
                         className="p-2 rounded-full transition cursor-pointer"
@@ -432,7 +456,7 @@ export default function Payments({ tenantId }) {
                       </button>
                     </div>
 
-                    <div className="mt-8">
+                    <div className="mt-4">
                       <h2 className="text-2xl font-semibold">
                         Mis pagos en {tenantName}
                       </h2>
@@ -480,15 +504,20 @@ export default function Payments({ tenantId }) {
 
       {openModal && (
         <PaymentDataModal
-          tenantId={tenantId}
+          name={tenantName}
           close={() => setOpenModal(false)}
           price={
             canManageBusiness
               ? tenantPayments[0]?.tenantPlan?.price
               : myTenantStatus?.planPrice
           }
+          paymentData={{
+            alias: myTenantStatus?.alias,
+            cbu: myTenantStatus?.cbu,
+          }}
         />
       )}
+
       {errorModal && (
         <ErrorModal
           close={() => setErrorModal(false)}

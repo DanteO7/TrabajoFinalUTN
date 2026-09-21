@@ -29,6 +29,9 @@ export const createMercadoPagoStudentPayment = async (tenantId) => {
   return request("post", `/payments/mercado-pago/student/${tenantId}`);
 };
 
+export const createMercadoPagoTenantPayment = (tenantId) =>
+  request("post", `/payments/mercado-pago/tenant/${tenantId}`);
+
 export const getPayment = async (paymentId) => {
   return request("get", `/payments/${paymentId}`);
 };
@@ -39,3 +42,6 @@ export const getMyBusinessPayments = async (year, month) => {
     `/payments/my-business-payments?year=${year}&month=${month}`,
   );
 };
+
+export const getTurnoFacilPaymentData = () =>
+  request("get", "/payments/turnofacil/payment-data");

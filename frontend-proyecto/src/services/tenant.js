@@ -22,7 +22,9 @@ export const deleteTenant = (id) => request("delete", `/tenants/${id}`);
 export const updateTenant = (id, data) =>
   request("put", `/tenants/${id}`, data);
 
-export const getMyTenants = () => request("get", "/tenants/my-tenants");
+export const getMyTenants = (onlyOwned = false) => {
+  return request("get", `/tenants/my-tenants?onlyOwned=${onlyOwned}`);
+};
 
 export const getMyPermissionInTenant = (tenantId) =>
   request("get", `/tenants/${tenantId}/my-permissions`);

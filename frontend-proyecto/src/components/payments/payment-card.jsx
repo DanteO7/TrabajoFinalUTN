@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PaymentModal from "./payment-modal";
 
-export default function PaymentCard({ payment, showUser, tenantId }) {
+export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
   const [openModal, setOpenModal] = useState(false);
 
   const getStatusText = (status) => {
@@ -46,7 +46,7 @@ export default function PaymentCard({ payment, showUser, tenantId }) {
         return "Efectivo";
 
       case "Bank Transfer":
-        return "Transferencia bancaria";
+        return "Transferencia";
 
       case "Debit Card":
         return "Tarjeta de débito";
@@ -70,6 +70,9 @@ export default function PaymentCard({ payment, showUser, tenantId }) {
               ? `${payment.user?.name} ${payment.user?.surname}`
               : `${payment.tenantName} `}
           </h3>
+          <span className="text-gray-500 text-sm">
+            {!showUser && `${payment.user?.name} ${payment.user?.surname}`}
+          </span>
         </div>
 
         <span
@@ -99,6 +102,7 @@ export default function PaymentCard({ payment, showUser, tenantId }) {
           tenantId={tenantId}
           payment={payment}
           close={() => setOpenModal(false)}
+          isAdmin={isAdmin}
         />
       )}
     </div>

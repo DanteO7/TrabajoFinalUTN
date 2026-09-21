@@ -12,7 +12,7 @@ import WhiteButton from "../buttons/white-button";
 import { deletePayment, updatePayment } from "../../services/payment";
 import { useTenantStore } from "../../store/tenant-store";
 
-export default function PaymentModal({ payment, tenantId, close }) {
+export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   const [editing, setEditing] = useState(false);
 
   const [backendError, setBackendError] = useState();
@@ -27,9 +27,13 @@ export default function PaymentModal({ payment, tenantId, close }) {
 
   const hasPermission = useTenantStore((state) => state.hasPermission);
 
-  const canUpdatePayment = hasPermission(tenantId, "PAYMENT_UPDATE");
+  const canUpdatePayment = isAdmin
+    ? true
+    : hasPermission(tenantId, "PAYMENT_UPDATE");
 
-  const canDeletePayment = hasPermission(tenantId, "PAYMENT_DELETE");
+  const canDeletePayment = isAdmin
+    ? true
+    : hasPermission(tenantId, "PAYMENT_DELETE");
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -41,32 +45,31 @@ export default function PaymentModal({ payment, tenantId, close }) {
     mutationFn: () => deletePayment(payment.id),
 
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["tenantPayments", tenantId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["myPayments"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["getTenantPaymentsForAdmin"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["getStudents", tenantId],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["getTenants"],
-      });
-
       setConfirmModal(false);
-
       setSuccessMessage("Pago eliminado correctamente");
       setSuccessModal(true);
 
       setTimeout(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["tenantPayments", tenantId],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["myPayments"],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["getTenantPaymentsForAdmin"],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["getStudents", tenantId],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["getTenants"],
+        });
+        setSuccessModal(false);
         close();
       }, 2000);
     },
@@ -173,7 +176,7 @@ export default function PaymentModal({ payment, tenantId, close }) {
         return "Efectivo";
 
       case "Bank Transfer":
-        return "Transferencia bancaria";
+        return "Transferencia";
 
       case "Debit Card":
         return "Tarjeta de débito";
@@ -239,7 +242,7 @@ export default function PaymentModal({ payment, tenantId, close }) {
         <>
           <h2 className="text-2xl font-semibold mb-5">Detalle del pago</h2>
 
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4">
             <div className="bg-[#efefef] rounded-xl p-4">
               <p className="text-sm text-gray-600 mb-1">
                 {payment.planType === "Student" ? "Alumno" : "Negocio"}
@@ -314,9 +317,8 @@ export default function PaymentModal({ payment, tenantId, close }) {
               </div>
             )}
           </div>
-
           {(canUpdatePayment || canDeletePayment) && (
-            <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">
+            <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px] mt-8">
               {canDeletePayment && (
                 <RedButton
                   text="Eliminar"
@@ -365,11 +367,11 @@ export default function PaymentModal({ payment, tenantId, close }) {
 
             <select
               {...register("paymentMethod")}
-              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
+              className="rounded-[13px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px] cursor-pointer"
             >
               <option value="Cash">Efectivo</option>
 
-              <option value="Bank Transfer">Transferencia bancaria</option>
+              <option value="Bank Transfer">Transferencia</option>
 
               <option value="Debit Card">Tarjeta de débito</option>
 
