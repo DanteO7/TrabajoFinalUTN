@@ -178,13 +178,18 @@ namespace backend_proyecto.Controllers
         [HttpGet("my-tenants")]
         [Authorize]
         [ProducesResponseType(typeof(List<ResponseMyTenantDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetMyTenants()
+        public async Task<ActionResult<List<ResponseMyTenantDTO>>> GetMyTenants(
+            [FromQuery] bool onlyOwned = false)
         {
             var userId = int.Parse(
-                User.FindFirst("id")!.Value 
+                User.FindFirst("id")!.Value
             );
 
-            var tenants = await _tenantServices.GetMyTenants(userId);
+            var tenants =
+                await _tenantServices.GetMyTenants(
+                    userId,
+                    onlyOwned: onlyOwned
+                );
 
             return Ok(tenants);
         }

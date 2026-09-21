@@ -89,6 +89,7 @@ namespace backend_proyecto.Services
                 );
             }
 
+
             var response = _mapper.Map<ResponseTenantDTO>(tenant);
             response.Role = GetRole(tenant, userId);
 
@@ -314,9 +315,9 @@ namespace backend_proyecto.Services
 
             return _mapper.Map<ResponseTenantDTO>(tenant);
         }
-        public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId, int? targetUserId = null)
+        public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int userId, int? targetUserId = null, bool onlyOwned = false)
         {
-            var tenants = await _tenantRepository.GetMyTenants(userId, targetUserId);
+            var tenants = await _tenantRepository.GetMyTenants(userId, targetUserId, onlyOwned);
 
             return tenants;
         }

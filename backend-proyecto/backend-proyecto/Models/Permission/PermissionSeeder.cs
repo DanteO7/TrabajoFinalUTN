@@ -89,7 +89,10 @@ public static class PermissionSeeder
             // INVITATIONS
             new Permission { Id = 55, Name = Permissions.INVITATION_READ },
             new Permission { Id = 56, Name = Permissions.INVITATION_CREATE },
-            new Permission { Id = 57, Name = Permissions.INVITATION_DELETE }
+            new Permission { Id = 57, Name = Permissions.INVITATION_DELETE },
+
+            // ADMIN
+            new Permission { Id = 58, Name = Permissions.ADMIN_PAYMENTS }
 };
 
         modelBuilder.Entity<Permission>().HasData(permissions);

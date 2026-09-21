@@ -14,5 +14,6 @@
         public string PaymentMethod { get; set; } = null!;
         public string Status { get; set; } = null!;
         public string? ExternalPaymentId { get; set; }
+        public bool StartedNewCycle { get; set; }
     }
 }

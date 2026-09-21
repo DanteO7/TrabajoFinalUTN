@@ -1,4 +1,5 @@
-﻿using backend_proyecto.Models.DTOs;
+﻿using backend_proyecto.Enums;
+using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +13,12 @@ namespace backend_proyecto.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly PaymentServices _paymentServices;
+        private readonly IConfiguration _configuration;
 
-        public PaymentController(
-            PaymentServices paymentServices)
+        public PaymentController(PaymentServices paymentServices, IConfiguration configuration)
         {
             _paymentServices = paymentServices;
+            _configuration = configuration;
         }
 
         // =========================================================
@@ -417,6 +419,41 @@ namespace backend_proyecto.Controllers
                 );
 
             return Ok(payments);
+        }
+
+        [HttpPost("mercado-pago/tenant/{tenantId}")]
+        [Authorize]
+        public async Task<IActionResult> CreateMercadoPagoTenantPayment(
+            int tenantId)
+        {
+            var userId = int.Parse(
+                User.FindFirst("id")?.Value!
+            );
+
+            var checkoutUrl =
+                await _paymentServices.CreateMercadoPagoTenantPayment(
+                    userId,
+                    tenantId
+                );
+
+            return Ok(new
+            {
+                checkoutUrl
+            });
+        }
+
+        [HttpGet("turnofacil/payment-data")]
+        [Authorize]
+        public IActionResult GetTurnoFacilPaymentData()
+        {
+            var alias = _configuration["TurnoFacilPayment:Alias"];
+            var cbu = _configuration["TurnoFacilPayment:CBU"];
+
+            return Ok(new TurnoFacilPaymentDataDTO
+            {
+                Alias = alias,
+                CBU = cbu
+            });
         }
     }
 }

@@ -15,5 +15,6 @@
         public string MonthlyFeeStatus { get; set; } = null!;
         public string? Alias { get; set; }
         public string? CBU { get; set; }
+        public DateTime? PaymentDueDate { get; set; }
     }
 }

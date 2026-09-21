@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend_proyecto.Config;
@@ -12,9 +13,11 @@ using backend_proyecto.Config;
 namespace backend_proyecto.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260915192921_AddPaymentStartedNewCycle")]
+    partial class AddPaymentStartedNewCycle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -419,11 +422,6 @@ namespace backend_proyecto.Migrations
                         {
                             Id = 57,
                             Name = "INVITATION_DELETE"
-                        },
-                        new
-                        {
-                            Id = 58,
-                            Name = "ADMIN_PAYMENTS"
                         });
                 });
 
@@ -1016,9 +1014,6 @@ namespace backend_proyecto.Migrations
 
                     b.Property<int>("OwnerUserId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime?>("PaymentDueDate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Dictionary<string, string>>("SocialNetworks")
                         .HasColumnType("hstore");

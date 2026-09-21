@@ -4,6 +4,7 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -19,7 +20,7 @@ namespace backend_proyecto.Services
         private readonly MercadoPagoServices _mercadoPagoServices;
         private readonly PermissionServices _permissionServices;
         private readonly IStudentRepository _studentRepository;
-        private readonly IAdminRepository _adminRepository; 
+        private readonly IAdminRepository _adminRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PaymentServices(
@@ -87,6 +88,11 @@ namespace backend_proyecto.Services
                 start.AddMonths(1)
             );
         }
+
+        // =========================================================
+        // MAPEAR PAGOS CON NOMBRE DEL PLAN
+        // =========================================================
+
         private async Task<List<ResponsePaymentDTO>> MapPaymentsWithPlanName(
             List<Payment> payments)
         {
@@ -128,17 +134,21 @@ namespace backend_proyecto.Services
 
             foreach (var payment in result)
             {
-                if (payment.PlanType == PlanType.STUDENT &&
+                if (
+                    payment.PlanType == PlanType.STUDENT &&
                     studentPlanNames.TryGetValue(
                         payment.PlanId,
-                        out var studentPlanName))
+                        out var studentPlanName)
+                )
                 {
                     payment.PlanName = studentPlanName;
                 }
-                else if (payment.PlanType == PlanType.TENANT &&
-                         tenantPlanNames.TryGetValue(
-                             payment.PlanId,
-                             out var tenantPlanName))
+                else if (
+                    payment.PlanType == PlanType.TENANT &&
+                    tenantPlanNames.TryGetValue(
+                        payment.PlanId,
+                        out var tenantPlanName)
+                )
                 {
                     payment.PlanName = tenantPlanName;
                 }
@@ -172,9 +182,10 @@ namespace backend_proyecto.Services
                 GetMonthRange(year, month);
 
             var payments = await _paymentRepository.GetAllAsync(
-                p => p.UserId == userId &&
-                     p.PaymentDate >= startOfMonth &&
-                     p.PaymentDate < startOfNextMonth,
+                p =>
+                    p.UserId == userId &&
+                    p.PaymentDate >= startOfMonth &&
+                    p.PaymentDate < startOfNextMonth,
                 p => p.User,
                 p => p.Tenant
             );
@@ -216,10 +227,11 @@ namespace backend_proyecto.Services
                 GetMonthRange(year, month);
 
             var payments = await _paymentRepository.GetAllAsync(
-                p => p.TenantId == tenantId &&
-                        p.PlanType == PlanType.STUDENT &&
-                        p.PaymentDate >= startOfMonth &&
-                        p.PaymentDate < startOfNextMonth,
+                p =>
+                    p.TenantId == tenantId &&
+                    p.PlanType == PlanType.STUDENT &&
+                    p.PaymentDate >= startOfMonth &&
+                    p.PaymentDate < startOfNextMonth,
                 p => p.User,
                 p => p.Tenant
             );
@@ -251,9 +263,10 @@ namespace backend_proyecto.Services
                 GetMonthRange(year, month);
 
             var payments = await _paymentRepository.GetAllAsync(
-                p => p.PlanType == PlanType.TENANT &&
-                     p.PaymentDate >= startOfMonth &&
-                     p.PaymentDate < startOfNextMonth,
+                p =>
+                    p.PlanType == PlanType.TENANT &&
+                    p.PaymentDate >= startOfMonth &&
+                    p.PaymentDate < startOfNextMonth,
                 p => p.User,
                 p => p.Tenant
             );
@@ -276,8 +289,9 @@ namespace backend_proyecto.Services
             }
             else if (createPaymentDTO.PlanType == PlanType.TENANT)
             {
-                var userId = _httpContextAccessor.HttpContext?
-                    .User.FindFirst("id")?.Value;
+                var userId =
+                    _httpContextAccessor.HttpContext?
+                        .User.FindFirst("id")?.Value;
 
                 if (!int.TryParse(userId, out var currentUserId))
                 {
@@ -287,7 +301,10 @@ namespace backend_proyecto.Services
                     );
                 }
 
-                var isAdmin = await _adminRepository.ExistsByUserId(currentUserId);
+                var isAdmin =
+                    await _adminRepository.ExistsByUserId(
+                        currentUserId
+                    );
 
                 if (!isAdmin)
                 {
@@ -329,175 +346,273 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var now = DateTime.UtcNow;
+            // =====================================================
+            // ALUMNO
+            // =====================================================
 
-            var startOfMonth = new DateTime(
-                now.Year,
-                now.Month,
-                1,
-                0,
-                0,
-                0,
-                DateTimeKind.Utc
-            );
-
-            var startOfNextMonth = startOfMonth.AddMonths(1);
-
-            var existingPayment =
-                await _paymentRepository.GetOneAsync(
-                    p => p.UserId == createPaymentDTO.UserId &&
-                         p.TenantId == createPaymentDTO.TenantId &&
-                         p.PlanType == createPaymentDTO.PlanType &&
-                         p.PaymentDate >= startOfMonth &&
-                         p.PaymentDate < startOfNextMonth &&
-                         p.Status != PaymentStatus.CANCELLED &&
-                         p.Status != PaymentStatus.REJECTED
+            if (createPaymentDTO.PlanType == PlanType.STUDENT)
+            {
+                var student = await _studentRepository.GetOneAsync(
+                    s =>
+                        s.UserId == createPaymentDTO.UserId &&
+                        s.TenantId == createPaymentDTO.TenantId
                 );
 
-            if (existingPayment != null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    createPaymentDTO.PlanType == PlanType.STUDENT
-                        ? "El alumno ya tiene un pago registrado para este mes."
-                        : "El negocio ya tiene un pago registrado para este mes."
-                );
-            }
-
-            decimal amount;
-
-            Student? student = null;
-
-            switch (createPaymentDTO.PlanType)
-            {
-                case PlanType.STUDENT:
-
-                    student = await _studentRepository.GetOneAsync(
-                        s => s.UserId == createPaymentDTO.UserId &&
-                             s.TenantId == createPaymentDTO.TenantId
-                    );
-
-                    if (student == null)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.BadRequest,
-                            "El usuario seleccionado no es alumno de este negocio."
-                        );
-                    }
-
-                    if (student.StudentPlanId != createPaymentDTO.PlanId)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.BadRequest,
-                            "El plan indicado no corresponde al plan actual del alumno."
-                        );
-                    }
-
-                    var studentPlan =
-                        await _studentPlanRepository.GetOneAsync(
-                            p => p.Id == student.StudentPlanId
-                        );
-
-                    if (studentPlan == null)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.NotFound,
-                            $"No se encontró el plan de estudiante con el Id = '{student.StudentPlanId}'"
-                        );
-                    }
-
-                    amount = studentPlan.Price;
-
-                    break;
-
-                case PlanType.TENANT:
-
-                    if (tenant.TenantPlanId != createPaymentDTO.PlanId)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.BadRequest,
-                            "El plan indicado no corresponde al plan actual del negocio."
-                        );
-                    }
-
-                    var tenantPlan =
-                        await _tenantPlanRepository.GetOneAsync(
-                            p => p.Id == createPaymentDTO.PlanId
-                        );
-
-                    if (tenantPlan == null)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.NotFound,
-                            $"No se encontró un plan de negocio con el Id = '{createPaymentDTO.PlanId}'"
-                        );
-                    }
-
-                    amount = tenantPlan.Price;
-
-                    break;
-
-                default:
-
+                if (student == null)
+                {
                     throw new HttpResponseError(
                         HttpStatusCode.BadRequest,
-                        "Tipo de plan inválido"
+                        "El usuario seleccionado no es alumno de este negocio."
                     );
-            }
+                }
 
-            if (amount <= 0)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "El monto del plan debe ser mayor a 0"
+                if (student.StudentPlanId != createPaymentDTO.PlanId)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El plan indicado no corresponde al plan actual del alumno."
+                    );
+                }
+
+                var studentPlan =
+                    await _studentPlanRepository.GetOneAsync(
+                        p => p.Id == student.StudentPlanId
+                    );
+
+                if (studentPlan == null)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.NotFound,
+                        $"No se encontró el plan de estudiante con el Id = '{student.StudentPlanId}'"
+                    );
+                }
+
+                if (
+                    student.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
+                    student.PaymentDueDate != null &&
+                    student.PaymentDueDate.Value > DateTime.UtcNow
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El alumno ya tiene la cuota pagada y vigente."
+                    );
+                }
+
+                var pendingPayment =
+                    await _paymentRepository.GetOneAsync(
+                        p =>
+                            p.UserId == createPaymentDTO.UserId &&
+                            p.TenantId == createPaymentDTO.TenantId &&
+                            p.PlanType == PlanType.STUDENT &&
+                            p.Status == PaymentStatus.PENDING
+                    );
+
+                if (pendingPayment != null)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El alumno ya tiene un pago pendiente."
+                    );
+                }
+
+                var amount = studentPlan.Price;
+
+                if (amount <= 0)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El monto del plan debe ser mayor a 0."
+                    );
+                }
+
+                var paymentMethod =
+                    createPaymentDTO.PaymentMethod;
+
+                if (
+                    paymentMethod != PaymentMethod.CASH &&
+                    paymentMethod != PaymentMethod.DEBIT_CARD &&
+                    paymentMethod != PaymentMethod.BANK_TRANSFER
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        $"No existe el método de pago con el nombre = '{paymentMethod}'"
+                    );
+                }
+
+                var paymentDate = DateTime.UtcNow;
+
+                var startedNewCycle =
+                    student.MonthlyFeeStatus ==
+                    MonthlyFeeStatus.OVERDUE;
+
+                var payment = new Payment
+                {
+                    UserId = createPaymentDTO.UserId,
+                    PlanId = createPaymentDTO.PlanId,
+                    PlanType = PlanType.STUDENT,
+                    TenantId = createPaymentDTO.TenantId,
+                    Amount = amount,
+                    PaymentMethod = paymentMethod,
+                    PaymentDate = paymentDate,
+                    Status = PaymentStatus.PAID,
+                    ExternalPaymentId = null,
+                    StartedNewCycle = startedNewCycle
+                };
+
+                await _paymentRepository.CreateOneAsync(
+                    payment
+                );
+
+                student.MonthlyFeeStatus =
+                    MonthlyFeeStatus.PAID;
+
+                student.MonthlyFeeStatusUpdatedAt =
+                    paymentDate;
+
+                if (startedNewCycle)
+                {
+                    student.PaymentDueDate =
+                        paymentDate.AddDays(30);
+                }
+
+                await _studentRepository.UpdateOneAsync(
+                    student
+                );
+
+                return _mapper.Map<ResponsePaymentDTO>(
+                    payment
                 );
             }
 
-            var paymentMethod = createPaymentDTO.PaymentMethod;
+            // =====================================================
+            // TENANT
+            // =====================================================
 
-            if (paymentMethod != PaymentMethod.CASH &&
-                paymentMethod != PaymentMethod.DEBIT_CARD &&
-                paymentMethod != PaymentMethod.BANK_TRANSFER)
+            if (tenant.TenantPlanId != createPaymentDTO.PlanId)
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
-                    $"No existe el método de pago con el nombre = '{paymentMethod}'"
+                    "El plan indicado no corresponde al plan actual del negocio."
                 );
             }
 
-            var payment = new Payment
+            var tenantPlan =
+                await _tenantPlanRepository.GetOneAsync(
+                    p => p.Id == createPaymentDTO.PlanId
+                );
+
+            if (tenantPlan == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un plan de negocio con el Id = '{createPaymentDTO.PlanId}'"
+                );
+            }
+
+            if (tenantPlan.Price <= 0)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El monto del plan debe ser mayor a 0."
+                );
+            }
+
+            if (
+                tenant.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
+                tenant.PaymentDueDate != null &&
+                tenant.PaymentDueDate.Value > DateTime.UtcNow
+            )
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El negocio ya tiene la cuota pagada y vigente."
+                );
+            }
+
+            var pendingTenantPayment =
+                await _paymentRepository.GetOneAsync(
+                    p =>
+                        p.UserId == createPaymentDTO.UserId &&
+                        p.TenantId == createPaymentDTO.TenantId &&
+                        p.PlanType == PlanType.TENANT &&
+                        p.Status == PaymentStatus.PENDING
+                );
+
+            if (pendingTenantPayment != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El negocio ya tiene un pago pendiente."
+                );
+            }
+
+            var tenantPaymentMethod =
+                createPaymentDTO.PaymentMethod;
+
+            if (
+                tenantPaymentMethod != PaymentMethod.CASH &&
+                tenantPaymentMethod != PaymentMethod.DEBIT_CARD &&
+                tenantPaymentMethod != PaymentMethod.BANK_TRANSFER
+            )
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    $"No existe el método de pago con el nombre = '{tenantPaymentMethod}'"
+                );
+            }
+
+            var tenantPaymentDate = DateTime.UtcNow;
+
+            var tenantStartedNewCycle =
+                tenant.MonthlyFeeStatus ==
+                MonthlyFeeStatus.OVERDUE;
+
+            var tenantPayment = new Payment
             {
                 UserId = createPaymentDTO.UserId,
                 PlanId = createPaymentDTO.PlanId,
-                PlanType = createPaymentDTO.PlanType,
+                PlanType = PlanType.TENANT,
                 TenantId = createPaymentDTO.TenantId,
-                Amount = amount,
-                PaymentMethod = paymentMethod,
-                PaymentDate = DateTime.UtcNow,
+                Amount = tenantPlan.Price,
+                PaymentMethod = tenantPaymentMethod,
+                PaymentDate = tenantPaymentDate,
                 Status = PaymentStatus.PAID,
-                ExternalPaymentId = null
+                ExternalPaymentId = null,
+                StartedNewCycle = tenantStartedNewCycle
             };
 
-            await _paymentRepository.CreateOneAsync(payment);
+            await _paymentRepository.CreateOneAsync(
+                tenantPayment
+            );
 
-            // Actualizar estado de cuota mensual
-            if (createPaymentDTO.PlanType == PlanType.STUDENT)
+            tenant.MonthlyFeeStatus =
+                MonthlyFeeStatus.PAID;
+
+            tenant.IsActive = true;
+
+            tenant.MonthlyFeeStatusUpdatedAt =
+                tenantPaymentDate;
+
+            if (tenantStartedNewCycle)
             {
-                student!.MonthlyFeeStatus = MonthlyFeeStatus.PAID;
-                student.MonthlyFeeStatusUpdatedAt = DateTime.UtcNow;
-
-                await _studentRepository.UpdateOneAsync(student);
-            }
-            else if (createPaymentDTO.PlanType == PlanType.TENANT)
-            {
-                tenant.MonthlyFeeStatus = MonthlyFeeStatus.PAID;
-                tenant.MonthlyFeeStatusUpdatedAt = DateTime.UtcNow;
-
-                await _tenantRepository.UpdateOneAsync(tenant);
+                tenant.PaymentDueDate =
+                    tenantPaymentDate.AddDays(30);
             }
 
-            return _mapper.Map<ResponsePaymentDTO>(payment);
+            await _tenantRepository.UpdateOneAsync(
+                tenant
+            );
+
+            return _mapper.Map<ResponsePaymentDTO>(
+                tenantPayment
+            );
         }
+
+        // =========================================================
+        // MIS PAGOS EN UN TENANT
+        // =========================================================
 
         public async Task<List<ResponsePaymentDTO>> GetMyPaymentsByTenant(
             int userId,
@@ -518,8 +633,9 @@ namespace backend_proyecto.Services
             }
 
             var student = await _studentRepository.GetOneAsync(
-                s => s.UserId == userId &&
-                     s.TenantId == tenantId
+                s =>
+                    s.UserId == userId &&
+                    s.TenantId == tenantId
             );
 
             if (student == null)
@@ -534,21 +650,28 @@ namespace backend_proyecto.Services
                 GetMonthRange(year, month);
 
             var payments = await _paymentRepository.GetAllAsync(
-                p => p.UserId == userId &&
-                     p.TenantId == tenantId &&
-                     p.PlanType == PlanType.STUDENT &&
-                     p.PaymentDate >= startOfMonth &&
-                     p.PaymentDate < startOfNextMonth,
+                p =>
+                    p.UserId == userId &&
+                    p.TenantId == tenantId &&
+                    p.PlanType == PlanType.STUDENT &&
+                    p.PaymentDate >= startOfMonth &&
+                    p.PaymentDate < startOfNextMonth,
                 p => p.User,
                 p => p.Tenant
             );
 
-            return await MapPaymentsWithPlanName(payments);
+            return await MapPaymentsWithPlanName(
+                payments
+            );
         }
 
+        // =========================================================
+        // ESTADO DE MI CUOTA
+        // =========================================================
+
         public async Task<MyTenantPaymentStatusDTO> GetMyTenantPaymentStatus(
-    int userId,
-    int tenantId)
+            int userId,
+            int tenantId)
         {
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId
@@ -563,8 +686,9 @@ namespace backend_proyecto.Services
             }
 
             var student = await _studentRepository.GetOneAsync(
-                s => s.UserId == userId &&
-                     s.TenantId == tenantId
+                s =>
+                    s.UserId == userId &&
+                    s.TenantId == tenantId
             );
 
             if (student == null)
@@ -595,7 +719,9 @@ namespace backend_proyecto.Services
                 PlanName = plan.Name,
                 PlanPrice = plan.Price,
 
-                MonthlyFeeStatus = student.MonthlyFeeStatus,
+                MonthlyFeeStatus =
+                    student.MonthlyFeeStatus,
+
                 MonthlyFeeStatusUpdatedAt =
                     student.MonthlyFeeStatusUpdatedAt,
 
@@ -607,122 +733,8 @@ namespace backend_proyecto.Services
         }
 
         // =========================================================
-        // CREAR PAGO MERCADO PAGO
+        // CREAR PAGO MERCADO PAGO - ALUMNO
         // =========================================================
-
-        public async Task<string> CreateMercadoPagoPayment(
-            CreateMercadoPagoPaymentDTO dto)
-        {
-            var user = await _userRepository.GetOneAsync(
-                u => u.Id == dto.UserId
-            );
-
-            if (user == null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    $"No se encontró un usuario con el Id = '{dto.UserId}'"
-                );
-            }
-
-            var tenant = await _tenantRepository.GetOneAsync(
-                t => t.Id == dto.TenantId
-            );
-
-            if (tenant == null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    $"No se encontró un tenant con el Id = '{dto.TenantId}'"
-                );
-            }
-
-            decimal amount;
-            string planName;
-
-            switch (dto.PlanType)
-            {
-                case PlanType.STUDENT:
-
-                    var studentPlan =
-                        await _studentPlanRepository.GetOneAsync(
-                            p => p.Id == dto.PlanId
-                        );
-
-                    if (studentPlan == null)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.NotFound,
-                            $"No se encontró un plan de estudiante con el Id = '{dto.PlanId}'"
-                        );
-                    }
-
-                    amount = studentPlan.Price;
-                    planName = studentPlan.Name;
-
-                    break;
-
-                case PlanType.TENANT:
-
-                    var tenantPlan =
-                        await _tenantPlanRepository.GetOneAsync(
-                            p => p.Id == dto.PlanId
-                        );
-
-                    if (tenantPlan == null)
-                    {
-                        throw new HttpResponseError(
-                            HttpStatusCode.NotFound,
-                            $"No se encontró un plan de tenant con el Id = '{dto.PlanId}'"
-                        );
-                    }
-
-                    amount = tenantPlan.Price;
-                    planName = tenantPlan.Name;
-
-                    break;
-
-                default:
-
-                    throw new HttpResponseError(
-                        HttpStatusCode.BadRequest,
-                        "Tipo de plan inválido"
-                    );
-            }
-
-            if (amount <= 0)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "El monto del plan debe ser mayor a 0"
-                );
-            }
-
-            var payment = new Payment
-            {
-                UserId = dto.UserId,
-                PlanId = dto.PlanId,
-                PlanType = dto.PlanType,
-                TenantId = dto.TenantId,
-                Amount = amount,
-                PaymentMethod = PaymentMethod.MERCADO_PAGO,
-                PaymentDate = DateTime.UtcNow,
-                Status = PaymentStatus.PENDING,
-                ExternalPaymentId = null
-            };
-
-            await _paymentRepository.CreateOneAsync(payment);
-
-            var checkoutUrl =
-                await _mercadoPagoServices.CreatePreference(
-                    tenant,
-                    payment,
-                    user,
-                    planName
-                );
-
-            return checkoutUrl;
-        }
 
         public async Task<string> CreateMercadoPagoStudentPayment(
             int userId,
@@ -753,8 +765,9 @@ namespace backend_proyecto.Services
             }
 
             var student = await _studentRepository.GetOneAsync(
-                s => s.UserId == userId &&
-                     s.TenantId == tenantId
+                s =>
+                    s.UserId == userId &&
+                    s.TenantId == tenantId
             );
 
             if (student == null)
@@ -765,9 +778,10 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var studentPlan = await _studentPlanRepository.GetOneAsync(
-                p => p.Id == student.StudentPlanId
-            );
+            var studentPlan =
+                await _studentPlanRepository.GetOneAsync(
+                    p => p.Id == student.StudentPlanId
+                );
 
             if (studentPlan == null)
             {
@@ -785,7 +799,8 @@ namespace backend_proyecto.Services
                 );
             }
 
-            if (string.IsNullOrWhiteSpace(tenant.MercadoPagoAccessToken))
+            if (string.IsNullOrWhiteSpace(
+                tenant.MercadoPagoAccessToken))
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
@@ -793,11 +808,17 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var (startOfMonth, startOfNextMonth) =
-                GetMonthRange(
-                    DateTime.UtcNow.Year,
-                    DateTime.UtcNow.Month
+            if (
+                student.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
+                student.PaymentDueDate != null &&
+                student.PaymentDueDate.Value > DateTime.UtcNow
+            )
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya realizaste el pago y tu cuota todavía está vigente."
                 );
+            }
 
             var existingPayment =
                 await _paymentRepository.GetOneAsync(
@@ -805,51 +826,18 @@ namespace backend_proyecto.Services
                         p.UserId == userId &&
                         p.TenantId == tenantId &&
                         p.PlanType == PlanType.STUDENT &&
-                        p.PaymentDate >= startOfMonth &&
-                        p.PaymentDate < startOfNextMonth &&
-                        (
-                            p.Status == PaymentStatus.PENDING ||
-                            p.Status == PaymentStatus.PAID
-                        )
+                        p.Status == PaymentStatus.PENDING
                 );
-
-            // =========================================================
-            // Ya existe un pago para este mes
-            // =========================================================
 
             if (existingPayment != null)
             {
-                // -----------------------------------------------------
-                // Si ya está pagado, no permitimos otro pago
-                // -----------------------------------------------------
-
-                if (existingPayment.Status == PaymentStatus.PAID)
-                {
-                    throw new HttpResponseError(
-                        HttpStatusCode.BadRequest,
-                        "Ya realizaste el pago de este mes."
-                    );
-                }
-
-                // -----------------------------------------------------
-                // Si está pendiente, reutilizamos el mismo Payment
-                // y generamos nuevamente el Checkout de Mercado Pago
-                // -----------------------------------------------------
-
-                var existingCheckoutUrl =
-                    await _mercadoPagoServices.CreatePreference(
-                        tenant,
-                        existingPayment,
-                        user,
-                        studentPlan.Name
-                    );
-
-                return existingCheckoutUrl;
+                return await _mercadoPagoServices.CreatePreference(
+                    tenant,
+                    existingPayment,
+                    user,
+                    studentPlan.Name
+                );
             }
-
-            // =========================================================
-            // No existe pago para este mes → crear uno nuevo
-            // =========================================================
 
             var payment = new Payment
             {
@@ -861,54 +849,28 @@ namespace backend_proyecto.Services
                 PaymentMethod = PaymentMethod.MERCADO_PAGO,
                 PaymentDate = DateTime.UtcNow,
                 Status = PaymentStatus.PENDING,
-                ExternalPaymentId = null
+                ExternalPaymentId = null,
+                StartedNewCycle = false
             };
 
-            await _paymentRepository.CreateOneAsync(payment);
+            await _paymentRepository.CreateOneAsync(
+                payment
+            );
 
-            var checkoutUrl =
-                await _mercadoPagoServices.CreatePreference(
-                    tenant,
-                    payment,
-                    user,
-                    studentPlan.Name
-                );
-
-            return checkoutUrl;
+            return await _mercadoPagoServices.CreatePreference(
+                tenant,
+                payment,
+                user,
+                studentPlan.Name
+            );
         }
+
         // =========================================================
         // ELIMINAR
         // =========================================================
 
         public async Task DeleteOne(int id)
         {
-            await _permissionServices.CheckPermission(Permissions.PAYMENT_DELETE);
-
-            var payment = await _paymentRepository.GetOneAsync(
-                p => p.Id == id
-            );
-
-            if (payment == null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    $"No se encontró un pago con el Id = '{id}'"
-                );
-            }
-
-            await _paymentRepository.DeleteOneAsync(payment);
-        }
-
-        // =========================================================
-        // ACTUALIZAR
-        // =========================================================
-
-        public async Task<ResponsePaymentDTO> UpdateOne(
-             int id,
-             UpdatePaymentDTO updatePaymentDTO)
-        {
-            await _permissionServices.CheckPermission(Permissions.PAYMENT_UPDATE);
-
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == id,
                 p => p.User,
@@ -923,14 +885,206 @@ namespace backend_proyecto.Services
                 );
             }
 
+            if (payment.PlanType == PlanType.TENANT)
+            {
+                await _permissionServices.CheckAdminPermission(
+                    Permissions.ADMIN_PAYMENTS
+                );
+            }
+            else if (payment.PlanType == PlanType.STUDENT)
+            {
+                await _permissionServices.CheckPermission(
+                    Permissions.PAYMENT_DELETE,
+                    payment.TenantId
+                );
+            }
+
+            // =====================================================
+            // PAGO DE ALUMNO
+            // =====================================================
+
+            if (
+                payment.PlanType == PlanType.STUDENT &&
+                payment.Status == PaymentStatus.PAID
+            )
+            {
+                var student =
+                    await _studentRepository.GetOneAsync(
+                        s =>
+                            s.UserId == payment.UserId &&
+                            s.TenantId == payment.TenantId
+                    );
+
+                if (student == null)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.NotFound,
+                        "No se encontró el alumno asociado al pago."
+                    );
+                }
+
+                var lastPaidPayment =
+                    await _paymentRepository.Query()
+                        .Where(
+                            p =>
+                                p.UserId == payment.UserId &&
+                                p.TenantId == payment.TenantId &&
+                                p.PlanType == PlanType.STUDENT &&
+                                p.Status == PaymentStatus.PAID
+                        )
+                        .OrderByDescending(p => p.PaymentDate)
+                        .FirstOrDefaultAsync();
+
+                if (
+                    lastPaidPayment == null ||
+                    lastPaidPayment.Id != payment.Id
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Solo se puede eliminar el último pago del alumno."
+                    );
+                }
+
+                if (payment.StartedNewCycle)
+                {
+                    student.MonthlyFeeStatus =
+                        MonthlyFeeStatus.OVERDUE;
+
+                    student.MonthlyFeeStatusUpdatedAt =
+                        DateTime.UtcNow;
+
+                    student.PaymentDueDate = null;
+                }
+                else
+                {
+                    student.MonthlyFeeStatus =
+                        MonthlyFeeStatus.PENDING;
+                }
+
+                await _studentRepository.UpdateOneAsync(
+                    student
+                );
+            }
+
+            // =====================================================
+            // PAGO DE TENANT
+            // =====================================================
+
+            if (
+                payment.PlanType == PlanType.TENANT &&
+                payment.Status == PaymentStatus.PAID
+            )
+            {
+                var tenant =
+                    await _tenantRepository.GetOneAsync(
+                        t => t.Id == payment.TenantId
+                    );
+
+                if (tenant == null)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.NotFound,
+                        "No se encontró el negocio asociado al pago."
+                    );
+                }
+
+                var lastPaidPayment =
+                    await _paymentRepository.Query()
+                        .Where(
+                            p =>
+                                p.UserId == payment.UserId &&
+                                p.TenantId == payment.TenantId &&
+                                p.PlanType == PlanType.TENANT &&
+                                p.Status == PaymentStatus.PAID
+                        )
+                        .OrderByDescending(p => p.PaymentDate)
+                        .FirstOrDefaultAsync();
+
+                if (
+                    lastPaidPayment == null ||
+                    lastPaidPayment.Id != payment.Id
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Solo se puede eliminar el último pago del negocio."
+                    );
+                }
+
+                if (payment.StartedNewCycle)
+                {
+                    tenant.MonthlyFeeStatus =
+                        MonthlyFeeStatus.OVERDUE;
+
+                    tenant.MonthlyFeeStatusUpdatedAt =
+                        DateTime.UtcNow;
+
+                    tenant.PaymentDueDate = null;
+                }
+                else
+                {
+                    tenant.MonthlyFeeStatus =
+                        MonthlyFeeStatus.PENDING;
+                }
+
+                await _tenantRepository.UpdateOneAsync(
+                    tenant
+                );
+            }
+
+            await _paymentRepository.DeleteOneAsync(
+                payment
+            );
+        }
+
+        // =========================================================
+        // ACTUALIZAR
+        // =========================================================
+
+        public async Task<ResponsePaymentDTO> UpdateOne(
+            int id,
+            UpdatePaymentDTO updatePaymentDTO)
+        {
+            var payment = await _paymentRepository.GetOneAsync(
+                p => p.Id == id,
+                p => p.User,
+                p => p.Tenant
+            );
+
+            if (payment == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un pago con el Id = '{id}'"
+                );
+            }
+
+            if (payment.PlanType == PlanType.TENANT)
+            {
+                await _permissionServices.CheckAdminPermission(
+                    Permissions.ADMIN_PAYMENTS
+                );
+            }
+            else if (payment.PlanType == PlanType.STUDENT)
+            {
+                await _permissionServices.CheckPermission(
+                    Permissions.PAYMENT_UPDATE,
+                    payment.TenantId
+                );
+            }
+
             if (updatePaymentDTO.PaymentMethod != null)
             {
-                var paymentMethod = updatePaymentDTO.PaymentMethod;
+                var paymentMethod =
+                    updatePaymentDTO.PaymentMethod;
 
-                if (paymentMethod != PaymentMethod.CASH &&
+                if (
+                    paymentMethod != PaymentMethod.CASH &&
                     paymentMethod != PaymentMethod.DEBIT_CARD &&
                     paymentMethod != PaymentMethod.BANK_TRANSFER &&
-                    paymentMethod != PaymentMethod.MERCADO_PAGO)
+                    paymentMethod != PaymentMethod.MERCADO_PAGO
+                )
                 {
                     throw new HttpResponseError(
                         HttpStatusCode.BadRequest,
@@ -941,9 +1095,13 @@ namespace backend_proyecto.Services
                 payment.PaymentMethod = paymentMethod;
             }
 
-            await _paymentRepository.UpdateOneAsync(payment);
+            await _paymentRepository.UpdateOneAsync(
+                payment
+            );
 
-            return _mapper.Map<ResponsePaymentDTO>(payment);
+            return _mapper.Map<ResponsePaymentDTO>(
+                payment
+            );
         }
 
         // =========================================================
@@ -958,8 +1116,10 @@ namespace backend_proyecto.Services
                 return;
             }
 
-            if (webhook.Data == null ||
-                string.IsNullOrWhiteSpace(webhook.Data.Id))
+            if (
+                webhook.Data == null ||
+                string.IsNullOrWhiteSpace(webhook.Data.Id)
+            )
             {
                 return;
             }
@@ -1027,8 +1187,10 @@ namespace backend_proyecto.Services
                 );
             }
 
-            if (payment.Amount !=
-                mercadoPagoPayment.TransactionAmount)
+            if (
+                payment.Amount !=
+                mercadoPagoPayment.TransactionAmount
+            )
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
@@ -1051,55 +1213,119 @@ namespace backend_proyecto.Services
             {
                 case "approved":
 
-                    payment.Status = PaymentStatus.PAID;
+                    payment.Status =
+                        PaymentStatus.PAID;
+
+                    var approvalDate = DateTime.UtcNow;
+
+                    // =================================================
+                    // ALUMNO
+                    // =================================================
 
                     if (payment.PlanType == PlanType.STUDENT)
                     {
-                        var student = await _studentRepository.GetOneAsync(
-                            s => s.UserId == payment.UserId &&
-                                 s.TenantId == payment.TenantId
-                        );
+                        var student =
+                            await _studentRepository.GetOneAsync(
+                                s =>
+                                    s.UserId == payment.UserId &&
+                                    s.TenantId == payment.TenantId
+                            );
 
                         if (student != null)
                         {
-                            student.MonthlyFeeStatus = MonthlyFeeStatus.PAID;
-                            student.MonthlyFeeStatusUpdatedAt = DateTime.UtcNow;
+                            var startedNewCycle =
+                                student.MonthlyFeeStatus ==
+                                MonthlyFeeStatus.OVERDUE;
 
-                            await _studentRepository.UpdateOneAsync(student);
+                            payment.StartedNewCycle =
+                                startedNewCycle;
+
+                            student.MonthlyFeeStatus =
+                                MonthlyFeeStatus.PAID;
+
+                            student.MonthlyFeeStatusUpdatedAt =
+                                approvalDate;
+
+                            if (startedNewCycle)
+                            {
+                                student.PaymentDueDate =
+                                    approvalDate.AddDays(30);
+                            }
+
+                            await _studentRepository.UpdateOneAsync(
+                                student
+                            );
                         }
                     }
+
+                    // =================================================
+                    // TENANT
+                    // =================================================
+
                     else if (payment.PlanType == PlanType.TENANT)
                     {
-                        var tenantPayment = await _tenantRepository.GetOneAsync(
-                            t => t.Id == payment.TenantId
-                        );
+                        var tenantPayment =
+                            await _tenantRepository.GetOneAsync(
+                                t => t.Id == payment.TenantId
+                            );
 
                         if (tenantPayment != null)
                         {
-                            tenantPayment.MonthlyFeeStatus = MonthlyFeeStatus.PAID;
-                            tenantPayment.MonthlyFeeStatusUpdatedAt = DateTime.UtcNow;
+                            var startedNewCycle =
+                                tenantPayment.MonthlyFeeStatus ==
+                                MonthlyFeeStatus.OVERDUE;
 
-                            await _tenantRepository.UpdateOneAsync(tenantPayment);
+                            payment.StartedNewCycle =
+                                startedNewCycle;
+
+                            tenantPayment.MonthlyFeeStatus =
+                                MonthlyFeeStatus.PAID;
+
+                            tenantPayment.MonthlyFeeStatusUpdatedAt =
+                                approvalDate;
+
+                            tenantPayment.IsActive = true;
+
+                            if (startedNewCycle)
+                            {
+                                tenantPayment.PaymentDueDate =
+                                    approvalDate.AddDays(30);
+                            }
+
+                            await _tenantRepository.UpdateOneAsync(
+                                tenantPayment
+                            );
                         }
                     }
 
                     break;
 
                 case "rejected":
-                    payment.Status = PaymentStatus.REJECTED;
+
+                    payment.Status =
+                        PaymentStatus.REJECTED;
+
                     break;
 
                 case "cancelled":
-                    payment.Status = PaymentStatus.CANCELLED;
+
+                    payment.Status =
+                        PaymentStatus.CANCELLED;
+
                     break;
 
                 case "pending":
                 case "in_process":
-                    payment.Status = PaymentStatus.PENDING;
+
+                    payment.Status =
+                        PaymentStatus.PENDING;
+
                     break;
             }
 
-            await _paymentRepository.UpdateOneAsync(payment);
+            await _paymentRepository.UpdateOneAsync(
+                payment
+            );
         }
 
         // =========================================================
@@ -1124,7 +1350,6 @@ namespace backend_proyecto.Services
                 );
             }
 
-            // El usuario solamente puede consultar sus propios pagos
             if (payment.UserId != userId)
             {
                 throw new HttpResponseError(
@@ -1133,14 +1358,17 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var result = _mapper.Map<ResponsePaymentDTO>(payment);
+            var result =
+                _mapper.Map<ResponsePaymentDTO>(
+                    payment
+                );
 
-            // Obtener nombre del plan
             if (payment.PlanType == PlanType.STUDENT)
             {
-                var plan = await _studentPlanRepository.GetOneAsync(
-                    p => p.Id == payment.PlanId
-                );
+                var plan =
+                    await _studentPlanRepository.GetOneAsync(
+                        p => p.Id == payment.PlanId
+                    );
 
                 if (plan != null)
                 {
@@ -1149,9 +1377,10 @@ namespace backend_proyecto.Services
             }
             else if (payment.PlanType == PlanType.TENANT)
             {
-                var plan = await _tenantPlanRepository.GetOneAsync(
-                    p => p.Id == payment.PlanId
-                );
+                var plan =
+                    await _tenantPlanRepository.GetOneAsync(
+                        p => p.Id == payment.PlanId
+                    );
 
                 if (plan != null)
                 {
@@ -1171,61 +1400,191 @@ namespace backend_proyecto.Services
             int year,
             int month)
         {
-            var tenants = await _tenantRepository.GetMyOwnedTenants(userId);
+            var tenants =
+                await _tenantRepository.GetMyOwnedTenants(
+                    userId
+                );
 
             var (startOfMonth, startOfNextMonth) =
                 GetMonthRange(year, month);
 
-            var result = new List<ResponseMyBusinessPaymentDTO>();
+            var result =
+                new List<ResponseMyBusinessPaymentDTO>();
 
             foreach (var tenant in tenants)
             {
-                var plan = await _tenantPlanRepository.GetOneAsync(
-                    p => p.Id == tenant.TenantPlanId
-                );
+                var plan =
+                    await _tenantPlanRepository.GetOneAsync(
+                        p => p.Id == tenant.TenantPlanId
+                    );
 
                 if (plan == null)
                 {
                     continue;
                 }
 
-                var payment = await _paymentRepository.GetOneAsync(
-                    p =>
-                        p.UserId == userId &&
-                        p.TenantId == tenant.Id &&
-                        p.PlanType == PlanType.TENANT &&
-                        p.PaymentDate >= startOfMonth &&
-                        p.PaymentDate < startOfNextMonth
+                var payment =
+                    await _paymentRepository.GetOneAsync(
+                        p =>
+                            p.UserId == userId &&
+                            p.TenantId == tenant.Id &&
+                            p.PlanType == PlanType.TENANT &&
+                            p.Status == PaymentStatus.PAID &&
+                            p.PaymentDate >= startOfMonth &&
+                            p.PaymentDate < startOfNextMonth
+                    );
+
+                result.Add(
+                    new ResponseMyBusinessPaymentDTO
+                    {
+                        TenantId = tenant.Id,
+                        TenantName = tenant.Name,
+
+                        PlanName = plan.Name,
+                        PlanPrice = plan.Price,
+
+                        MonthlyFeeStatus =
+                            tenant.MonthlyFeeStatus,
+
+                        MonthlyFeeStatusUpdatedAt =
+                            tenant.MonthlyFeeStatusUpdatedAt,
+
+                        MercadoPagoConnected =
+                            !string.IsNullOrWhiteSpace(
+                                tenant.MercadoPagoAccessToken
+                            )
+                    }
                 );
-
-                var monthlyFeeStatus =
-                    payment?.Status == PaymentStatus.PAID
-                        ? MonthlyFeeStatus.PAID
-                        : MonthlyFeeStatus.PENDING;
-
-                result.Add(new ResponseMyBusinessPaymentDTO
-                {
-                    TenantId = tenant.Id,
-                    TenantName = tenant.Name,
-
-                    PlanName = plan.Name,
-                    PlanPrice = plan.Price,
-
-                    MonthlyFeeStatus = monthlyFeeStatus,
-
-                    MonthlyFeeStatusUpdatedAt =
-                        payment?.Status == PaymentStatus.PAID
-                            ? payment.PaymentDate
-                            : null,
-
-                    MercadoPagoConnected =
-                        !string.IsNullOrWhiteSpace(
-                            tenant.MercadoPagoAccessToken
-                        )
-                });
             }
 
             return result;
+        }
+
+        // =========================================================
+        // CREAR PAGO MERCADO PAGO - TENANT
+        // =========================================================
+
+        public async Task<string> CreateMercadoPagoTenantPayment(
+            int userId,
+            int tenantId)
+        {
+            var user = await _userRepository.GetOneAsync(
+                u => u.Id == userId
+            );
+
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el usuario."
+                );
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el negocio."
+                );
+            }
+
+            if (tenant.OwnerUserId != userId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "No sos el dueño de este negocio."
+                );
+            }
+
+            var tenantPlan =
+                await _tenantPlanRepository.GetOneAsync(
+                    p => p.Id == tenant.TenantPlanId
+                );
+
+            if (tenantPlan == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el plan del negocio."
+                );
+            }
+
+            if (tenantPlan.Price <= 0)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El monto del plan debe ser mayor a 0."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(
+                tenant.MercadoPagoAccessToken))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Este negocio no tiene Mercado Pago conectado."
+                );
+            }
+
+            if (
+                tenant.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
+                tenant.PaymentDueDate != null &&
+                tenant.PaymentDueDate.Value > DateTime.UtcNow
+            )
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La cuota del negocio todavía está vigente."
+                );
+            }
+
+            var existingPayment =
+                await _paymentRepository.GetOneAsync(
+                    p =>
+                        p.UserId == userId &&
+                        p.TenantId == tenantId &&
+                        p.PlanType == PlanType.TENANT &&
+                        p.Status == PaymentStatus.PENDING
+                );
+
+            if (existingPayment != null)
+            {
+                return await _mercadoPagoServices.CreatePreference(
+                    tenant,
+                    existingPayment,
+                    user,
+                    tenantPlan.Name
+                );
+            }
+
+            var payment = new Payment
+            {
+                UserId = userId,
+                PlanId = tenantPlan.Id,
+                PlanType = PlanType.TENANT,
+                TenantId = tenantId,
+                Amount = tenantPlan.Price,
+                PaymentMethod = PaymentMethod.MERCADO_PAGO,
+                PaymentDate = DateTime.UtcNow,
+                Status = PaymentStatus.PENDING,
+                ExternalPaymentId = null,
+                StartedNewCycle = false
+            };
+
+            await _paymentRepository.CreateOneAsync(
+                payment
+            );
+
+            return await _mercadoPagoServices.CreatePreference(
+                tenant,
+                payment,
+                user,
+                tenantPlan.Name
+            );
         }
     }
 }

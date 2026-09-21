@@ -1,6 +1,7 @@
 ﻿using backend_projeto.Models.DTOs;
 using backend_proyecto.Config;
 using backend_proyecto.Enums;
+using backend_proyecto.Models;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -11,15 +12,18 @@ public class PermissionServices
     private readonly ApplicationDbContext _context;
     private readonly CurrentTenantService _currentTenant;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ITenantRepository _tenantRepository;
 
     public PermissionServices(
         ApplicationDbContext context,
         CurrentTenantService currentTenant,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        ITenantRepository tenantRepository)
     {
         _context = context;
         _currentTenant = currentTenant;
         _httpContextAccessor = httpContextAccessor;
+        _tenantRepository = tenantRepository;
     }
 
     public async Task CheckPermission(
@@ -64,12 +68,80 @@ public class PermissionServices
             );
         }
 
+        var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
+        if (tenant == null)
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.NotFound,
+                "No existe el tenant o está inactivo"
+            );
+        }
+
+        if (tenant.IsActive == false)
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.NotFound,
+                "No existe el tenant o está inactivo"
+            );
+        }
+
         var permissions = await GetEffectivePermissions(
             userId,
             tenantId.Value
         );
 
         if (!permissions.Contains(permissionName))
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.Forbidden,
+                "No tenés permiso para realizar esta acción"
+            );
+        }
+    }
+
+    public async Task CheckAdminPermission(
+        string permissionName)
+    {
+        var context = _httpContextAccessor.HttpContext;
+
+        if (context == null)
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.Unauthorized,
+                "No hay una request activa"
+            );
+        }
+
+        var userIdClaim = context.User.FindFirst("id");
+
+        if (userIdClaim == null)
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.Unauthorized,
+                "Usuario no autenticado"
+            );
+        }
+
+        if (!int.TryParse(userIdClaim.Value, out var userId))
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.Unauthorized,
+                "Usuario no válido"
+            );
+        }
+
+        var isAdmin = await _context.Admin
+            .AnyAsync(a => a.UserId == userId);
+
+        if (!isAdmin)
+        {
+            throw new HttpResponseError(
+                HttpStatusCode.Forbidden,
+                "No tenés permisos de administrador"
+            );
+        }
+
+        if (permissionName != Permissions.ADMIN_PAYMENTS)
         {
             throw new HttpResponseError(
                 HttpStatusCode.Forbidden,
@@ -231,6 +303,7 @@ public class PermissionServices
     private async Task<HashSet<string>> GetAllPermissions()
     {
         var permissions = await _context.Permissions
+            .Where(p => !p.Name.StartsWith("ADMIN_"))
             .Select(p => p.Name)
             .ToListAsync();
 

@@ -11,5 +11,9 @@
         public bool IsActive { get; set; }
         public string? Alias { get; set; }
         public string? CBU { get; set; }
+        public string MonthlyFeeStatus { get; set; } = null!;
+        public DateTime? PaymentDueDate { get; set; }
+        public bool MercadoPagoConnected { get; set; }
+        public decimal PlanPrice { get; set; }
     }
 }

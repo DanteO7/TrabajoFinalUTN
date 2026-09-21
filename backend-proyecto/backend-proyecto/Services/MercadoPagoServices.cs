@@ -327,16 +327,16 @@ namespace backend_proyecto.Services
             {
                 items = new[]
                 {
-            new
-            {
-                id = payment.Id.ToString(),
-                title = planName,
-                description = $"Pago del plan {planName}",
-                quantity = 1,
-                currency_id = "ARS",
-                unit_price = payment.Amount
-            }
-        },
+                    new
+                    {
+                        id = payment.Id.ToString(),
+                        title = planName,
+                        description = $"Pago del plan {planName}",
+                        quantity = 1,
+                        currency_id = "ARS",
+                        unit_price = payment.Amount
+                    }
+                },
 
                 payer = new
                 {

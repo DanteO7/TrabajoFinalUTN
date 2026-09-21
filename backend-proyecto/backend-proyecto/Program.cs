@@ -110,8 +110,7 @@ builder.Services.AddScoped<IRoutineRepository, RoutineRepository>();
 
 // Backgound Services
 builder.Services.AddHostedService<ClassCleanupService>();
-builder.Services.AddHostedService<MonthlyPendingService>();
-builder.Services.AddHostedService<MonthlyOverdueService>();
+builder.Services.AddHostedService<BillingCycleService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(opts => { }, typeof(Mapping));

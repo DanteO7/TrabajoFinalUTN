@@ -124,6 +124,20 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                Console.WriteLine("=== WEBHOOK MERCADO PAGO ===");
+
+                Console.WriteLine(
+                    $"Type: {webhook.Type}"
+                );
+
+                Console.WriteLine(
+                    $"UserId: {webhook.UserId}"
+                );
+
+                Console.WriteLine(
+                    $"PaymentId: {webhook.Data?.Id}"
+                );
+
                 await _paymentServices
                     .ProcessMercadoPagoWebhook(webhook);
 
@@ -132,7 +146,7 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"Error procesando webhook de Mercado Pago: {ex.Message}"
+                    $"Error procesando webhook de Mercado Pago: {ex}"
                 );
 
                 return BadRequest();

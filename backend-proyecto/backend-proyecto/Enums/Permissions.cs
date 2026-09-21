@@ -84,4 +84,7 @@
     public const string INVITATION_READ = "INVITATION_READ";
     public const string INVITATION_CREATE = "INVITATION_CREATE";
     public const string INVITATION_DELETE = "INVITATION_DELETE";
+
+    // ADMIN
+    public const string ADMIN_PAYMENTS = "ADMIN_PAYMENTS";
 }

@@ -10,17 +10,8 @@ public interface ITenantRepository : IRepository<Tenant>
 {
     Task<bool> ExistsByUserId(int userId);
     Task<bool> ExistsByOwnerAndId(int userId, int tenantId);
-    Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null);
+    Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null, bool onlyOwned = false);
     Task<int> CountAsync(Expression<Func<Tenant, bool>> predicate);
-    Task ResetMonthlyFeeStatusAsync(
-            DateTime date,
-            CancellationToken cancellationToken = default
-        );
-
-    Task SetPendingToOverdueAsync(
-        DateTime date,
-        CancellationToken cancellationToken = default
-    );
     Task<Tenant?> GetByMercadoPagoUserIdAsync(
     string mercadoPagoUserId);
 
@@ -46,76 +37,63 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
         return await dbSet.AnyAsync(t => t.OwnerUserId == userId && t.Id == tenantId);
     }
 
-    public async Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null)
+    public async Task<List<ResponseMyTenantDTO>> GetMyTenants(
+    int currentUserId,
+    int? targetUserId = null,
+    bool onlyOwned = false)
     {
         var userId = targetUserId ?? currentUserId;
 
-        var tenants = await _db.Tenants
-            .Where(t =>
+        var query = _db.Tenants.AsQueryable();
+
+        if (onlyOwned)
+        {
+            query = query.Where(t =>
+                t.OwnerUserId == userId
+            );
+        }
+        else
+        {
+            query = query.Where(t =>
                 t.OwnerUserId == userId ||
                 t.Professors.Any(p => p.UserId == userId) ||
                 t.Students.Any(s => s.UserId == userId)
-            )
-            .Select(t => new ResponseMyTenantDTO
-            {
-                Id = t.Id,
-                Name = t.Name,
-                Role = t.OwnerUserId == userId
-                    ? "Owner"
-                    : t.Professors.Any(p => p.UserId == userId)
-                        ? "Professor"
-                        : "Student",
-                OwnerName = t.OwnerUser.Name + " " + t.OwnerUser.Surname,
-                IsActive = t.IsActive,
-                Address = t.Address,
-            })
-            .ToListAsync();
+            );
+        }
+
+        var tenants =
+            await query
+                .Select(t => new ResponseMyTenantDTO
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Role = t.OwnerUserId == userId
+                        ? "Owner"
+                        : t.Professors.Any(p => p.UserId == userId)
+                            ? "Professor"
+                            : "Student",
+                    OwnerName =
+                        t.OwnerUser.Name + " " +
+                        t.OwnerUser.Surname,
+                    IsActive = t.IsActive,
+                    Address = t.Address,
+                    Alias = t.Alias,
+                    CBU = t.CBU,
+                    MonthlyFeeStatus = t.MonthlyFeeStatus,
+                    PaymentDueDate = t.PaymentDueDate,
+                    MercadoPagoConnected =
+                        !string.IsNullOrWhiteSpace(
+                            t.MercadoPagoAccessToken
+                        ),
+                    PlanPrice = t.TenantPlan.Price
+                })
+                .ToListAsync();
 
         return tenants;
     }
     public async Task<int> CountAsync(Expression<Func<Tenant, bool>> predicate)
     {
         return await _db.Tenants.CountAsync(predicate);
-    }
-    public async Task ResetMonthlyFeeStatusAsync(
-            DateTime date,
-            CancellationToken cancellationToken = default)
-    {
-        await _db.Tenants
-            .ExecuteUpdateAsync(
-                setters => setters
-                    .SetProperty(
-                        t => t.MonthlyFeeStatus,
-                        MonthlyFeeStatus.PENDING
-                    )
-                    .SetProperty(
-                        t => t.MonthlyFeeStatusUpdatedAt,
-                        date
-                    ),
-                cancellationToken
-            );
-    }
-
-    public async Task SetPendingToOverdueAsync(
-        DateTime date,
-        CancellationToken cancellationToken = default)
-    {
-        await _db.Tenants
-            .Where(t =>
-                t.MonthlyFeeStatus == MonthlyFeeStatus.PENDING
-            )
-            .ExecuteUpdateAsync(
-                setters => setters
-                    .SetProperty(
-                        t => t.MonthlyFeeStatus,
-                        MonthlyFeeStatus.OVERDUE
-                    )
-                    .SetProperty(
-                        t => t.MonthlyFeeStatusUpdatedAt,
-                        date
-                    ),
-                cancellationToken
-            );
     }
     public async Task<Tenant?> GetByMercadoPagoUserIdAsync(
     string mercadoPagoUserId)

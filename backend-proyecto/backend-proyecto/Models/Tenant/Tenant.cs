@@ -13,6 +13,7 @@
         public TenantPlan TenantPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
         public DateTime? MonthlyFeeStatusUpdatedAt { get; set; }
+        public DateTime? PaymentDueDate { get; set; }
 
         // Mercado Pago
         public string? MercadoPagoAccessToken { get; set; }
