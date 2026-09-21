@@ -105,7 +105,7 @@ export default function TenantPaymentCard({
 
         {!isPaid && (
           <div className="flex flex-col gap-3">
-            {tenant.mercadoPagoConnected && (
+            {tenant.mercadoPagoConnected && tenant.role !== "Owner" && (
               <BlackButton
                 text={
                   mercadoPagoMutation.isPending
