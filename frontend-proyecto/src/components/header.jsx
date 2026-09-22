@@ -60,7 +60,7 @@ export default function Header() {
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="/pagos-app"
                   >
-                    Pagos
+                    Pagos App
                   </Link>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-xl px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
@@ -188,7 +188,7 @@ export default function Header() {
                     icon={FaMoneyBillWave}
                     onClick={() => setMenu(false)}
                   >
-                    Pagos
+                    Pagos App
                   </MenuItem>
                 </>
               )}
