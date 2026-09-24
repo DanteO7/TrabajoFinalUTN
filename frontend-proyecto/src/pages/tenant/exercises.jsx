@@ -10,11 +10,12 @@ import ExerciseModal from "../../components/exercises/exercise-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import SearchInput from "../../components/inputs/search-input";
 
 export default function Exercises({ tenantId }) {
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
   const [, setLocation] = useLocation();
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
 
@@ -33,9 +34,9 @@ export default function Exercises({ tenantId }) {
 
   const filteredExercises = exercises.filter((exercise) => {
     return (
-      exercise.name.toLowerCase().includes(search.toLowerCase()) ||
+      exercise.name.toLowerCase().includes(inputValue.toLowerCase()) ||
       (exercise.description &&
-        exercise.description.toLowerCase().includes(search.toLowerCase()))
+        exercise.description.toLowerCase().includes(inputValue.toLowerCase()))
     );
   });
 
@@ -70,11 +71,10 @@ export default function Exercises({ tenantId }) {
 
             {exercises.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                <SearchInput
+                  value={inputValue}
+                  onChange={setInputValue}
                   placeholder="Buscar ejercicio..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
                 {canCreateExercise && (

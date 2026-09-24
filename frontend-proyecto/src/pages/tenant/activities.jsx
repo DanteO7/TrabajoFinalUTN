@@ -9,11 +9,14 @@ import ActivityForm from "../../components/activities/activity-form";
 import ActivityModal from "../../components/activities/activity-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
+import SearchInput from "../../components/inputs/search-input";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Activities({ tenantId }) {
   const [, setLocation] = useLocation();
+  const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
@@ -32,9 +35,9 @@ export default function Activities({ tenantId }) {
 
   const filteredActivities = activities.filter((activity) => {
     return (
-      activity.name.toLowerCase().includes(search.toLowerCase()) ||
+      activity.name.toLowerCase().includes(inputValue.toLowerCase()) ||
       (activity.description &&
-        activity.description.toLowerCase().includes(search.toLowerCase()))
+        activity.description.toLowerCase().includes(inputValue.toLowerCase()))
     );
   });
 
@@ -69,11 +72,10 @@ export default function Activities({ tenantId }) {
 
             {activities.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                <SearchInput
+                  value={inputValue}
+                  onChange={setInputValue}
                   placeholder="Buscar actividad..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
                 {canCreateActivity && (
@@ -82,7 +84,7 @@ export default function Activities({ tenantId }) {
                       text="+ Nueva actividad"
                       onClick={() => setOpenForm(true)}
                       textSmall={true}
-                      wfit={true}
+                      wfit={isSmallScreen}
                     />
                   </div>
                 )}

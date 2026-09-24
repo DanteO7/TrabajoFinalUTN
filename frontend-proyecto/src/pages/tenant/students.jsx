@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getStudents } from "../../services/student";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
-import { Search, X } from "lucide-react";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
 import StudentModal from "../../components/students/student-modal";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import SearchInput from "../../components/inputs/search-input";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -85,27 +85,11 @@ export default function Students({ tenantId }) {
 
             {students.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <div className="relative w-full sm:max-w-md">
-                  <Search
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  />
-
-                  <input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Buscar alumno..."
-                    className="w-full rounded-xl border px-10 py-2 bg-[#efefef] outline-none focus:ring-2 focus:ring-[#333]"
-                  />
-
-                  {inputValue && (
-                    <X
-                      size={18}
-                      onClick={() => setInputValue("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer"
-                    />
-                  )}
-                </div>
+                <SearchInput
+                  value={inputValue}
+                  onChange={setInputValue}
+                  placeholder="Buscar alumno..."
+                />
 
                 <BlackButton
                   text="+ Invitar alumno"

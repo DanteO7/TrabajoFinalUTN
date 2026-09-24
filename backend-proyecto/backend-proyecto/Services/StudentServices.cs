@@ -3,6 +3,7 @@ using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
+using backend_proyecto.Utils;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -219,7 +220,9 @@ namespace backend_proyecto.Services
             await _studentRepository.UpdateOneAsync(student);
             return _mapper.Map<ResponseStudentDTO>(student);
         }
-        public async Task<ResponseStudentDTO> GetByUserAndTenant(int userId, int tenantId)
+        public async Task<ResponseStudentDTO> GetByUserAndTenant(
+            int userId,
+            int tenantId)
         {
             var student = await _studentRepository.GetOneAsync(
                 s => s.UserId == userId && s.TenantId == tenantId,
@@ -229,11 +232,51 @@ namespace backend_proyecto.Services
 
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound,
-                    "No existe un registro de alumno para este usuario en este tenant");
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No existe un registro de alumno para este usuario en este tenant"
+                );
             }
 
-            return _mapper.Map<ResponseStudentDTO>(student);
+            var dto = _mapper.Map<ResponseStudentDTO>(student);
+
+            if (student.PaymentDueDate == null || student.StudentPlan == null)
+            {
+                dto.RemainingClasses = 0;
+                return dto;
+            }
+
+            var cycleEnd = DateOnly.FromDateTime(
+                student.PaymentDueDate.Value
+            );
+
+            var cycleStart = DateOnly.FromDateTime(
+                student.PaymentDueDate.Value.AddDays(-30)
+            );
+
+            var now = TimeHelper.Now();
+            var today = DateOnly.FromDateTime(now);
+
+            while (today > cycleEnd)
+            {
+                cycleStart = cycleEnd.AddDays(1);
+                cycleEnd = cycleStart.AddDays(30);
+            }
+
+            var reservationsInCycle =
+                await _reservationRepository.CountAsync(
+                    r =>
+                        r.StudentId == student.Id &&
+                        r.Class.Date >= cycleStart &&
+                        r.Class.Date <= cycleEnd
+                );
+
+            dto.RemainingClasses = Math.Max(
+                0,
+                student.StudentPlan.ClassesPerMonth - reservationsInCycle
+            );
+
+            return dto;
         }
         public async Task<List<ResponseStudentDTO>> GetPendingPaymentStudents(int tenantId,int userId)
         {

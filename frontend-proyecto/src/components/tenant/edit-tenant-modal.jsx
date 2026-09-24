@@ -29,7 +29,6 @@ const PLATFORMS = [
 
 export default function EditTenantModal({ tenant, close }) {
   const queryClient = useQueryClient();
-  console.log(tenant);
 
   const [networks, setNetworks] = useState(tenant.socialNetworks || {});
 
@@ -44,10 +43,12 @@ export default function EditTenantModal({ tenant, close }) {
   } = useForm({
     resolver: zodResolver(updateTenantSchema),
     defaultValues: {
+      name: tenant.name || "",
       alias: tenant.alias || "",
       cbu: tenant.cbu || "",
       address: tenant.address || "",
     },
+    mode: "onTouched",
   });
 
   const mutation = useMutation({
@@ -66,6 +67,7 @@ export default function EditTenantModal({ tenant, close }) {
       );
 
       return updateTenant(tenant.id, {
+        name: data.name,
         alias: data.alias || null,
         cbu: data.cbu || null,
         address: data.address || null,
@@ -149,6 +151,21 @@ export default function EditTenantModal({ tenant, close }) {
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="mb-10">
+          <h3 className="font-semibold text-lg mb-3">Nombre</h3>
+
+          <div className="space-y-3">
+            <FormInput
+              label="Nombre del negocio"
+              id="name"
+              type="text"
+              placeholder="Gym power..."
+              register={register("name")}
+              error={errors.name}
+              disabled={isSubmitting || mutation.isPending}
+            />
+          </div>
+        </div>
         <div className="mb-10">
           <h3 className="font-semibold text-lg mb-3">
             Datos de cuenta bancaria

@@ -1,6 +1,7 @@
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useUserFilterStore } from "../../store/user-filter-store";
+import SearchInput from "../inputs/search-input";
 
 export default function UserSearchFilters() {
   const { search, role, setFilters } = useUserFilterStore();
@@ -18,28 +19,11 @@ export default function UserSearchFilters() {
 
   return (
     <div className="flex flex-col min-[700px]:flex-row gap-3 mb-6">
-      <div className="relative flex-1 min-w-62.5 max-w-110">
-        <Search
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Buscar usuario..."
-          className="w-full rounded-xl bg-[#efefef] border px-10 py-2 outline-none focus:ring-2 focus:ring-[#333]"
-        />
-
-        {inputValue && (
-          <X
-            size={18}
-            onClick={() => setInputValue("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer"
-          />
-        )}
-      </div>
+      <SearchInput
+        value={inputValue}
+        onChange={setInputValue}
+        placeholder="Buscar usuario..."
+      />
 
       <div className="flex items-center gap-2">
         <select

@@ -36,6 +36,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
     defaultValues: {
       paymentMethod: "",
     },
+    mode: "onTouched",
   });
 
   const mutation = useMutation({

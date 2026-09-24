@@ -4,8 +4,6 @@ namespace backend_proyecto.Models.DTOs
 {
     public class UpdateTenantDTO
     {
-        public bool? IsActive { get; set; }
-
         public int? TenantPlanId { get; set; }
 
         [MaxLength(50)]
@@ -14,8 +12,6 @@ namespace backend_proyecto.Models.DTOs
         [MaxLength(200)]
         public string? Address { get; set; }
         public Dictionary<string, string>? SocialNetworks { get; set; }
-
-        public string? MonthlyFeeStatus { get; set; }
 
         [MaxLength(100)]
         public string? Alias { get; set; }

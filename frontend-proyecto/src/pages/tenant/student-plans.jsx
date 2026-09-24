@@ -70,18 +70,18 @@ export default function StudentPlans({ tenantId }) {
           Volver
         </button>
 
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">Planes de alumno</h2>
+        <div className=" mb-6 flex flex-col gap-3 min-[900px]:gap-5">
+          <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
+            Planes de alumno
+          </h1>
 
           {canCreateStudentPlan && (
-            <div className="justify-self-end">
-              <BlackButton
-                text="+ Nuevo plan"
-                onClick={() => setOpenCreateForm(true)}
-                textSmall={true}
-                wfit={true}
-              />
-            </div>
+            <BlackButton
+              text="+ Nuevo plan"
+              onClick={() => setOpenCreateForm(true)}
+              textSmall={true}
+              wfit={true}
+            />
           )}
         </div>
 

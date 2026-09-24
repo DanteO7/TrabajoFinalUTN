@@ -13,6 +13,9 @@ import {
 import { getMyTenants } from "../services/tenant";
 import TenantPaymentCard from "../components/payments/tenant-payment-card";
 import ToggleInput from "../components/toggle-input";
+import { Link } from "wouter";
+import BlackButton from "../components/buttons/black-button";
+import { useAuthStore } from "../store/auth-store";
 
 const MONTHS = [
   "Enero",
@@ -31,6 +34,7 @@ const MONTHS = [
 
 export default function MyPayments() {
   const now = new Date();
+  const { isAuthenticated } = useAuthStore();
 
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
 
@@ -110,94 +114,103 @@ export default function MyPayments() {
             Consultá el historial de todos tus pagos.
           </p>
         </div>
-
-        {myTenants?.some((t) => t.isActive === false) && (
-          <ToggleInput
-            state={showInactive}
-            setState={setShowInactive}
-            text="Mostrar inactivos:"
-            gap={4}
-          />
-        )}
-
-        {isLoadingTenants ? (
-          <Loading />
-        ) : (
-          myTenants.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-semibold">Mis negocios</h2>
-
-              <div className="grid gap-6 mt-6 sm:grid-cols-2">
-                {myTenants
-                  ?.filter((t) => t.isActive || showInactive)
-                  .filter((t) => t.role !== "Professor")
-                  .map((tenant) => (
-                    <TenantPaymentCard
-                      key={tenant.id}
-                      tenant={tenant}
-                      turnoFacilPaymentData={turnoFacilPaymentData}
-                      mercadoPagoMutation={mercadoPagoMutation}
-                      openTransferModal={openTransferModal}
-                    />
-                  ))}
-              </div>
-            </div>
-          )
-        )}
-
-        <div className="flex items-center justify-center gap-4 mt-10">
-          <button
-            onClick={goToPreviousMonth}
-            className="p-2 rounded-full transition cursor-pointer"
-            aria-label="Mes anterior"
-          >
-            <FaChevronLeft size={22} color="fc697b" />
-          </button>
-
-          <div className="min-w-47.5 text-center">
-            <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
-              {MONTHS[selectedMonth - 1]} {selectedYear}
-            </p>
-          </div>
-
-          <button
-            onClick={goToNextMonth}
-            className="p-2 rounded-full transition cursor-pointer"
-            aria-label="Mes siguiente"
-          >
-            <FaChevronRight size={22} color="fc697b" />
-          </button>
-        </div>
-
-        {isLoading ? (
-          <Loading />
-        ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700 mt-8">
-            No se pudieron cargar tus pagos.
+        {!isAuthenticated ? (
+          <div className="flex flex-col gap-3 w-[90%] max-w-202.25">
+            <span>No tienes iniciada la sesion</span>
+            <Link href="/iniciar-sesion">
+              <BlackButton text="Iniciar sesion" wfit textSmall />
+            </Link>
           </div>
         ) : (
           <>
-            <div className="mt-8">
-              <h2 className="text-2xl font-semibold">Historial de pagos</h2>
+            {myTenants?.some((t) => t.isActive === false) && (
+              <ToggleInput
+                state={showInactive}
+                setState={setShowInactive}
+                text="Mostrar inactivos:"
+                gap={4}
+              />
+            )}
+            {isLoadingTenants ? (
+              <Loading />
+            ) : (
+              myTenants.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-semibold">Mis negocios</h2>
 
-              <p className="text-gray-500 mt-1">
-                {myPayments.length} {myPayments.length === 1 ? "pago" : "pagos"}{" "}
-                en {MONTHS[selectedMonth - 1].toLowerCase()} de {selectedYear}.
-              </p>
-            </div>
-
-            <div className="grid gap-6 mt-8 sm:grid-cols-2 xl:grid-cols-3">
-              {myPayments.length > 0 ? (
-                myPayments.map((p) => (
-                  <PaymentCard key={p.id} payment={p} showUser={false} />
-                ))
-              ) : (
-                <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                  No realizaste pagos en{" "}
-                  {MONTHS[selectedMonth - 1].toLowerCase()} de {selectedYear}.
+                  <div className="grid gap-6 mt-6 sm:grid-cols-2">
+                    {myTenants
+                      ?.filter((t) => t.isActive || showInactive)
+                      .filter((t) => t.role !== "Professor")
+                      .map((tenant) => (
+                        <TenantPaymentCard
+                          key={tenant.id}
+                          tenant={tenant}
+                          turnoFacilPaymentData={turnoFacilPaymentData}
+                          mercadoPagoMutation={mercadoPagoMutation}
+                          openTransferModal={openTransferModal}
+                        />
+                      ))}
+                  </div>
                 </div>
-              )}
+              )
+            )}
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <button
+                onClick={goToPreviousMonth}
+                className="p-2 rounded-full transition cursor-pointer"
+                aria-label="Mes anterior"
+              >
+                <FaChevronLeft size={22} color="fc697b" />
+              </button>
+
+              <div className="min-w-47.5 text-center">
+                <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
+                  {MONTHS[selectedMonth - 1]} {selectedYear}
+                </p>
+              </div>
+
+              <button
+                onClick={goToNextMonth}
+                className="p-2 rounded-full transition cursor-pointer"
+                aria-label="Mes siguiente"
+              >
+                <FaChevronRight size={22} color="fc697b" />
+              </button>
             </div>
+            {isLoading ? (
+              <Loading />
+            ) : isError ? (
+              <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700 mt-8">
+                No se pudieron cargar tus pagos.
+              </div>
+            ) : (
+              <>
+                <div className="mt-8">
+                  <h2 className="text-2xl font-semibold">Historial de pagos</h2>
+
+                  <p className="text-gray-500 mt-1">
+                    {myPayments.length}{" "}
+                    {myPayments.length === 1 ? "pago" : "pagos"} en{" "}
+                    {MONTHS[selectedMonth - 1].toLowerCase()} de {selectedYear}.
+                  </p>
+                </div>
+
+                <div className="grid gap-6 mt-8 sm:grid-cols-2 xl:grid-cols-3">
+                  {myPayments.length > 0 ? (
+                    myPayments.map((p) => (
+                      <PaymentCard key={p.id} payment={p} showUser={false} />
+                    ))
+                  ) : (
+                    <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
+                      No realizaste pagos en{" "}
+                      {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
+                      {selectedYear}.
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

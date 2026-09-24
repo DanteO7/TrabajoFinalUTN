@@ -9,5 +9,7 @@
         public int StudentPlanId { get; set; }
         public ResponseStudentPlanDTO StudentPlan { get; set; } = null!;
         public string MonthlyFeeStatus { get; set; } = null!;
+        public DateTime? PaymentDueDate { get; set; }
+        public int RemainingClasses { get; set; }
     }
 }

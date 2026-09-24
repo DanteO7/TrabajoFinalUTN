@@ -21,7 +21,6 @@ export default function Profile() {
   const queryClient = useQueryClient();
 
   const { user, isAuthenticated, logout } = useAuthStore();
-  console.log(user);
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -203,11 +202,8 @@ export default function Profile() {
           ) : (
             <div className="flex flex-col mt-5 gap-3">
               <span>No tienes iniciada la sesion</span>
-              <Link
-                href="/iniciar-sesion"
-                className="border rounded-xl w-fit px-2 py-1"
-              >
-                Inicia sesión
+              <Link href="/iniciar-sesion">
+                <BlackButton text="Iniciar sesion" wfit textSmall />
               </Link>
             </div>
           )}

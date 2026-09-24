@@ -9,10 +9,11 @@ import RoutineForm from "../../components/routines/routine-form";
 import RoutineModal from "../../components/routines/routine-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
+import SearchInput from "../../components/inputs/search-input";
 
 export default function Routines({ tenantId }) {
   const [, setLocation] = useLocation();
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [openForm, setOpenForm] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
 
@@ -31,9 +32,9 @@ export default function Routines({ tenantId }) {
 
   const filteredRoutines = routines.filter((routine) => {
     return (
-      routine.name.toLowerCase().includes(search.toLowerCase()) ||
+      routine.name.toLowerCase().includes(inputValue.toLowerCase()) ||
       (routine.description &&
-        routine.description.toLowerCase().includes(search.toLowerCase()))
+        routine.description.toLowerCase().includes(inputValue.toLowerCase()))
     );
   });
 
@@ -69,11 +70,10 @@ export default function Routines({ tenantId }) {
 
             {routines.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                <SearchInput
+                  value={inputValue}
+                  onChange={setInputValue}
                   placeholder="Buscar rutina..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
                 />
 
                 {canCreateRoutine && (

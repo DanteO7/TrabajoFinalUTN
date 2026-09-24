@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { getSpecialities } from "../../services/speciality";
@@ -8,11 +8,12 @@ import SpecialityForm from "../../components/specialities/speciality-form";
 import SpecialityModal from "../../components/specialities/speciality-modal";
 import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
+import SearchInput from "../../components/inputs/search-input";
 
 export default function Specialities({ tenantId }) {
   const [, setLocation] = useLocation();
 
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedSpeciality, setSelectedSpeciality] = useState(null);
 
@@ -26,7 +27,7 @@ export default function Specialities({ tenantId }) {
   });
 
   const filteredSpecialities = specialities.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()),
+    s.name.toLowerCase().includes(inputValue.toLowerCase()),
   );
 
   return (
@@ -61,11 +62,10 @@ export default function Specialities({ tenantId }) {
 
             {specialities.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar especialidad..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
+                <SearchInput
+                  value={inputValue}
+                  onChange={setInputValue}
+                  placeholder="Buscar profesión..."
                 />
                 <div className="justify-self-end">
                   <BlackButton

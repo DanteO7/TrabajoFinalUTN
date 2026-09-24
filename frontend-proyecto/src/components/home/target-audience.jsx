@@ -14,7 +14,7 @@ export default function TargetAudience() {
   const [visible, setVisible] = useState(4);
   const [isDragging, setIsDragging] = useState(false);
 
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const isDesktop = useMediaQuery("(min-width: 900px)");
 
   const containerRef = useRef(null);
   const trackRef = useRef(null);

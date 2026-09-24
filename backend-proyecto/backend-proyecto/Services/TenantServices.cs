@@ -207,18 +207,15 @@ namespace backend_proyecto.Services
                 {
                     throw new HttpResponseError(HttpStatusCode.BadRequest, "El nombre no puede tener más de 50 caracteres");
                 }
-
                 tenant.Name = updateTenantDTO.Name;
             }
+            var tenantWithSameName = await _tenantRepository.GetOneAsync(
+                t => t.Name == updateTenantDTO.Name
+            );
 
-            if (updateTenantDTO.IsActive.HasValue)
+            if(tenantWithSameName != null)
             {
-                if (updateTenantDTO.IsActive == tenant.IsActive)
-                {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El estado ya es el mismo");
-                }
-
-                tenant.IsActive = updateTenantDTO.IsActive.Value;
+                throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe un negocio con el nombre: '{updateTenantDTO.Name}'");
             }
 
             if (updateTenantDTO.TenantPlanId.HasValue)
@@ -236,23 +233,6 @@ namespace backend_proyecto.Services
                 }
 
                 tenant.TenantPlanId = updateTenantDTO.TenantPlanId.Value;
-            }
-
-            if (updateTenantDTO.MonthlyFeeStatus != null)
-            {
-                if (updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.PAID &&
-                    updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.PENDING &&
-                    updateTenantDTO.MonthlyFeeStatus != MonthlyFeeStatus.OVERDUE)
-                {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, $"Estado inválido: '{updateTenantDTO.MonthlyFeeStatus}'");
-                }
-
-                if (updateTenantDTO.MonthlyFeeStatus == tenant.MonthlyFeeStatus)
-                {
-                    throw new HttpResponseError(HttpStatusCode.BadRequest, "El estado ya es el mismo");
-                }
-
-                tenant.MonthlyFeeStatus = updateTenantDTO.MonthlyFeeStatus;
             }
 
             if (updateTenantDTO.Address != null)

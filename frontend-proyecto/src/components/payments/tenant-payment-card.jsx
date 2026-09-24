@@ -85,7 +85,7 @@ export default function TenantPaymentCard({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-px">
           <div className="flex justify-between">
             <span className="text-gray-500">Estado</span>
 

@@ -77,6 +77,16 @@ export default function Reservations({ tenantId }) {
             <p className="text-gray-500 mt-2">
               Todas las clases a las que estás anotado.
             </p>
+
+            {student && (
+              <p className="text-gray-500 mt-2">
+                Clases disponibles:{" "}
+                <span className="font-semibold text-black">
+                  {student.remainingClasses}/
+                  {student.studentPlan.classesPerMonth}
+                </span>
+              </p>
+            )}
           </div>
 
           <ReservationFilter filter={filter} setFilter={setFilter} />

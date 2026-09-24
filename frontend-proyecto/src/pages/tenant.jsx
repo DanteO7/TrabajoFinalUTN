@@ -134,6 +134,7 @@ export default function Tenant({ id }) {
       icon: <FaClipboardList size={35} />,
       href: "reservas",
       permission: "RESERVATION_READ",
+      onlyStudent: true,
     },
   ];
 
@@ -141,13 +142,21 @@ export default function Tenant({ id }) {
     state.getUserPermissions(id),
   );
 
-  const cards = userPermissions
-    ? sections.filter((section) =>
-        userPermissions.permissions.includes(section.permission),
-      )
-    : [];
-
   const userRoles = useTenantStore((state) => state.getUserRoles(id));
+
+  const cards = userPermissions
+    ? sections.filter((section) => {
+        const hasPermission = userPermissions.permissions.includes(
+          section.permission,
+        );
+
+        const isStudentOnly = section.onlyStudent === true;
+
+        const isStudent = userRoles.includes("Student");
+
+        return hasPermission && (!isStudentOnly || isStudent);
+      })
+    : [];
 
   const roleConfig = {
     Admin: {
@@ -170,9 +179,8 @@ export default function Tenant({ id }) {
 
   const role = userRoles.map((role) => roleConfig[role]).find(Boolean);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canUpdateTenant = hasPermission(id, "TENANT_UPDATE");
+  const canUpdateTenant =
+    userPermissions?.permissions?.includes("TENANT_UPDATE") ?? false;
 
   const { data: unreadCount } = useQuery({
     queryKey: ["unreadCount", tenant?.id],
@@ -182,6 +190,7 @@ export default function Tenant({ id }) {
 
   const newsCard = cards?.find((c) => c.href === "novedades");
   const otherCards = cards?.filter((c) => c.href !== "novedades");
+  console.log(otherCards);
 
   return (
     <MainLayout>
@@ -312,10 +321,12 @@ export default function Tenant({ id }) {
                 >
                   <div className="cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>
+
                     <div>
                       <h3 className="font-semibold text-[19px]">
                         {section.title}
                       </h3>
+
                       <p className="text-gray-500 max-[900px]:text-[13px]">
                         {section.description}
                       </p>
