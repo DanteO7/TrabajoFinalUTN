@@ -51,7 +51,10 @@ namespace backend_proyecto.Services
                 {
                     case Roles.PROFESSOR:
                         query = query.Where(u =>
-                            _db.Professors.Any(p => p.UserId == u.Id));
+                            _db.Professors.Any(p =>
+                                p.UserId == u.Id &&
+                                p.Tenant.OwnerUserId != u.Id
+                            ));
                         break;
 
                     case Roles.STUDENT:

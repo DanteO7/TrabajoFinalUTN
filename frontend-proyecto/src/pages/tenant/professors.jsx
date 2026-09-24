@@ -9,14 +9,19 @@ import LinkModal from "../../components/modals/link-modal";
 import ProfessorModal from "../../components/professors/professor-modal";
 import { useTenantStore } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
+import { X } from "lucide-react";
+import { Search } from "lucide-react";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Professors({ tenantId }) {
   const hasPermission = useTenantStore((state) => state.hasPermission);
 
+  const isSmallScreen = useMediaQuery("(min-width: 900px)");
+
   const canCreateInvitation = hasPermission(tenantId, "INVITATION_CREATE");
 
   const [, setLocation] = useLocation();
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedProfessor, setSelectedProfessor] = useState(null);
 
@@ -34,8 +39,8 @@ export default function Professors({ tenantId }) {
       `${professor.user.name} ${professor.user.surname}`.toLowerCase();
 
     return (
-      fullName.includes(search.toLowerCase()) ||
-      professor.user.email.toLowerCase().includes(search.toLowerCase())
+      fullName.includes(inputValue.toLowerCase()) ||
+      professor.user.email.toLowerCase().includes(inputValue.toLowerCase())
     );
   });
 
@@ -70,21 +75,34 @@ export default function Professors({ tenantId }) {
 
             {professors.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar profesor..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
-                />
+                <div className="relative w-full sm:max-w-md">
+                  <Search
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
 
-                {canCreateInvitation && (
-                  <button
-                    onClick={() => setOpenModal(true)}
-                    className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
-                  >
-                    + Invitar profesor
-                  </button>
-                )}
+                  <input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Buscar alumno..."
+                    className="w-full rounded-xl border px-10 py-2 bg-[#efefef] outline-none focus:ring-2 focus:ring-[#333]"
+                  />
+
+                  {inputValue && (
+                    <X
+                      size={18}
+                      onClick={() => setInputValue("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer"
+                    />
+                  )}
+                </div>
+
+                <BlackButton
+                  text="+ Invitar alumno"
+                  onClick={() => setOpenModal(true)}
+                  textSmall={true}
+                  wfit={isSmallScreen}
+                />
               </div>
             )}
 

@@ -6,7 +6,6 @@ import MainLayout from "../layouts/main-layout";
 import { useInfiniteUsers } from "../hooks/useInfiniteUsers";
 import UserItem from "../components/users/user-item";
 import UserModal from "../components/users/user-modal";
-import Loading from "../components/loading";
 import UserSearchFilters from "../components/users/user-search-filter";
 
 export default function Users() {

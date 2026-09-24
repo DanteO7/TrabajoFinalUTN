@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { getStudents } from "../../services/student";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
+import { Search, X } from "lucide-react";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
 import StudentModal from "../../components/students/student-modal";
@@ -12,11 +13,12 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
+
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
-  const [search, setSearch] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [inputValue, setInputValue] = useState("");
 
   const {
     data: students = [],
@@ -28,12 +30,14 @@ export default function Students({ tenantId }) {
   });
 
   const filteredStudents = students.filter((student) => {
+    const search = inputValue.toLowerCase();
+
     const fullName =
       `${student.user.name} ${student.user.surname}`.toLowerCase();
 
     return (
-      fullName.includes(search.toLowerCase()) ||
-      student.user.email.toLowerCase().includes(search.toLowerCase())
+      fullName.includes(search) ||
+      student.user.email.toLowerCase().includes(search)
     );
   });
 
@@ -81,12 +85,28 @@ export default function Students({ tenantId }) {
 
             {students.length > 0 && (
               <div className="flex flex-col sm:flex-row justify-between gap-4 mt-10">
-                <input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar alumno..."
-                  className="w-full sm:max-w-md rounded-xl border px-4 py-2 bg-[#efefef]"
-                />
+                <div className="relative w-full sm:max-w-md">
+                  <Search
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+
+                  <input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Buscar alumno..."
+                    className="w-full rounded-xl border px-10 py-2 bg-[#efefef] outline-none focus:ring-2 focus:ring-[#333]"
+                  />
+
+                  {inputValue && (
+                    <X
+                      size={18}
+                      onClick={() => setInputValue("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black cursor-pointer"
+                    />
+                  )}
+                </div>
+
                 <BlackButton
                   text="+ Invitar alumno"
                   onClick={() => setOpenModal(true)}
@@ -132,13 +152,14 @@ export default function Students({ tenantId }) {
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
-                  <h3 className="text-xl  font-semibold">
+                  <h3 className="text-xl font-semibold">
                     Todavía no hay alumnos
                   </h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">
                     Invitá tu primer alumno para comenzar.
                   </p>
+
                   <BlackButton
                     text="+ Invitar alumno"
                     onClick={() => setOpenModal(true)}

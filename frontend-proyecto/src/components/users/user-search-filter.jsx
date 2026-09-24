@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useUserFilterStore } from "../../store/user-filter-store";
 
 export default function UserSearchFilters() {
-  const { search, role, setFilters, clearFilters } = useUserFilterStore();
+  const { search, role, setFilters } = useUserFilterStore();
   const [inputValue, setInputValue] = useState(search || "");
 
   useEffect(() => {
@@ -17,8 +17,8 @@ export default function UserSearchFilters() {
   }, [inputValue, setFilters]);
 
   return (
-    <div className="flex flex-wrap gap-3 mb-6">
-      <div className="relative flex-1 min-w-62.5">
+    <div className="flex flex-col min-[700px]:flex-row gap-3 mb-6">
+      <div className="relative flex-1 min-w-62.5 max-w-110">
         <Search
           size={18}
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -41,30 +41,34 @@ export default function UserSearchFilters() {
         )}
       </div>
 
-      <select
-        value={role || ""}
-        onChange={(e) =>
-          setFilters({
-            role: e.target.value || undefined,
-          })
-        }
-        className="rounded-xl bg-[#efefef] border px-3 py-2 outline-none focus:ring-2 focus:ring-[#333]"
-      >
-        <option value="">Todos</option>
-        <option value="Admin">Administrador</option>
-        <option value="Tenant">Dueño</option>
-        <option value="Professor">Profesor</option>
-        <option value="Student">Alumno</option>
-      </select>
-
-      {(search || role) && (
-        <button
-          onClick={clearFilters}
-          className="text-gray-500 hover:text-black underline text-sm cursor-pointer"
+      <div className="flex items-center gap-2">
+        <select
+          value={role || ""}
+          onChange={(e) =>
+            setFilters({
+              role: e.target.value || undefined,
+            })
+          }
+          className="rounded-xl bg-[#efefef] border px-3 py-2 outline-none focus:ring-2 focus:ring-[#333]"
         >
-          Limpiar filtros
-        </button>
-      )}
+          <option value="">Todos</option>
+          <option value="Admin">Administrador</option>
+          <option value="Tenant">Dueño</option>
+          <option value="Professor">Profesor</option>
+          <option value="Student">Alumno</option>
+        </select>
+
+        {role && (
+          <button
+            type="button"
+            onClick={() => setFilters({ role: undefined })}
+            className="text-gray-400 hover:text-black transition cursor-pointer"
+            title="Quitar filtro de rol"
+          >
+            <X size={18} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
