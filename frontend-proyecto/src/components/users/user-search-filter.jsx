@@ -25,7 +25,7 @@ export default function UserSearchFilters() {
         placeholder="Buscar usuario..."
       />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ">
         <select
           value={role || ""}
           onChange={(e) =>
@@ -33,7 +33,7 @@ export default function UserSearchFilters() {
               role: e.target.value || undefined,
             })
           }
-          className="rounded-xl bg-[#efefef] border px-3 py-2 outline-none focus:ring-2 focus:ring-[#333]"
+          className="rounded-lg px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:ring-[#fc697b] focus:border-transparent transition-all duration-200"
         >
           <option value="">Todos</option>
           <option value="Admin">Administrador</option>
@@ -49,7 +49,7 @@ export default function UserSearchFilters() {
             className="text-gray-400 hover:text-black transition cursor-pointer"
             title="Quitar filtro de rol"
           >
-            <X size={18} />
+            <X size={18} color="#fc697b" />
           </button>
         )}
       </div>

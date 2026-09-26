@@ -10,7 +10,7 @@ import {
 } from "../../services/mercado-pago";
 import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission, useTenantStore } from "../../store/tenant-store";
 import {
   getTenantPayments,
   getMyPaymentsByTenant,
@@ -55,7 +55,7 @@ export default function Payments({ tenantId }) {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [openModal, setOpenModal] = useState(false);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
+  const canCreatePayments = useHasPermission(tenantId, "PAYMENT_CREATE");
 
   const userTenantPermissions = useTenantStore(
     (state) => state.userPermissionsInTenant[tenantId],
@@ -66,8 +66,7 @@ export default function Payments({ tenantId }) {
   const hasAccessToTenant = userTenantPermissions?.hasAccessToTenant === true;
 
   const canManageBusiness =
-    userTenantPermissions?.roles?.includes("TENANT") ||
-    hasPermission(tenantId, "PAYMENT_CREATE");
+    userTenantPermissions?.roles?.includes("TENANT") || canCreatePayments;
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);

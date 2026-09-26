@@ -6,13 +6,13 @@ import { useAuthStore } from "../../store/auth-store";
 import { useMutation } from "@tanstack/react-query";
 import { updateUser } from "../../services/user";
 import { useState } from "react";
-import FormInput from "../form-input";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import { me } from "../../services/auth";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { X } from "lucide-react";
+import FormInput from "../inputs/form-input";
 
 export default function EditProfileModal({ close }) {
   const { user, login } = useAuthStore();

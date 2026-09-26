@@ -4,7 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Modal from "../modals/modal";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { createClassSchema } from "../../schema/class-schema";

@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNews, markNewsAsRead } from "../../services/news";
 import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import { useState } from "react";
 import NewsForm from "../../components/news/news-form";
 import NewsModal from "../../components/news/news-modal";
@@ -16,9 +16,7 @@ export default function News({ tenantId }) {
   const [openCreateModal, setOpenCreateModal] = useState();
   const [selectedNews, setSelectedNews] = useState(null);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateNews = hasPermission(tenantId, "NEWS_CREATE");
+  const canCreateNews = useHasPermission(tenantId, "NEWS_CREATE");
 
   const {
     data: news = [],
@@ -109,7 +107,7 @@ export default function News({ tenantId }) {
                         markMutation.mutate(novedad.id);
                       }
                     }}
-                    className={`cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+                    className={`cursor-pointer rounded-lg bg-[#efecf0] border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
                       !novedad.isRead && "bg-red-100"
                     }`}
                   >

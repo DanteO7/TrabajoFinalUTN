@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +10,7 @@ import { createSpeciality } from "../../services/speciality";
 import { createSpecialitySchema } from "../../schema/speciality-schema";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import FormInput from "../inputs/form-input";
 
 export default function SpecialityForm({ tenantId, close }) {
   const queryClient = useQueryClient();
@@ -90,22 +90,13 @@ export default function SpecialityForm({ tenantId, close }) {
           register={register("name")}
           error={errors.name}
         />
-
-        <div>
-          <label className="block mb-2">Descripción (opcional)</label>
-
-          <textarea
-            rows={4}
-            {...register("description")}
-            className="w-full rounded-[13px] px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
-          />
-
-          {errors.description && (
-            <p className="text-red-500 text-[13px] mt-1">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
+        <FormInput
+          textarea
+          label="Descripción (opcional)"
+          register={register("description")}
+          error={errors.description}
+          placeholder="Explicación de la profesión..."
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />

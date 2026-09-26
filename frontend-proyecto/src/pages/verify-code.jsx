@@ -3,12 +3,12 @@ import { useMutation } from "@tanstack/react-query";
 import { signUp, sendRegisterCode } from "../services/auth";
 import { useAuthStore } from "../store/auth-store";
 import { Link, useLocation } from "wouter";
-import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import { useForm } from "react-hook-form";
 import { useTenantStore } from "../store/tenant-store";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
+import FormInput from "../components/inputs/form-input";
 
 export default function VerifyCode() {
   const [, setLocation] = useLocation();

@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -102,22 +102,14 @@ export default function NewsForm({ tenantId, close }) {
           error={errors.title}
         />
 
-        <div>
-          <label className="block mb-2">Contenido</label>
+        <FormInput
+          textarea
+          placeholder="Explicación de la noticia"
+          label="Contenido"
+          register={register("content")}
+          error={errors.content}
+        />
 
-          <textarea
-            placeholder="Explicación de la noticia"
-            rows={4}
-            {...register("content")}
-            className={`w-full rounded-[13px] px-3 py-2 border ${errors.content ? "border-red-500" : "border-gray-300"}  bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]`}
-          />
-
-          {errors.content && (
-            <p className="text-red-500 text-[13px] mt-1">
-              {errors.content.message}
-            </p>
-          )}
-        </div>
         {isAdmin && (
           <select {...register("tenantId")} className="...">
             <option value="global">Global</option>

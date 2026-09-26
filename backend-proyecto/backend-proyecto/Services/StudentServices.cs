@@ -196,7 +196,6 @@ namespace backend_proyecto.Services
             await _permissionServices.CheckPermission(Permissions.STUDENT_UPDATE);
 
             var studentPlanId = updateStudentDTO.StudentPlanId;
-            var status = updateStudentDTO.MonthlyFeeStatus;
 
             var student = await _studentRepository.GetOneAsync(s => s.Id == id, s => s.StudentPlan, s => s.User);
             if (student == null)
@@ -209,12 +208,6 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{studentPlanId}'");
             }
-
-            if (status != MonthlyFeeStatus.PAID && status != MonthlyFeeStatus.PENDING && status != MonthlyFeeStatus.OVERDUE)
-            {
-                throw new HttpResponseError(HttpStatusCode.BadRequest, $"No existe el estado de la couta del mes con el nombre = '{status}'");
-            }
-
             _mapper.Map(updateStudentDTO, student);
 
             await _studentRepository.UpdateOneAsync(student);

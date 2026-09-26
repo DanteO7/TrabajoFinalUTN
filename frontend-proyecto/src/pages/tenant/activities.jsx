@@ -7,7 +7,7 @@ import { getActivities } from "../../services/activity";
 import Loading from "../../components/loading";
 import ActivityForm from "../../components/activities/activity-form";
 import ActivityModal from "../../components/activities/activity-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -20,9 +20,7 @@ export default function Activities({ tenantId }) {
   const [openForm, setOpenForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateActivity = hasPermission(tenantId, "ACTIVITY_CREATE");
+  const canCreateActivity = useHasPermission(tenantId, "ACTIVITY_CREATE");
 
   const {
     data: activities = [],
@@ -97,7 +95,7 @@ export default function Activities({ tenantId }) {
                   <div
                     key={activity.id}
                     onClick={() => setSelectedActivity(activity)}
-                    className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    className="bg-[#efecf0] cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
 

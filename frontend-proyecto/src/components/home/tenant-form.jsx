@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
 import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTenantSchema } from "../../schema/tenant-schema";
@@ -10,6 +9,7 @@ import { getTenantPlans } from "../../services/tenant-plan";
 import ErrorModal from "../modals/error-modal";
 import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
+import FormInput from "../inputs/form-input";
 
 export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const { data: plans, isLoading } = useQuery({

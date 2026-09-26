@@ -1,5 +1,4 @@
 import { Link, useLocation } from "wouter";
-import FormInput from "../components/form-input";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "../store/auth-store";
 import { signIn } from "../services/auth";
@@ -8,10 +7,10 @@ import { useMutation } from "@tanstack/react-query";
 import { signInSchema } from "../schema/auth-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ErrorModal from "../components/modals/error-modal";
-import EmailSentModal from "../components/modals/email-sent-modal";
 import { useTenantStore } from "../store/tenant-store";
 import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
+import FormInput from "../components/inputs/form-input";
 
 export default function SignIn() {
   const { login } = useAuthStore();

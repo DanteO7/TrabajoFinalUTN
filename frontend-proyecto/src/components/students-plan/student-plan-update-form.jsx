@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

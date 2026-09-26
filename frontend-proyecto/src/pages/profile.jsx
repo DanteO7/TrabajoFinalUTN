@@ -3,7 +3,6 @@ import MainLayout from "../layouts/main-layout";
 import { useAuthStore } from "../store/auth-store";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import Navbar from "../components/navbar";
 import { forgotPassword, signOut } from "../services/auth";
@@ -16,6 +15,7 @@ import RedButton from "../components/buttons/red-button";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 import EditProfileModal from "../components/profile/edit-profile-modal";
+import FormInput from "../components/inputs/form-input";
 
 export default function Profile() {
   const queryClient = useQueryClient();

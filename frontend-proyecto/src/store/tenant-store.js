@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { getMyPermissionInTenant } from "../services/tenant";
 
 const EMPTY_ARRAY = [];
@@ -62,7 +63,6 @@ export const useTenantStore = create((set) => ({
 
   hasPermission: (tenantId, permission) => {
     const state = useTenantStore.getState();
-
     const userData = state.userPermissionsInTenant[tenantId];
 
     if (!userData) {
@@ -78,3 +78,11 @@ export const useTenantStore = create((set) => ({
       loadingPermissions: {},
     }),
 }));
+
+export const useHasPermission = (tenantId, permission) =>
+  useTenantStore(
+    (state) =>
+      state.userPermissionsInTenant[tenantId]?.permissions?.includes(
+        permission,
+      ) ?? false,
+  );

@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +10,7 @@ import { updateTenantPlan } from "../../services/tenant-plan";
 import { updateTenantPlanSchema } from "../../schema/tenant-plans-schema";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import FormInput from "../inputs/form-input";
 
 export default function TenantPlanUpdateForm({ planId, plan, close }) {
   const queryClient = useQueryClient();

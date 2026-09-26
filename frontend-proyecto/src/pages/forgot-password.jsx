@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { forgotPassword } from "../services/auth";
 import { Link } from "wouter";
-import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import { useForm } from "react-hook-form";
 import z from "zod/v3";
@@ -10,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
+import FormInput from "../components/inputs/form-input";
 
 const forgotPasswordSchema = z.object({
   email: z

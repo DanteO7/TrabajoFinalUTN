@@ -190,7 +190,6 @@ export default function Tenant({ id }) {
 
   const newsCard = cards?.find((c) => c.href === "novedades");
   const otherCards = cards?.filter((c) => c.href !== "novedades");
-  console.log(otherCards);
 
   return (
     <MainLayout>
@@ -275,7 +274,7 @@ export default function Tenant({ id }) {
                 </span>
               </div>
               {tenant?.role == "Tenant" && (
-                <p>
+                <p className="text-gray-500">
                   Vencimiento:{" "}
                   {tenant?.paymentDueDate
                     ? new Date(tenant.paymentDueDate).toLocaleDateString(
@@ -294,7 +293,7 @@ export default function Tenant({ id }) {
               {newsCard && (
                 <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
                   <div
-                    className={`relative cursor-pointer rounded-xl ${unreadCount?.unreadCount > 0 && "bg-red-100"} border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center`}
+                    className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center`}
                   >
                     {unreadCount?.unreadCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
@@ -319,7 +318,7 @@ export default function Tenant({ id }) {
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className="cursor-pointer rounded-xl border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
+                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>
 
                     <div>

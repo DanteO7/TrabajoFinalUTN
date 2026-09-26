@@ -9,22 +9,19 @@ import { getExercises } from "../../services/exercise";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import ConfirmModal from "../modals/confirm-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import { updateRoutineSchema } from "../../schema/routine-schema";
 import AddExerciseModal from "./add-exercise-modal";
 
 export default function RoutineModal({ routine, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canUpdateRoutine = hasPermission(tenantId, "ROUTINE_UPDATE");
-
-  const canDeleteRoutine = hasPermission(tenantId, "ROUTINE_DELETE");
+  const canUpdateRoutine = useHasPermission(tenantId, "ROUTINE_UPDATE");
+  const canDeleteRoutine = useHasPermission(tenantId, "ROUTINE_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentRoutine, setCurrentRoutine] = useState(routine);
@@ -317,28 +314,13 @@ export default function RoutineModal({ routine, tenantId, close }) {
             register={register("name")}
             error={errors.name}
           />
-
-          <div>
-            <label htmlFor="description" className="block mb-2">
-              Descripción (opcional)
-            </label>
-
-            <textarea
-              id="description"
-              rows={4}
-              placeholder="Descripción de la rutina..."
-              {...register("description")}
-              className={`w-full rounded-[13px] px-3 py-2 border ${
-                errors.description ? "border-red-500" : "border-gray-300"
-              } bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]`}
-            />
-
-            {errors.description && (
-              <p className="text-red-500 text-[13px] mt-1">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
+          <FormInput
+            textarea
+            label="Descripción (opcional)"
+            register={register("description")}
+            error={errors.description}
+            placeholder="Explicación de la actividad..."
+          />
 
           <div className="border-t pt-5">
             <div className="flex items-center mb-3 justify-between">

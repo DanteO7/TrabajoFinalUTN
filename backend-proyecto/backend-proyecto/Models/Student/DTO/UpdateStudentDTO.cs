@@ -6,8 +6,5 @@ namespace backend_proyecto.Models.DTOs
     {
         [Required]
         public int StudentPlanId { get; set; }
-
-        [Required]
-        public string MonthlyFeeStatus { get; set; } = null!;
     }
 }

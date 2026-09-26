@@ -9,7 +9,7 @@ import ErrorModal from "../modals/error-modal";
 import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 
 import { createExercise } from "../../services/exercise";
 
@@ -108,26 +108,13 @@ export default function ExerciseForm({ tenantId, close }) {
           register={register("name")}
           error={errors.name}
         />
-
-        <div>
-          <label htmlFor="description" className="block mb-2">
-            Descripción (opcional)
-          </label>
-
-          <textarea
-            id="description"
-            rows={4}
-            placeholder="Descripción del ejercicio..."
-            {...register("description")}
-            className="w-full rounded-[13px] px-3 py-2 border border-gray-300 bg-[#efefef] resize-none focus:outline-none focus:ring-2 focus:ring-[#333]"
-          />
-
-          {errors.description && (
-            <p className="text-red-500 text-[13px] mt-1">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
+        <FormInput
+          textarea
+          label="Descripción (opcional)"
+          register={register("description")}
+          error={errors.description}
+          placeholder="Explicación de la actividad..."
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />

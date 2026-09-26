@@ -2,7 +2,7 @@ import { X, Pencil } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modals/modal";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
@@ -13,6 +13,8 @@ import { Trash2 } from "lucide-react";
 import WhiteButton from "../buttons/white-button";
 import { deleteNews, updateNews } from "../../services/news";
 import { useAuthStore } from "../../store/auth-store";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateNewSchema } from "../../schema/news-schema";
 
 export default function NewsModal({ news, tenantId, close, canCreateNews }) {
   const { user } = useAuthStore();
@@ -32,11 +34,18 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
 
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, reset } = useForm({
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(updateNewSchema),
     defaultValues: {
-      title: news.title,
-      content: news.content,
+      title: news.title || "",
+      content: news.content || "",
     },
+    mode: "onTouched",
   });
 
   const deleteMutation = useMutation({
@@ -160,17 +169,20 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
           >
             <h2 className="text-2xl font-semibold text-center">Editar</h2>
 
-            <FormInput label="Titulo" register={register("title")} />
+            <FormInput
+              label="Titulo"
+              register={register("title")}
+              error={errors.title}
+              placeholder="Ej: Nuevas actividades, Nuevo plan, etc."
+            />
 
-            <div>
-              <label className="block mb-2">Contenido</label>
-
-              <textarea
-                rows={4}
-                {...register("content")}
-                className="w-full rounded-xl bg-[#efefef] border px-3 py-2 resize-none"
-              />
-            </div>
+            <FormInput
+              textarea
+              label="Contenido"
+              register={register("content")}
+              error={errors.content}
+              placeholder="Explicación de la noticia"
+            />
 
             <div className="grid grid-cols-2 gap-3">
               <WhiteButton

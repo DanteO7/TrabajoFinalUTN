@@ -6,7 +6,7 @@ import { updateProfessor, deleteProfessor } from "../../services/professor";
 import { getSpecialities } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import ConfirmModal from "../modals/confirm-modal";
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
@@ -15,11 +15,8 @@ import WhiteButton from "../buttons/white-button";
 export default function ProfessorModal({ professor, tenantId, close }) {
   const queryClient = useQueryClient();
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canUpdateProfessor = hasPermission(tenantId, "PROFESSOR_UPDATE");
-
-  const canDeleteProfessor = hasPermission(tenantId, "PROFESSOR_DELETE");
+  const canUpdateProfessor = useHasPermission(tenantId, "PROFESSOR_UPDATE");
+  const canDeleteProfessor = useHasPermission(tenantId, "PROFESSOR_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentProfessor, setCurrentProfessor] = useState(professor);

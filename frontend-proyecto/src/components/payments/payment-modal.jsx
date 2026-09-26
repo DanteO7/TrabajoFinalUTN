@@ -10,7 +10,7 @@ import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 import { deletePayment, updatePayment } from "../../services/payment";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   const [editing, setEditing] = useState(false);
@@ -25,15 +25,11 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
   const queryClient = useQueryClient();
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
+  const canUpdate = useHasPermission(tenantId, "PAYMENT_UPDATE");
+  const canDelete = useHasPermission(tenantId, "PAYMENT_DELETE");
 
-  const canUpdatePayment = isAdmin
-    ? true
-    : hasPermission(tenantId, "PAYMENT_UPDATE");
-
-  const canDeletePayment = isAdmin
-    ? true
-    : hasPermission(tenantId, "PAYMENT_DELETE");
+  const canUpdatePayment = isAdmin ? true : canUpdate;
+  const canDeletePayment = isAdmin ? true : canDelete;
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -243,7 +239,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
           <h2 className="text-2xl font-semibold mb-5">Detalle del pago</h2>
 
           <div className="space-y-4">
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">
                 {payment.planType === "Student" ? "Alumno" : "Negocio"}
               </p>
@@ -255,7 +251,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Plan</p>
 
               <div className="flex justify-between items-start gap-4">
@@ -271,7 +267,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
               </div>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Método de pago</p>
 
               <p className="font-semibold text-[#333]">
@@ -279,7 +275,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Fecha</p>
 
               <p className="font-semibold text-[#333]">
@@ -287,7 +283,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Monto</p>
 
               <p className="font-bold text-[#333] whitespace-nowrap">
@@ -295,7 +291,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Estado de pago</p>
 
               <span
@@ -308,7 +304,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             </div>
 
             {payment.externalPaymentId && (
-              <div className="bg-[#efefef] rounded-xl p-4">
+              <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">ID de Mercado Pago</p>
 
                 <p className="font-semibold text-[#333] break-all">
@@ -344,7 +340,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">Editar pago</h2>
 
-          <div className="bg-[#efefef] rounded-xl p-4">
+          <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
             <p className="text-sm text-gray-600 mb-1">Pago</p>
 
             <p className="font-semibold text-[#333]">
@@ -367,7 +363,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
             <select
               {...register("paymentMethod")}
-              className="rounded-[13px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px] cursor-pointer"
+              className="w-full rounded-lg px-3 h-11.5 py-2.5 text-gray-600 cursor-pointer bg-[#f4f0f5] shadow-md border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
             >
               <option value="Cash">Efectivo</option>
 

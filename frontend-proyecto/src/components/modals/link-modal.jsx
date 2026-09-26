@@ -15,6 +15,7 @@ import RedButton from "../buttons/red-button";
 import { Trash2 } from "lucide-react";
 import { Copy } from "lucide-react";
 import { Check } from "lucide-react";
+import FormInput from "../inputs/form-input";
 
 export default function LinkModal({ tenantId, close, role }) {
   const queryClient = useQueryClient();
@@ -107,14 +108,10 @@ export default function LinkModal({ tenantId, close, role }) {
         <p className="text-center text-gray-500">Cargando...</p>
       ) : hasValidLink ? (
         <>
-          <div className="border rounded-xl p-4 bg-[#efefef] mb-4">
-            <p className="font-semibold mb-3">Link de invitación activo</p>
+          <div className="border rounded-xl p-4 mb-4 flex flex-col gap-3">
+            <p className="font-semibold">Link de invitación activo</p>
 
-            <input
-              readOnly
-              value={currentInvitation.link}
-              className="w-full border rounded-xl px-3 py-2 bg-white mb-3"
-            />
+            <FormInput value={currentInvitation.link} />
 
             <BlackButton
               type="button"
@@ -125,7 +122,7 @@ export default function LinkModal({ tenantId, close, role }) {
               className="flex items-center gap-2 shrink-0 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-black hover:bg-white transition cursor-pointer"
             />
 
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-sm text-gray-600">
               Expira el:{" "}
               {new Date(currentInvitation.expirationDate).toLocaleDateString(
                 "es-AR",

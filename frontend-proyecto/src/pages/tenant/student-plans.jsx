@@ -9,7 +9,7 @@ import MainLayout from "../../layouts/main-layout";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import BlackButton from "../../components/buttons/black-button";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function StudentPlans({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -17,9 +17,10 @@ export default function StudentPlans({ tenantId }) {
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_CREATE");
+  const canCreateStudentPlan = useHasPermission(
+    tenantId,
+    "STUDENT_PLAN_CREATE",
+  );
 
   const {
     data: plans = [],

@@ -2,7 +2,6 @@ import { X, Pencil } from "lucide-react";
 import { useState } from "react";
 import Modal from "../modals/modal";
 import { useForm } from "react-hook-form";
-import FormInput from "../form-input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateSpeciality, deleteSpeciality } from "../../services/speciality";
 import SuccessModal from "../modals/success-modal";
@@ -12,6 +11,9 @@ import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import { Trash2 } from "lucide-react";
 import WhiteButton from "../buttons/white-button";
+import FormInput from "../inputs/form-input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updateSpecialitySchema } from "../../schema/speciality-schema";
 
 export default function SpecialityModal({ speciality, tenantId, close }) {
   const [editing, setEditing] = useState(false);
@@ -27,7 +29,14 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(updateSpecialitySchema),
+    mode: "onTouched",
     defaultValues: {
       name: speciality.name,
       description: speciality.description,
@@ -148,17 +157,20 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <h2 className="text-2xl font-semibold text-center">Editar</h2>
 
-          <FormInput label="Nombre" register={register("name")} />
+          <FormInput
+            label="Nombre"
+            placeholder="Ej: Kinesiólogo, Instructor de Pilates..."
+            register={register("name")}
+            error={errors.name}
+          />
 
-          <div>
-            <label className="block mb-2">Descripción</label>
-
-            <textarea
-              rows={4}
-              {...register("description")}
-              className="w-full rounded-xl bg-[#efefef] border px-3 py-2 resize-none"
-            />
-          </div>
+          <FormInput
+            textarea
+            label="Descripción (opcional)"
+            register={register("description")}
+            error={errors.description}
+            placeholder="Explicación de la profesón..."
+          />
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton

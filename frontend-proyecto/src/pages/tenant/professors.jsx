@@ -7,17 +7,15 @@ import { getProfessors } from "../../services/professor";
 import Loading from "../../components/loading";
 import LinkModal from "../../components/modals/link-modal";
 import ProfessorModal from "../../components/professors/professor-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
 
 export default function Professors({ tenantId }) {
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
-  const canCreateInvitation = hasPermission(tenantId, "INVITATION_CREATE");
+  const canCreateInvitation = useHasPermission(tenantId, "INVITATION_CREATE");
 
   const [, setLocation] = useLocation();
   const [inputValue, setInputValue] = useState("");

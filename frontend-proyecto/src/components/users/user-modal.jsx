@@ -39,9 +39,8 @@ export default function UserModal({ user, close }) {
 
           <p className="text-gray-600 mb-6">{userDetail?.email}</p>
 
-          {/* Información personal */}
           <div className="space-y-4 mb-8">
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Teléfono</p>
               <p className="font-semibold text-[#333]">
                 {userDetail?.phoneNumber || "No proporcionado"}
@@ -56,7 +55,10 @@ export default function UserModal({ user, close }) {
               </h3>
               <div className="space-y-3">
                 {tenants.map((tenant) => (
-                  <div key={tenant.id} className="border rounded-xl p-4">
+                  <div
+                    key={tenant.id}
+                    className="border rounded-lg p-4 bg-[#f4f0f5]"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-semibold">{tenant.name}</p>

@@ -209,11 +209,9 @@ namespace backend_proyecto.Services
                 }
                 tenant.Name = updateTenantDTO.Name;
             }
-            var tenantWithSameName = await _tenantRepository.GetOneAsync(
-                t => t.Name == updateTenantDTO.Name
-            );
+            var tenantWithSameName = await _tenantRepository.GetOneAsync(t => t.Id != id && t.Name == updateTenantDTO.Name);
 
-            if(tenantWithSameName != null)
+            if (tenantWithSameName != null)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe un negocio con el nombre: '{updateTenantDTO.Name}'");
             }

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Modal from "../modals/modal";
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateClass, deleteClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
@@ -17,7 +17,7 @@ import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { updateClassSchema } from "../../schema/class-schema";
 import { useAuthStore } from "../../store/auth-store";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import { getStudentByUser } from "../../services/student";
 import ClassStudentsModal from "./class-students-modal";
 import ConfirmModal from "../modals/confirm-modal";
@@ -35,17 +35,11 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const { user } = useAuthStore();
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canUpdateClass = hasPermission(tenantId, "CLASS_UPDATE");
-
-  const canDeleteClass = hasPermission(tenantId, "CLASS_DELETE");
-
-  const canReadStudents = hasPermission(tenantId, "STUDENT_READ");
-
-  const canCreateReservation = hasPermission(tenantId, "RESERVATION_CREATE");
-
-  const canDeleteReservation = hasPermission(tenantId, "RESERVATION_DELETE");
+  const canUpdateClass = useHasPermission(tenantId, "CLASS_UPDATE");
+  const canDeleteClass = useHasPermission(tenantId, "CLASS_DELETE");
+  const canReadStudents = useHasPermission(tenantId, "STUDENT_READ");
+  const canCreateReservation = useHasPermission(tenantId, "RESERVATION_CREATE");
+  const canDeleteReservation = useHasPermission(tenantId, "RESERVATION_DELETE");
 
   const [editing, setEditing] = useState(false);
   const [currentClass, setCurrentClass] = useState(classItem);

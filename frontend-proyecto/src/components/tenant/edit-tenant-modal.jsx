@@ -12,7 +12,7 @@ import BlackButton from "../buttons/black-button";
 
 import { X } from "lucide-react";
 
-import FormInput from "../form-input";
+import FormInput from "../inputs/form-input";
 
 import { updateTenant } from "../../services/tenant";
 import { updateTenantSchema } from "../../schema/tenant-schema";
@@ -150,8 +150,8 @@ export default function EditTenantModal({ tenant, close }) {
         Editar información del negocio
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-10">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
+        <div>
           <h3 className="font-semibold text-lg mb-3">Nombre</h3>
 
           <div className="space-y-3">
@@ -166,7 +166,7 @@ export default function EditTenantModal({ tenant, close }) {
             />
           </div>
         </div>
-        <div className="mb-10">
+        <div>
           <h3 className="font-semibold text-lg mb-3">
             Datos de cuenta bancaria
           </h3>
@@ -194,7 +194,7 @@ export default function EditTenantModal({ tenant, close }) {
           </div>
         </div>
 
-        <div className="mb-10">
+        <div>
           <h3 className="font-semibold text-lg mb-3">Dirección</h3>
 
           <FormInput
@@ -222,7 +222,7 @@ export default function EditTenantModal({ tenant, close }) {
                     key={platform.name}
                     type="button"
                     onClick={() => handleAddNetwork(platform.name)}
-                    className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full transition cursor-pointer"
+                    className="text-xs bg-[#f1eef3] hover:bg-[#eae8ec] border border-gray-300 px-3 py-1 rounded-full transition duration-150 cursor-pointer"
                   >
                     + {platform.label}
                   </button>
@@ -241,7 +241,10 @@ export default function EditTenantModal({ tenant, close }) {
                   : url;
 
                 return (
-                  <div key={platform} className="border rounded-xl p-3">
+                  <div
+                    key={platform}
+                    className="border rounded-lg p-3 border-gray-400"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-semibold capitalize text-sm">
                         {platform}
@@ -252,7 +255,7 @@ export default function EditTenantModal({ tenant, close }) {
                         onClick={() => handleRemoveNetwork(platform)}
                         className="text-red-600 text-xs hover:text-red-700 transition cursor-pointer"
                       >
-                        Remover
+                        <X size={18} color="#fc697b" />
                       </button>
                     </div>
 
@@ -266,7 +269,7 @@ export default function EditTenantModal({ tenant, close }) {
                           }
                           placeholder="Ej: 5491234567890"
                           disabled={isSubmitting || mutation.isPending}
-                          className="rounded-[13px] text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] outline-none focus:border-[#333]"
+                          className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#f1eef3]"
                         />
 
                         <p className="text-xs text-gray-500 mt-1">
@@ -282,7 +285,7 @@ export default function EditTenantModal({ tenant, close }) {
                         }
                         placeholder={`https://${platform}.com/...`}
                         disabled={isSubmitting || mutation.isPending}
-                        className="rounded-[13px] text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] outline-none focus:border-[#333]"
+                        className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#f1eef3]"
                       />
                     )}
                   </div>
@@ -296,7 +299,7 @@ export default function EditTenantModal({ tenant, close }) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mt-8">
+        <div className="grid grid-cols-2 gap-3">
           <WhiteButton
             text="Cancelar"
             onClick={close}

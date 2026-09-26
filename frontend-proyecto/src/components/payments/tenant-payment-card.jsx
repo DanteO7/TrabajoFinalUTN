@@ -51,7 +51,7 @@ export default function TenantPaymentCard({
       : turnoFacilPaymentData;
 
   return (
-    <div className="rounded-xl border p-6 shadow-md">
+    <div className="rounded-lg border p-6 shadow-md bg-[#efecf0]">
       <div className="flex flex-col gap-5">
         <div className="flex justify-between items-center">
           <div>

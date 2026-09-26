@@ -16,7 +16,7 @@ export default function FormInput({
 }) {
   const [show, setShow] = useState(false);
 
-  const inputClassName = `rounded-[13px] text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] ${
+  const inputClassName = `rounded-lg text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#f1eef3] ${
     error ? "border-red-500" : ""
   } ${isPassword ? "pr-10" : ""}`;
 

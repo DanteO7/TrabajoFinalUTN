@@ -12,7 +12,7 @@ export default function RedButton({
       disabled={disabled}
       type={type}
       onClick={onClick}
-      className={`bg-[#fc697b] text-[#efefef] px-4.5 rounded-xl hover:bg-[#f5576a] transition-all duration-200 cursor-pointer flex justify-center items-center gap-1 ${wfit ? "w-fit" : "w-full"} ${textSmall ? "text-[15px] py-1.75" : "text-xl py-2"}`}
+      className={`bg-[#fc697b] text-[#efefef] px-4.5 rounded-lg hover:bg-[#f5576a] shadow-md border-b border-[#e03549] transition-all duration-200 cursor-pointer flex justify-center items-center gap-1 ${wfit ? "w-fit" : "w-full"} ${textSmall ? "text-[15px] py-1.75" : "text-xl py-2"}`}
     >
       {img}
       {text}

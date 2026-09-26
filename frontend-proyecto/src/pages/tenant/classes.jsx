@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { getClasses } from "../../services/class";
@@ -10,7 +10,7 @@ import "../../css/day-picker.css";
 import ClassForm from "../../components/classes/class-form";
 import ClassModal from "../../components/classes/class-modal";
 import Loading from "../../components/loading";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 
 export default function Classes({ tenantId }) {
@@ -28,9 +28,7 @@ export default function Classes({ tenantId }) {
     return `${year}-${month}-${day}`;
   };
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateClass = hasPermission(tenantId, "CLASS_CREATE");
+  const canCreateClass = useHasPermission(tenantId, "CLASS_CREATE");
 
   const {
     data: classes = [],

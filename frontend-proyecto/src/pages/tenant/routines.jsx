@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MainLayout from "../../layouts/main-layout";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -7,7 +7,7 @@ import { getRoutines } from "../../services/routine";
 import Loading from "../../components/loading";
 import RoutineForm from "../../components/routines/routine-form";
 import RoutineModal from "../../components/routines/routine-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
 
@@ -17,9 +17,7 @@ export default function Routines({ tenantId }) {
   const [openForm, setOpenForm] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateRoutine = hasPermission(tenantId, "ROUTINE_CREATE");
+  const canCreateRoutine = useHasPermission(tenantId, "ROUTINE_CREATE");
 
   const {
     data: routines = [],
@@ -96,7 +94,7 @@ export default function Routines({ tenantId }) {
                     <div
                       key={routine.id}
                       onClick={() => setSelectedRoutine(routine)}
-                      className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                      className="cursor-pointer rounded-lg border border-gray-500 bg-[#efecf0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     >
                       <h3 className="font-semibold text-xl">{routine.name}</h3>
 

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import FormInput from "../form-input";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changeEmailSchema } from "../../schema/change-email-schema";
@@ -12,7 +11,7 @@ import { X } from "lucide-react";
 import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
 import BlackButton from "../buttons/black-button";
-import WhiteButton from "../buttons/white-button";
+import FormInput from "../inputs/form-input";
 
 export default function ChangeEmailForm({ user, close }) {
   const { login } = useAuthStore();

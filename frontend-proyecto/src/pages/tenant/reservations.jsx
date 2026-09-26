@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "../../layouts/main-layout";
 import { useAuthStore } from "../../store/auth-store";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import { getStudentByUser } from "../../services/student";
 import { getReservationsByStudentId } from "../../services/reservation";
 import ReservationCard from "../../components/reservations/reservation-card";
@@ -12,6 +12,8 @@ import ReservationEmpty from "../../components/reservations/reservation-empty";
 import Loader from "../../components/loading";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
+import BlackButton from "../../components/buttons/black-button";
+import { Link } from "wouter";
 
 export default function Reservations({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -19,9 +21,7 @@ export default function Reservations({ tenantId }) {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [filter, setFilter] = useState("pending");
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canReadReservations = hasPermission(tenantId, "RESERVATION_READ");
+  const canReadReservations = useHasPermission(tenantId, "RESERVATION_READ");
 
   const { data: student } = useQuery({
     queryKey: ["getStudentByUser", tenantId],
@@ -97,7 +97,16 @@ export default function Reservations({ tenantId }) {
             <Loader />
           </div>
         ) : filteredReservations.length === 0 ? (
-          <ReservationEmpty />
+          <div className="mt-20 flex flex-col justify-center items-center gap-4 text-center">
+            <h2 className="text-2xl font-semibold">No hay reservas</h2>
+
+            <p className="text-gray-500">
+              Cuando reserves una clase aparecerá acá.
+            </p>
+            <Link href={`/tu-espacio/${tenantId}/clases`}>
+              <BlackButton text="Ir a clases" wfit textSmall />
+            </Link>
+          </div>
         ) : (
           <div className="grid gap-6 mt-10 min-[900px]:grid-cols-2">
             {filteredReservations.map((reservation) => (

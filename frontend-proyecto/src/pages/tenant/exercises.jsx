@@ -7,7 +7,7 @@ import { getExercises } from "../../services/exercise";
 import Loading from "../../components/loading";
 import ExerciseForm from "../../components/exercises/exercise-form";
 import ExerciseModal from "../../components/exercises/exercise-modal";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
@@ -19,9 +19,7 @@ export default function Exercises({ tenantId }) {
   const [openForm, setOpenForm] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canCreateExercise = hasPermission(tenantId, "EXERCISE_CREATE");
+  const canCreateExercise = useHasPermission(tenantId, "EXERCISE_CREATE");
 
   const {
     data: exercises = [],

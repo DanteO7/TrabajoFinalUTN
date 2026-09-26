@@ -66,16 +66,17 @@ export default function TenantPlans() {
           Volver
         </button>
 
-        <div className="grid grid-cols-2 items-center mb-6">
-          <h2 className="text-2xl font-semibold">Planes de negocio</h2>
-          <div className="justify-self-end">
-            <BlackButton
-              text="+ Nuevo plan"
-              onClick={() => setOpenCreateForm(true)}
-              textSmall={true}
-              wfit={true}
-            />
-          </div>
+        <div className=" mb-6 flex flex-col gap-3 min-[900px]:gap-5">
+          <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
+            Planes de negocio
+          </h1>
+
+          <BlackButton
+            text="+ Nuevo plan"
+            onClick={() => setOpenCreateForm(true)}
+            textSmall={true}
+            wfit={true}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

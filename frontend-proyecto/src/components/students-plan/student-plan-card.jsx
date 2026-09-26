@@ -6,7 +6,7 @@ import { useState } from "react";
 import { deleteStudentPlan } from "../../services/student-plan";
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
-import { useTenantStore } from "../../store/tenant-store";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function StudentPlanCard({ plan, tenantId, onEdit }) {
   const queryClient = useQueryClient();
@@ -14,11 +14,14 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
   const [errorModal, setErrorModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const hasPermission = useTenantStore((state) => state.hasPermission);
-
-  const canUpdateStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_UPDATE");
-
-  const canDeleteStudentPlan = hasPermission(tenantId, "STUDENT_PLAN_DELETE");
+  const canUpdateStudentPlan = useHasPermission(
+    tenantId,
+    "STUDENT_PLAN_UPDATE",
+  );
+  const canDeleteStudentPlan = useHasPermission(
+    tenantId,
+    "STUDENT_PLAN_DELETE",
+  );
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteStudentPlan(plan.id),
