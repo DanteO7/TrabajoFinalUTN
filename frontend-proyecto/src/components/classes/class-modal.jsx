@@ -388,7 +388,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
           </p>
 
           <div className="space-y-4 mb-8">
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Fecha</p>
 
               <p className="font-semibold text-[#333]">
@@ -396,7 +396,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Horario</p>
 
               <p className="font-semibold text-[#333]">
@@ -406,7 +406,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
             </div>
 
             <div
-              className={`bg-[#efefef] rounded-xl p-4 ${
+              className={`bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4 ${
                 isFull && "bg-red-100"
               }`}
             >
@@ -461,14 +461,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
                 No disponible
               </div>
             ) : isReserved ? (
-              <div className="flex gap-3">
-                <WhiteButton
-                  type="button"
-                  text="Cancelar"
-                  onClick={close}
-                  textSmall={true}
-                />
-
+              <div>
                 {canDeleteReservation && (
                   <RedButton
                     onClick={() => cancelReservationMutation.mutate()}
@@ -540,7 +533,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <select
               {...register("activityId")}
-              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
+              className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
             >
               <option value="">Selecciona una actividad</option>
 
@@ -563,7 +556,7 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <select
               {...register("professorId")}
-              className="w-full border rounded-xl px-3 py-2 bg-[#efefef] focus:outline-none focus:ring-2 focus:ring-[#333]"
+              className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
             >
               <option value="">Selecciona un profesor</option>
 

@@ -256,7 +256,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
                 {[...currentRoutine.exercises]
                   .sort((a, b) => a.order - b.order)
                   .map((exercise) => (
-                    <div key={exercise.id} className="border rounded-xl p-4">
+                    <div
+                      key={exercise.id}
+                      className="border border-gray-500 rounded-lg bg-[#EFECF0] p-4"
+                    >
                       <h4 className="font-semibold">
                         {exercise.order}. {exercise.exercise?.name}
                       </h4>
@@ -322,7 +325,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
             placeholder="Explicación de la actividad..."
           />
 
-          <div className="border-t pt-5">
+          <div className="border-t border-gray-500 pt-5">
             <div className="flex items-center mb-3 justify-between">
               <h3 className="font-semibold text-lg">Ejercicios</h3>
 
@@ -347,7 +350,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
                     const index = exercise.originalIndex;
 
                     return (
-                      <div key={exercise.id} className="border rounded-xl p-4">
+                      <div
+                        key={exercise.id}
+                        className="border border-gray-500 rounded-lg p-4"
+                      >
                         <div className="flex justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-3">

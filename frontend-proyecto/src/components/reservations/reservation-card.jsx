@@ -1,13 +1,12 @@
-import { CalendarDays, Clock3, CheckCircle2 } from "lucide-react";
+import { CalendarDays, Clock3 } from "lucide-react";
 
 export default function ReservationCard({ reservation, onClick }) {
   const completed = reservation.reservationStatus === "Completed";
-  console.log(reservation);
 
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer rounded-xl border p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="cursor-pointer rounded-lg border border-gray-500 bg-[#efecf0] p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
     >
       <div className="flex justify-between items-start">
         <div>
@@ -36,10 +35,10 @@ export default function ReservationCard({ reservation, onClick }) {
           </div>
         </div>
         <span
-          className={`rounded-full px-3 py-1 text-sm border text-center flex items-center h-fit ${
-            completed
-              ? "border-gray-600 text-gray-600"
-              : "border-green-600 text-green-600"
+          className={`rounded-full px-3 py-1 text-sm ${
+            reservation.reservationStatus === "Completed"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
           }`}
         >
           {completed ? "Completada" : "Pendiente"}

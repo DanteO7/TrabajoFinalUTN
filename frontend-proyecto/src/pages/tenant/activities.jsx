@@ -95,15 +95,13 @@ export default function Activities({ tenantId }) {
                   <div
                     key={activity.id}
                     onClick={() => setSelectedActivity(activity)}
-                    className="bg-[#efecf0] cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    className="bg-[#efecf0] cursor-pointer rounded-lg border border-gray-500 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
 
-                    {activity.description && (
-                      <p className="text-gray-500 mt-2 line-clamp-2">
-                        {activity.description}
-                      </p>
-                    )}
+                    <p className="text-gray-500 mt-2 line-clamp-3">
+                      {activity.description || "Sin descripción"}
+                    </p>
                   </div>
                 ))
               ) : (

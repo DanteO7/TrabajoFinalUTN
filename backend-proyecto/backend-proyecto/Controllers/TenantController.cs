@@ -211,5 +211,15 @@ namespace backend_proyecto.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("pending-payment")]
+        public async Task<ActionResult<List<ResponseTenantDTO>>> GetPendingPaymentTenants()
+        {
+            var userId = int.Parse(User.FindFirst("id")?.Value!);
+
+            var tenants = await _tenantServices.GetPendingPaymentTenants(userId);
+
+            return Ok(tenants);
+        }
     }
 }

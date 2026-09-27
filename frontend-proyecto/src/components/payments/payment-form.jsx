@@ -161,7 +161,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
               wfit={true}
             />
           ) : (
-            <div className="rounded-[13px] p-4 w-full border-gray-300 border-[1.7px] bg-[#efefef]">
+            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-medium tracking-wide text-gray-500">
@@ -203,7 +203,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         </div>
 
         {!isAdmin && selected && (
-          <div className="rounded-[13px] p-4 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px]">
+          <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
               PLAN ACTUAL
             </p>
@@ -221,7 +221,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         )}
 
         {isAdmin && selected && (
-          <div className="rounded-[13px] p-4 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px]">
+          <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
               PLAN ACTUAL
             </p>
@@ -245,7 +245,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
 
           <select
             {...register("paymentMethod")}
-            className="rounded-[13px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#efefef] text-[15px] cursor-pointer"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 shadow-md text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar método</option>
 

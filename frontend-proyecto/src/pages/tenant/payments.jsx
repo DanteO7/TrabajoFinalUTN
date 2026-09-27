@@ -215,7 +215,7 @@ export default function Payments({ tenantId }) {
               <>
                 {canManageBusiness && (
                   <>
-                    <div className="mt-8 rounded-xl border p-6 shadow-md">
+                    <div className="mt-8 rounded-lg bg-[#EFECF0] border border-gray-500 p-6 shadow-md">
                       <div className="flex flex-col min-[700px]:grid min-[700px]:grid-cols-2 items-center min-[700px]:justify-between gap-5">
                         <div className="flex gap-5 items-center">
                           <SiMercadopago
@@ -351,7 +351,7 @@ export default function Payments({ tenantId }) {
 
                 {!canManageBusiness && (
                   <>
-                    <div className="mt-8 rounded-xl border p-6 shadow-md">
+                    <div className="mt-8 bg-[#EFECF0] rounded-lg border border-gray-500 p-6 shadow-md">
                       <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-6">
                         <div>
                           <h2 className="text-2xl font-semibold">
@@ -373,7 +373,7 @@ export default function Payments({ tenantId }) {
                       </div>
                     </div>
 
-                    <div className="mt-6 rounded-xl border p-6 shadow-md">
+                    <div className="mt-6 bg-[#EFECF0] rounded-lg border border-gray-500 p-6 shadow-md">
                       <h2 className="text-xl font-semibold">
                         Estado de la cuota
                       </h2>

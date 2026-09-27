@@ -316,5 +316,27 @@ namespace backend_proyecto.Services
 
             return _mapper.Map<List<ResponseTenantDTO>>(tenants);
         }
+        public async Task<List<ResponseTenantDTO>> GetPendingPaymentTenants(int userId)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede consultar los negocios sin pagar"
+                );
+            }
+            var tenants = await _tenantRepository
+                .Query()
+                .Include(t => t.OwnerUser)
+                .Include(t => t.TenantPlan)
+                .Where(t =>
+                    t.MonthlyFeeStatus != MonthlyFeeStatus.PAID
+                )
+                .ToListAsync();
+
+            return _mapper.Map<List<ResponseTenantDTO>>(tenants);
+        }
     }
 }

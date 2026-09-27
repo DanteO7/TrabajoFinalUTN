@@ -57,7 +57,7 @@ export default function UserModal({ user, close }) {
                 {tenants.map((tenant) => (
                   <div
                     key={tenant.id}
-                    className="border rounded-lg p-4 bg-[#f4f0f5]"
+                    className="border rounded-lg border-gray-500 p-4 bg-[#f4f0f5]"
                   >
                     <div className="flex justify-between items-start">
                       <div>

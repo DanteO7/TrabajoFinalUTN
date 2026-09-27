@@ -1,3 +1,8 @@
+.rdp-root {
+  border-radius: 8px;
+  background-color: #efecf0;
+}
+
 /* Cada celda de día */
 .rdp-day {
   border-radius: 8px;

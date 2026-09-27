@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, X, Check } from "lucide-react";
+import { X, Check } from "lucide-react";
 import Modal from "../modals/modal";
-import { GetPendingPaymentStudents } from "../../services/student";
-import { getTenants } from "../../services/tenant";
+import { getPendingPaymentStudents } from "../../services/student";
+import { getPendingPaymentTenants } from "../../services/tenant";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import SearchInput from "../inputs/search-input";
 
 export default function SelectStudentPaymentModal({
   tenantId,
@@ -13,18 +14,18 @@ export default function SelectStudentPaymentModal({
   onSelect,
   isAdmin = false,
 }) {
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [selected, setSelected] = useState(null);
 
   const { data: students = [], isLoading: isLoadingStudents } = useQuery({
     queryKey: ["pendingPaymentStudents", tenantId],
-    queryFn: () => GetPendingPaymentStudents(tenantId),
+    queryFn: () => getPendingPaymentStudents(tenantId),
     enabled: !isAdmin && !!tenantId,
   });
 
   const { data: tenants = [], isLoading: isLoadingTenants } = useQuery({
-    queryKey: ["getTenants"],
-    queryFn: getTenants,
+    queryKey: ["pendingPaymentTenants"],
+    queryFn: getPendingPaymentTenants,
     enabled: isAdmin,
   });
 
@@ -37,7 +38,7 @@ export default function SelectStudentPaymentModal({
           item.user?.email || ""
         }`;
 
-    return text.toLowerCase().includes(search.toLowerCase());
+    return text.toLowerCase().includes(inputValue.toLowerCase());
   });
 
   const isLoading = isAdmin ? isLoadingTenants : isLoadingStudents;
@@ -83,26 +84,13 @@ export default function SelectStudentPaymentModal({
         {isAdmin ? "Seleccionar negocio" : "Seleccionar alumno"}
       </h2>
 
-      <div className="relative mb-4">
-        <Search
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
+      <SearchInput
+        value={inputValue}
+        onChange={setInputValue}
+        placeholder="Buscar usuario..."
+      />
 
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={
-            isAdmin
-              ? "Buscar negocio..."
-              : "Buscar por nombre, apellido o email..."
-          }
-          className="w-full border rounded-xl pl-10 pr-3 py-2 outline-none"
-        />
-      </div>
-
-      <div className="max-h-96 overflow-y-auto space-y-2">
+      <div className="max-h-96 overflow-y-auto space-y-2 mt-4">
         {isLoading ? (
           <p className="text-gray-500 text-center py-4">Cargando...</p>
         ) : filteredItems.length === 0 ? (
@@ -119,8 +107,10 @@ export default function SelectStudentPaymentModal({
               <div
                 key={item.id}
                 onClick={() => setSelected(item)}
-                className={`border rounded-xl p-3 cursor-pointer transition ${
-                  isSelected ? "bg-blue-50 border-blue-300" : "hover:bg-gray-50"
+                className={`border rounded-lg border-gray-500 p-3 cursor-pointer bg-[#F1EEF3] transition ${
+                  isSelected
+                    ? "bg-red-100 border-red-400"
+                    : "hover:bg-[#F1EEF3]"
                 }`}
               >
                 <div className="flex justify-between gap-3 items-center px-1">
@@ -132,9 +122,7 @@ export default function SelectStudentPaymentModal({
                     </p>
                   </div>
                   <div className="mt-1 w-5 flex justify-center items-center">
-                    {isSelected && (
-                      <Check size={20} className="text-blue-600" />
-                    )}
+                    {isSelected && <Check size={20} color="#FC697B" />}
                   </div>
                 </div>
               </div>

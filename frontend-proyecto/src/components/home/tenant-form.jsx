@@ -102,7 +102,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         />
 
         <div>
-          <label className="block mb-2">Plan</label>
+          <label className="block text-sm font-medium mb-1">Plan</label>
           <select
             className="w-full rounded-[13px] px-3 py-2 border border-gray-200 bg-[#efefef]"
             {...register("tenantPlanId")}

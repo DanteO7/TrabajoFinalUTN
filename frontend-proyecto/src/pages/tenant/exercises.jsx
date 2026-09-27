@@ -95,15 +95,13 @@ export default function Exercises({ tenantId }) {
                     <div
                       key={exercise.id}
                       onClick={() => setSelectedExercise(exercise)}
-                      className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                      className="cursor-pointer rounded-lg border border-gray-500 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     >
                       <h3 className="font-semibold text-xl">{exercise.name}</h3>
 
-                      {exercise.description && (
-                        <p className="text-gray-500 mt-2 line-clamp-3">
-                          {exercise.description}
-                        </p>
-                      )}
+                      <p className="text-gray-500 mt-2 line-clamp-3">
+                        {exercise.description || "Sin descripción"}
+                      </p>
                     </div>
                   ))
                 ) : (

@@ -30,3 +30,6 @@ export const getMyPermissionInTenant = (tenantId) =>
   request("get", `/tenants/${tenantId}/my-permissions`);
 
 export const getUserTenants = (id) => request("get", `/tenants/user/${id}`);
+
+export const getPendingPaymentTenants = () =>
+  request("get", `/tenants/pending-payment`);

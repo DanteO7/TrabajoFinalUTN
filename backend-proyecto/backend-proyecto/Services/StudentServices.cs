@@ -271,9 +271,13 @@ namespace backend_proyecto.Services
 
             return dto;
         }
-        public async Task<List<ResponseStudentDTO>> GetPendingPaymentStudents(int tenantId,int userId)
+        public async Task<List<ResponseStudentDTO>> GetPendingPaymentStudents(
+            int tenantId,
+            int userId)
         {
-            await _permissionServices.CheckPermission(Permissions.STUDENT_READ);
+            await _permissionServices.CheckPermission(
+                Permissions.STUDENT_READ
+            );
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
@@ -302,41 +306,13 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var now = DateTime.UtcNow;
-
-            var startOfMonth = new DateTime(
-                now.Year,
-                now.Month,
-                1,
-                0,
-                0,
-                0,
-                DateTimeKind.Utc
-            );
-
-            var startOfNextMonth = startOfMonth.AddMonths(1);
-
-            var paidUserIds = await _paymentRepository
-                .Query()
-                .Where(p =>
-                    p.TenantId == tenantId &&
-                    p.PlanType == PlanType.STUDENT &&
-                    p.PaymentDate >= startOfMonth &&
-                    p.PaymentDate < startOfNextMonth &&
-                    p.Status != PaymentStatus.CANCELLED &&
-                    p.Status != PaymentStatus.REJECTED
-                )
-                .Select(p => p.UserId)
-                .Distinct()
-                .ToListAsync();
-
             var students = await _studentRepository
                 .Query()
                 .Include(s => s.User)
                 .Include(s => s.StudentPlan)
                 .Where(s =>
                     s.TenantId == tenantId &&
-                    !paidUserIds.Contains(s.UserId)
+                    s.MonthlyFeeStatus != MonthlyFeeStatus.PAID
                 )
                 .ToListAsync();
 

@@ -150,7 +150,7 @@ export default function Classes({ tenantId }) {
                       <div
                         key={classItem.id}
                         onClick={() => setSelectedClass(classItem)}
-                        className="cursor-pointer rounded-xl border p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                        className={`cursor-pointer rounded-lg ${classItem.reservationsCount === classItem.maxCapacity ? "bg-red-100" : "bg-[#EFECF0]"} border border-gray-500 p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
                       >
                         <div className="grid grid-cols-2 items-center">
                           <div>

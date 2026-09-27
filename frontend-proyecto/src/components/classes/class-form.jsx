@@ -101,11 +101,11 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div>
-          <label className="block mb-2">Actividad</label>
+          <label className="block text-sm font-medium mb-1">Actividad</label>
 
           <select
             {...register("activityId")}
-            className="w-full rounded-xl border bg-[#efefef] px-3 py-2"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar</option>
 
@@ -124,11 +124,11 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
         </div>
 
         <div>
-          <label className="block mb-2">Profesor</label>
+          <label className="block text-sm font-medium mb-1">Profesor</label>
 
           <select
             {...register("professorId")}
-            className="w-full rounded-xl border bg-[#efefef] px-3 py-2"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar</option>
 

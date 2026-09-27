@@ -8,12 +8,11 @@ import { getReservationsByStudentId } from "../../services/reservation";
 import ReservationCard from "../../components/reservations/reservation-card";
 import ReservationModal from "../../components/reservations/reservation-modal";
 import ReservationFilter from "../../components/reservations/reservation-filter";
-import ReservationEmpty from "../../components/reservations/reservation-empty";
-import Loader from "../../components/loading";
 import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import BlackButton from "../../components/buttons/black-button";
 import { Link } from "wouter";
+import Loading from "../../components/loading";
 
 export default function Reservations({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -81,7 +80,7 @@ export default function Reservations({ tenantId }) {
             {student && (
               <p className="text-gray-500 mt-2">
                 Clases disponibles:{" "}
-                <span className="font-semibold text-black">
+                <span className="font-semibold text-[#444]">
                   {student.remainingClasses}/
                   {student.studentPlan.classesPerMonth}
                 </span>
@@ -94,7 +93,7 @@ export default function Reservations({ tenantId }) {
 
         {isLoading ? (
           <div className="flex justify-center mt-20">
-            <Loader />
+            <Loading />
           </div>
         ) : filteredReservations.length === 0 ? (
           <div className="mt-20 flex flex-col justify-center items-center gap-4 text-center">

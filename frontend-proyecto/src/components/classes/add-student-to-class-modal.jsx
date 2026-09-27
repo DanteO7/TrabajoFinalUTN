@@ -9,6 +9,7 @@ import ErrorModal from "../modals/error-modal";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import { createReservation } from "../../services/reservation";
+import SearchInput from "../inputs/search-input";
 
 export default function AddStudentToClassModal({
   classId,
@@ -17,7 +18,7 @@ export default function AddStudentToClassModal({
   increaseReservationCount,
 }) {
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [selectedStudents, setSelectedStudents] = useState([]);
 
   const [errorModal, setErrorModal] = useState(false);
@@ -25,12 +26,12 @@ export default function AddStudentToClassModal({
   const [successModal, setSuccessModal] = useState(false);
 
   const { data: students = [] } = useQuery({
-    queryKey: ["students", { tenantId, classId, search }],
+    queryKey: ["students", { tenantId, classId, inputValue }],
     queryFn: () =>
       getStudents({
         tenantId,
         classId,
-        search: search || undefined,
+        search: inputValue || undefined,
       }),
     enabled: !!classId && !!tenantId,
   });
@@ -86,17 +87,11 @@ export default function AddStudentToClassModal({
 
       <h2 className="text-2xl font-semibold mb-4">Agregar alumnos</h2>
 
-      <div className="relative mb-4">
-        <Search
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-        />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      <div className="mb-4">
+        <SearchInput
+          value={inputValue}
+          onChange={setInputValue}
           placeholder="Buscar por nombre, apellido o email..."
-          className="w-full border rounded-xl pl-10 pr-3 py-2 outline-none"
         />
       </div>
 
@@ -118,16 +113,13 @@ export default function AddStudentToClassModal({
               <div
                 key={student.id}
                 onClick={() => toggleStudent(student.id)}
-                className={`border rounded-xl p-3 cursor-pointer transition ${
-                  isSelected ? "bg-blue-50 border-blue-300" : "hover:bg-gray-50"
+                className={`border rounded-lg border-gray-500 p-3 cursor-pointer bg-[#F1EEF3] transition ${
+                  isSelected
+                    ? "bg-red-100 border-red-400"
+                    : "hover:bg-[#F1EEF3]"
                 }`}
               >
-                <div className="flex items-start gap-3">
-                  <div className="mt-1">
-                    {isSelected && (
-                      <Check size={20} className="text-blue-600" />
-                    )}
-                  </div>
+                <div className="flex justify-between gap-3 items-center px-1">
                   <div>
                     <p className="font-semibold">
                       {student.user.name} {student.user.surname}
@@ -135,6 +127,9 @@ export default function AddStudentToClassModal({
                     <p className="text-sm text-gray-600">
                       {student.user.email}
                     </p>
+                  </div>
+                  <div className="mt-1 w-5 flex justify-center items-center">
+                    {isSelected && <Check size={20} color="#FC697B" />}
                   </div>
                 </div>
               </div>

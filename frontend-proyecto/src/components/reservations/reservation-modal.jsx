@@ -9,7 +9,6 @@ import SuccessModal from "../modals/success-modal";
 import { deleteReservation } from "../../services/reservation";
 import ConfirmModal from "../modals/confirm-modal";
 import RedButton from "../buttons/red-button";
-import WhiteButton from "../buttons/white-button";
 
 export default function ReservationModal({ reservation, tenantId, close }) {
   const queryClient = useQueryClient();
@@ -82,10 +81,10 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-2">{classItem.activityName}</h2>
+      <h2 className="text-2xl font-semibold mb-3">{classItem.activityName}</h2>
 
       <div className="space-y-4">
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Estado</p>
 
           <span
@@ -101,13 +100,13 @@ export default function ReservationModal({ reservation, tenantId, close }) {
           </span>
         </div>
 
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Fecha</p>
 
           <p className="font-semibold">{formatDateWithDay(classItem.date)}</p>
         </div>
 
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Horario</p>
 
           <p className="font-semibold">
@@ -115,13 +114,13 @@ export default function ReservationModal({ reservation, tenantId, close }) {
           </p>
         </div>
 
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Actividad</p>
 
           <p className="font-semibold">{classItem.activityName}</p>
         </div>
 
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Profesor</p>
 
           <p className="font-semibold">
