@@ -1,4 +1,3 @@
-import React from "react";
 import MainLayout from "../layouts/main-layout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -6,11 +5,11 @@ import { changePasswordSchema } from "../schema/change-password-schema";
 import { useMutation } from "@tanstack/react-query";
 import { changePassword } from "../services/user";
 import { useState } from "react";
-import FormInput from "../components/form-input";
 import { useSearchParams } from "wouter";
 import ErrorModal from "../components/modals/error-modal";
 import SuccessModal from "../components/modals/success-modal";
 import { useLocation } from "wouter";
+import FormInput from "../components/inputs/form-input";
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();

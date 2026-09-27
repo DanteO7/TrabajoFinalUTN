@@ -1,8 +1,5 @@
-import { Link } from "wouter";
 import MainLayout from "../layouts/main-layout";
 import { useAuthStore } from "../store/auth-store";
-import FormInput from "../components/form-input";
-import ErrorModal from "../components/modals/error-modal";
 import Navbar from "../components/navbar";
 import LanguageSelector from "../components/language-selector";
 import ThemeSelector from "../components/theme-selector";

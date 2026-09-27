@@ -4,11 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import { sendRegisterCode } from "../services/auth";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
-import FormInput from "../components/form-input";
 import ErrorModal from "../components/modals/error-modal";
 import { signUpSchema } from "../schema/auth-schema";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
+import FormInput from "../components/inputs/form-input";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
