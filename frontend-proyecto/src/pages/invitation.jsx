@@ -90,21 +90,21 @@ export default function Invitation({ token }) {
 
           <div className="space-y-6">
             {/* Información de la invitación */}
-            <div className="bg-[#efefef] rounded-xl p-5">
+            <div className="bg-[#efefef] rounded-lg p-5">
               <p className="text-sm text-gray-600 mb-2">Negocio</p>
               <h2 className="text-2xl font-bold text-[#333]">
                 {invitation?.tenantName}
               </h2>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-5">
+            <div className="bg-[#efefef] rounded-lg p-5">
               <p className="text-sm text-gray-600 mb-2">Rol</p>
               <p className="text-lg font-semibold text-[#333]">
                 {invitation?.role === "Student" ? "Alumno" : "Profesor"}
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-xl p-5">
+            <div className="bg-[#efefef] rounded-lg p-5">
               <p className="text-sm text-gray-600 mb-2">Válido hasta</p>
               <p className="text-lg font-semibold text-[#333]">
                 {new Date(invitation?.expirationDate).toLocaleDateString(
@@ -127,10 +127,10 @@ export default function Invitation({ token }) {
                       <div
                         key={plan.id}
                         onClick={() => setSelectedPlan(plan.id)}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition ${
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition ${
                           selectedPlan === plan.id
                             ? "border-[#333] bg-[#efefef]"
-                            : "border-gray-200 hover:border-gray-300"
+                            : "border-gray-200 hover:border-gray-400"
                         }`}
                       >
                         <div className="flex justify-between items-start">
@@ -160,14 +160,14 @@ export default function Invitation({ token }) {
               <button
                 onClick={handleAccept}
                 disabled={mutation.isPending}
-                className="w-full bg-[#333] text-white rounded-xl py-3 font-semibold hover:bg-gray-700 transition cursor-pointer disabled:opacity-50"
+                className="w-full bg-[#333] text-white rounded-lg py-3 font-semibold hover:bg-gray-700 transition cursor-pointer disabled:opacity-50"
               >
                 {mutation.isPending ? "Aceptando..." : "Aceptar invitación"}
               </button>
 
               <button
                 onClick={() => setLocation("/")}
-                className="w-full bg-gray-200 text-[#333] rounded-xl py-3 font-semibold hover:bg-gray-300 transition cursor-pointer"
+                className="w-full bg-gray-200 text-[#333] rounded-lg py-3 font-semibold hover:bg-gray-300 transition cursor-pointer"
               >
                 Cancelar
               </button>

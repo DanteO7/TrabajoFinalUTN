@@ -29,7 +29,7 @@ export default function TargetAudience() {
 
   const setWidthRef = useRef(0);
 
-  const speed = isDesktop ? 90 : 30;
+  const speed = isDesktop ? 90 : 40;
 
   useEffect(() => {
     const updateVisible = () => {

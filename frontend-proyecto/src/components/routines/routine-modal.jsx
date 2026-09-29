@@ -258,7 +258,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
                   .map((exercise) => (
                     <div
                       key={exercise.id}
-                      className="border border-gray-500 rounded-lg bg-[#EFECF0] p-4"
+                      className="border border-gray-400 rounded-lg bg-[#EFECF0] p-4"
                     >
                       <h4 className="font-semibold">
                         {exercise.order}. {exercise.exercise?.name}
@@ -274,7 +274,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
                   ))}
               </div>
             ) : (
-              <div className="border rounded-xl p-5 text-center text-gray-500">
+              <div className="border rounded-lg p-5 text-center text-gray-500">
                 Esta rutina no tiene ejercicios.
               </div>
             )}
@@ -325,7 +325,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
             placeholder="Explicación de la actividad..."
           />
 
-          <div className="border-t border-gray-500 pt-5">
+          <div className="border-t border-gray-400 pt-5">
             <div className="flex items-center mb-3 justify-between">
               <h3 className="font-semibold text-lg">Ejercicios</h3>
 
@@ -352,7 +352,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
                     return (
                       <div
                         key={exercise.id}
-                        className="border border-gray-500 rounded-lg p-4"
+                        className="border border-gray-400 rounded-lg p-4"
                       >
                         <div className="flex justify-between gap-4">
                           <div className="flex-1 min-w-0">
@@ -416,7 +416,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
                   })}
               </div>
             ) : (
-              <div className="border rounded-xl p-5 text-center text-gray-500">
+              <div className="border rounded-lg p-5 text-center text-gray-500">
                 Esta rutina no tiene ejercicios.
               </div>
             )}

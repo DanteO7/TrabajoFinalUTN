@@ -2,7 +2,7 @@ export default function UserItem({ user, onSelect }) {
   return (
     <div
       onClick={() => onSelect(user)}
-      className="cursor-pointer rounded-lg border border-gray-500 p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-[#efecf0]"
+      className="cursor-pointer rounded-lg border border-gray-400 p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 bg-[#efecf0]"
     >
       <div className="flex justify-between">
         <div>

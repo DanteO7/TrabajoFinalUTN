@@ -6,7 +6,7 @@ export default function ReservationCard({ reservation, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="cursor-pointer rounded-lg border border-gray-500 bg-[#efecf0] p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
     >
       <div className="flex justify-between items-start">
         <div>

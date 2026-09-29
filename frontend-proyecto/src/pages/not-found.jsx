@@ -30,20 +30,20 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => setLocation("/")}
-              className="bg-[#333] text-white px-8 py-3 rounded-xl hover:bg-gray-700 transition font-semibold cursor-pointer"
+              className="bg-[#333] text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition font-semibold cursor-pointer"
             >
               Ir a Inicio
             </button>
 
             <button
               onClick={() => window.history.back()}
-              className="border-2 border-[#333] text-[#333] px-8 py-3 rounded-xl hover:bg-[#efefef] transition font-semibold cursor-pointer"
+              className="border-2 border-[#333] text-[#333] px-8 py-3 rounded-lg hover:bg-[#efefef] transition font-semibold cursor-pointer"
             >
               Volver atrás
             </button>
           </div>
 
-          <div className="mt-16 pt-8 border-t border-gray-300">
+          <div className="mt-16 pt-8 border-t border-gray-400">
             <p className="text-gray-500 text-sm">
               ¿Necesitás ayuda? Contactá con soporte:
               contacto@turnofacilapp.com.ar

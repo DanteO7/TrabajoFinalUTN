@@ -34,7 +34,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
       <p className="text-gray-600 mb-6">{name}</p>
 
       <div className="space-y-4 mb-8">
-        <div className="bg-[#efefef] rounded-xl p-4">
+        <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
           <p className="text-sm text-gray-600 mb-1">Importe a transferir</p>
 
           <p className="text-2xl font-bold text-[#333]">
@@ -43,7 +43,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
         </div>
 
         {paymentData?.alias && (
-          <div className="bg-[#efefef] rounded-xl p-4">
+          <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-sm text-gray-600 mb-2">Alias</p>
 
             <div className="flex items-center justify-between gap-3">
@@ -65,7 +65,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
         )}
 
         {!paymentData?.alias && paymentData?.cbu && (
-          <div className="bg-[#efefef] rounded-xl p-4">
+          <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-sm text-gray-600 mb-2">CBU</p>
 
             <div className="flex items-center justify-between gap-3">
@@ -87,7 +87,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
         )}
 
         {!paymentData?.alias && !paymentData?.cbu && (
-          <div className="bg-red-50 rounded-xl p-4">
+          <div className="bg-red-50 rounded-lg p-4">
             <p className="text-sm text-red-600">
               No hay datos de transferencia configurados.
             </p>

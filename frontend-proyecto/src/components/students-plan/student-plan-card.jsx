@@ -51,7 +51,7 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
 
   return (
     <>
-      <div className="border rounded-lg border-gray-500 bg-[#EFECF0] p-5 shadow-sm flex flex-col gap-4">
+      <div className="border rounded-lg border-gray-400 bg-[#EFECF0] p-5 shadow-sm flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-xl font-semibold text-[#333]">{plan.name}</h3>

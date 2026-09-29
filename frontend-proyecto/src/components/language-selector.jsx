@@ -30,7 +30,7 @@ export default function LanguageSelector() {
             e.stopPropagation();
             setOpen(!open);
           }}
-          className="cursor-pointer px-3 py-2 rounded-xl bg-[#ace1f6] dark:bg-[#131934]"
+          className="cursor-pointer px-3 py-2 rounded-lg bg-[#ace1f6] dark:bg-[#131934]"
         >
           {language === "en" ? "Inglés (EN)" : "Español (ES)"}
         </button>

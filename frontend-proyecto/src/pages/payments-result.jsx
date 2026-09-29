@@ -36,7 +36,7 @@ export default function PaymentsResult() {
   if (!paymentId || isError || !payment) {
     return (
       <MainLayout>
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
             No se pudo consultar el pago
           </h1>
@@ -60,7 +60,7 @@ export default function PaymentsResult() {
   if (payment.status === "Paid") {
     return (
       <MainLayout>
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#1fc762] min-[900px]:text-2xl">
             ¡Pago realizado correctamente!
           </h1>
@@ -84,7 +84,7 @@ export default function PaymentsResult() {
   if (payment.status === "Pending") {
     return (
       <MainLayout>
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border border-gray-400 mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#e5a400] min-[900px]:text-2xl">
             Pago pendiente
           </h1>
@@ -111,7 +111,7 @@ export default function PaymentsResult() {
   if (payment.status === "Rejected") {
     return (
       <MainLayout>
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
             Pago rechazado
           </h1>
@@ -127,7 +127,7 @@ export default function PaymentsResult() {
   if (payment.status === "Cancelled") {
     return (
       <MainLayout>
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
             Pago cancelado
           </h1>
@@ -142,7 +142,7 @@ export default function PaymentsResult() {
 
   return (
     <MainLayout>
-      <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+      <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
         <h1 className="font-semibold text-[19px] min-[900px]:text-2xl">
           Estado del pago
         </h1>

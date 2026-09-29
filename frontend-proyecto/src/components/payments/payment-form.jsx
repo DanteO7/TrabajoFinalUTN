@@ -161,7 +161,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
               wfit={true}
             />
           ) : (
-            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-medium tracking-wide text-gray-500">
@@ -203,7 +203,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         </div>
 
         {!isAdmin && selected && (
-          <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+          <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
               PLAN ACTUAL
             </p>
@@ -221,7 +221,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         )}
 
         {isAdmin && selected && (
-          <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+          <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
               PLAN ACTUAL
             </p>
@@ -245,7 +245,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
 
           <select
             {...register("paymentMethod")}
-            className="rounded-lg w-full px-3 pt-1.75 pb-2 shadow-md text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 shadow-md text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar método</option>
 

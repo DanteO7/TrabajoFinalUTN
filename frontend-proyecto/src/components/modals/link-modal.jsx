@@ -108,7 +108,7 @@ export default function LinkModal({ tenantId, close, role }) {
         <p className="text-center text-gray-500">Cargando...</p>
       ) : hasValidLink ? (
         <>
-          <div className="border rounded-xl p-4 mb-4 flex flex-col gap-3">
+          <div className="border rounded-lg p-4 mb-4 flex flex-col gap-3">
             <p className="font-semibold">Link de invitación activo</p>
 
             <FormInput value={currentInvitation.link} />

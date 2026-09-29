@@ -46,7 +46,7 @@ export default function TenantPlanCard({ plan, onEdit }) {
 
   return (
     <>
-      <div className="border border-gray-500 rounded-lg p-5 shadow-sm flex flex-col gap-4 bg-[#efecf0]">
+      <div className="border border-gray-400 rounded-lg p-5 shadow-sm flex flex-col gap-4 bg-[#efecf0]">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-xl font-semibold text-[#333]">{plan.name}</h3>

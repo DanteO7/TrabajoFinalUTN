@@ -14,7 +14,7 @@ export default function MercadoPagoResult() {
   return (
     <MainLayout>
       {connected ? (
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#1fc762] min-[900px]:text-2xl">
             ¡Mercado Pago conectado correctamente!
           </h1>
@@ -30,7 +30,7 @@ export default function MercadoPagoResult() {
           />
         </div>
       ) : (
-        <div className="border mt-12 p-4 rounded-xl flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
+        <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
             No se pudo conectar con Mercado Pago
           </h1>

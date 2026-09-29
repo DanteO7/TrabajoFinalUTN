@@ -65,7 +65,7 @@ export default function Classes({ tenantId }) {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -150,7 +150,7 @@ export default function Classes({ tenantId }) {
                       <div
                         key={classItem.id}
                         onClick={() => setSelectedClass(classItem)}
-                        className={`cursor-pointer rounded-lg ${classItem.reservationsCount === classItem.maxCapacity ? "bg-red-100" : "bg-[#EFECF0]"} border border-gray-500 p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
+                        className={`cursor-pointer rounded-lg ${classItem.reservationsCount === classItem.maxCapacity ? "bg-red-100" : "bg-[#EFECF0]"} border border-gray-400 p-5 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
                       >
                         <div className="grid grid-cols-2 items-center">
                           <div>
@@ -180,7 +180,7 @@ export default function Classes({ tenantId }) {
                     ))
                   ) : isDateInPast ? (
                     canCreateClass ? (
-                      <div className="border rounded-xl py-16 text-center">
+                      <div className="border bg-[#EFECF0] rounded-lg py-16 text-center">
                         <h3 className="text-xl font-semibold text-red-600">
                           No puedes crear clases para días anteriores
                         </h3>
@@ -191,7 +191,7 @@ export default function Classes({ tenantId }) {
                         </p>
                       </div>
                     ) : (
-                      <div className="border rounded-xl py-16 text-center">
+                      <div className="border border-gray-400 bg-[#EFECF0] rounded-lg py-16 text-center">
                         <h3 className="text-xl font-semibold text-red-600">
                           No hubo clases este dia
                         </h3>
@@ -202,7 +202,7 @@ export default function Classes({ tenantId }) {
                       </div>
                     )
                   ) : !canCreateClass ? (
-                    <div className="border rounded-xl py-16 text-center">
+                    <div className="border border-gray-400 bg-[#EFECF0] rounded-lg py-16 text-center">
                       <h3 className="text-xl font-semibold">
                         No hay clases este día
                       </h3>
@@ -213,7 +213,7 @@ export default function Classes({ tenantId }) {
                       </p>
                     </div>
                   ) : (
-                    <div className="border rounded-xl py-16 text-center flex flex-col items-center">
+                    <div className="border rounded-lg py-16 text-center flex flex-col items-center">
                       <h3 className="text-xl font-semibold">
                         No hay clases este día
                       </h3>

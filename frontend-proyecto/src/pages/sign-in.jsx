@@ -115,7 +115,7 @@ export default function SignIn() {
           />
           {/* <button
             type="button"
-            className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-300 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
+            className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-400 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
           >
             <img className="w-6" src="/google.png" alt="Icono de Google" />
             <p className="text-center">Inicia sesión con Google</p>

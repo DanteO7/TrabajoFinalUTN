@@ -61,7 +61,7 @@ export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
   return (
     <div
       onClick={() => setOpenModal(true)}
-      className="cursor-pointer rounded-lg bg-[#efecf0] border border-gray-500 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="cursor-pointer rounded-lg bg-[#efecf0] border border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
     >
       <div className="flex justify-between items-start gap-3">
         <div className="min-w-0">

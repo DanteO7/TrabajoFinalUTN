@@ -48,7 +48,7 @@ export default function VideoSection() {
         <div ref={videoRef} className="w-[90%] md:w-[80%] scroll-m-16">
           <div className="aspect-video w-full">
             <iframe
-              className="w-full h-full rounded-xl shadow-lg"
+              className="w-full h-full rounded-lg shadow-lg"
               src={`https://www.youtube.com/embed/${videoId}`}
               title="Video"
               allowFullScreen
@@ -68,9 +68,9 @@ export default function VideoSection() {
               <div
                 key={video.id}
                 onClick={() => handleChangeVideo(video.id)}
-                className="cursor-pointer group border border-gray-300 rounded-xl"
+                className="cursor-pointer group border border-gray-400 rounded-lg"
               >
-                <div className="relative bg-gray-200 rounded-xl aspect-video flex items-center justify-center ">
+                <div className="relative bg-gray-200 rounded-lg aspect-video flex items-center justify-center ">
                   <div className="bg-black/60 p-4 rounded-full group-hover:scale-110 transition">
                     <Play className="text-white" size={28} />
                   </div>

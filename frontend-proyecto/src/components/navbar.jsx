@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 export default function Navbar({ user }) {
   const [location] = useLocation();
   const linkClass = (path) =>
-    `px-2 border-b  py-1 rounded-[6px] hover:text-gray-400 ${location === path ? "bg-gray-300" : " "}`;
+    `px-2 border  py-1 rounded-[6px] hover:text-gray-400 ${location === path ? "bg-gray-300" : " "}`;
 
   return (
     <div className="hidden w-80 justify-self-end lg:block border-r px-10 pb-5">

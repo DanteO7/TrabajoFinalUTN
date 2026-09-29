@@ -21,7 +21,7 @@ export default function ColorButton({
         color: textColor,
       }}
       className={`
-        px-4.5 rounded-xl
+        px-4.5 rounded-lg
         transition-all duration-200
         cursor-pointer
         flex justify-center items-center gap-1

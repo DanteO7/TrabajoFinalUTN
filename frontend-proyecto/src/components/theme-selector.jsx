@@ -30,7 +30,7 @@ export default function ThemeSelector() {
             e.stopPropagation();
             setOpen(!open);
           }}
-          className="cursor-pointer px-3 py-2 rounded-xl bg-[#ace1f6] dark:bg-[#131934]"
+          className="cursor-pointer px-3 py-2 rounded-lg bg-[#ace1f6] dark:bg-[#131934]"
         >
           {theme.charAt(0).toUpperCase() + theme.slice(1)}
         </button>

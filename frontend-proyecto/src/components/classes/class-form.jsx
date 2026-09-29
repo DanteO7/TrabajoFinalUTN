@@ -105,7 +105,7 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
 
           <select
             {...register("activityId")}
-            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar</option>
 
@@ -128,7 +128,7 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
 
           <select
             {...register("professorId")}
-            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
           >
             <option value="">Seleccionar</option>
 

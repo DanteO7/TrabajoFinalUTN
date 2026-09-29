@@ -53,7 +53,7 @@ export default function Activities({ tenantId }) {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -95,7 +95,7 @@ export default function Activities({ tenantId }) {
                   <div
                     key={activity.id}
                     onClick={() => setSelectedActivity(activity)}
-                    className="bg-[#efecf0] cursor-pointer rounded-lg border border-gray-500 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    className="bg-[#efecf0] cursor-pointer rounded-lg border border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
 
@@ -105,7 +105,7 @@ export default function Activities({ tenantId }) {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
+                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
                   <h3 className="text-xl font-semibold">No hay actividades</h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">

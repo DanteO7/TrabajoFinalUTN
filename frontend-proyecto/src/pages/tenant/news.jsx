@@ -55,7 +55,7 @@ export default function News({ tenantId }) {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -133,7 +133,7 @@ export default function News({ tenantId }) {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
+                <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
                     Todavía no hay noticias
                   </h3>
@@ -155,7 +155,7 @@ export default function News({ tenantId }) {
                     </>
                   ) : (
                     <p className="text-gray-500 mt-2 mb-6">
-                      Todavia no hay noticias subidas.
+                      Todavía no hay noticias subidas.
                     </p>
                   )}
                 </div>

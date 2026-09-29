@@ -48,7 +48,7 @@ const Modal = forwardRef(function Modal(
     >
       <div
         ref={ref}
-        className={`bg-[#ede9ee] rounded-xl ${isSuccesOrError ? "p-0" : "p-6"} w-120 shadow-xl
+        className={`bg-[#ede9ee] rounded-lg ${isSuccesOrError ? "p-0" : "p-6"} w-120 shadow-xl
           max-h-[90dvh] overflow-y-auto
           transition-all duration-300 ease-out
           translate-y-0 opacity-100

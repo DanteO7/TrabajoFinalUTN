@@ -50,7 +50,7 @@ export default function Routines({ tenantId }) {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -94,7 +94,7 @@ export default function Routines({ tenantId }) {
                     <div
                       key={routine.id}
                       onClick={() => setSelectedRoutine(routine)}
-                      className="cursor-pointer rounded-lg border border-gray-500 bg-[#efecf0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                      className="cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                     >
                       <h3 className="font-semibold text-xl">{routine.name}</h3>
 
@@ -113,7 +113,7 @@ export default function Routines({ tenantId }) {
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
                     <h3 className="text-xl font-semibold">
                       No se encontraron rutinas
                     </h3>
@@ -124,7 +124,7 @@ export default function Routines({ tenantId }) {
                   </div>
                 )
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
+                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
                   <h3 className="text-xl font-semibold">No hay rutinas</h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">

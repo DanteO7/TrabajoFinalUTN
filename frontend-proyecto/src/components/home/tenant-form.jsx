@@ -10,6 +10,7 @@ import ErrorModal from "../modals/error-modal";
 import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import FormInput from "../inputs/form-input";
+import BlackButton from "../buttons/black-button";
 
 export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const { data: plans, isLoading } = useQuery({
@@ -104,7 +105,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         <div>
           <label className="block text-sm font-medium mb-1">Plan</label>
           <select
-            className="w-full rounded-[13px] px-3 py-2 border border-gray-200 bg-[#efefef]"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
             {...register("tenantPlanId")}
           >
             <option value="">
@@ -124,17 +125,12 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
           )}
         </div>
 
-        <div className="text-center bg-[#efefef] rounded-xl py-3">
+        <div className="bg-[#F1EEF3] rounded-lg border border-gray-400 shadow-md p-4 text-center">
           <p className="text-sm text-gray-600">Precio mensual</p>
           <p className="text-2xl font-semibold">${currentPlan?.price || 0}</p>
         </div>
 
-        <button
-          type="submit"
-          className="mt-2 bg-[#333] text-[#efefef] rounded-[13px] py-2 hover:bg-gray-700 transition duration-300 cursor-pointer"
-        >
-          Contratar
-        </button>
+        <BlackButton text="Contratar" type="submit" textSmall />
       </form>
       {errorModal && (
         <ErrorModal

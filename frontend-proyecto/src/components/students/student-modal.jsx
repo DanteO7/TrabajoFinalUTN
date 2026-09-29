@@ -153,7 +153,7 @@ export default function StudentModal({ student, tenantId, close }) {
           <p className="text-gray-600 mb-6">{currentStudent.user.email}</p>
 
           <div className="space-y-4 mb-8">
-            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Email</p>
               <p className="font-semibold text-[#333]">
                 {currentStudent.user.email}
@@ -161,7 +161,7 @@ export default function StudentModal({ student, tenantId, close }) {
             </div>
 
             {currentStudent.user.phoneNumber && (
-              <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">Teléfono</p>
                 <p className="font-semibold text-[#333]">
                   {currentStudent.user.phoneNumber}
@@ -172,7 +172,7 @@ export default function StudentModal({ student, tenantId, close }) {
             {(currentStudent.user.weight || currentStudent.user.age) && (
               <div className="flex gap-4">
                 {currentStudent.user.age && (
-                  <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4 w-full">
+                  <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">Edad</p>
                     <p className="font-semibold text-[#333]">
                       {currentStudent.user.age} Años
@@ -180,7 +180,7 @@ export default function StudentModal({ student, tenantId, close }) {
                   </div>
                 )}
                 {currentStudent.user.weight && (
-                  <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4 w-full">
+                  <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">Peso</p>
                     <p className="font-semibold text-[#333]">
                       {currentStudent.user.weight} Kg
@@ -189,7 +189,7 @@ export default function StudentModal({ student, tenantId, close }) {
                 )}
               </div>
             )}
-            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Plan</p>
               <div className="flex justify-between items-start">
                 <div>
@@ -206,7 +206,7 @@ export default function StudentModal({ student, tenantId, close }) {
               </div>
             </div>
 
-            <div className="bg-[#f4f0f5] rounded-lg border-b border-gray-300 shadow-md p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Estado de cuota</p>
               <span
                 className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${getStatusColor(
@@ -245,7 +245,7 @@ export default function StudentModal({ student, tenantId, close }) {
             <select
               value={selectedPlan}
               onChange={(e) => setSelectedPlan(parseInt(e.target.value))}
-              className="rounded-lg w-full px-3 py-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+              className="rounded-lg w-full px-3 py-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
             >
               {plans.map((plan) => (
                 <option key={plan.id} value={plan.id}>

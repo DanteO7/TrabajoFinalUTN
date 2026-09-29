@@ -113,7 +113,7 @@ export default function AddStudentToClassModal({
               <div
                 key={student.id}
                 onClick={() => toggleStudent(student.id)}
-                className={`border rounded-lg border-gray-500 p-3 cursor-pointer bg-[#F1EEF3] transition ${
+                className={`border rounded-lg border-gray-400 p-3 cursor-pointer bg-[#F1EEF3] transition ${
                   isSelected
                     ? "bg-red-100 border-red-400"
                     : "hover:bg-[#F1EEF3]"

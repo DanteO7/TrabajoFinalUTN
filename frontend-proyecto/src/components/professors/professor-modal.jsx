@@ -162,11 +162,9 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           <h2 className="text-2xl font-semibold mb-2">
             {currentProfessor.user.name} {currentProfessor.user.surname}
           </h2>
-
           <p className="text-gray-600 mb-6">{currentProfessor.user.email}</p>
-
-          <div className="space-y-4 mb-8">
-            <div className="bg-[#efefef] rounded-xl p-4">
+          <div className="space-y-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Email</p>
 
               <p className="font-semibold text-[#333]">
@@ -175,7 +173,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             </div>
 
             {currentProfessor.user.phoneNumber && (
-              <div className="bg-[#efefef] rounded-xl p-4">
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">Teléfono</p>
 
                 <p className="font-semibold text-[#333]">
@@ -187,7 +185,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             {(currentProfessor.user.weight || currentProfessor.user.age) && (
               <div className="flex gap-4">
                 {currentProfessor.user.age && (
-                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                  <div className="bg-[#f4f0f5] w-full rounded-lg border border-gray-400 shadow-md p-4">
                     <p className="text-sm text-gray-600 mb-1">Edad</p>
 
                     <p className="font-semibold text-[#333]">
@@ -197,7 +195,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                 )}
 
                 {currentProfessor.user.weight && (
-                  <div className="bg-[#efefef] rounded-xl p-4 w-full">
+                  <div className="bg-[#f4f0f5] w-full rounded-lg border border-gray-400 shadow-md p-4">
                     <p className="text-sm text-gray-600 mb-1">Peso</p>
 
                     <p className="font-semibold text-[#333]">
@@ -208,7 +206,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
               </div>
             )}
 
-            <div className="bg-[#efefef] rounded-xl p-4">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Estado</p>
 
               <span
@@ -223,7 +221,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             </div>
 
             {currentProfessor.specialities.length > 0 && (
-              <div className="bg-[#efefef] rounded-xl p-4">
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-3">Profesiones</p>
 
                 <div className="flex flex-wrap gap-2">
@@ -239,7 +237,6 @@ export default function ProfessorModal({ professor, tenantId, close }) {
               </div>
             )}
           </div>
-
           {(canUpdateProfessor || canDeleteProfessor) && (
             <div className="flex gap-2 mt-8">
               {canDeleteProfessor && (
@@ -277,10 +274,10 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                 <div
                   key={status.toString()}
                   onClick={() => setIsActive(status)}
-                  className={`p-3 rounded-xl border-2 cursor-pointer transition ${
+                  className={`p-3 rounded-lg border-2 cursor-pointer transition ${
                     isActive === status
                       ? "border-[#333] bg-[#efefef]"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-gray-200 hover:border-gray-400"
                   }`}
                 >
                   <p className="font-semibold text-[#333]">
@@ -297,7 +294,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             </label>
 
             {selectedSpecialityIds.length > 0 ? (
-              <div className="mb-4 p-3 bg-[#efefef] rounded-xl">
+              <div className="mb-4 p-3 bg-[#efefef] rounded-lg">
                 <div className="flex flex-wrap gap-2">
                   {selectedSpecialityIds.map((specialityId) => {
                     const speciality = specialities.find(
@@ -379,7 +376,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                     addSpeciality(speciality.id);
                     setOpenSpecialityModal(false);
                   }}
-                  className="w-full text-left p-3 rounded-xl border border-gray-200 hover:border-[#333] hover:bg-[#efefef] transition cursor-pointer"
+                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#333] hover:bg-[#efefef] transition cursor-pointer"
                 >
                   <p className="font-semibold">{speciality.name}</p>
                 </button>

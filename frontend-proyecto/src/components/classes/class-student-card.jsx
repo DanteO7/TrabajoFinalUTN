@@ -2,7 +2,7 @@ import { Trash2 } from "lucide-react";
 
 export default function ClassStudentCard({ student, onDelete, isPending }) {
   return (
-    <div className="flex items-center justify-between bg-[#f4f0f5] rounded-lg border-b border-gray-300 p-4">
+    <div className="flex items-center justify-between bg-[#f4f0f5] rounded-lg border border-gray-400 p-4">
       <div>
         <p className="font-semibold text-[#333]">
           {student.name} {student.surname}

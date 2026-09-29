@@ -13,8 +13,9 @@ export default function Profile() {
         <Navbar user={user} />
         <div className="w-full lg:max-w-120 flex flex-col gap-5 text-[18px]">
           <h3 className="text-2xl font-semibold">Ajustes</h3>
-          <LanguageSelector />
-          <ThemeSelector />
+          <p>Próximamente</p>
+          {/* <LanguageSelector />
+          <ThemeSelector /> */}
         </div>
       </div>
     </MainLayout>

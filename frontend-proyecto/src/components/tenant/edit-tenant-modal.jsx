@@ -222,7 +222,7 @@ export default function EditTenantModal({ tenant, close }) {
                     key={platform.name}
                     type="button"
                     onClick={() => handleAddNetwork(platform.name)}
-                    className="text-xs bg-[#f1eef3] hover:bg-[#eae8ec] border border-gray-300 px-3 py-1 rounded-full transition duration-150 cursor-pointer"
+                    className="text-xs bg-[#f1eef3] hover:bg-[#eae8ec] border border-gray-400 px-3 py-1 rounded-full transition duration-150 cursor-pointer"
                   >
                     + {platform.label}
                   </button>
@@ -269,7 +269,7 @@ export default function EditTenantModal({ tenant, close }) {
                           }
                           placeholder="Ej: 5491234567890"
                           disabled={isSubmitting || mutation.isPending}
-                          className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#f1eef3]"
+                          className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-400 border-[1.7px] bg-[#f1eef3]"
                         />
 
                         <p className="text-xs text-gray-500 mt-1">
@@ -285,7 +285,7 @@ export default function EditTenantModal({ tenant, close }) {
                         }
                         placeholder={`https://${platform}.com/...`}
                         disabled={isSubmitting || mutation.isPending}
-                        className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-300 border-[1.7px] bg-[#f1eef3]"
+                        className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-400 border-[1.7px] bg-[#f1eef3]"
                       />
                     )}
                   </div>

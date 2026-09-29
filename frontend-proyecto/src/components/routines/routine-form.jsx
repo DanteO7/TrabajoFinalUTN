@@ -190,7 +190,7 @@ export default function RoutineForm({ tenantId, close }) {
                   const index = exercise.originalIndex;
 
                   return (
-                    <div key={exercise.id} className="border rounded-xl p-4">
+                    <div key={exercise.id} className="border rounded-lg p-4">
                       <div className="flex justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
@@ -250,7 +250,7 @@ export default function RoutineForm({ tenantId, close }) {
                 })}
             </div>
           ) : (
-            <div className="border rounded-xl p-5 text-center text-gray-500">
+            <div className="border border-gray-400 rounded-lg p-5 text-center text-gray-500">
               Todavía no agregaste ejercicios.
             </div>
           )}

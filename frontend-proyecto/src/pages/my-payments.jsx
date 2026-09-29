@@ -181,7 +181,7 @@ export default function MyPayments() {
             {isLoading ? (
               <Loading />
             ) : isError ? (
-              <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700 mt-8">
+              <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700 mt-8">
                 No se pudieron cargar tus pagos.
               </div>
             ) : (

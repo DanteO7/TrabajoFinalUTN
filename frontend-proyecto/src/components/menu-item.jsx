@@ -15,7 +15,7 @@ export default function MenuItem({ href, icon: Icon, children, onClick }) {
       onClick={onClick}
       className={`
         flex items-center gap-2.5
-        px-3 py-2 rounded-xl
+        px-3 py-2 rounded-lg
         transition-all duration-200
         ${
           active

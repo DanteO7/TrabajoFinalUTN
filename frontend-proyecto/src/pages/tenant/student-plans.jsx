@@ -52,7 +52,7 @@ export default function StudentPlans({ tenantId }) {
             Volver
           </button>
 
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function StudentPlans({ tenantId }) {
               />
             ))
           ) : (
-            <div className="col-span-full border rounded-xl py-16 text-center">
+            <div className="col-span-full border rounded-lg py-16 text-center">
               <h3 className="text-xl font-semibold">No hay planes</h3>
 
               <p className="text-gray-500 mt-2 mb-6">

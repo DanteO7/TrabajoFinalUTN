@@ -55,7 +55,7 @@ export default function Professors({ tenantId }) {
         {isLoading ? (
           <Loading />
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -93,7 +93,7 @@ export default function Professors({ tenantId }) {
                   <div
                     key={professor.id}
                     onClick={() => setSelectedProfessor(professor)}
-                    className="cursor-pointer rounded-xl border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    className="cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-xl">
@@ -134,7 +134,7 @@ export default function Professors({ tenantId }) {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-xl text-center">
+                <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
                     Todavía no hay profesores
                   </h3>

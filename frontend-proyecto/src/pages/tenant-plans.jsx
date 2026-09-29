@@ -47,7 +47,7 @@ export default function TenantPlans() {
             Volver
           </button>
 
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         </div>
@@ -85,7 +85,7 @@ export default function TenantPlans() {
               <TenantPlanCard key={plan.id} plan={plan} onEdit={handleEdit} />
             ))
           ) : (
-            <div className="col-span-full border rounded-xl py-16 text-center">
+            <div className="col-span-full border rounded-lg py-16 text-center">
               <h3 className="text-xl font-semibold">No hay planes</h3>
               <p className="text-gray-500 mt-2 mb-6">
                 Creá un nuevo plan para comenzar.
@@ -93,7 +93,7 @@ export default function TenantPlans() {
 
               <button
                 onClick={() => setOpenCreateForm(true)}
-                className="bg-[#333] text-white px-5 py-2 rounded-xl hover:bg-gray-700 transition cursor-pointer"
+                className="bg-[#333] text-white px-5 py-2 rounded-lg hover:bg-gray-700 transition cursor-pointer"
               >
                 + Crear plan
               </button>
