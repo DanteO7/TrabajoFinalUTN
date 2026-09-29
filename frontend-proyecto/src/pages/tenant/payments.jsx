@@ -55,8 +55,6 @@ export default function Payments({ tenantId }) {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
   const [openModal, setOpenModal] = useState(false);
 
-  const canCreatePayments = useHasPermission(tenantId, "PAYMENT_CREATE");
-
   const userTenantPermissions = useTenantStore(
     (state) => state.userPermissionsInTenant[tenantId],
   );
@@ -65,8 +63,21 @@ export default function Payments({ tenantId }) {
 
   const hasAccessToTenant = userTenantPermissions?.hasAccessToTenant === true;
 
-  const canManageBusiness =
-    userTenantPermissions?.roles?.includes("TENANT") || canCreatePayments;
+  const roles = (userTenantPermissions?.roles || []).map((role) =>
+    role.toUpperCase(),
+  );
+
+  const isTenant = roles.includes("TENANT");
+  const isProfessor = roles.includes("PROFESSOR");
+  const isStudent = roles.includes("STUDENT");
+
+  const canReadPayments = useHasPermission(tenantId, "PAYMENT_READ");
+
+  const canCreatePayments = useHasPermission(tenantId, "PAYMENT_CREATE");
+
+  const canSeeReceivedPayments = (isTenant || isProfessor) && canReadPayments;
+
+  const canSeeOwnPayments = isStudent && !isTenant && !isProfessor;
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -78,21 +89,28 @@ export default function Payments({ tenantId }) {
     mutationFn: () => disconnectMercadoPago(tenantId),
     onSuccess: () => {
       queryClient.invalidateQueries(["mercadoPagoStatus", tenantId]);
+
       setSuccessMessage("Cuenta de Mercado Pago desvinculada correctamente");
+
       setSuccessModal(true);
       setBackendError(null);
+
       setTimeout(() => {
         setSuccessModal(false);
       }, 2000);
     },
     onError: (error) => {
       const data = error?.response?.data;
+
       let msg = "Ocurrió un error al desvincular Mercado Pago";
 
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
+      if (typeof data === "string") {
+        msg = data;
+      } else if (data?.errors) {
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
+      } else if (data?.title) {
+        msg = data.title;
+      }
 
       setBackendError(msg);
       setErrorModal(true);
@@ -106,7 +124,7 @@ export default function Payments({ tenantId }) {
   } = useQuery({
     queryKey: ["tenantPayments", tenantId, selectedYear, selectedMonth],
     queryFn: () => getTenantPayments(tenantId, selectedYear, selectedMonth),
-    enabled: rolesLoaded && hasAccessToTenant && canManageBusiness,
+    enabled: rolesLoaded && hasAccessToTenant && canSeeReceivedPayments,
   });
 
   const {
@@ -116,7 +134,7 @@ export default function Payments({ tenantId }) {
   } = useQuery({
     queryKey: ["myTenantPayments", tenantId, selectedYear, selectedMonth],
     queryFn: () => getMyPaymentsByTenant(tenantId, selectedYear, selectedMonth),
-    enabled: rolesLoaded && hasAccessToTenant && !canManageBusiness,
+    enabled: rolesLoaded && hasAccessToTenant && canSeeOwnPayments,
   });
 
   const {
@@ -126,27 +144,31 @@ export default function Payments({ tenantId }) {
   } = useQuery({
     queryKey: ["myTenantStatus", tenantId],
     queryFn: () => getMyTenantPaymentStatus(tenantId),
-    enabled: rolesLoaded && hasAccessToTenant && !canManageBusiness,
+    enabled: rolesLoaded && hasAccessToTenant && canSeeOwnPayments,
   });
 
   const { data: mercadoPagoStatus, isLoading: isLoadingMercadoPago } = useQuery(
     {
       queryKey: ["mercadoPagoStatus", tenantId],
       queryFn: () => getMercadoPagoStatus(tenantId),
-      enabled: rolesLoaded && hasAccessToTenant && canManageBusiness,
+      enabled: rolesLoaded && hasAccessToTenant && isTenant,
     },
   );
 
   const tenantName =
     myTenantStatus?.tenantName || tenantPayments[0]?.tenantName || "Mi negocio";
 
-  const isLoading = canManageBusiness
+  const isLoading = canSeeReceivedPayments
     ? isLoadingTenantPayments || isLoadingMercadoPago
-    : isLoadingMyTenantPayments || isLoadingMyTenantStatus;
+    : canSeeOwnPayments
+      ? isLoadingMyTenantPayments || isLoadingMyTenantStatus
+      : false;
 
-  const isError = canManageBusiness
+  const isError = canSeeReceivedPayments
     ? isTenantPaymentsError
-    : isMyTenantPaymentsError || isMyTenantStatusError;
+    : canSeeOwnPayments
+      ? isMyTenantPaymentsError || isMyTenantStatusError
+      : false;
 
   const goToPreviousMonth = () => {
     if (selectedMonth === 1) {
@@ -168,9 +190,11 @@ export default function Payments({ tenantId }) {
 
   const mercadoPagoMutation = useMutation({
     mutationFn: () => createMercadoPagoStudentPayment(tenantId),
+
     onSuccess: (data) => {
       window.location.href = data.checkoutUrl;
     },
+
     onError: (error) => {
       console.error("Error al crear el pago con Mercado Pago:", error);
     },
@@ -190,11 +214,11 @@ export default function Payments({ tenantId }) {
         {!rolesLoaded ? (
           <Loading />
         ) : !hasAccessToTenant ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : isError ? (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-4 text-red-700">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             Esta página no existe o no tienes acceso.
           </div>
         ) : (
@@ -203,8 +227,8 @@ export default function Payments({ tenantId }) {
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">Pagos</h1>
 
               <p className="text-gray-500 mt-3">
-                {canManageBusiness
-                  ? "Gestioná los pagos de tu negocio y consultá los pagos que realizaste."
+                {canSeeReceivedPayments
+                  ? "Gestioná los pagos de tu negocio y consultá los pagos recibidos."
                   : "Consultá tus pagos y el estado de tu cuota."}
               </p>
             </div>
@@ -213,74 +237,78 @@ export default function Payments({ tenantId }) {
               <Loading />
             ) : (
               <>
-                {canManageBusiness && (
+                {canSeeReceivedPayments && (
                   <>
-                    <div className="mt-8 rounded-lg bg-[#EFECF0] border border-gray-500 p-6 shadow-md">
-                      <div className="flex flex-col min-[700px]:grid min-[700px]:grid-cols-2 items-center min-[700px]:justify-between gap-5">
-                        <div className="flex gap-5 items-center">
-                          <SiMercadopago
-                            className="hidden min-[900px]:flex"
-                            size={40}
-                          />
-                          <div>
-                            <div className="flex gap-3 items-center">
-                              <SiMercadopago
-                                className="flex min-[900px]:hidden"
-                                size={40}
-                              />
-                              <h2 className="text-xl font-semibold">
-                                Mercado Pago
-                              </h2>
+                    {isTenant && (
+                      <div className="mt-8 rounded-lg bg-[#EFECF0] border border-gray-400 p-6 shadow-md">
+                        <div className="flex flex-col min-[700px]:grid min-[700px]:grid-cols-2 items-center min-[700px]:justify-between gap-5">
+                          <div className="flex gap-5 items-center">
+                            <SiMercadopago
+                              className="hidden min-[900px]:flex"
+                              size={40}
+                            />
+
+                            <div>
+                              <div className="flex gap-3 items-center">
+                                <SiMercadopago
+                                  className="flex min-[900px]:hidden"
+                                  size={40}
+                                />
+
+                                <h2 className="text-xl font-semibold">
+                                  Mercado Pago
+                                </h2>
+                              </div>
+
+                              {mercadoPagoStatus?.connected ? (
+                                <p className="text-green-600 mt-1">
+                                  Cuenta conectada correctamente
+                                </p>
+                              ) : (
+                                <p className="text-gray-500 mt-1">
+                                  Conectá tu cuenta para recibir pagos mediante
+                                  Mercado Pago.
+                                </p>
+                              )}
                             </div>
-
-                            {mercadoPagoStatus?.connected ? (
-                              <p className="text-green-600 mt-1">
-                                Cuenta conectada correctamente
-                              </p>
-                            ) : (
-                              <p className="text-gray-500 mt-1">
-                                Conectá tu cuenta para recibir pagos mediante
-                                Mercado Pago.
-                              </p>
-                            )}
                           </div>
+
+                          {mercadoPagoStatus?.connected ? (
+                            <div className="flex gap-3 max-[700px]:flex-col justify-self-end max-[700px]:w-full">
+                              <BlackButton
+                                text="Cuenta vinculada"
+                                img={<LinkIcon size={18} />}
+                                textSmall={true}
+                                wfit={isSmallScreen}
+                                disabled={true}
+                              />
+
+                              <RedButton
+                                text={
+                                  disconnectMutation.isPending
+                                    ? "Desvinculando..."
+                                    : "Desvincular"
+                                }
+                                textSmall={true}
+                                wfit={isSmallScreen}
+                                disabled={disconnectMutation.isPending}
+                                onClick={() => disconnectMutation.mutate()}
+                              />
+                            </div>
+                          ) : (
+                            <div className="justify-self-end max-[700px]:w-full">
+                              <BlackButton
+                                text="Vincular Mercado Pago"
+                                img={<LinkIcon size={18} />}
+                                textSmall={true}
+                                wfit={isSmallScreen}
+                                onClick={() => connectMercadoPago(tenantId)}
+                              />
+                            </div>
+                          )}
                         </div>
-
-                        {mercadoPagoStatus?.connected ? (
-                          <div className="flex gap-3 max-[700px]:flex-col justify-self-end max-[700px]:w-full">
-                            <BlackButton
-                              text="Cuenta vinculada"
-                              img={<LinkIcon size={18} />}
-                              textSmall={true}
-                              wfit={isSmallScreen}
-                              disabled={true}
-                            />
-
-                            <RedButton
-                              text={
-                                disconnectMutation.isPending
-                                  ? "Desvinculando..."
-                                  : "Desvincular"
-                              }
-                              textSmall={true}
-                              wfit={isSmallScreen}
-                              disabled={disconnectMutation.isPending}
-                              onClick={() => disconnectMutation.mutate()}
-                            />
-                          </div>
-                        ) : (
-                          <div className="justify-self-end max-[700px]:w-full">
-                            <BlackButton
-                              text="Vincular Mercado Pago"
-                              img={<LinkIcon size={18} />}
-                              textSmall={true}
-                              wfit={isSmallScreen}
-                              onClick={() => connectMercadoPago(tenantId)}
-                            />
-                          </div>
-                        )}
                       </div>
-                    </div>
+                    )}
 
                     <div className="flex items-center justify-center gap-4 mt-11">
                       <button
@@ -320,12 +348,14 @@ export default function Payments({ tenantId }) {
                         </p>
                       </div>
 
-                      <BlackButton
-                        text="+ Registrar pago"
-                        onClick={() => setOpenCreateModal(true)}
-                        textSmall={true}
-                        wfit={true}
-                      />
+                      {canCreatePayments && (
+                        <BlackButton
+                          text="+ Registrar pago"
+                          onClick={() => setOpenCreateModal(true)}
+                          textSmall={true}
+                          wfit={true}
+                        />
+                      )}
                     </div>
 
                     <div className="grid gap-6 mt-8 sm:grid-cols-2 xl:grid-cols-3">
@@ -348,10 +378,9 @@ export default function Payments({ tenantId }) {
                     </div>
                   </>
                 )}
-
-                {!canManageBusiness && (
+                {canSeeOwnPayments && (
                   <>
-                    <div className="mt-8 bg-[#EFECF0] rounded-lg border border-gray-500 p-6 shadow-md">
+                    <div className="mt-8 bg-[#EFECF0] rounded-lg border border-gray-400 p-6 shadow-md">
                       <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-6">
                         <div>
                           <h2 className="text-2xl font-semibold">
@@ -373,7 +402,7 @@ export default function Payments({ tenantId }) {
                       </div>
                     </div>
 
-                    <div className="mt-6 bg-[#EFECF0] rounded-lg border border-gray-500 p-6 shadow-md">
+                    <div className="mt-6 bg-[#EFECF0] rounded-lg border border-gray-400 p-6 shadow-md">
                       <h2 className="text-xl font-semibold">
                         Estado de la cuota
                       </h2>
@@ -480,7 +509,7 @@ export default function Payments({ tenantId }) {
                         ))
                       ) : (
                         <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                          No realizaste pagos en{" "}
+                          No hay pagos registrados en{" "}
                           {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
                           {selectedYear}.
                         </div>
@@ -506,7 +535,7 @@ export default function Payments({ tenantId }) {
           name={tenantName}
           close={() => setOpenModal(false)}
           price={
-            canManageBusiness
+            canSeeReceivedPayments
               ? tenantPayments[0]?.tenantPlan?.price
               : myTenantStatus?.planPrice
           }

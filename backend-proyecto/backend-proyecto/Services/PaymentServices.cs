@@ -203,8 +203,15 @@ namespace backend_proyecto.Services
             int year,
             int month)
         {
+            await _permissionServices.CheckPermission(
+                Permissions.PAYMENT_READ,
+                tenantId
+            );
+
             var tenant = await _tenantRepository.GetOneAsync(
-                t => t.Id == tenantId
+                t => t.Id == tenantId,
+                t => t.Professors,
+                t => t.Students
             );
 
             if (tenant == null)
@@ -215,7 +222,10 @@ namespace backend_proyecto.Services
                 );
             }
 
-            if (tenant.OwnerUserId != userId)
+            var isOwner = tenant.OwnerUserId == userId;
+            var isProfessor = tenant.Professors.Any(p => p.UserId == userId);
+
+            if (!isOwner && !isProfessor)
             {
                 throw new HttpResponseError(
                     HttpStatusCode.Forbidden,
