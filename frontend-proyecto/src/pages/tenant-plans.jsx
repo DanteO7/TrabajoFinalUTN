@@ -85,7 +85,7 @@ export default function TenantPlans() {
               <TenantPlanCard key={plan.id} plan={plan} onEdit={handleEdit} />
             ))
           ) : (
-            <div className="col-span-full border rounded-lg py-16 text-center">
+            <div className="col-span-full border border-gray-400 rounded-lg py-16 text-center">
               <h3 className="text-xl font-semibold">No hay planes</h3>
               <p className="text-gray-500 mt-2 mb-6">
                 Creá un nuevo plan para comenzar.

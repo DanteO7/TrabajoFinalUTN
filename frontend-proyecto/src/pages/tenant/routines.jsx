@@ -113,7 +113,7 @@ export default function Routines({ tenantId }) {
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
+                  <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                     <h3 className="text-xl font-semibold">
                       No se encontraron rutinas
                     </h3>
@@ -124,7 +124,7 @@ export default function Routines({ tenantId }) {
                   </div>
                 )
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
+                <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">No hay rutinas</h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">

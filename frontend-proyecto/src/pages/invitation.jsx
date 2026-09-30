@@ -7,6 +7,8 @@ import ErrorModal from "../components/modals/error-modal";
 import SuccessModal from "../components/modals/success-modal";
 import Loading from "../components/loading";
 import { getStudentPlans } from "../services/student-plan";
+import BlackButton from "../components/buttons/black-button";
+import WhiteButton from "../components/buttons/white-button";
 
 export default function Invitation({ token }) {
   const [, setLocation] = useLocation();
@@ -81,7 +83,7 @@ export default function Invitation({ token }) {
   return (
     <MainLayout>
       <div className="w-full max-w-md mx-auto mt-20">
-        <div className="border rounded-2xl shadow-lg p-8 bg-white">
+        <div className="border border-gray-400 rounded-lg shadow-lg p-8 bg-[#EFECF0]">
           <h1 className="text-3xl font-bold text-center mb-2">Invitación</h1>
 
           <p className="text-gray-500 text-center mb-8">
@@ -89,22 +91,21 @@ export default function Invitation({ token }) {
           </p>
 
           <div className="space-y-6">
-            {/* Información de la invitación */}
-            <div className="bg-[#efefef] rounded-lg p-5">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Negocio</p>
               <h2 className="text-2xl font-bold text-[#333]">
                 {invitation?.tenantName}
               </h2>
             </div>
 
-            <div className="bg-[#efefef] rounded-lg p-5">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Rol</p>
               <p className="text-lg font-semibold text-[#333]">
                 {invitation?.role === "Student" ? "Alumno" : "Profesor"}
               </p>
             </div>
 
-            <div className="bg-[#efefef] rounded-lg p-5">
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Válido hasta</p>
               <p className="text-lg font-semibold text-[#333]">
                 {new Date(invitation?.expirationDate).toLocaleDateString(
@@ -127,10 +128,10 @@ export default function Invitation({ token }) {
                       <div
                         key={plan.id}
                         onClick={() => setSelectedPlan(plan.id)}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition ${
+                        className={`p-4 rounded-lg border cursor-pointer transition ${
                           selectedPlan === plan.id
-                            ? "border-[#333] bg-[#efefef]"
-                            : "border-gray-200 hover:border-gray-400"
+                            ? "border-black border-2 bg-[#F4F0F5]"
+                            : "border-gray-400 hover:border-gray-600"
                         }`}
                       >
                         <div className="flex justify-between items-start">
@@ -155,22 +156,20 @@ export default function Invitation({ token }) {
               </div>
             )}
 
-            {/* Botones */}
             <div className="space-y-2">
-              <button
+              <BlackButton
+                text={
+                  mutation.isPending ? "Aceptando..." : "Aceptar invitación"
+                }
+                textSmall
                 onClick={handleAccept}
                 disabled={mutation.isPending}
-                className="w-full bg-[#333] text-white rounded-lg py-3 font-semibold hover:bg-gray-700 transition cursor-pointer disabled:opacity-50"
-              >
-                {mutation.isPending ? "Aceptando..." : "Aceptar invitación"}
-              </button>
-
-              <button
+              />
+              <WhiteButton
+                text="Cancelar"
+                textSmall
                 onClick={() => setLocation("/")}
-                className="w-full bg-gray-200 text-[#333] rounded-lg py-3 font-semibold hover:bg-gray-300 transition cursor-pointer"
-              >
-                Cancelar
-              </button>
+              />
             </div>
           </div>
         </div>

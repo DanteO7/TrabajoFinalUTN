@@ -3,7 +3,7 @@ import BlackButton from "../buttons/black-button";
 
 export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
   return (
-    <div className="border rounded-2xl flex flex-col items-center gap-3 p-6 lg:p-8 lg:px-11 shadow-sm">
+    <div className="border rounded-lg border-gray-400 flex flex-col items-center gap-3 p-6 lg:p-8 lg:px-11 shadow-md">
       <h4 className="text-2xl lg:text-[28px] font-semibold">{plan.name}</h4>
       <span className="font-semibold text-3xl lg:text-[40px] text-[#fc697b]">
         ${plan.price}

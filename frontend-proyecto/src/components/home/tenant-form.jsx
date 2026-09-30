@@ -11,11 +11,18 @@ import Modal from "../modals/modal";
 import SuccessModal from "../modals/success-modal";
 import FormInput from "../inputs/form-input";
 import BlackButton from "../buttons/black-button";
+import { getTurnoFacilPaymentData } from "../../services/payment";
+import { Copy } from "lucide-react";
 
 export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const { data: plans, isLoading } = useQuery({
     queryKey: ["tenantsPlan"],
     queryFn: getTenantPlans,
+  });
+
+  const { data: turnoFacilPaymentData } = useQuery({
+    queryKey: ["turnoFacilPaymentData"],
+    queryFn: getTurnoFacilPaymentData,
   });
 
   const {
@@ -32,6 +39,22 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
       tenantPlanId: selectedPlan?.id || "",
     },
   });
+
+  const [copied, setCopied] = useState(false);
+
+  const copyPaymentData = async (value) => {
+    try {
+      await navigator.clipboard.writeText(value);
+
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("No se pudo copiar:", error);
+    }
+  };
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -129,7 +152,25 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
           <p className="text-sm text-gray-600">Precio mensual</p>
           <p className="text-2xl font-semibold">${currentPlan?.price || 0}</p>
         </div>
+        <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+          <p className="text-sm text-gray-600 mb-2">Alias</p>
 
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-semibold text-[#333] break-all">
+              {turnoFacilPaymentData?.alias}
+            </p>
+
+            <BlackButton
+              type="button"
+              text={copied ? "Copiado" : "Copiar"}
+              textSmall={true}
+              wfit
+              img={copied ? <Check size={16} /> : <Copy size={16} />}
+              onClick={() => copyPaymentData(turnoFacilPaymentData?.alias)}
+              className="flex items-center gap-2 shrink-0 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-black hover:bg-white transition cursor-pointer"
+            />
+          </div>
+        </div>
         <BlackButton text="Contratar" type="submit" textSmall />
       </form>
       {errorModal && (

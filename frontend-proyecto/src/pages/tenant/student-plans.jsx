@@ -97,7 +97,7 @@ export default function StudentPlans({ tenantId }) {
               />
             ))
           ) : (
-            <div className="col-span-full border rounded-lg py-16 text-center">
+            <div className="col-span-full border border-gray-400 rounded-lg py-16 text-center">
               <h3 className="text-xl font-semibold">No hay planes</h3>
 
               <p className="text-gray-500 mt-2 mb-6">

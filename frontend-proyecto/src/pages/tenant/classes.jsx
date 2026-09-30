@@ -213,7 +213,7 @@ export default function Classes({ tenantId }) {
                       </p>
                     </div>
                   ) : (
-                    <div className="border rounded-lg py-16 text-center flex flex-col items-center">
+                    <div className="border border-gray-400 rounded-lg py-16 text-center flex flex-col items-center">
                       <h3 className="text-xl font-semibold">
                         No hay clases este día
                       </h3>
