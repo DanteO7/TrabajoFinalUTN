@@ -1,8 +1,6 @@
-import React from "react";
 import Modal from "./modal";
 import { MdOutlineEmail } from "react-icons/md";
 import { X } from "lucide-react";
-import { useState } from "react";
 
 export default function EmailSentModal({
   close,

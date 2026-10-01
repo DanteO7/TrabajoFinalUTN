@@ -45,6 +45,7 @@ const AppPayments = lazy(() => import("./pages/app-payments"));
 const MercadoPagoResult = lazy(() => import("./pages/mercado-pago-result"));
 const PaymentsResult = lazy(() => import("./pages/payments-result"));
 const MyPayments = lazy(() => import("./pages/my-payments"));
+const CreateTenant = lazy(() => import("./pages/create-tenant"));
 
 const queryClient = new QueryClient();
 
@@ -161,6 +162,10 @@ export default function App() {
 
             <AdminRoute path={"/pagos-app"}>
               <AppPayments />
+            </AdminRoute>
+
+            <AdminRoute path={"/crear-negocio"}>
+              <CreateTenant />
             </AdminRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/alumnos">

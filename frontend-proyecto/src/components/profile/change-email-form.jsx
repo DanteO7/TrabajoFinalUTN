@@ -134,18 +134,13 @@ export default function ChangeEmailForm({ user, close }) {
             />
           </div>
         )}
-        <button
+        <BlackButton
           type="button"
           onClick={handleSendCode}
           disabled={seconds > 0}
-          className={`rounded-[13px] px-3 py-1.5 border-[1.7px] border-[#333] transition-all duration-300 ${
-            seconds > 0
-              ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-              : "hover:bg-gray-300 hover:text-[#333] cursor-pointer text-[#333]"
-          }`}
-        >
-          {seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
-        </button>
+          text={seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
+          textSmall
+        />
 
         {codeSent && (
           <BlackButton

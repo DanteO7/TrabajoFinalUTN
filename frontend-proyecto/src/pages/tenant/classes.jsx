@@ -180,7 +180,7 @@ export default function Classes({ tenantId }) {
                     ))
                   ) : isDateInPast ? (
                     canCreateClass ? (
-                      <div className="border bg-[#EFECF0] rounded-lg py-16 text-center">
+                      <div className="border border-gray-400 bg-[#EFECF0] rounded-lg py-16 text-center">
                         <h3 className="text-xl font-semibold text-red-600">
                           No puedes crear clases para días anteriores
                         </h3>
@@ -213,7 +213,7 @@ export default function Classes({ tenantId }) {
                       </p>
                     </div>
                   ) : (
-                    <div className="border border-gray-400 rounded-lg py-16 text-center flex flex-col items-center">
+                    <div className="border border-gray-400 rounded-lg bg-[#EFECF0] py-16 text-center flex flex-col items-center">
                       <h3 className="text-xl font-semibold">
                         No hay clases este día
                       </h3>

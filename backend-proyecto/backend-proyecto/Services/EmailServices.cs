@@ -112,5 +112,134 @@ namespace backend_proyecto.Services
 
             await _resend.EmailSendAsync(message);
         }
+        public async Task SendTenantRequestEmail(
+            string userEmail,
+            string userName,
+            string tenantName,
+            string planName,
+            IFormFile comprobante,
+            string token)
+        {
+            using var memoryStream = new MemoryStream();
+
+            await comprobante.CopyToAsync(memoryStream);
+
+            var message = new EmailMessage();
+
+            message.From = "turnos@turnofacilapp.com.ar";
+            message.To.Add("dante.orsetti@gmail.com");
+
+            message.Subject =
+                $"Solicitud de nuevo negocio - {tenantName}";
+
+            var reviewUrl = $"https://turnofacilapp.com.ar/crear-negocio?token={Uri.EscapeDataString(token)}";
+
+            message.HtmlBody = $@"
+                <h2>Nueva solicitud de negocio</h2>
+
+                <p>
+                    <strong>Usuario:</strong> {userName}
+                </p>
+
+                <p>
+                    <strong>Email:</strong> {userEmail}
+                </p>
+
+                <p>
+                    <strong>Negocio:</strong> {tenantName}
+                </p>
+
+                <p>
+                    <strong>Plan:</strong> {planName}
+                </p>
+
+                <p>
+                    Se adjunta el comprobante de pago enviado por el usuario.
+                </p>
+
+                <p>
+                    Si el comprobante es correcto, podés crear el negocio
+                    desde el siguiente enlace:
+                </p>
+
+                <p>
+                    <a
+                        href=""{reviewUrl}""
+                        style=""
+                            display:inline-block;
+                            padding:12px 20px;
+                            background-color:#000;
+                            color:#fff;
+                            text-decoration:none;
+                            border-radius:6px;
+                        ""
+                    >
+                        Crear negocio
+                    </a>
+                </p>
+            ";
+
+            message.Attachments ??= new List<EmailAttachment>();
+
+            message.Attachments.Add(new EmailAttachment
+            {
+                Filename = comprobante.FileName,
+                Content = memoryStream.ToArray(),
+                ContentType = comprobante.ContentType
+            });
+
+            await _resend.EmailSendAsync(message);
+        }
+
+        public async Task SendTenantCreatedEmail(
+            string to,
+            string tenantName)
+        {
+            var safeTenantName = System.Net.WebUtility.HtmlEncode(tenantName);
+
+            var message = new EmailMessage();
+
+            message.From = "turnos@turnofacilapp.com.ar";
+            message.To.Add(to);
+            message.Subject = "¡Tu negocio ya está listo en Turno Fácil!";
+
+            message.HtmlBody = $@"
+                <div style=""font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;"">
+                    <h2>¡Tu negocio ya está creado!</h2>
+
+                    <p>
+                        Te informamos que <strong>{safeTenantName}</strong>
+                        ya está creado y listo para usar en Turno Fácil.
+                    </p>
+
+                    <p>
+                        Ya podés ingresar a la plataforma y comenzar a
+                        administrar tu negocio, tus clases y tus alumnos.
+                    </p>
+
+                    <p>
+                        <a
+                            href=""https://turnofacilapp.com.ar/""
+                            style=""
+                                display: inline-block;
+                                padding: 12px 20px;
+                                background-color: #000;
+                                color: #fff;
+                                text-decoration: none;
+                                border-radius: 6px;
+                            ""
+                        >
+                            Ingresar a Turno Fácil
+                        </a>
+                    </p>
+
+                    <p>
+                        ¡Gracias por confiar en nosotros!
+                    </p>
+                </div>
+            ";
+
+            await _resend.EmailSendAsync(message);
+        }
     }
 }

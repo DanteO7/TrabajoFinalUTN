@@ -7,6 +7,7 @@ using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace backend_proyecto.Services
 {
@@ -20,6 +21,8 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IAdminRepository _adminRepository;
         private readonly PermissionServices _permissionServices;
+        private readonly EmailServices _emailServices; 
+        private readonly IDataProtector _tenantRequestProtector;
 
         public TenantServices(
             ITenantRepository tenantRepository,
@@ -29,7 +32,9 @@ namespace backend_proyecto.Services
             IProfessorRepository professorRepository,
             IMapper mapper,
             IAdminRepository adminRepository,
-            PermissionServices permissionServices)
+            PermissionServices permissionServices,
+            EmailServices emailServices,
+            IDataProtectionProvider dataProtectionProvider)
         {
             _tenantRepository = tenantRepository;
             _tenantPlanRepository = tenantPlanRepository;
@@ -37,8 +42,10 @@ namespace backend_proyecto.Services
             _studentRepository = studentRepository;
             _professorRepository = professorRepository;
             _mapper = mapper;
-            _adminRepository = adminRepository; 
+            _adminRepository = adminRepository;
             _permissionServices = permissionServices;
+            _emailServices = emailServices;
+            _tenantRequestProtector = dataProtectionProvider.CreateProtector("TurnoFacil.TenantRequest");
         }
 
         public async Task<List<ResponseTenantDTO>> GetAll(int userId)
@@ -116,8 +123,18 @@ namespace backend_proyecto.Services
             );
         }
 
-        public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO)
+        public async Task<ResponseTenantDTO> CreateOne(CreateTenantDTO createTenantDTO, int userId)
         {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede crear un negocio"
+                );
+            }
+
             var user = await _userRepository.GetOneAsync(p => p.Id == createTenantDTO.OwnerUserId);
             if (user == null)
             {
@@ -149,9 +166,14 @@ namespace backend_proyecto.Services
                 IsActive = true,
                 TenantPlanId = createTenantDTO.TenantPlanId,
                 MonthlyFeeStatus = MonthlyFeeStatus.PAID,
+                PaymentDueDate = DateTime.UtcNow.AddDays(30)
             };
 
             await _tenantRepository.CreateOneAsync(tenant);
+
+            user.HasActiveTenantRequest = false;
+
+            await _userRepository.UpdateOneAsync(user);
 
             // Crear automáticamente el Professor para el dueño
             var professor = new Professor
@@ -337,6 +359,331 @@ namespace backend_proyecto.Services
                 .ToListAsync();
 
             return _mapper.Map<List<ResponseTenantDTO>>(tenants);
+        }
+
+        public async Task RequestTenant(
+            int userId,
+            RequestTenantDTO dto)
+        {
+            var user = await _userRepository.GetOneAsync(
+                u => u.Id == userId
+            );
+
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el usuario."
+                );
+            }
+
+            if (user.HasActiveTenantRequest)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Ya tenés una solicitud de negocio pendiente."
+                );
+            }
+
+            if (dto.Comprobante == null ||
+                dto.Comprobante.Length == 0)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Tenés que adjuntar un comprobante de pago."
+                );
+            }
+
+            if (dto.Comprobante.Length > 5 * 1024 * 1024)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El comprobante no puede superar los 5 MB."
+                );
+            }
+
+            var extension = Path
+                .GetExtension(dto.Comprobante.FileName)
+                .ToLower();
+
+            var allowedExtensions = new[]
+            {
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".pdf"
+            };
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El comprobante debe ser PDF, JPG o PNG."
+                );
+            }
+
+            var plan = await _tenantPlanRepository.GetOneAsync(
+                p => p.Id == dto.TenantPlanId
+            );
+
+            if (plan == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No existe plan de Tenant con el Id = '{dto.TenantPlanId}'"
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El nombre del negocio es obligatorio."
+                );
+            }
+
+            dto.Name = dto.Name.Trim();
+
+            if (dto.Name.Length > 50)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El nombre no puede tener más de 50 caracteres."
+                );
+            }
+
+            var existingTenant = await _tenantRepository.GetOneAsync(
+                t =>
+                    t.OwnerUserId == userId &&
+                    t.Name == dto.Name
+            );
+
+            if (existingTenant != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    $"Ya existe un negocio con el nombre '{dto.Name}' para este usuario."
+                );
+            }
+
+            var tokenData = $"{userId}|{dto.Name}|{dto.TenantPlanId}";
+
+            var token = _tenantRequestProtector.Protect(tokenData);
+
+            await _emailServices.SendTenantRequestEmail(
+                user.Email,
+                $"{user.Name} {user.Surname}",
+                dto.Name,
+                plan.Name,
+                dto.Comprobante,
+                token
+            );
+
+            user.HasActiveTenantRequest = true;
+
+            await _userRepository.UpdateOneAsync(user);
+        }
+
+        private (int userId, string name, int tenantPlanId) GetTenantData(
+            string token)
+        {
+            string data;
+
+            try
+            {
+                data = _tenantRequestProtector.Unprotect(token);
+            }
+            catch
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El enlace no es válido."
+                );
+            }
+
+            var parts = data.Split('|');
+
+            if (parts.Length != 3)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El enlace no es válido."
+                );
+            }
+
+            if (!int.TryParse(parts[0], out var userId))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El usuario del enlace no es válido."
+                );
+            }
+
+            if (!int.TryParse(parts[2], out var tenantPlanId))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El plan del enlace no es válido."
+                );
+            }
+
+            return (
+                userId,
+                parts[1],
+                tenantPlanId
+            );
+        }
+
+        public async Task<object> GetTenantDataFromToken(
+            int userId,
+            string token)
+        {
+            var isAdmin =
+                await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede consultar los negocios sin pagar"
+                );
+            }
+
+            var data = GetTenantData(token);
+
+            var user = await _userRepository.GetOneAsync(
+                u => u.Id == data.userId
+            );
+
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el usuario."
+                );
+            }
+
+            var plan = await _tenantPlanRepository.GetOneAsync(
+                p => p.Id == data.tenantPlanId
+            );
+
+            if (plan == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el plan."
+                );
+            }
+
+            return new
+            {
+                userId = data.userId,
+                userName = $"{user.Name} {user.Surname}",
+                userEmail = user.Email,
+                name = data.name,
+                tenantPlanId = data.tenantPlanId,
+                planName = plan.Name
+            };
+        }
+
+        public async Task<ResponseTenantDTO> CreateTenantFromToken(
+            int userId,
+            CreateTenantFromTokenDTO dto)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede crear negocios."
+                );
+            }
+
+            var tokenData = GetTenantData(dto.Token);
+
+            var name = dto.Name?.Trim();
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El nombre del negocio es obligatorio."
+                );
+            }
+
+            if (name.Length > 50)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El nombre no puede tener más de 50 caracteres."
+                );
+            }
+
+            var plan = await _tenantPlanRepository.GetOneAsync(
+                p => p.Id == dto.TenantPlanId
+            );
+
+            if (plan == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el plan seleccionado."
+                );
+            }
+
+            var createTenantDTO = new CreateTenantDTO
+            {
+                OwnerUserId = tokenData.userId,
+                Name = name,
+                TenantPlanId = dto.TenantPlanId
+            };
+
+            return await CreateOne(createTenantDTO, userId);
+        }
+
+        public async Task SendTenantCreatedEmailToOwner(
+            int adminId,
+            int tenantId)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(adminId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede enviar este correo."
+                );
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el negocio."
+                );
+            }
+
+            var user = await _userRepository.GetOneAsync(
+                u => u.Id == tenant.OwnerUserId
+            );
+
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el propietario del negocio."
+                );
+            }
+
+            await _emailServices.SendTenantCreatedEmail(
+                user.Email,
+                tenant.Name
+            );
         }
     }
 }

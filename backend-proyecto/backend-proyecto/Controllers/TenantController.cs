@@ -109,7 +109,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var tenant = await _tenantServices.CreateOne(createTenantDTO);
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+                var tenant = await _tenantServices.CreateOne(createTenantDTO, userId);
 
                 var user = await _userServices.GetOneById(createTenantDTO.OwnerUserId);
                 var userDto = _mapper.Map<UserWithoutPassDTO>(user);
@@ -220,6 +221,120 @@ namespace backend_proyecto.Controllers
             var tenants = await _tenantServices.GetPendingPaymentTenants(userId);
 
             return Ok(tenants);
+        }
+
+        [HttpPost("request")]
+        [Authorize]
+        public async Task<IActionResult> RequestTenant(
+            [FromForm] RequestTenantDTO dto)
+        {
+            try
+            {
+                var userId = int.Parse(
+                    User.FindFirst("id")!.Value
+                );
+
+                await _tenantServices.RequestTenant(
+                    userId,
+                    dto
+                );
+
+                return Ok(new
+                {
+                    message = "Solicitud enviada correctamente."
+                });
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode(
+                    (int)ex.StatusCode,
+                    ex.Message
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    ex.Message
+                );
+            }
+        }
+
+        [HttpGet("create-from-token")]
+        [Authorize]
+        public async Task<IActionResult> GetTenantDataFromToken(
+            [FromQuery] string token)
+        {
+            try
+            {
+                var userId = int.Parse(
+                    User.FindFirst("id")!.Value
+                );
+
+                var data =
+                    await _tenantServices.GetTenantDataFromToken(
+                        userId,
+                        token
+                    );
+
+                return Ok(data);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode(
+                    (int)ex.StatusCode,
+                    ex.Message
+                );
+            }
+        }
+
+        [HttpPost("create-from-token")]
+        [Authorize]
+        public async Task<IActionResult> CreateTenantFromToken(
+            [FromBody] CreateTenantFromTokenDTO dto)
+        {
+            try
+            {
+                var userId = int.Parse(
+                    User.FindFirst("id")!.Value
+                );
+
+                var result =
+                    await _tenantServices.CreateTenantFromToken(
+                        userId,
+                        dto
+                    );
+
+                return Ok(result);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode(
+                    (int)ex.StatusCode,
+                    ex.Message
+                );
+            }
+        }
+
+        [HttpPost("{tenantId}/send-email-creation")]
+        [Authorize]
+        public async Task<IActionResult> SendTenantCreatedEmail(int tenantId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+
+                await _tenantServices.SendTenantCreatedEmailToOwner(
+                    userId,
+                    tenantId
+                );
+
+                return Ok(new { message = "Correo enviado correctamente." });
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
         }
     }
 }

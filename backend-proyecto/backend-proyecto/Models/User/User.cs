@@ -9,6 +9,7 @@
         public string? PhoneNumber { get; set; }
         public int? Age { get; set; }
         public int? Weight { get; set; }
-        public string Password { get; set; } = null!;
+        public string Password { get; set; } = null!;    
+        public bool HasActiveTenantRequest { get; set; } = false;
     }
 }

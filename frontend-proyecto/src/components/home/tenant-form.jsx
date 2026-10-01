@@ -4,15 +4,17 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTenantSchema } from "../../schema/tenant-schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createTenant } from "../../services/tenant";
+import { requestTenant } from "../../services/tenant";
 import { getTenantPlans } from "../../services/tenant-plan";
 import ErrorModal from "../modals/error-modal";
 import Modal from "../modals/modal";
-import SuccessModal from "../modals/success-modal";
 import FormInput from "../inputs/form-input";
 import BlackButton from "../buttons/black-button";
 import { getTurnoFacilPaymentData } from "../../services/payment";
 import { Copy } from "lucide-react";
+import { Check } from "lucide-react";
+import ApprovalModal from "../modals/approval-modal";
+import { Upload } from "lucide-react";
 
 export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const { data: plans, isLoading } = useQuery({
@@ -41,6 +43,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   });
 
   const [copied, setCopied] = useState(false);
+  const [comprobante, setComprobante] = useState(null);
 
   const copyPaymentData = async (value) => {
     try {
@@ -62,24 +65,30 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const [succesModal, setSuccesModal] = useState(false);
 
   const mutation = useMutation({
-    mutationKey: ["createTenant"],
-    mutationFn: createTenant,
+    mutationKey: ["requestTenant"],
+    mutationFn: requestTenant,
     onSuccess: () => {
-      setSuccessMessage("Negocio creado correctamente");
+      setSuccessMessage(
+        "Ya recibimos tu formulario y revisaremos el comprobante de pago. Te avisaremos por email cuando tu negocio esté creado o si detectamos algún error con el pago.",
+      );
+
       setSuccesModal(true);
       setBackendError(null);
-
-      setTimeout(() => {
-        close();
-      }, 2000);
     },
+
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al crear tu negocio";
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
+
+      let msg = "Ocurrió un error al enviar la solicitud.";
+
+      if (typeof data === "string") {
+        msg = data;
+      } else if (data?.errors) {
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
+      } else if (data?.title) {
+        msg = data.title;
+      }
+
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -89,7 +98,19 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
   const currentPlan = plans.find((p) => p.id === selectedPlanId);
 
   const onSubmit = (data) => {
-    mutation.mutate(data);
+    if (!comprobante) {
+      setBackendError("Tenés que adjuntar el comprobante de pago.");
+      setErrorModal(true);
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", data.name);
+    formData.append("tenantPlanId", data.tenantPlanId);
+    formData.append("comprobante", comprobante);
+
+    mutation.mutate(formData);
   };
 
   useEffect(() => {
@@ -171,6 +192,58 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
             />
           </div>
         </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Comprobante de pago
+          </label>
+
+          <input
+            id="comprobante"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => {
+              setComprobante(e.target.files?.[0] || null);
+            }}
+            className="sr-only"
+          />
+
+          <label
+            htmlFor="comprobante"
+            className="flex items-center justify-center gap-2 w-full rounded-lg px-3 py-3
+            bg-[#f1eef3] border border-gray-400 text-gray-700
+            hover:bg-[#e9e4ec] hover:border-gray-500
+            transition-all duration-200 cursor-pointer"
+          >
+            <Upload size={18} />
+            <span className="font-medium">
+              {comprobante ? "Cambiar archivo" : "Seleccionar comprobante"}
+            </span>
+          </label>
+
+          <p className="text-xs text-gray-500 mt-1">
+            Formatos permitidos: PDF, JPG o PNG. Máximo 5 MB.
+          </p>
+
+          {comprobante && (
+            <div className="flex items-center gap-2 mt-2 rounded-lg border border-gray-400 bg-[#F4F0F5] px-3 py-2">
+              <span className="text-sm text-gray-700 truncate flex-1">
+                {comprobante.name}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setComprobante(null);
+                  document.getElementById("comprobante").value = "";
+                }}
+                className="text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
+                aria-label="Eliminar comprobante"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          )}
+        </div>
         <BlackButton text="Contratar" type="submit" textSmall />
       </form>
       {errorModal && (
@@ -181,7 +254,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         />
       )}
       {succesModal && (
-        <SuccessModal
+        <ApprovalModal
           close={() => setSuccesModal(false)}
           message={succesMessage}
           isSuccesOrError={true}
