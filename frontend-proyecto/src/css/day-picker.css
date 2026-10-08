@@ -60,3 +60,71 @@
   --rdp-day_button-width: 35px;
   --rdp-day_button-height: 35px; /* También hay de altura */
 }
+
+/* Solo el DayPicker de copiar día */
+.copy-day-picker.rdp-root {
+  --rdp-day_button-width: 30px;
+  --rdp-day_button-height: 30px;
+
+  border-radius: 8px;
+  background-color: #efecf0;
+  border-color: #99a1af;
+}
+
+/* Cada celda */
+.copy-day-picker .rdp-day {
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Día de hoy */
+.copy-day-picker .rdp-day.rdp-today {
+  color: #fc697b !important;
+  font-weight: bold !important;
+}
+
+/* Día seleccionado */
+.copy-day-picker .rdp-day.rdp-selected .rdp-day_button {
+  background-color: #fc697b;
+  color: white;
+  border: none;
+}
+
+/* Quitar outline */
+.copy-day-picker .rdp-day_button:focus,
+.copy-day-picker .rdp-day_button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Focus personalizado */
+.copy-day-picker .rdp-day_button:focus-visible {
+  outline: 2px solid #fc697b;
+  outline-offset: 2px;
+}
+
+/* Flechas */
+.copy-day-picker .rdp-button_previous,
+.copy-day-picker .rdp-button_next {
+  color: #333 !important;
+  transition: all;
+  transition-duration: 200ms;
+}
+
+.copy-day-picker .rdp-button_previous svg,
+.copy-day-picker .rdp-button_next svg {
+  fill: #fc697b !important;
+  transition: all;
+  transition-duration: 200ms;
+}
+
+.copy-day-picker .rdp-button_previous:hover svg,
+.copy-day-picker .rdp-button_next:hover svg {
+  fill: #fa5266;
+}
+
+/* Tamaño de los días */
+.copy-day-picker .rdp-day_button {
+  --rdp-day_button-width: 30px;
+  --rdp-day_button-height: 30px;
+}

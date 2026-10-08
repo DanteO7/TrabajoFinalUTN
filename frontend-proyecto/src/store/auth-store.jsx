@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const handler = (set) => ({
-  isAuthenticated: false,
+  isAuthenticated: null,
   user: null,
   isLoading: true,
 

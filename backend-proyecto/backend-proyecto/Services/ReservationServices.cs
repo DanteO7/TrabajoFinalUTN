@@ -21,7 +21,7 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IWaitlistSubject _waitlistSubject;
         private readonly PermissionServices _permissionServices;
-
+        private readonly ReservationValidationServices _reservationValidationServices;
         public ReservationServices(
             IReservationRepository reservationRepository,
             IClassRepository classRepository,
@@ -30,7 +30,8 @@ namespace backend_proyecto.Services
             IStudentPlanRepository studentPlanRepository,
             IMapper mapper,
             IWaitlistSubject waitlistSubject,
-            PermissionServices permissionServices)
+            PermissionServices permissionServices,
+            ReservationValidationServices reservationValidationServices)
         {
             _reservationRepository = reservationRepository;
             _classRepository = classRepository;
@@ -40,6 +41,7 @@ namespace backend_proyecto.Services
             _mapper = mapper;
             _waitlistSubject = waitlistSubject;
             _permissionServices = permissionServices;
+            _reservationValidationServices = reservationValidationServices;
         }
 
         public async Task<List<ResponseReservationDTO>> CreateMultiple(
@@ -127,7 +129,6 @@ namespace backend_proyecto.Services
                     errors.Add(
                         $"Alumno {studentId}: No encontrado"
                     );
-
                     continue;
                 }
 
@@ -137,7 +138,6 @@ namespace backend_proyecto.Services
                         $"Alumno {student.User.Name} {student.User.Surname}: " +
                         "No pertenece a este tenant"
                     );
-
                     continue;
                 }
 
@@ -154,7 +154,6 @@ namespace backend_proyecto.Services
                         $"Alumno {student.User.Name} {student.User.Surname}: " +
                         "Ya tiene una reserva en esta clase"
                     );
-
                     continue;
                 }
 
@@ -169,115 +168,18 @@ namespace backend_proyecto.Services
                         $"Alumno {student.User.Name} {student.User.Surname}: " +
                         "La clase está llena"
                     );
-
                     continue;
                 }
 
-                var studentPlan =
-                    await _studentPlanRepository.GetOneAsync(
-                        p => p.Id == student.StudentPlanId
+                var validationError =
+                    await _reservationValidationServices.ValidateStudentForClass(
+                        student,
+                        classEntity
                     );
 
-                if (studentPlan == null)
+                if (validationError != null)
                 {
-                    errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
-                        "No tiene plan activo"
-                    );
-
-                    continue;
-                }
-
-                // =====================================================
-                // VALIDAR PAGO
-                // =====================================================
-
-                if (
-                    student.MonthlyFeeStatus ==
-                    MonthlyFeeStatus.OVERDUE
-                )
-                {
-                    errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
-                        "No tiene la cuota al día"
-                    );
-
-                    continue;
-                }
-
-                if (student.PaymentDueDate == null)
-                {
-                    errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
-                        "No tiene un ciclo de clases activo"
-                    );
-
-                    continue;
-                }
-
-                // =====================================================
-                // DETERMINAR EL CICLO DE LA CLASE
-                //
-                // PaymentDueDate representa el FINAL del ciclo actual.
-                //
-                // Ejemplo:
-                //
-                // PaymentDueDate = 17/11
-                // Ciclo = 18/10 → 17/11
-                // =====================================================
-
-                var cycleEnd =
-                    DateOnly.FromDateTime(
-                        student.PaymentDueDate.Value
-                    );
-
-                var cycleStart =
-                    DateOnly.FromDateTime(
-                        student.PaymentDueDate.Value.AddDays(-30)
-                    );
-
-                // Si la clase está después del ciclo actual,
-                // avanzamos ciclos hasta encontrar el que corresponde.
-                while (classEntity.Date > cycleEnd)
-                {
-                    cycleStart = cycleEnd.AddDays(1);
-                    cycleEnd = cycleStart.AddDays(30);
-                }
-
-                // Si por alguna razón la clase quedó antes del
-                // ciclo calculado, no debería poder reservarse.
-                if (classEntity.Date < cycleStart)
-                {
-                    errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
-                        "La clase no pertenece a un ciclo disponible"
-                    );
-
-                    continue;
-                }
-
-                // =====================================================
-                // CONTAR CLASES DEL CICLO
-                // =====================================================
-
-                var reservationsInCycle =
-                    await _reservationRepository.CountAsync(
-                        r =>
-                            r.StudentId == student.Id &&
-                            r.Class.Date >= cycleStart &&
-                            r.Class.Date <= cycleEnd
-                    );
-
-                if (
-                    reservationsInCycle >=
-                    studentPlan.ClassesPerMonth
-                )
-                {
-                    errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
-                        "Alcanzó el límite de clases de su ciclo"
-                    );
-
+                    errors.Add(validationError);
                     continue;
                 }
 

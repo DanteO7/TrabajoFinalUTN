@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Check } from "lucide-react";
 import Modal from "../modals/modal";
 import { getStudents } from "../../services/student";
@@ -10,12 +10,19 @@ import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import { createReservation } from "../../services/reservation";
 import SearchInput from "../inputs/search-input";
+import {
+  addStudentToClassTemplate,
+  getClassTemplates,
+} from "../../services/classTemplate";
 
 export default function AddStudentToClassModal({
   classId,
   tenantId,
   close,
   increaseReservationCount,
+  isTemplate = false,
+  currentClass,
+  onClassUpdated,
 }) {
   const queryClient = useQueryClient();
   const [inputValue, setInputValue] = useState("");
@@ -36,6 +43,15 @@ export default function AddStudentToClassModal({
     enabled: !!classId && !!tenantId,
   });
 
+  const availableStudents = isTemplate
+    ? students?.filter(
+        (student) =>
+          !currentClass.students?.some(
+            (classStudent) => classStudent.studentId === student.id,
+          ),
+      )
+    : students;
+
   const toggleStudent = (studentId) => {
     setSelectedStudents((prev) => {
       if (prev.includes(studentId)) {
@@ -47,19 +63,61 @@ export default function AddStudentToClassModal({
   };
 
   const addMutation = useMutation({
-    mutationFn: () =>
-      createReservation({ classId, tenantId, studentIds: selectedStudents }),
+    mutationFn: async () => {
+      if (isTemplate) {
+        console.log("xd");
+        await Promise.all(
+          selectedStudents.map((studentId) =>
+            addStudentToClassTemplate(classId, studentId),
+          ),
+        );
 
-    onSuccess: () => {
+        return;
+      }
+
+      return createReservation({
+        classId,
+        tenantId,
+        studentIds: selectedStudents,
+      });
+    },
+
+    onSuccess: async () => {
+      if (isTemplate) {
+        const updatedClassTemplates = await queryClient.fetchQuery({
+          queryKey: ["getClassTemplates", tenantId],
+          queryFn: getClassTemplates,
+        });
+
+        const updatedClass = updatedClassTemplates.find(
+          (classTemplate) => classTemplate.id === classId,
+        );
+
+        if (updatedClass) {
+          onClassUpdated(updatedClass);
+        }
+
+        setSuccessModal(true);
+
+        setTimeout(() => {
+          close();
+        }, 2000);
+
+        return;
+      }
+
       increaseReservationCount(selectedStudents.length);
+
       queryClient.invalidateQueries({
         queryKey: ["classStudents", classId],
       });
+
       queryClient.invalidateQueries({
         queryKey: ["getClasses", tenantId],
       });
 
       setSuccessModal(true);
+
       setTimeout(() => {
         close();
       }, 2000);
@@ -67,10 +125,12 @@ export default function AddStudentToClassModal({
 
     onError: (error) => {
       const data = error?.response?.data;
+
       const msg =
         typeof data === "string"
           ? data
           : data?.message || "Error al agregar alumnos";
+
       setErrorMessage(msg);
       setErrorModal(true);
     },
@@ -102,12 +162,12 @@ export default function AddStudentToClassModal({
       )}
 
       <div className="max-h-96 overflow-y-auto space-y-2">
-        {students.length === 0 ? (
+        {availableStudents.length === 0 ? (
           <p className="text-gray-500 text-center py-4">
             No se encontraron alumnos disponibles
           </p>
         ) : (
-          students.map((student) => {
+          availableStudents.map((student) => {
             const isSelected = selectedStudents.includes(student.id);
             return (
               <div

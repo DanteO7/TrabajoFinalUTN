@@ -80,6 +80,8 @@ builder.Services.AddScoped<ProfessorPermissionServices>();
 builder.Services.AddScoped<ExerciseServices>();
 builder.Services.AddScoped<RoutineServices>();
 builder.Services.AddScoped<MercadoPagoServices>();
+builder.Services.AddScoped<ClassTemplateServices>();
+builder.Services.AddScoped<ReservationValidationServices>();
 
 builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
 builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();
@@ -106,6 +108,8 @@ builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IRoutineRepository, RoutineRepository>();
+builder.Services.AddScoped<IClassTemplateRepository, ClassTemplateRepository>();
+builder.Services.AddScoped<IClassTemplateStudentRepository, ClassTemplateStudentRepository>();
 
 
 // Backgound Services

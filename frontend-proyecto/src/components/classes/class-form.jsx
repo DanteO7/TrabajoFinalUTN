@@ -7,14 +7,24 @@ import Modal from "../modals/modal";
 import FormInput from "../inputs/form-input";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { createClassSchema } from "../../schema/class-schema";
+import {
+  createClassSchema,
+  createClassTemplateSchema,
+} from "../../schema/class-schema";
 import { createClass } from "../../services/class";
 import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
+import { createClassTemplate } from "../../services/classTemplate";
 
-export default function ClassForm({ tenantId, defaultDate, close }) {
+export default function ClassForm({
+  tenantId,
+  defaultDate,
+  defaultDayOfWeek,
+  close,
+  isTemplate = false,
+}) {
   const queryClient = useQueryClient();
 
   const {
@@ -22,10 +32,13 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createClassSchema),
+    resolver: zodResolver(
+      isTemplate ? createClassTemplateSchema : createClassSchema,
+    ),
     mode: "onTouched",
     defaultValues: {
       date: defaultDate || "",
+      dayOfWeek: defaultDayOfWeek ?? "",
     },
   });
 
@@ -46,14 +59,22 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
   });
 
   const mutation = useMutation({
-    mutationFn: createClass,
+    mutationFn: (data) =>
+      isTemplate ? createClassTemplate(data) : createClass(data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["getClasses", tenantId],
+        queryKey: isTemplate
+          ? ["getClassTemplates", tenantId]
+          : ["getClasses", tenantId],
       });
 
-      setSuccessMessage("Clase creada correctamente");
+      setSuccessMessage(
+        isTemplate
+          ? "Clase modelo creada correctamente"
+          : "Clase creada correctamente",
+      );
+
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -77,6 +98,19 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
   });
 
   const onSubmit = (form) => {
+    if (isTemplate) {
+      mutation.mutate({
+        dayOfWeek: Number(form.dayOfWeek),
+        activityId: Number(form.activityId),
+        professorId: Number(form.professorId),
+        startTime: `${form.startTime}:00`,
+        endTime: `${form.endTime}:00`,
+        maxCapacity: Number(form.maxCapacity),
+      });
+
+      return;
+    }
+
     mutation.mutate({
       activityId: Number(form.activityId),
       professorId: Number(form.professorId),
@@ -146,12 +180,38 @@ export default function ClassForm({ tenantId, defaultDate, close }) {
           )}
         </div>
 
-        <FormInput
-          type="date"
-          label="Fecha"
-          register={register("date")}
-          error={errors.date}
-        />
+        {isTemplate ? (
+          <div>
+            <label className="block text-sm font-medium mb-1">Día</label>
+
+            <select
+              {...register("dayOfWeek")}
+              className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+            >
+              <option value="">Seleccionar</option>
+              <option value="1">Lunes</option>
+              <option value="2">Martes</option>
+              <option value="3">Miércoles</option>
+              <option value="4">Jueves</option>
+              <option value="5">Viernes</option>
+              <option value="6">Sábado</option>
+              <option value="0">Domingo</option>
+            </select>
+
+            {errors.dayOfWeek && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.dayOfWeek.message}
+              </p>
+            )}
+          </div>
+        ) : (
+          <FormInput
+            type="date"
+            label="Fecha"
+            register={register("date")}
+            error={errors.date}
+          />
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <FormInput

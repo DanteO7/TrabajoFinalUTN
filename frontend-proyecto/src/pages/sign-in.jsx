@@ -33,7 +33,6 @@ export default function SignIn() {
     mutationFn: signIn,
     onSuccess: (data) => {
       clearPermissions();
-      console.log(data);
 
       login(data);
 

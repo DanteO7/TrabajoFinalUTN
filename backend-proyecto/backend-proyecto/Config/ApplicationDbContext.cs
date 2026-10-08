@@ -33,7 +33,8 @@ namespace backend_proyecto.Config
         public DbSet<Routine> Routines { get; set; }
         public DbSet<News> News { get; set; }
         public DbSet<NewsRead> NewsRead { get; set; }
-
+        public DbSet<ClassTemplate> ClassTemplates { get; set; } = null!;
+        public DbSet<ClassTemplateStudent> ClassTemplateStudents { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

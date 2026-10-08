@@ -1,14 +1,23 @@
 import { Trash2 } from "lucide-react";
 
-export default function ClassStudentCard({ student, onDelete, isPending }) {
+export default function ClassStudentCard({
+  student,
+  onDelete,
+  isPending,
+  isTemplate = false,
+}) {
   return (
     <div className="flex items-center justify-between bg-[#f4f0f5] rounded-lg border border-gray-400 p-4">
       <div>
         <p className="font-semibold text-[#333]">
-          {student.name} {student.surname}
+          {isTemplate
+            ? `${student.studentName} ${student.studentSurname}`
+            : `${student.name} ${student.surname}`}
         </p>
 
-        <p className="text-sm text-gray-500">{student.email}</p>
+        {!isTemplate && (
+          <p className="text-sm text-gray-500">{student.email}</p>
+        )}
       </div>
 
       <button

@@ -1,11 +1,10 @@
-import { Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import Modal from "../modals/modal";
 import Loading from "../loading";
 import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
-import { FiPlus } from "react-icons/fi";
 
 import { getStudentsByClass } from "../../services/class";
 import { deleteReservation } from "../../services/reservation";
@@ -15,6 +14,10 @@ import ClassStudentCard from "./class-student-card";
 import AddStudentToClassModal from "./add-student-to-class-modal";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import {
+  getClassTemplates,
+  removeStudentFromClassTemplate,
+} from "../../services/classTemplate";
 
 export default function ClassStudentsModal({
   currentClass,
@@ -24,6 +27,8 @@ export default function ClassStudentsModal({
   formatDateWithDay,
   decreaseReservationCount,
   increaseReservationCount,
+  isTemplate = false,
+  onClassUpdated,
 }) {
   const classId = currentClass.id;
   const queryClient = useQueryClient();
@@ -40,12 +45,43 @@ export default function ClassStudentsModal({
   const { data: students = [], isLoading } = useQuery({
     queryKey: ["classStudents", classId],
     queryFn: () => getStudentsByClass(classId),
+    enabled: !isTemplate,
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (reservationId) => deleteReservation(reservationId),
+  const displayedStudents = isTemplate ? currentClass.students : students;
 
-    onSuccess: () => {
+  const deleteMutation = useMutation({
+    mutationFn: (student) =>
+      isTemplate
+        ? removeStudentFromClassTemplate(classId, student.studentId)
+        : deleteReservation(student.reservationId),
+
+    onSuccess: async () => {
+      if (isTemplate) {
+        const updatedClassTemplates = await queryClient.fetchQuery({
+          queryKey: ["getClassTemplates", tenantId],
+          queryFn: getClassTemplates,
+        });
+
+        const updatedClass = updatedClassTemplates.find(
+          (classTemplate) => classTemplate.id === classId,
+        );
+
+        if (updatedClass) {
+          onClassUpdated(updatedClass);
+        }
+
+        setReservationToDelete(null);
+        setSuccessMessage("Alumno eliminado de la clase modelo");
+        setSuccessModal(true);
+
+        setTimeout(() => {
+          setSuccessModal(false);
+        }, 2000);
+
+        return;
+      }
+
       queryClient.invalidateQueries({
         queryKey: ["classStudents", classId],
       });
@@ -55,6 +91,7 @@ export default function ClassStudentsModal({
       });
 
       decreaseReservationCount(1);
+
       setReservationToDelete(null);
       setSuccessMessage("Alumno eliminado de la clase");
       setSuccessModal(true);
@@ -69,10 +106,13 @@ export default function ClassStudentsModal({
 
       let msg = "Ocurrió un error";
 
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
+      if (typeof data === "string") {
+        msg = data;
+      } else if (data?.errors) {
         msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.message) msg = data.message;
+      } else if (data?.message) {
+        msg = data.message;
+      }
 
       setReservationToDelete(null);
       setBackendError(msg);
@@ -93,21 +133,21 @@ export default function ClassStudentsModal({
       <div className="flex justify-center items-center">
         <div></div>
         <p className=" text-center text-gray-500 mt-2">
-          {students.length} / {maxCapacity} alumnos
+          {displayedStudents?.length || "0"} / {maxCapacity} alumnos
         </p>
       </div>
 
-      {isLoading ? (
+      {!isTemplate && isLoading ? (
         <div className="mt-8">
           <Loading />
         </div>
-      ) : students.length === 0 ? (
+      ) : displayedStudents?.length === 0 ? (
         <div className="mt-8 text-center text-gray-500">
           No hay alumnos inscriptos.
         </div>
       ) : (
         <div className="space-y-3 mt-8 max-h-100 overflow-y-auto">
-          {students.map((student) => (
+          {displayedStudents?.map((student) => (
             <ClassStudentCard
               key={student.studentId}
               student={student}
@@ -115,6 +155,7 @@ export default function ClassStudentsModal({
               formatDateWithDay={formatDateWithDay}
               onDelete={() => setReservationToDelete(student)}
               isPending={deleteMutation.isPending}
+              isTemplate={isTemplate}
             />
           ))}
         </div>
@@ -134,16 +175,22 @@ export default function ClassStudentsModal({
       </div>
       {reservationToDelete && (
         <ConfirmModal
-          title="¿Cancelar esta reserva?"
-          message={`Estás por cancelar la reserva de ${
-            reservationToDelete.name
-          } del día ${formatDateWithDay(currentClass.date)} a las ${currentClass.startTime.slice(
+          title={isTemplate ? "¿Eliminar alumno?" : "¿Cancelar esta reserva?"}
+          message={`Estás por ${
+            isTemplate ? "eliminar a" : "cancelar la reserva de"
+          } ${
+            isTemplate
+              ? `${reservationToDelete.studentName} ${reservationToDelete.studentSurname}`
+              : reservationToDelete.name
+          } del día ${
+            isTemplate
+              ? formatDateWithDay(currentClass.dayOfWeek)
+              : formatDateWithDay(currentClass.date)
+          } a las ${currentClass.startTime.slice(
             0,
             5,
           )} - ${currentClass.endTime.slice(0, 5)}.`}
-          onConfirm={() =>
-            deleteMutation.mutate(reservationToDelete.reservationId)
-          }
+          onConfirm={() => deleteMutation.mutate(reservationToDelete)}
           close={() => setReservationToDelete(null)}
           isPending={deleteMutation.isPending}
         />
@@ -170,6 +217,9 @@ export default function ClassStudentsModal({
           classId={classId}
           tenantId={tenantId}
           increaseReservationCount={increaseReservationCount}
+          isTemplate={isTemplate}
+          currentClass={currentClass}
+          onClassUpdated={onClassUpdated}
         />
       )}
     </Modal>

@@ -15,7 +15,10 @@ import {
 } from "../../services/reservation";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { updateClassSchema } from "../../schema/class-schema";
+import {
+  updateClassSchema,
+  updateClassTemplateSchema,
+} from "../../schema/class-schema";
 import { useAuthStore } from "../../store/auth-store";
 import { useHasPermission } from "../../store/tenant-store";
 import { getStudentByUser } from "../../services/student";
@@ -29,8 +32,17 @@ import {
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
+import {
+  deleteClassTemplate,
+  updateClassTemplate,
+} from "../../services/classTemplate";
 
-export default function ClassModal({ classItem, tenantId, close }) {
+export default function ClassModal({
+  classItem,
+  tenantId,
+  close,
+  isTemplate = false,
+}) {
   const queryClient = useQueryClient();
 
   const { user } = useAuthStore();
@@ -50,13 +62,26 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const [studentsModal, setStudentsModal] = useState(false);
   const [confirmModal, setConfirmModal] = useState(false);
 
-  const classStart = new Date(
-    `${currentClass.date.split("T")[0]}T${currentClass.startTime}`,
-  );
-
-  const classStarted = new Date() >= classStart;
+  const classStarted = isTemplate
+    ? false
+    : new Date() >=
+      new Date(`${currentClass.date.split("T")[0]}T${currentClass.startTime}`);
 
   const formatDateWithDay = (dateString) => {
+    if (isTemplate) {
+      const days = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+      ];
+
+      return days[Number(dateString)];
+    }
+
     const [year, month, day] = dateString.split("T")[0].split("-");
 
     const date = new Date(year, month - 1, day);
@@ -75,12 +100,15 @@ export default function ClassModal({ classItem, tenantId, close }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(updateClassSchema),
+    resolver: zodResolver(
+      isTemplate ? updateClassTemplateSchema : updateClassSchema,
+    ),
     mode: "onTouched",
     defaultValues: {
       activityId: currentClass.activityId?.toString() || "",
       professorId: currentClass.professorId?.toString() || "",
-      date: currentClass.date,
+      date: currentClass.date || "",
+      dayOfWeek: currentClass.dayOfWeek?.toString() || "",
       startTime: currentClass.startTime?.slice(0, 5) || "",
       endTime: currentClass.endTime?.slice(0, 5) || "",
       maxCapacity: currentClass.maxCapacity?.toString() || "",
@@ -100,19 +128,19 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const { data: currentStudent } = useQuery({
     queryKey: ["getStudentByUser", tenantId, user?.id],
     queryFn: () => getStudentByUser(tenantId),
-    enabled: canCreateReservation && !!user?.id,
+    enabled: !isTemplate && canCreateReservation && !!user?.id,
   });
 
   const { data: reservations = [] } = useQuery({
     queryKey: ["getReservationsByStudentId", currentStudent?.id],
     queryFn: () => getReservationsByStudentId(currentStudent.id),
-    enabled: !!currentStudent,
+    enabled: !isTemplate && !!currentStudent,
   });
 
   const { data: waitlists = [] } = useQuery({
     queryKey: ["getWaitlistByStudentId", currentStudent?.id],
     queryFn: () => getWaitlistByStudentId(currentStudent.id),
-    enabled: !!currentStudent,
+    enabled: !isTemplate && !!currentStudent,
   });
 
   const currentWaitlist = waitlists.find((w) => w.classId === currentClass.id);
@@ -128,15 +156,22 @@ export default function ClassModal({ classItem, tenantId, close }) {
   const isReserved = !!currentReservation;
 
   const deleteMutation = useMutation({
-    mutationFn: () => deleteClass(currentClass.id),
+    mutationFn: () =>
+      isTemplate
+        ? deleteClassTemplate(currentClass.id)
+        : deleteClass(currentClass.id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["getClasses", tenantId],
+        queryKey: [isTemplate ? "getClassTemplates" : "getClasses", tenantId],
       });
 
       setConfirmModal(false);
-      setSuccessMessage("Clase eliminada correctamente");
+      setSuccessMessage(
+        isTemplate
+          ? "Clase modelo eliminada correctamente"
+          : "Clase eliminada correctamente",
+      );
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -162,26 +197,43 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
   const updateMutation = useMutation({
     mutationFn: (form) =>
-      updateClass(currentClass.id, {
-        activityId: form.activityId ? Number(form.activityId) : undefined,
-
-        professorId: form.professorId ? Number(form.professorId) : undefined,
-
-        date: form.date || undefined,
-
-        startTime: form.startTime ? `${form.startTime}:00` : undefined,
-
-        endTime: form.endTime ? `${form.endTime}:00` : undefined,
-
-        maxCapacity: form.maxCapacity ? Number(form.maxCapacity) : undefined,
-      }),
+      isTemplate
+        ? updateClassTemplate(currentClass.id, {
+            activityId: form.activityId ? Number(form.activityId) : undefined,
+            professorId: form.professorId
+              ? Number(form.professorId)
+              : undefined,
+            dayOfWeek: Number(form.dayOfWeek),
+            startTime: form.startTime ? `${form.startTime}:00` : undefined,
+            endTime: form.endTime ? `${form.endTime}:00` : undefined,
+            maxCapacity: form.maxCapacity
+              ? Number(form.maxCapacity)
+              : undefined,
+          })
+        : updateClass(currentClass.id, {
+            activityId: form.activityId ? Number(form.activityId) : undefined,
+            professorId: form.professorId
+              ? Number(form.professorId)
+              : undefined,
+            date: form.date || undefined,
+            startTime: form.startTime ? `${form.startTime}:00` : undefined,
+            endTime: form.endTime ? `${form.endTime}:00` : undefined,
+            maxCapacity: form.maxCapacity
+              ? Number(form.maxCapacity)
+              : undefined,
+          }),
 
     onSuccess: (updatedClass) => {
       queryClient.invalidateQueries({
-        queryKey: ["getClasses", tenantId],
+        queryKey: [isTemplate ? "getClassTemplates" : "getClasses", tenantId],
       });
 
-      setSuccessMessage("Clase actualizada correctamente");
+      setSuccessMessage(
+        isTemplate
+          ? "Clase modelo actualizada correctamente"
+          : "Clase actualizada correctamente",
+      );
+
       setSuccessModal(true);
       setCurrentClass(updatedClass);
       setEditing(false);
@@ -383,16 +435,29 @@ export default function ClassModal({ classItem, tenantId, close }) {
           </h2>
 
           <p className="text-gray-600 mb-6">
-            {currentClass.professor.user.name}{" "}
-            {currentClass.professor.user.surname}
+            {isTemplate
+              ? `${currentClass.professorName} ${currentClass.professorSurname}`
+              : `${currentClass.professor.user.name} ${currentClass.professor.user.surname}`}
           </p>
 
           <div className="space-y-4 mb-8">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Fecha</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {isTemplate ? "Día" : "Fecha"}
+              </p>
 
               <p className="font-semibold text-[#333]">
-                {formatDateWithDay(currentClass.date)}
+                {isTemplate
+                  ? [
+                      "Domingo",
+                      "Lunes",
+                      "Martes",
+                      "Miércoles",
+                      "Jueves",
+                      "Viernes",
+                      "Sábado",
+                    ][currentClass.dayOfWeek]
+                  : formatDateWithDay(currentClass.date)}
               </p>
             </div>
 
@@ -407,17 +472,18 @@ export default function ClassModal({ classItem, tenantId, close }) {
 
             <div
               className={`bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 ${
-                isFull && "bg-red-100"
+                !isTemplate && isFull && "bg-red-100"
               }`}
             >
               <p className="text-sm text-gray-600 mb-1">
-                {isFull ? "Lleno" : "Disponibilidad"}
+                {isTemplate ? "Alumnos" : isFull ? "Lleno" : "Disponibilidad"}
               </p>
 
               <div className="flex justify-between items-center gap-3">
                 <p className="font-semibold text-[14px] min-[900px]:text-[16px] text-[#333]">
-                  {currentClass.reservationsCount} / {currentClass.maxCapacity}{" "}
-                  alumnos
+                  {isTemplate
+                    ? `${currentClass.students.length} / ${currentClass.maxCapacity} alumnos`
+                    : `${currentClass.reservationsCount} / ${currentClass.maxCapacity} alumnos`}
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -572,12 +638,38 @@ export default function ClassModal({ classItem, tenantId, close }) {
             )}
           </div>
 
-          <FormInput
-            label="Fecha"
-            type="date"
-            register={register("date")}
-            error={errors.date}
-          />
+          {isTemplate ? (
+            <div>
+              <label className="block text-sm font-semibold mb-2">Día</label>
+
+              <select
+                {...register("dayOfWeek")}
+                className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+              >
+                <option value="">Selecciona un día</option>
+                <option value="1">Lunes</option>
+                <option value="2">Martes</option>
+                <option value="3">Miércoles</option>
+                <option value="4">Jueves</option>
+                <option value="5">Viernes</option>
+                <option value="6">Sábado</option>
+                <option value="0">Domingo</option>
+              </select>
+
+              {errors.dayOfWeek && (
+                <p className="text-red-500 text-[13px] mt-1">
+                  {errors.dayOfWeek.message}
+                </p>
+              )}
+            </div>
+          ) : (
+            <FormInput
+              label="Fecha"
+              type="date"
+              register={register("date")}
+              error={errors.date}
+            />
+          )}
 
           <FormInput
             label="Hora de inicio"
@@ -621,9 +713,11 @@ export default function ClassModal({ classItem, tenantId, close }) {
       {confirmModal && (
         <ConfirmModal
           title="¿Eliminar esta clase?"
-          message={`Estás por eliminar la clase del dia ${formatDateWithDay(
-            currentClass.date,
-          )} a las ${currentClass.startTime.slice(
+          message={`Estás por eliminar la clase del día ${
+            isTemplate
+              ? formatDateWithDay(currentClass.dayOfWeek)
+              : formatDateWithDay(currentClass.date)
+          } a las ${currentClass.startTime.slice(
             0,
             5,
           )} - ${currentClass.endTime.slice(0, 5)}.`}
@@ -658,6 +752,10 @@ export default function ClassModal({ classItem, tenantId, close }) {
           formatDateWithDay={formatDateWithDay}
           decreaseReservationCount={decreaseReservationCount}
           increaseReservationCount={increaseReservationCount}
+          isTemplate={isTemplate}
+          onClassUpdated={(updatedClass) => {
+            setCurrentClass(updatedClass);
+          }}
         />
       )}
     </Modal>

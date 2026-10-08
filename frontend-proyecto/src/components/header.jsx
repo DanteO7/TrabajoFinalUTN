@@ -90,7 +90,7 @@ export default function Header() {
               </Link>
             </div>
           )}
-          {isAuthenticated ? (
+          {isAuthenticated === null ? null : isAuthenticated ? (
             <Link className="hidden min-[900px]:flex" href="/perfil">
               <IoPersonSharp size={22} />
             </Link>

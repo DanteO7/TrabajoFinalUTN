@@ -134,6 +134,59 @@ namespace backend_proyecto.Config
 
             // routine exercise
             CreateMap<RoutineExercise, ResponseRoutineExerciseDTO>();
+
+            // class template
+            CreateMap<CreateClassTemplateDTO, ClassTemplate>();
+            CreateMap<UpdateClassTemplateDTO, ClassTemplate>();
+
+            CreateMap<ClassTemplate, ResponseClassTemplateDTO>()
+                .ForMember(dest => dest.ActivityName,
+                    opt => opt.MapFrom(src => src.Activity.Name))
+                .ForMember(dest => dest.ProfessorName,
+                    opt => opt.MapFrom(src => src.Professor.User.Name))
+                .ForMember(dest => dest.ProfessorSurname,
+                    opt => opt.MapFrom(src => src.Professor.User.Surname));
+
+            CreateMap<ClassTemplateStudent, ResponseClassTemplateStudentDTO>()
+                .ForMember(dest => dest.StudentName,
+                    opt => opt.MapFrom(src => src.Student.User.Name))
+                .ForMember(dest => dest.StudentSurname,
+                    opt => opt.MapFrom(src => src.Student.User.Surname));
+            CreateMap<ClassTemplate, Class>()
+                .ForMember(
+                    dest => dest.Id,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Date,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Activity,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Professor,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Tenant,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Reservations,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Waitlists,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.ActivityName,
+                    opt => opt.MapFrom(
+                        src => src.Activity.Name
+                    )
+                );
         }
     }
 }

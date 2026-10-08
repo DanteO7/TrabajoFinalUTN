@@ -1,0 +1,17 @@
+﻿namespace backend_proyecto.Models.DTOs
+{
+    public class UpdateClassTemplateDTO
+    {
+        public DayOfWeek DayOfWeek { get; set; }
+
+        public TimeOnly StartTime { get; set; }
+
+        public TimeOnly EndTime { get; set; }
+
+        public int ActivityId { get; set; }
+
+        public int ProfessorId { get; set; }
+
+        public int MaxCapacity { get; set; }
+    }
+}
