@@ -77,7 +77,7 @@ export default function ChangeEmailForm({ user, close }) {
     }
 
     try {
-      await sendRegisterCode({ email });
+      await sendRegisterCode({ email, purpose: "ChangeEmail" });
       setCodeSent(true);
       setSeconds(60);
     } catch (error) {

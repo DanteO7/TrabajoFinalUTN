@@ -7,5 +7,8 @@ namespace backend_proyecto.Models.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; } = null!;
+        
+        [Required]
+        public string Purpose { get; set; } = null!;
     }
 }

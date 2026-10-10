@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { useAuthStore } from "../store/auth-store";
-import { signIn } from "../services/auth";
+import { googleRegister, signIn } from "../services/auth";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { signInSchema } from "../schema/auth-schema";
@@ -11,6 +11,8 @@ import { useTenantStore } from "../store/tenant-store";
 import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
 import FormInput from "../components/inputs/form-input";
+import { GoogleLogin } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignIn() {
   const { login } = useAuthStore();
@@ -49,6 +51,34 @@ export default function SignIn() {
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
       else if (data?.title) msg = data.title;
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
+  const googleMutation = useMutation({
+    mutationKey: ["google-signin"],
+    mutationFn: googleRegister,
+
+    onSuccess: (data) => {
+      clearPermissions();
+      login(data);
+
+      if (data?.roles?.length > 0) {
+        setLocation("/tu-espacio");
+      } else {
+        setLocation("/");
+      }
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+
+      const msg =
+        typeof data === "string"
+          ? data
+          : data?.message || "No se pudo continuar con Google.";
+
       setBackendError(msg);
       setErrorModal(true);
     },
@@ -112,13 +142,38 @@ export default function SignIn() {
             type="submit"
             textSmall={true}
           />
-          {/* <button
-            type="button"
-            className="flex justify-center items-center gap-3 bg-[#efefef] text-[#333] rounded-[13px] px-3 py-2 w-full cursor-pointer border-gray-400 border-[1.7px] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-          >
-            <img className="w-6" src="/google.png" alt="Icono de Google" />
-            <p className="text-center">Inicia sesión con Google</p>
-          </button> */}
+          <div className="relative">
+            <WhiteButton
+              text="Acceder con Google"
+              disabled={
+                isSubmitting || mutation.isPending || googleMutation.isPending
+              }
+              type="button"
+              textSmall={true}
+              img={<FcGoogle size={25} />}
+            />
+
+            <div className="absolute inset-0 opacity-0">
+              <GoogleLogin
+                onSuccess={(response) => {
+                  if (response.credential) {
+                    setBackendError(null);
+                    googleMutation.mutate(response.credential);
+                  }
+                }}
+                onError={() => {
+                  setBackendError(
+                    "No se pudo conectar con Google. Intentá nuevamente.",
+                  );
+                  setErrorModal(true);
+                }}
+                text="signin_with"
+                shape="rectangular"
+                locale="es"
+                width="300"
+              />
+            </div>
+          </div>
           <Link
             href="/olvide-contraseña"
             className="text-gray-500 cursor-pointer underline"

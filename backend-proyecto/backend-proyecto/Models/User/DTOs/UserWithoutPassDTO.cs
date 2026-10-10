@@ -9,5 +9,6 @@
         public string? PhoneNumber { get; set; }
         public int? Age { get; set; }
         public int? Weight { get; set; }
+        public bool IsGoogleAccount { get; set; } = false;
     }
 }

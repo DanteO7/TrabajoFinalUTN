@@ -42,8 +42,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var userId =
-                    int.Parse(User.FindFirst("id")?.Value!);
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
 
                 var payments =
                     await _paymentServices.GetAllByIdUser(

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
-import { sendRegisterCode } from "../services/auth";
+import { googleRegister, sendRegisterCode } from "../services/auth";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import ErrorModal from "../components/modals/error-modal";
@@ -9,8 +9,14 @@ import { signUpSchema } from "../schema/auth-schema";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 import FormInput from "../components/inputs/form-input";
+import { GoogleLogin } from "@react-oauth/google";
+import { useTenantStore } from "../store/tenant-store";
+import { useAuthStore } from "../store/auth-store";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignUp() {
+  const { login } = useAuthStore();
+  const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [, setLocation] = useLocation();
   const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
@@ -45,9 +51,37 @@ export default function SignUp() {
     },
   });
 
+  const googleMutation = useMutation({
+    mutationKey: ["google-signin"],
+    mutationFn: googleRegister,
+
+    onSuccess: (data) => {
+      clearPermissions();
+      login(data);
+
+      if (data?.roles?.length > 0) {
+        setLocation("/tu-espacio");
+      } else {
+        setLocation("/");
+      }
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+
+      const msg =
+        typeof data === "string"
+          ? data
+          : data?.message || "No se pudo continuar con Google.";
+
+      setBackendError(msg);
+      setErrorModal(true);
+    },
+  });
+
   const onSubmit = (credentials) => {
     setBackendError(null);
-    mutation.mutate({ email: credentials.email });
+    mutation.mutate({ email: credentials.email, purpose: "Register" });
   };
 
   return (
@@ -128,7 +162,38 @@ export default function SignUp() {
             disabled={isSubmitting || mutation.isPending}
             textSmall={true}
           />
+          <div className="relative">
+            <WhiteButton
+              text="Acceder con Google"
+              disabled={
+                isSubmitting || mutation.isPending || googleMutation.isPending
+              }
+              type="button"
+              textSmall={true}
+              img={<FcGoogle size={25} />}
+            />
 
+            <div className="absolute inset-0 opacity-0">
+              <GoogleLogin
+                onSuccess={(response) => {
+                  if (response.credential) {
+                    setBackendError(null);
+                    googleMutation.mutate(response.credential);
+                  }
+                }}
+                onError={() => {
+                  setBackendError(
+                    "No se pudo conectar con Google. Intentá nuevamente.",
+                  );
+                  setErrorModal(true);
+                }}
+                text="signin_with"
+                shape="rectangular"
+                locale="es"
+                width="300"
+              />
+            </div>
+          </div>
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
             <span className="text-gray-500">si ya tienes cuenta</span>

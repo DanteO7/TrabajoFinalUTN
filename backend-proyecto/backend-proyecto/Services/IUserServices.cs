@@ -1,6 +1,7 @@
 ﻿using backend_projeto.Models.DTOs;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
+using Google.Apis.Auth;
 
 namespace backend_proyecto.Services
 {
@@ -18,5 +19,7 @@ namespace backend_proyecto.Services
         Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser);
         Task<UserWithoutPassDTO> ChangeEmail(int id, ChangeEmailDTO changeEmailDTO);
         Task<UserWithoutPassDTO> ChangePassword(ChangePasswordDTO changePasswordDTO);
+        Task<User> CreateGoogleUser(GoogleJsonWebSignature.Payload payload);
+        Task<User?> GetOneByGoogleId(string googleId);
     }
 }

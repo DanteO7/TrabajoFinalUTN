@@ -4,22 +4,12 @@ import { forgotPassword } from "../services/auth";
 import { Link } from "wouter";
 import ErrorModal from "../components/modals/error-modal";
 import { useForm } from "react-hook-form";
-import z from "zod/v3";
 import { zodResolver } from "@hookform/resolvers/zod";
 import EmailSentModal from "../components/modals/email-sent-modal";
 import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
 import FormInput from "../components/inputs/form-input";
-
-const forgotPasswordSchema = z.object({
-  email: z
-    .string()
-    .min(1, "El email es obligatorio")
-    .min(4, "Email es requerido")
-    .max(100, "El email no debe tener mas de 100 caracteres")
-    .email("Debe ser un email válido")
-    .refine((value) => value.includes("@"), "Debe ser un email válido"),
-});
+import { forgotPasswordSchema } from "../schema/auth-schema";
 
 export default function ForgotPassword() {
   const [seconds, setSeconds] = useState(0);

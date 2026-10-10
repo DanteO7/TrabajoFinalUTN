@@ -7,8 +7,9 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Win32;
 using System.Net;
+using System.Security.Cryptography;
+using Google.Apis.Auth;
 
 namespace backend_proyecto.Services
 {
@@ -204,6 +205,15 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
+
+            if (user.IsGoogleAccount)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Tu cuenta utiliza Google para iniciar sesión. No podés cambiar el email desde TurnoFácil."
+                );
+            }
+
             if (changeEmailDTO.NewEmail.Length > 100)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nuevo email no puede tener mas de 100 caracteres");
@@ -273,6 +283,14 @@ namespace backend_proyecto.Services
                     "Usuario no encontrado"
                 );
 
+            if (user.IsGoogleAccount)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Tu cuenta utiliza Google para iniciar sesión. Administrá tu contraseña desde tu cuenta de Google."
+                );
+            }
+
             if (changePasswordDTO.NewPassword.Length < 8)
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
@@ -292,6 +310,100 @@ namespace backend_proyecto.Services
 
             await _repo.UpdateOneAsync(user);
             return _mapper.Map<UserWithoutPassDTO>(user);
+        }
+
+        public async Task<User> CreateGoogleUser(
+            GoogleJsonWebSignature.Payload payload)
+        {
+            if (string.IsNullOrWhiteSpace(payload.Subject))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se pudo identificar la cuenta de Google."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(payload.Email) ||
+                payload.Email.Length > 100)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El email de Google no es válido."
+                );
+            }
+
+            if (payload.EmailVerified != true)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El email de Google debe estar verificado."
+                );
+            }
+
+            var existingGoogleUser = await _repo.GetOneAsync(
+                u => u.GoogleId == payload.Subject
+            );
+
+            if (existingGoogleUser != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Conflict,
+                    "Esta cuenta de Google ya está registrada."
+                );
+            }
+
+            var existingEmail = await _repo.GetOneAsync(
+                u => u.Email == payload.Email
+            );
+
+            if (existingEmail != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Conflict,
+                    "Ya existe una cuenta con ese email. Iniciá sesión o vinculá tu cuenta."
+                );
+            }
+
+            var name = payload.GivenName;
+            var surname = payload.FamilyName;
+
+            if (string.IsNullOrWhiteSpace(name) ||
+                name.Length > 50 ||
+                string.IsNullOrWhiteSpace(surname) ||
+                surname.Length > 50)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se pudieron obtener un nombre y apellido válidos de Google."
+                );
+            }
+
+            var user = new User
+            {
+                Name = name,
+                Surname = surname,
+                Email = payload.Email,
+                GoogleId = payload.Subject,
+                IsGoogleAccount = true,
+
+                // No se usa para autenticar: Google es el método de acceso.
+                Password = _encoderServices.Encode(
+                    Convert.ToBase64String(
+                        RandomNumberGenerator.GetBytes(32)
+                    )
+                )
+            };
+
+            await _repo.CreateOneAsync(user);
+
+            return user;
+        }
+
+        public async Task<User?> GetOneByGoogleId(string googleId)
+        {
+            return await _repo.GetOneAsync(
+                u => u.GoogleId == googleId
+            );
         }
     }
 }

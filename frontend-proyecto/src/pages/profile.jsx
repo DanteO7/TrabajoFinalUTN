@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import MainLayout from "../layouts/main-layout";
 import { useAuthStore } from "../store/auth-store";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ErrorModal from "../components/modals/error-modal";
 import Navbar from "../components/navbar";
 import { forgotPassword, signOut } from "../services/auth";
@@ -71,18 +71,20 @@ export default function Profile() {
     return () => clearInterval(interval);
   }, [seconds]);
 
-  const handleForgotPassword = async () => {
-    try {
-      await forgotPassword({
-        email: user?.email,
-      });
+  const forgotPasswordMutation = useMutation({
+    mutationKey: ["forgot-password"],
+    mutationFn: () => forgotPassword({ email: user?.email }),
 
+    onSuccess: () => {
       const endTime = Date.now() + 60_000;
+
       localStorage.setItem("forgotPasswordCooldown", endTime.toString());
 
       setSeconds(60);
       setOpenForgotPassword(true);
-    } catch (error) {
+    },
+
+    onError: (error) => {
       if (error.response?.status === 429) {
         const remaining = error.response.data.remainingSeconds;
 
@@ -95,10 +97,18 @@ export default function Profile() {
 
         return;
       }
-      setBackendError("Error enviando el correo.");
+
+      const data = error.response?.data;
+
+      setBackendError(
+        typeof data === "string"
+          ? data
+          : data?.message || "Error enviando el correo.",
+      );
+
       setErrorModal(true);
-    }
-  };
+    },
+  });
 
   return (
     <MainLayout>
@@ -173,11 +183,15 @@ export default function Profile() {
                 wfit={true}
               />
               <WhiteButton
-                disabled={seconds > 0}
+                disabled={seconds > 0 || forgotPasswordMutation.isPending}
                 text={
-                  seconds > 0 ? `Reenviar en ${seconds}s` : "Cambiar contraseña"
+                  forgotPasswordMutation.isPending
+                    ? "Enviando correo..."
+                    : seconds > 0
+                      ? `Reenviar en ${seconds}s`
+                      : "Cambiar contraseña"
                 }
-                onClick={handleForgotPassword}
+                onClick={() => forgotPasswordMutation.mutate()}
                 textSmall={true}
                 wfit={true}
               />
@@ -224,7 +238,7 @@ export default function Profile() {
           close={() => setOpenForgotPassword(false)}
           email={user.email}
           isSuccesOrError={true}
-          sendAgain={handleForgotPassword}
+          sendAgain={() => forgotPasswordMutation.mutate()}
           seconds={seconds}
         />
       )}

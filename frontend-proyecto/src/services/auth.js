@@ -22,3 +22,6 @@ export const sendRegisterCode = (data) =>
 
 export const forgotPassword = (data) =>
   request("post", "/auth/forgot-password", data);
+
+export const googleRegister = (credential) =>
+  request("post", "/auth/google-register", { credential });

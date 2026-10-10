@@ -5,9 +5,8 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
-using Humanizer;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Google.Apis.Auth;
+using Humanizer.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,8 +28,18 @@ namespace backend_proyecto.Services
         private readonly IAdminRepository _adminRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly ApplicationDbContext _db;
+        private readonly IConfiguration _configuration;
 
-        public AuthServices(IUserServices userServices, IEncoderServices encoderServices, IMapper mapper, IConfiguration config, IProfessorRepository professorRepo, IStudentRepository studentRepo, IAdminRepository adminRepository, ITenantRepository tenantRepository, ApplicationDbContext db)
+        public AuthServices(
+            IUserServices userServices, 
+            IEncoderServices encoderServices, 
+            IMapper mapper, IConfiguration config, 
+            IProfessorRepository professorRepo, 
+            IStudentRepository studentRepo, 
+            IAdminRepository adminRepository, 
+            ITenantRepository tenantRepository, 
+            ApplicationDbContext db,
+            IConfiguration configuration)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;
@@ -42,6 +51,7 @@ namespace backend_proyecto.Services
             _adminRepository = adminRepository;
             _tenantRepository = tenantRepository;
             _db = db;
+            _configuration = configuration;
         }
 
         public async Task<AuthResponseDTO> Register(RegisterDTO register, HttpContext context)
@@ -91,6 +101,14 @@ namespace backend_proyecto.Services
             var user = await _userServices.GetOneByEmail(login.Email);
             if (user == null)
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "Credenciales invalidas.");
+
+            if (user.IsGoogleAccount)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Esta cuenta utiliza Google para iniciar sesión."
+                );
+            }
 
             if (!_encoderServices.Verify(login.Password, user.Password))
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "Credenciales invalidas.");
@@ -169,6 +187,96 @@ namespace backend_proyecto.Services
             return tokenHandler.WriteToken(
                 tokenHandler.CreateToken(tokenDescriptor)
             );
+        }
+
+        public async Task<AuthResponseDTO> RegisterWithGoogle(
+    GoogleRegisterDTO dto,
+    HttpContext context)
+        {
+            GoogleJsonWebSignature.Payload payload;
+
+            // 1. Validar la credencial de Google
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(
+                    dto.Credential,
+                    new GoogleJsonWebSignature.ValidationSettings
+                    {
+                        Audience = new[]
+                        {
+                    _configuration["Google:ClientId"]!
+                        }
+                    }
+                );
+            }
+            catch (InvalidJwtException)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Unauthorized,
+                    "La credencial de Google no es válida."
+                );
+            }
+
+            if (payload.EmailVerified != true)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Tu cuenta de Google debe tener el email verificado."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(payload.Subject) ||
+                string.IsNullOrWhiteSpace(payload.Email))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se pudo identificar tu cuenta de Google."
+                );
+            }
+
+            // 2. Buscar una cuenta vinculada a este Google ID
+            var existingGoogleUser = await _userServices.GetOneByGoogleId(
+                payload.Subject
+            );
+
+            if (existingGoogleUser != null)
+            {
+                // Ya tiene cuenta de Google: iniciar sesión
+                var userDto = _mapper.Map<UserWithoutPassDTO>(
+                    existingGoogleUser
+                );
+
+                var token = await GenerateJwt(userDto);
+                SetCookie(token, context);
+
+                return await BuildAuthResponse(existingGoogleUser);
+            }
+
+            // 3. Buscar si el email pertenece a otra cuenta
+            var existingUser = await _userServices.GetOneByEmail(
+                payload.Email
+            );
+
+            if (existingUser != null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Conflict,
+                    "Ya existe una cuenta con ese email. Iniciá sesión con tu método habitual."
+                );
+            }
+
+            // 4. No existe una cuenta: crearla
+            var createdUser = await _userServices.CreateGoogleUser(payload);
+
+            // 5. Iniciar sesión automáticamente después del registro
+            var createdUserDto = _mapper.Map<UserWithoutPassDTO>(
+                createdUser
+            );
+
+            var createdToken = await GenerateJwt(createdUserDto);
+            SetCookie(createdToken, context);
+
+            return await BuildAuthResponse(createdUser);
         }
     }
 }

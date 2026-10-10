@@ -41,3 +41,13 @@ export const signUpSchema = z
     message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "El email es obligatorio")
+    .min(4, "Email es requerido")
+    .max(100, "El email no debe tener mas de 100 caracteres")
+    .email("Debe ser un email válido")
+    .refine((value) => value.includes("@"), "Debe ser un email válido"),
+});

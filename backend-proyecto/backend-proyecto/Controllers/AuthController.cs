@@ -26,11 +26,10 @@ namespace backend_proyecto.Controllers
         private readonly IAdminRepository _adminRepository; 
         private readonly ITenantRepository _tenantRepository;
         private readonly ApplicationDbContext _db;
-
         private readonly IMapper _mapper;
+        private readonly IUserServices _userServices;
 
-
-        public AuthController(AuthServices authServices, IUserRepository userRepository, IMapper mapper, IProfessorRepository professorRepository, IStudentRepository studentRepository, IAdminRepository adminRepository, ITenantRepository tenantRepository, ApplicationDbContext db)
+        public AuthController(AuthServices authServices, IUserRepository userRepository, IMapper mapper, IProfessorRepository professorRepository, IStudentRepository studentRepository, IAdminRepository adminRepository, ITenantRepository tenantRepository, ApplicationDbContext db, IUserServices userServices)
         {
             _authServices = authServices;
             _userRepository = userRepository;
@@ -40,6 +39,7 @@ namespace backend_proyecto.Controllers
             _adminRepository = adminRepository;
             _tenantRepository = tenantRepository;
             _db = db;
+            _userServices = userServices;
         }
 
         [HttpPost("register")]
@@ -156,6 +156,27 @@ namespace backend_proyecto.Controllers
             [FromBody] SendRegisterCodeDTO dto,
             [FromServices] EmailServices emailServices)
         {
+            if (dto.Purpose == "ChangeEmail")
+            {
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+
+                var user = await _userServices.GetOneById(userId);
+
+                if (user != null && user.IsGoogleAccount)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Tu cuenta utiliza Google para iniciar sesión. No necesitás cambiar el email en TurnoFácil."
+                    );
+                }
+            }
+            else if (dto.Purpose != "Register")
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El propósito de la verificación no es válido."
+                );
+            }
             var oldCodes = _db.EmailVerifications
                 .Where(v => v.Email == dto.Email && !v.Used);
 
@@ -183,11 +204,23 @@ namespace backend_proyecto.Controllers
                 message = "Código enviado correctamente"
             });
         }
+
         [HttpPost("forgot-password")]
         public async Task<ActionResult> ForgotPassword(
             [FromBody] ForgotPasswordDTO dto,
             [FromServices] EmailServices emailServices)
         {
+            var userId = int.Parse(User.FindFirst("id")?.Value!);
+
+            var user = await _userServices.GetOneById(userId);
+
+            if (user != null && user.IsGoogleAccount)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Tu cuenta utiliza Google para iniciar sesión. No necesitás recuperar una contraseña en TurnoFácil."
+                );
+            }
             try
             {
                 await emailServices.ForgotPassword(dto.Email);
@@ -205,6 +238,17 @@ namespace backend_proyecto.Controllers
             {
                 message = "Email enviado correctamente"
             });
+        }
+        [HttpPost("google-register")]
+        public async Task<ActionResult<AuthResponseDTO>> GoogleRegister(
+            [FromBody] GoogleRegisterDTO dto)
+        {
+            var response = await _authServices.RegisterWithGoogle(
+                dto,
+                HttpContext
+            );
+
+            return Ok(response);
         }
     }
 }
