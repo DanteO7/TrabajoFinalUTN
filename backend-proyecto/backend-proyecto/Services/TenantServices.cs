@@ -23,6 +23,7 @@ namespace backend_proyecto.Services
         private readonly PermissionServices _permissionServices;
         private readonly EmailServices _emailServices; 
         private readonly IDataProtector _tenantRequestProtector;
+        private readonly GroupServices _groupServices;
 
         public TenantServices(
             ITenantRepository tenantRepository,
@@ -34,7 +35,8 @@ namespace backend_proyecto.Services
             IAdminRepository adminRepository,
             PermissionServices permissionServices,
             EmailServices emailServices,
-            IDataProtectionProvider dataProtectionProvider)
+            IDataProtectionProvider dataProtectionProvider,
+            GroupServices groupServices)
         {
             _tenantRepository = tenantRepository;
             _tenantPlanRepository = tenantPlanRepository;
@@ -46,6 +48,7 @@ namespace backend_proyecto.Services
             _permissionServices = permissionServices;
             _emailServices = emailServices;
             _tenantRequestProtector = dataProtectionProvider.CreateProtector("TurnoFacil.TenantRequest");
+            _groupServices = groupServices;
         }
 
         public async Task<List<ResponseTenantDTO>> GetAll(int userId)
@@ -170,6 +173,8 @@ namespace backend_proyecto.Services
             };
 
             await _tenantRepository.CreateOneAsync(tenant);
+
+            await _groupServices.CreateDefaultGroups(tenant.Id);
 
             user.HasActiveTenantRequest = false;
 

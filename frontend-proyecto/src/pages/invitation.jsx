@@ -43,7 +43,7 @@ export default function Invitation({ token }) {
       setSuccessModal(true);
 
       setTimeout(() => {
-        setLocation("/");
+        setLocation("/tu-espacio");
       }, 3000);
     },
 

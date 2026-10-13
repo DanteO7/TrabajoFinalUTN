@@ -93,7 +93,7 @@ namespace backend_proyecto.Services
             }
 
             var student = _mapper.Map<Student>(assignStudentDTO);
-            student.MonthlyFeeStatus = MonthlyFeeStatus.PENDING;
+            student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
 
             await _studentRepository.CreateOneAsync(student);
 
