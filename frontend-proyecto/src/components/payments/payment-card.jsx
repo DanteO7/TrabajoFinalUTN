@@ -65,7 +65,7 @@ export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
     >
       <div className="flex justify-between items-start gap-3">
         <div className="min-w-0">
-          <h3 className="font-semibold truncate">
+          <h3 className="font-semibold">
             {showUser
               ? `${payment.user?.name} ${payment.user?.surname}`
               : `${payment.tenantName} `}

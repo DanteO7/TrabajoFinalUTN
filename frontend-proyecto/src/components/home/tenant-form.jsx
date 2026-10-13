@@ -244,7 +244,12 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
             </div>
           )}
         </div>
-        <BlackButton text="Contratar" type="submit" textSmall />
+        <BlackButton
+          text="Contratar"
+          type="submit"
+          textSmall
+          disabled={mutation.isPending}
+        />
       </form>
       {errorModal && (
         <ErrorModal

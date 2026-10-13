@@ -57,6 +57,7 @@ export default function ClassForm({
     queryKey: ["getProfessors", tenantId],
     queryFn: () => getProfessors(tenantId),
   });
+  console.log(professors);
 
   const mutation = useMutation({
     mutationFn: (data) =>
@@ -166,11 +167,13 @@ export default function ClassForm({
           >
             <option value="">Seleccionar</option>
 
-            {professors.map((professor) => (
-              <option key={professor.id} value={professor.id}>
-                {professor.user.name} {professor.user.surname}
-              </option>
-            ))}
+            {professors
+              .filter((professor) => professor.isActive === true)
+              .map((professor) => (
+                <option key={professor.id} value={professor.id}>
+                  {professor.user.name} {professor.user.surname}
+                </option>
+              ))}
           </select>
 
           {errors.professorId && (

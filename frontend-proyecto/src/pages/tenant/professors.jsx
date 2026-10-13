@@ -79,7 +79,7 @@ export default function Professors({ tenantId }) {
                 />
 
                 <BlackButton
-                  text="+ Invitar alumno"
+                  text="+ Invitar profesor"
                   onClick={() => setOpenModal(true)}
                   textSmall={true}
                   wfit={isSmallScreen}

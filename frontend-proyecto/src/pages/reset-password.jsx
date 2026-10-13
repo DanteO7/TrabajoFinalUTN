@@ -10,6 +10,7 @@ import ErrorModal from "../components/modals/error-modal";
 import SuccessModal from "../components/modals/success-modal";
 import { useLocation } from "wouter";
 import FormInput from "../components/inputs/form-input";
+import BlackButton from "../components/buttons/black-button";
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
@@ -95,13 +96,13 @@ export default function ResetPassword() {
             disabled={isSubmitting || mutation.isPending}
             isPassword
           />
-          <button
+
+          <BlackButton
+            disabled={mutation.isPending}
             type="submit"
-            disabled={isSubmitting || mutation.isPending}
-            className="text-[#efefef] bg-[#333] rounded-[13px] w-fit px-3 py-2 cursor-pointer border-[1.7px] border-[#333] hover:bg-gray-300 hover:text-[#333] hover:border-gray-400 transition duration-300"
-          >
-            {mutation.isPending ? "Cambiando..." : "Cambiar contraseña"}
-          </button>
+            text={mutation.isPending ? "Cambiando..." : "Cambiar contraseña"}
+            textSmall
+          />
         </form>
       </div>
       {errorModal && (

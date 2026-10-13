@@ -60,7 +60,7 @@ export default function Tenant({ id }) {
   const sections = [
     {
       title: "Novedades",
-      description: "Mira las novedades del negocio y de la app.",
+      description: "Mira las novedades del negocio.",
       icon: <FaBell size={35} />,
       href: "novedades",
       permission: "NEWS_READ",
@@ -293,7 +293,7 @@ export default function Tenant({ id }) {
               {newsCard && (
                 <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
                   <div
-                    className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border border-gray-400 px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center`}
+                    className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center`}
                   >
                     {unreadCount?.unreadCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
@@ -305,7 +305,7 @@ export default function Tenant({ id }) {
                       <h3 className="font-semibold text-[19px]">
                         {newsCard.title}
                       </h3>
-                      <p className="text-gray-500 max-[900px]:text-[13px]">
+                      <p className="text-gray-500 max-[900px]:text-[12px]">
                         {newsCard.description}
                       </p>
                     </div>
@@ -318,7 +318,7 @@ export default function Tenant({ id }) {
                   key={section.href}
                   href={`/tu-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4.5 py-3.25 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4.5 max-[900px]:items-center">
+                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>
 
                     <div>
@@ -326,7 +326,7 @@ export default function Tenant({ id }) {
                         {section.title}
                       </h3>
 
-                      <p className="text-gray-500 max-[900px]:text-[13px]">
+                      <p className="text-gray-500 max-[900px]:text-[12px]">
                         {section.description}
                       </p>
                     </div>

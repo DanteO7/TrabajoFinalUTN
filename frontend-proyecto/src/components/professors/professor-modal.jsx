@@ -276,8 +276,8 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                   onClick={() => setIsActive(status)}
                   className={`p-3 rounded-lg border-2 cursor-pointer transition ${
                     isActive === status
-                      ? "border-[#333] bg-[#efefef]"
-                      : "border-gray-200 hover:border-gray-400"
+                      ? "border-black border-2 bg-[#F4F0F5]"
+                      : "border-gray-300 hover:border-gray-600"
                   }`}
                 >
                   <p className="font-semibold text-[#333]">
@@ -294,7 +294,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
             </label>
 
             {selectedSpecialityIds.length > 0 ? (
-              <div className="mb-4 p-3 bg-[#efefef] rounded-lg">
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 mb-4">
                 <div className="flex flex-wrap gap-2">
                   {selectedSpecialityIds.map((specialityId) => {
                     const speciality = specialities.find(
@@ -376,7 +376,7 @@ export default function ProfessorModal({ professor, tenantId, close }) {
                     addSpeciality(speciality.id);
                     setOpenSpecialityModal(false);
                   }}
-                  className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#333] hover:bg-[#efefef] transition cursor-pointer"
+                  className="w-full text-left p-3 rounded-lg border border-gray-400  hover:border-[#333] hover:bg-[#F4F0F5] shadow-md transition cursor-pointer"
                 >
                   <p className="font-semibold">{speciality.name}</p>
                 </button>
