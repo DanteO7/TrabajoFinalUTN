@@ -13,35 +13,34 @@ export default function ConfirmModal({
   isPending = false,
 }) {
   return (
-    <Modal open onClose={close}>
-      <div className="relative">
-        <button
-          onClick={close}
-          disabled={isPending}
-          className="absolute top-0 right-0 text-gray-400 hover:text-black transition cursor-pointer disabled:opacity-50"
-        >
-          <X size={20} />
-        </button>
+    <Modal open onClose={close} isSuccesOrError={true}>
+      <button
+        type="button"
+        onClick={close}
+        disabled={isPending}
+        aria-label="Cerrar"
+        className="absolute top-4 right-4 z-10 cursor-pointer text-white transition hover:text-gray-200 disabled:opacity-50"
+      >
+        <X size={20} />
+      </button>
 
-        <div className="flex items-start gap-4 pr-8">
-          <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-full bg-red-100 text-red-600">
-            <AlertTriangle size={22} />
-          </div>
+      <div className="bg-[#ec5e66] flex justify-center py-10">
+        <AlertTriangle className="text-white" size={80} />
+      </div>
 
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold text-[#333]">{title}</h2>
+      <div className="flex flex-col items-center justify-center text-center px-8 gap-2 my-5">
+        <h4 className="font-semibold text-2xl">{title}</h4>
 
-            <p className="text-gray-500 mt-2">{message}</p>
-          </div>
-        </div>
+        <p className="text-xl text-gray-600 whitespace-pre-line">{message}</p>
 
-        <div className="flex gap-3 mt-6">
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
           <WhiteButton
             onClick={close}
             disabled={isPending}
             text={cancelText}
             textSmall
           />
+
           <RedButton
             onClick={onConfirm}
             disabled={isPending}

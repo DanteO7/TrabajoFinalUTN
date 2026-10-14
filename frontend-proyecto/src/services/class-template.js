@@ -35,3 +35,6 @@ export const copyClassTemplateWeek = (destinationMonday) =>
   request("post", "/class-templates/copy-week", {
     destinationMonday,
   });
+
+export const deleteClassTemplates = (classTemplateIds) =>
+  request("delete", "/class-templates/bulk", classTemplateIds);

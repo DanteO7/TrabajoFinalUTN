@@ -16,7 +16,7 @@ import { getActivities } from "../../services/activity";
 import { getProfessors } from "../../services/professor";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
-import { createClassTemplate } from "../../services/classTemplate";
+import { createClassTemplate } from "../../services/class-template";
 
 export default function ClassForm({
   tenantId,

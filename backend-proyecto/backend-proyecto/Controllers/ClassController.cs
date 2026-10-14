@@ -140,5 +140,28 @@ namespace backend_proyecto.Controllers
                     new { message = ex.Message });
             }
         }
+
+        [HttpDelete("bulk")]
+        [Authorize]
+        [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteMany([FromBody] List<int> classIds)
+        {
+            try
+            {
+                await _classServices.DeleteMany(classIds);
+                return Ok("Clase eliminada correctamente");
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

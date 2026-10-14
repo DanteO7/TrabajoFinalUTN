@@ -11,3 +11,6 @@ export const updateClass = (id, data) => request("put", `/classes/${id}`, data);
 
 export const getStudentsByClass = (classId) =>
   request("get", `/classes/${classId}/students`);
+
+export const deleteClasses = (classIds) =>
+  request("delete", "/classes/bulk", classIds);

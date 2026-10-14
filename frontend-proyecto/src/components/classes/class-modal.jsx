@@ -35,7 +35,7 @@ import RedButton from "../buttons/red-button";
 import {
   deleteClassTemplate,
   updateClassTemplate,
-} from "../../services/classTemplate";
+} from "../../services/class-template";
 
 export default function ClassModal({
   classItem,
@@ -501,26 +501,30 @@ export default function ClassModal({
           </div>
 
           {canUpdateClass || canDeleteClass ? (
-            <div className="flex gap-2 mt-8">
-              {canDeleteClass && (
-                <RedButton
-                  text="Eliminar"
-                  disabled={deleteMutation.isPending}
-                  onClick={() => setConfirmModal(true)}
-                  textSmall={true}
-                  img={<Trash2 size={18} />}
-                />
-              )}
+            classStarted ? (
+              <WhiteButton text="No disponible" textSmall />
+            ) : (
+              <div className="flex gap-2 mt-8">
+                {canDeleteClass && (
+                  <RedButton
+                    text="Eliminar"
+                    disabled={deleteMutation.isPending}
+                    onClick={() => setConfirmModal(true)}
+                    textSmall={true}
+                    img={<Trash2 size={18} />}
+                  />
+                )}
 
-              {canUpdateClass && (
-                <BlackButton
-                  text="Editar"
-                  onClick={() => setEditing(true)}
-                  textSmall={true}
-                  img={<Pencil size={18} />}
-                />
-              )}
-            </div>
+                {canUpdateClass && (
+                  <BlackButton
+                    text="Editar"
+                    onClick={() => setEditing(true)}
+                    textSmall={true}
+                    img={<Pencil size={18} />}
+                  />
+                )}
+              </div>
+            )
           ) : canCreateReservation ? (
             classStarted ? (
               <WhiteButton text="No disponible" textSmall />

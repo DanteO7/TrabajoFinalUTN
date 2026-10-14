@@ -8,7 +8,7 @@ import BlackButton from "../buttons/black-button";
 import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
 
-import { copyClassTemplateDay } from "../../services/classTemplate";
+import { copyClassTemplateDay } from "../../services/class-template";
 import { X } from "lucide-react";
 
 export default function CopyClassTemplateDayModal({

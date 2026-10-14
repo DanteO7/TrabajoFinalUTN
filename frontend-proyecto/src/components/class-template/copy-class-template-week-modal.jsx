@@ -6,7 +6,7 @@ import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
-import { copyClassTemplateWeek } from "../../services/classTemplate";
+import { copyClassTemplateWeek } from "../../services/class-template";
 import { X } from "lucide-react";
 
 export default function CopyClassTemplateWeekModal({ tenantId, close }) {

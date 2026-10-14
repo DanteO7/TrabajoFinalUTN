@@ -13,7 +13,7 @@ import SearchInput from "../inputs/search-input";
 import {
   addStudentToClassTemplate,
   getClassTemplates,
-} from "../../services/classTemplate";
+} from "../../services/class-template";
 
 export default function AddStudentToClassModal({
   classId,
@@ -65,7 +65,6 @@ export default function AddStudentToClassModal({
   const addMutation = useMutation({
     mutationFn: async () => {
       if (isTemplate) {
-        console.log("xd");
         await Promise.all(
           selectedStudents.map((studentId) =>
             addStudentToClassTemplate(classId, studentId),

@@ -1025,5 +1025,39 @@ namespace backend_proyecto.Services
                 createdClasses
             );
         }
+        public async Task DeleteMany(List<int> classTemplateIds)
+        {
+            await _permissionServices.CheckPermission(Permissions.CLASS_DELETE);
+
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+
+            if (classTemplateIds == null || classTemplateIds.Count == 0)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Debés seleccionar al menos una plantilla para eliminar."
+                );
+            }
+
+            var ids = classTemplateIds.Distinct().ToList();
+
+            var templates = await _classTemplateRepository.Query()
+                .Where(t => ids.Contains(t.Id) && t.TenantId == tenantId)
+                .Include(t => t.Students)
+                .ToListAsync();
+
+            if (templates.Count != ids.Count)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Una o más plantillas no existen o no pertenecen a este tenant."
+                );
+            }
+
+            foreach (var template in templates)
+            {
+                await _classTemplateRepository.DeleteOneAsync(template);
+            }
+        }
     }
 }

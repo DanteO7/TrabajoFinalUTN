@@ -17,7 +17,7 @@ import BlackButton from "../buttons/black-button";
 import {
   getClassTemplates,
   removeStudentFromClassTemplate,
-} from "../../services/classTemplate";
+} from "../../services/class-template";
 
 export default function ClassStudentsModal({
   currentClass,

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using backend_proyecto.Config;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
-using backend_proyecto.Utils.Errors;
 using backend_proyecto.Utils;
+using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
@@ -18,8 +19,10 @@ namespace backend_proyecto.Services
         private readonly IProfessorRepository _professorRepository;
         private readonly IReservationRepository _reservationRepository; 
         private readonly PermissionServices _permissionServices;
+        private readonly CurrentTenantService _currentTenantService;
+        private readonly ApplicationDbContext _context;
 
-        public ClassServices(IClassRepository classRepository, ITenantRepository tenantRepository, IMapper mapper, IActivityRepository activityRepository, IProfessorRepository professorRepository, IReservationRepository reservationRepository, PermissionServices permissionServices)
+        public ClassServices(IClassRepository classRepository, ITenantRepository tenantRepository, IMapper mapper, IActivityRepository activityRepository, IProfessorRepository professorRepository, IReservationRepository reservationRepository, PermissionServices permissionServices, CurrentTenantService currentTenantService, ApplicationDbContext context)
         {
             _classRepository = classRepository;
             _tenantRepository = tenantRepository;
@@ -28,6 +31,8 @@ namespace backend_proyecto.Services
             _professorRepository = professorRepository;
             _reservationRepository = reservationRepository;
             _permissionServices = permissionServices;
+            _currentTenantService = currentTenantService;
+            _context = context;
         }
 
         public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date, int userId)
@@ -299,6 +304,77 @@ namespace backend_proyecto.Services
              .ToListAsync();
 
             return _mapper.Map<List<ResponseClassStudentDTO>>(reservations);
+        }
+
+        public async Task DeleteMany(List<int> classIds)
+        {
+            await _permissionServices.CheckPermission(Permissions.CLASS_DELETE);
+
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+
+            if (classIds == null || classIds.Count == 0)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Debés seleccionar al menos una clase para eliminar."
+                );
+            }
+
+            var ids = classIds.Distinct().ToList();
+
+            var classes = await _classRepository.Query()
+                .Where(c => ids.Contains(c.Id) && c.TenantId == tenantId)
+                .Include(c => c.Reservations)
+                .ToListAsync();
+
+            if (classes.Count != ids.Count)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Una o más clases no existen o no pertenecen a este tenant."
+                );
+            }
+
+            var now = TimeHelper.Now();
+
+            foreach (var classModel in classes)
+            {
+                var classStart = classModel.Date.ToDateTime(classModel.StartTime);
+
+                if (classStart < now)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        $"No se puede eliminar porque una o mas clases ya terminó."
+                    );
+                }
+            }
+
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                foreach (var classModel in classes)
+                {
+                    foreach (var reservation in classModel.Reservations.ToList())
+                    {
+                        await _reservationRepository.DeleteOneAsync(reservation);
+                    }
+                }
+
+                foreach (var classModel in classes)
+                {
+                    await _classRepository.DeleteOneAsync(classModel);
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

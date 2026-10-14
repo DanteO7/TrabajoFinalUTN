@@ -129,8 +129,8 @@ export default function CreateTenant() {
 
   return (
     <MainLayout>
-      <div className="mt-10 min-w-63 w-[45%]">
-        <h1 className="text-2xl font-semibold">Crear negocio</h1>
+      <div className="mt-12 w-full max-w-2xl">
+        <h1 className="text-4xl font-semibold text-center">Crear negocio</h1>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
