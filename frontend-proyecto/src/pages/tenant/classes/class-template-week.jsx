@@ -42,7 +42,8 @@ export default function ClassTemplateWeek({ tenantId }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const longPressTimer = useRef(null);
-  const longPressTriggered = useRef(false);
+  const ignoreNextClick = useRef(false);
+  const pointerStartPosition = useRef(null);
 
   const canCreateClass = useHasPermission(tenantId, "CLASS_CREATE");
   const canDeleteClass = useHasPermission(tenantId, "CLASS_DELETE");
@@ -129,31 +130,60 @@ export default function ClassTemplateWeek({ tenantId }) {
     setActiveSelectionDay(allSelected ? null : dayOfWeek);
   };
 
-  const handleTouchStart = (classTemplateId, dayOfWeek) => {
-    if (!canDeleteClass) return;
+  const handlePointerDown = (event, classTemplate, dayOfWeek) => {
+    // Una nueva interacción reinicia cualquier bloqueo anterior.
+    ignoreNextClick.current = false;
+
+    if (!canDeleteClass || event.pointerType !== "touch") return;
 
     clearTimeout(longPressTimer.current);
-    longPressTriggered.current = false;
+
+    pointerStartPosition.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
 
     longPressTimer.current = setTimeout(() => {
-      longPressTriggered.current = true;
-      toggleClassSelection(classTemplateId, dayOfWeek);
+      ignoreNextClick.current = true;
+
+      // Seleccionar la plantilla sin alternar su selección
+      // si ya estaba seleccionada.
+      setSelectedClassTemplateIds((prev) =>
+        prev.includes(classTemplate.id) ? prev : [...prev, classTemplate.id],
+      );
+
+      setSelectionModeByDay((prev) => ({
+        ...prev,
+        [dayOfWeek]: true,
+      }));
+
+      setActiveSelectionDay(dayOfWeek);
     }, 500);
   };
 
-  const handleTouchEnd = () => {
+  const handlePointerMove = (event) => {
+    if (!pointerStartPosition.current) return;
+
+    const deltaX = Math.abs(event.clientX - pointerStartPosition.current.x);
+
+    const deltaY = Math.abs(event.clientY - pointerStartPosition.current.y);
+
+    // Si el dedo se mueve, asumimos que el usuario está desplazándose.
+    if (deltaX > 10 || deltaY > 10) {
+      clearTimeout(longPressTimer.current);
+      pointerStartPosition.current = null;
+    }
+  };
+
+  const handlePointerEnd = () => {
     clearTimeout(longPressTimer.current);
+    pointerStartPosition.current = null;
   };
 
   const handleCardClick = (classTemplate) => {
-    if (longPressTriggered.current) {
-      longPressTriggered.current = false;
-      return;
-    }
+    if (ignoreNextClick.current) return;
 
     if (selectionModeByDay[classTemplate.dayOfWeek]) {
-      if (!canDeleteClass) return;
-
       toggleClassSelection(classTemplate.id, classTemplate.dayOfWeek);
       return;
     }
@@ -266,17 +296,30 @@ export default function ClassTemplateWeek({ tenantId }) {
                     {canDeleteClass &&
                       classesOfDay.length > 0 &&
                       isSelectionMode && (
-                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                          <BlackButton
-                            onClick={() => selectAllTemplates(day.value)}
-                            text={
-                              allSelected
-                                ? "Deseleccionar todo"
-                                : "Seleccionar todo"
-                            }
-                            wfit
-                            textSmall
-                          />
+                        <div className="mb-4 flex justify-end gap-2">
+                          <div className="min-[350px]:hidden">
+                            <BlackButton
+                              onClick={() => selectAllTemplates(day.value)}
+                              text={
+                                allSelected ? "Deseleccionar" : "Seleccionar"
+                              }
+                              wfit
+                              textSmall
+                            />
+                          </div>
+
+                          <div className="hidden min-[350px]:block">
+                            <BlackButton
+                              onClick={() => selectAllTemplates(day.value)}
+                              text={
+                                allSelected
+                                  ? "Deseleccionar todo"
+                                  : "Seleccionar todo"
+                              }
+                              wfit
+                              textSmall
+                            />
+                          </div>
 
                           <RedButton
                             onClick={() => {
@@ -336,23 +379,40 @@ export default function ClassTemplateWeek({ tenantId }) {
                                   day.value,
                                 )
                               }
-                              onTouchStart={() => {
-                                if (!canDeleteClass) return;
-
-                                handleTouchStart(classTemplate.id, day.value);
+                              onPointerDown={(event) =>
+                                handlePointerDown(
+                                  event,
+                                  classTemplate,
+                                  day.value,
+                                )
+                              }
+                              onPointerMove={handlePointerMove}
+                              onPointerUp={handlePointerEnd}
+                              onPointerCancel={handlePointerEnd}
+                              onClickCapture={(event) => {
+                                if (ignoreNextClick.current) {
+                                  ignoreNextClick.current = false;
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                }
                               }}
-                              onTouchEnd={handleTouchEnd}
-                              onTouchMove={handleTouchEnd}
-                              onTouchCancel={handleTouchEnd}
                               onContextMenu={(event) => {
                                 event.preventDefault();
 
                                 if (!canDeleteClass) return;
 
-                                toggleClassSelection(
-                                  classTemplate.id,
-                                  day.value,
+                                setSelectedClassTemplateIds((prev) =>
+                                  prev.includes(classTemplate.id)
+                                    ? prev
+                                    : [...prev, classTemplate.id],
                                 );
+
+                                setSelectionModeByDay((prev) => ({
+                                  ...prev,
+                                  [day.value]: true,
+                                }));
+
+                                setActiveSelectionDay(day.value);
                               }}
                               onClick={() => handleCardClick(classTemplate)}
                             />

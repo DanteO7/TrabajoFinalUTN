@@ -33,7 +33,8 @@ export default function OfficialClasses({ tenantId }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const longPressTimer = useRef(null);
-  const longPressTriggered = useRef(false);
+  const ignoreNextClick = useRef(false);
+  const pointerStartPosition = useRef(null);
 
   const canCreateClass = useHasPermission(tenantId, "CLASS_CREATE");
   const canDeleteClass = useHasPermission(tenantId, "CLASS_DELETE");
@@ -90,36 +91,71 @@ export default function OfficialClasses({ tenantId }) {
   };
 
   const selectAllClasses = () => {
-    if (selectedClassIds.length === classesOfDay.length) {
-      clearSelection();
+    const idsOfDay = classesOfDay.map((classItem) => classItem.id);
+
+    const allSelected =
+      idsOfDay.length > 0 &&
+      idsOfDay.every((id) => selectedClassIds.includes(id));
+
+    if (allSelected) {
+      setSelectedClassIds((prev) =>
+        prev.filter((id) => !idsOfDay.includes(id)),
+      );
+
+      if (selectedClassIds.every((id) => idsOfDay.includes(id))) {
+        setSelectionMode(false);
+        setShowDeleteConfirmation(false);
+      }
     } else {
-      setSelectedClassIds(classesOfDay.map((classItem) => classItem.id));
+      setSelectedClassIds((prev) => [...new Set([...prev, ...idsOfDay])]);
+
       setSelectionMode(true);
     }
   };
 
-  const handleTouchStart = (classId) => {
-    if (!canDeleteClass) return;
+  const handlePointerDown = (event, classId) => {
+    ignoreNextClick.current = false;
+
+    if (!canDeleteClass || event.pointerType !== "touch") return;
 
     clearTimeout(longPressTimer.current);
-    longPressTriggered.current = false;
+
+    pointerStartPosition.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
 
     longPressTimer.current = setTimeout(() => {
-      longPressTriggered.current = true;
+      ignoreNextClick.current = true;
+
+      setSelectedClassIds((prev) =>
+        prev.includes(classId) ? prev : [...prev, classId],
+      );
+
       setSelectionMode(true);
-      toggleClassSelection(classId);
     }, 500);
   };
 
-  const handleTouchEnd = () => {
+  const handlePointerMove = (event) => {
+    if (!pointerStartPosition.current) return;
+
+    const deltaX = Math.abs(event.clientX - pointerStartPosition.current.x);
+
+    const deltaY = Math.abs(event.clientY - pointerStartPosition.current.y);
+
+    if (deltaX > 10 || deltaY > 10) {
+      clearTimeout(longPressTimer.current);
+      pointerStartPosition.current = null;
+    }
+  };
+
+  const handlePointerEnd = () => {
     clearTimeout(longPressTimer.current);
+    pointerStartPosition.current = null;
   };
 
   const handleCardClick = (classItem) => {
-    if (longPressTriggered.current) {
-      longPressTriggered.current = false;
-      return;
-    }
+    if (ignoreNextClick.current) return;
 
     if (selectionMode) {
       toggleClassSelection(classItem.id);
@@ -229,7 +265,10 @@ export default function OfficialClasses({ tenantId }) {
                   <BlackButton
                     onClick={selectAllClasses}
                     text={
-                      selectedClassIds.length === classesOfDay.length
+                      classesOfDay.length > 0 &&
+                      classesOfDay.every((classItem) =>
+                        selectedClassIds.includes(classItem.id),
+                      )
                         ? "Deseleccionar todo"
                         : "Seleccionar todo"
                     }
@@ -276,17 +315,31 @@ export default function OfficialClasses({ tenantId }) {
                     isSelected={isSelected}
                     canSelect={canDeleteClass}
                     onToggleSelection={() => toggleClassSelection(classItem.id)}
-                    onTouchStart={() => handleTouchStart(classItem.id)}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchMove={handleTouchEnd}
-                    onTouchCancel={handleTouchEnd}
+                    onPointerDown={(event) =>
+                      handlePointerDown(event, classItem.id)
+                    }
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerEnd}
+                    onPointerCancel={handlePointerEnd}
+                    onClickCapture={(event) => {
+                      if (ignoreNextClick.current) {
+                        ignoreNextClick.current = false;
+                        event.preventDefault();
+                        event.stopPropagation();
+                      }
+                    }}
                     onContextMenu={(event) => {
                       event.preventDefault();
 
                       if (!canDeleteClass) return;
 
+                      setSelectedClassIds((prev) =>
+                        prev.includes(classItem.id)
+                          ? prev
+                          : [...prev, classItem.id],
+                      );
+
                       setSelectionMode(true);
-                      toggleClassSelection(classItem.id);
                     }}
                     onClick={() => handleCardClick(classItem)}
                   />

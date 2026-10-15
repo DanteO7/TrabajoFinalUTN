@@ -2,15 +2,16 @@ import { Check } from "lucide-react";
 
 export default function ClassCard({
   classItem,
-  onClick,
-  isSelected = false,
-  canSelect = false,
+  isSelected,
+  canSelect,
   onToggleSelection,
-  onTouchStart,
-  onTouchEnd,
-  onTouchMove,
-  onTouchCancel,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  onPointerCancel,
+  onClickCapture,
   onContextMenu,
+  onClick,
 }) {
   const isFull =
     classItem.reservationsCount != null &&
@@ -21,12 +22,13 @@ export default function ClassCard({
 
   return (
     <div
-      onClick={onClick}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
-      onTouchMove={onTouchMove}
-      onTouchCancel={onTouchCancel}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
+      onClickCapture={onClickCapture}
       onContextMenu={onContextMenu}
+      onClick={onClick}
       className={`relative cursor-pointer rounded-lg border p-5 shadow-md transition-all duration-300 ${
         isSelected
           ? "border-[#FC697B] bg-red-100"
