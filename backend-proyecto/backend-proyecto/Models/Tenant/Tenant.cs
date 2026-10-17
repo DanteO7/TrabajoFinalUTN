@@ -25,6 +25,10 @@
         public string? Alias { get; set; }
         public string? CBU { get; set; }
 
+        public bool OnboardingCompleted { get; set; } = false;
+        public int OnboardingCurrentStep { get; set; } = 1;
+        public string OnboardingStepsJson { get; set; } = "{}";
+
         public ICollection<Professor> Professors { get; set; } = new List<Professor>();
         public ICollection<Student> Students { get; set; } = new List<Student>();
     }

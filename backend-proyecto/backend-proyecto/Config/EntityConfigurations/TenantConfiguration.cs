@@ -46,6 +46,18 @@ namespace backend_proyecto.Config.EntityConfigurations
 
             entity.Property(t => t.MercadoPagoUserId)
                   .IsRequired(false);
+
+            entity.Property(t => t.OnboardingCompleted)
+                  .IsRequired()
+                  .HasDefaultValue(false);
+
+            entity.Property(t => t.OnboardingCurrentStep)
+                  .IsRequired()
+                  .HasDefaultValue(1);
+
+            entity.Property(t => t.OnboardingStepsJson)
+                  .IsRequired()
+                  .HasDefaultValue("{}");
         }
     }
 }

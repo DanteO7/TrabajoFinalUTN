@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using backend_projeto.Models.DTOs;
-using backend_proyecto.Enums;
-using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
-using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -330,6 +326,77 @@ namespace backend_proyecto.Controllers
                 );
 
                 return Ok(new { message = "Correo enviado correctamente." });
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+        }
+
+        [HttpGet("onboarding")]
+        [Authorize]
+        public async Task<IActionResult> GetOnboarding()
+        {
+            var userIdClaim = User.FindFirst("id")?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            try
+            {
+                var result = await _tenantServices.GetOnboarding(userId);
+
+                return Ok(result);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+        }
+
+        [HttpPut("onboarding/current-step")]
+        [Authorize]
+        public async Task<IActionResult> UpdateOnboardingCurrentStep(
+            [FromBody] UpdateOnboardingStepDTO dto)
+        {
+            var userIdClaim = User.FindFirst("id")?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            try
+            {
+                await _tenantServices.UpdateOnboardingCurrentStep(
+                    userId,
+                    dto.CurrentStep
+                );
+
+                return NoContent();
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+        }
+
+        [HttpPut("onboarding/complete-step")]
+        [Authorize]
+        public async Task<IActionResult> CompleteOnboardingStep(
+            [FromBody] CompleteOnboardingStepDTO dto)
+        {
+            var userIdClaim = User.FindFirst("id")?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
+            try
+            {
+                await _tenantServices.CompleteOnboardingStep(
+                    userId,
+                    dto.Step
+                );
+
+                return NoContent();
             }
             catch (HttpResponseError ex)
             {

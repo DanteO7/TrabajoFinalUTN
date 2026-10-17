@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using backend_projeto.Models.DTOs;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
@@ -8,6 +7,7 @@ using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Microsoft.AspNetCore.DataProtection;
+using System.Text.Json;
 
 namespace backend_proyecto.Services
 {
@@ -24,6 +24,7 @@ namespace backend_proyecto.Services
         private readonly EmailServices _emailServices; 
         private readonly IDataProtector _tenantRequestProtector;
         private readonly GroupServices _groupServices;
+        private readonly CurrentTenantService _currentTenantService;
 
         public TenantServices(
             ITenantRepository tenantRepository,
@@ -36,7 +37,8 @@ namespace backend_proyecto.Services
             PermissionServices permissionServices,
             EmailServices emailServices,
             IDataProtectionProvider dataProtectionProvider,
-            GroupServices groupServices)
+            GroupServices groupServices,
+            CurrentTenantService currentTenantService)
         {
             _tenantRepository = tenantRepository;
             _tenantPlanRepository = tenantPlanRepository;
@@ -49,6 +51,7 @@ namespace backend_proyecto.Services
             _emailServices = emailServices;
             _tenantRequestProtector = dataProtectionProvider.CreateProtector("TurnoFacil.TenantRequest");
             _groupServices = groupServices;
+            _currentTenantService = currentTenantService;
         }
 
         public async Task<List<ResponseTenantDTO>> GetAll(int userId)
@@ -689,6 +692,131 @@ namespace backend_proyecto.Services
                 user.Email,
                 tenant.Name
             );
+        }
+
+        private async Task<Tenant> GetOwnedTenantForOnboarding(int userId)
+        {
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el negocio."
+                );
+            }
+
+            if (tenant.OwnerUserId != userId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el negocio."
+                );
+            }
+
+            return tenant;
+        }
+
+        public async Task<TenantOnboardingDTO> GetOnboarding(int userId)
+        {
+            var tenant = await GetOwnedTenantForOnboarding(userId);
+
+            var steps =
+                JsonSerializer.Deserialize<Dictionary<string, bool>>(
+                    tenant.OnboardingStepsJson
+                ) ?? new Dictionary<string, bool>();
+
+            return new TenantOnboardingDTO
+            {
+                Completed = tenant.OnboardingCompleted,
+                CurrentStep = tenant.OnboardingCurrentStep,
+                Steps = steps
+            };
+        }
+
+
+        public async Task UpdateOnboardingCurrentStep(
+            int userId,
+            int currentStep)
+        {
+            if (currentStep < 1 || currentStep > 10)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El paso indicado no es válido."
+                );
+            }
+
+            var tenant = await GetOwnedTenantForOnboarding(userId);
+
+            if (tenant.OnboardingCompleted)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El onboarding ya está completo."
+                );
+            }
+
+            tenant.OnboardingCurrentStep = currentStep;
+
+            await _tenantRepository.UpdateOneAsync(tenant);
+        }
+
+        public async Task CompleteOnboardingStep(
+            int userId,
+            string step)
+        {
+            var validSteps = new HashSet<string>
+            {
+                "welcome",
+                "activities",
+                "firstClass",
+                "inviteProfessor",
+                "specialities",
+                "studentPlans",
+                "inviteStudent",
+                "firstPayment",
+                "welcomeNews",
+                "finish"
+            };
+
+            if (!validSteps.Contains(step))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El paso indicado no es válido."
+                );
+            }
+
+            var tenant = await GetOwnedTenantForOnboarding(userId);
+
+            if (tenant.OnboardingCompleted)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El onboarding ya está completo."
+                );
+            }
+
+            var steps =
+                JsonSerializer.Deserialize<Dictionary<string, bool>>(
+                    tenant.OnboardingStepsJson
+                ) ?? new Dictionary<string, bool>();
+
+            steps[step] = true;
+
+            tenant.OnboardingStepsJson = JsonSerializer.Serialize(steps);
+
+            if (step == "finish")
+            {
+                tenant.OnboardingCompleted = true;
+            }
+
+            await _tenantRepository.UpdateOneAsync(tenant);
         }
     }
 }

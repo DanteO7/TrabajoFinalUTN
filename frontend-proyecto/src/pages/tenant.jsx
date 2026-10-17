@@ -19,6 +19,7 @@ import { useLocation } from "wouter";
 import Loading from "../components/loading";
 import { useState } from "react";
 import BlackButton from "../components/buttons/black-button";
+import RedButton from "../components/buttons/red-button";
 import { getUnreadNewsCount } from "../services/news";
 import EditTenantModal from "../components/tenant/edit-tenant-modal";
 import {
@@ -211,10 +212,23 @@ export default function Tenant({ id }) {
           </div>
         ) : (
           <div className="flex flex-col justify-between items-start flex-wrap gap-5">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                {tenant?.name}
-              </h1>
+            <div className="flex min-w-0 flex-col gap-2 w-full">
+              <div className="flex min-w-0 flex-wrap items-center gap-3 justify-between w-full">
+                <h1 className="min-w-0 wrap-break-word text-4xl font-bold min-[900px]:text-5xl">
+                  {tenant?.name}
+                </h1>
+                {tenant?.role === "Tenant" &&
+                  tenant.onboardingCompleted === false && (
+                    <RedButton
+                      text="Completar primeros pasos"
+                      onClick={() =>
+                        setLocation(`/tu-espacio/${tenant.id}/primeros-pasos`)
+                      }
+                      wfit
+                      textSmall
+                    />
+                  )}
+              </div>
 
               <p className="text-gray-500">
                 Administrado por {tenant?.ownerUser.name}{" "}

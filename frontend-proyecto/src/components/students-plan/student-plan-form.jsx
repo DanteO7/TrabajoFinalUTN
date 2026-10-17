@@ -12,7 +12,7 @@ import { createStudentPlan } from "../../services/student-plan";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 
-export default function StudentPlanForm({ tenantId, close }) {
+export default function StudentPlanForm({ tenantId, close, onCreated }) {
   const queryClient = useQueryClient();
 
   const {
@@ -33,11 +33,12 @@ export default function StudentPlanForm({ tenantId, close }) {
     mutationKey: ["createStudentPlan"],
     mutationFn: createStudentPlan,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["getStudentPlans", tenantId],
       });
 
+      onCreated?.();
       setSuccessMessage("Plan creado correctamente");
       setSuccessModal(true);
       setBackendError(null);

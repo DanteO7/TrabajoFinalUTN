@@ -72,6 +72,35 @@ namespace backend_proyecto.Services
             return _mapper.Map<List<ResponseClassDTO>>(classes);
         }
 
+        public async Task<bool> HasClasses(int tenantId, int userId)
+        {
+            await _permissionServices.CheckPermission(Permissions.CLASS_READ);
+
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == tenantId,
+                t => t.Students,
+                t => t.Professors
+            );
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
+            }
+
+            var hasAccess =
+                tenant.OwnerUserId == userId ||
+                tenant.Professors.Any(p => p.UserId == userId) ||
+                tenant.Students.Any(s => s.UserId == userId);
+
+            if (!hasAccess)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
+            return await _classRepository.Query()
+                .AnyAsync(c => c.TenantId == tenantId);
+        }
+
         public async Task<ResponseClassDTO> CreateOne(CreateClassDTO createClassDTO)
         {
             await _permissionServices.CheckPermission(Permissions.CLASS_CREATE);

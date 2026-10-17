@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DayPicker } from "react-day-picker";
+import "../../css/day-picker.css";
+import "react-day-picker/dist/style.css";
+
 import Modal from "../modals/modal";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
@@ -9,7 +12,11 @@ import SuccessModal from "../modals/success-modal";
 import { copyClassTemplateWeek } from "../../services/class-template";
 import { X } from "lucide-react";
 
-export default function CopyClassTemplateWeekModal({ tenantId, close }) {
+export default function CopyClassTemplateWeekModal({
+  tenantId,
+  close,
+  onCopied,
+}) {
   const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -34,6 +41,8 @@ export default function CopyClassTemplateWeekModal({ tenantId, close }) {
       queryClient.invalidateQueries({
         queryKey: ["getClasses", tenantId],
       });
+
+      onCopied?.();
 
       setSuccessModal(true);
 

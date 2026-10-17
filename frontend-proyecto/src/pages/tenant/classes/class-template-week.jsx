@@ -297,7 +297,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                       classesOfDay.length > 0 &&
                       isSelectionMode && (
                         <div className="mb-4 flex justify-end gap-2">
-                          <div className="min-[350px]:hidden">
+                          <div className="min-[356px]:hidden">
                             <BlackButton
                               onClick={() => selectAllTemplates(day.value)}
                               text={
@@ -308,7 +308,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                             />
                           </div>
 
-                          <div className="hidden min-[350px]:block">
+                          <div className="hidden min-[356px]:block">
                             <BlackButton
                               onClick={() => selectAllTemplates(day.value)}
                               text={

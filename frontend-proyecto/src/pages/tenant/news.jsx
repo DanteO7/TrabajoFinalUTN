@@ -146,7 +146,7 @@ export default function News({ tenantId }) {
 
                       <div className="flex items-center justify-center">
                         <BlackButton
-                          text="+ Crear Noticia"
+                          text="+ Crear"
                           onClick={() => setOpenCreateModal(true)}
                           textSmall={true}
                           wfit={true}

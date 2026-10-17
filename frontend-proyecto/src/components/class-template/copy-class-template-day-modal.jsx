@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DayPicker } from "react-day-picker";
+import "../../css/day-picker.css";
+import "react-day-picker/dist/style.css";
 
 import Modal from "../modals/modal";
 import WhiteButton from "../buttons/white-button";
@@ -15,6 +17,7 @@ export default function CopyClassTemplateDayModal({
   tenantId,
   dayOfWeek,
   close,
+  onCopied,
 }) {
   const queryClient = useQueryClient();
 
@@ -50,6 +53,8 @@ export default function CopyClassTemplateDayModal({
       queryClient.invalidateQueries({
         queryKey: ["getClasses", tenantId],
       });
+
+      onCopied?.();
 
       setSuccessModal(true);
 

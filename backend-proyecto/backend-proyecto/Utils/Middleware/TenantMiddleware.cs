@@ -56,6 +56,14 @@ namespace backend_proyecto.Middlewares
                 );
             }
 
+            if (context.Request.Path.StartsWithSegments(
+                "/api/tenants/onboarding",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                await _next(context);
+                return;
+            }
+
             var isAdmin = await db.Admin
                 .AnyAsync(a => a.UserId == userId);
 

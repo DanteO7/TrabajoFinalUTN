@@ -12,7 +12,7 @@ import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
 
-export default function SpecialityForm({ tenantId, close }) {
+export default function SpecialityForm({ tenantId, close, onCreated }) {
   const queryClient = useQueryClient();
 
   const {
@@ -33,11 +33,12 @@ export default function SpecialityForm({ tenantId, close }) {
     mutationKey: ["createSpeciality"],
     mutationFn: createSpeciality,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["getSpecialities", tenantId],
       });
 
+      onCreated?.();
       setSuccessMessage("Especialidad creada correctamente");
       setSuccessModal(true);
       setBackendError(null);
@@ -101,7 +102,7 @@ export default function SpecialityForm({ tenantId, close }) {
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear profesión"}
+            text={mutation.isPending ? "Creando..." : "Crear"}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

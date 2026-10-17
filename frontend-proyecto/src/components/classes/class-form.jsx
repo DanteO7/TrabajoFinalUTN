@@ -24,6 +24,7 @@ export default function ClassForm({
   defaultDayOfWeek,
   close,
   isTemplate = false,
+  onCreated,
 }) {
   const queryClient = useQueryClient();
 
@@ -77,6 +78,10 @@ export default function ClassForm({
       );
 
       setSuccessModal(true);
+
+      if (!isTemplate) {
+        onCreated?.();
+      }
 
       setTimeout(() => {
         close();

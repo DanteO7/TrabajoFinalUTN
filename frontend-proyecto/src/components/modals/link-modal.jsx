@@ -12,12 +12,11 @@ import {
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 import RedButton from "../buttons/red-button";
-import { Trash2 } from "lucide-react";
 import { Copy } from "lucide-react";
 import { Check } from "lucide-react";
 import FormInput from "../inputs/form-input";
 
-export default function LinkModal({ tenantId, close, role }) {
+export default function LinkModal({ tenantId, close, role, onCompleted }) {
   const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
@@ -54,6 +53,8 @@ export default function LinkModal({ tenantId, close, role }) {
 
     onSuccess: (data) => {
       queryClient.setQueryData(["invitation", tenantId, role], data);
+
+      onCompleted?.();
     },
 
     onError: (error) => {

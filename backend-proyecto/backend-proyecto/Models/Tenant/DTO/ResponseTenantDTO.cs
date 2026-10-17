@@ -16,5 +16,6 @@
         public string? Alias { get; set; }
         public string? CBU { get; set; }
         public DateTime? PaymentDueDate { get; set; }
+        public bool OnboardingCompleted { get; set; }
     }
 }

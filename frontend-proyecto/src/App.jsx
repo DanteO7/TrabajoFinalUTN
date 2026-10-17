@@ -46,6 +46,7 @@ const MercadoPagoResult = lazy(() => import("./pages/mercado-pago-result"));
 const PaymentsResult = lazy(() => import("./pages/payments-result"));
 const MyPayments = lazy(() => import("./pages/my-payments"));
 const CreateTenant = lazy(() => import("./pages/create-tenant"));
+const TenantOnboarding = lazy(() => import("./pages/tenant/onboarding"));
 
 const queryClient = new QueryClient();
 
@@ -218,6 +219,10 @@ export default function App() {
 
             <ProtectedRoute path="/invitacion/:token">
               {(params) => <Invitation token={params.token} />}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/primeros-pasos">
+              {(params) => <TenantOnboarding tenantId={params.id} />}
             </ProtectedRoute>
 
             <Route component={NotFound} />

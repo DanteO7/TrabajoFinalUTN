@@ -13,6 +13,7 @@ export default function SelectStudentPaymentModal({
   close,
   onSelect,
   isAdmin = false,
+  demoMode = false,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [selected, setSelected] = useState(null);
@@ -20,16 +21,31 @@ export default function SelectStudentPaymentModal({
   const { data: students = [], isLoading: isLoadingStudents } = useQuery({
     queryKey: ["pendingPaymentStudents", tenantId],
     queryFn: () => getPendingPaymentStudents(tenantId),
-    enabled: !isAdmin && !!tenantId,
+    enabled: !demoMode && !isAdmin && !!tenantId,
   });
 
   const { data: tenants = [], isLoading: isLoadingTenants } = useQuery({
     queryKey: ["pendingPaymentTenants"],
     queryFn: getPendingPaymentTenants,
-    enabled: isAdmin,
+    enabled: !demoMode && isAdmin,
   });
 
-  const items = isAdmin ? tenants : students;
+  const demoStudent = {
+    id: "demo-student",
+    userId: "demo-user",
+    tenantId,
+    studentPlanId: "demo-plan",
+    user: {
+      name: "Alumno",
+      surname: "demo",
+      email: "alumno.demo@turnofacil.local",
+    },
+    studentPlan: {
+      name: "Plan mensual de demostración",
+      price: 18000,
+    },
+  };
+  const items = demoMode ? [demoStudent] : isAdmin ? tenants : students;
 
   const filteredItems = items.filter((item) => {
     const text = isAdmin

@@ -13,7 +13,14 @@ import { createNews } from "../../services/news";
 import { useAuthStore } from "../../store/auth-store";
 import { createNewsSchema } from "../../schema/news-schema";
 
-export default function NewsForm({ tenantId, close }) {
+export default function NewsForm({
+  tenantId,
+  close,
+  initialTitle = "",
+  initialContent = "",
+  tenantOnly = false,
+  onCreated,
+}) {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
 
@@ -26,6 +33,10 @@ export default function NewsForm({ tenantId, close }) {
   } = useForm({
     resolver: zodResolver(createNewsSchema),
     mode: "onTouched",
+    defaultValues: {
+      title: initialTitle,
+      content: initialContent,
+    },
   });
 
   const [backendError, setBackendError] = useState();
@@ -37,11 +48,12 @@ export default function NewsForm({ tenantId, close }) {
     mutationKey: ["createNews"],
     mutationFn: createNews,
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ["news", tenantId],
       });
 
+      onCreated?.();
       setSuccessMessage("Noticia creada correctamente");
       setSuccessModal(true);
       setBackendError(null);
@@ -67,7 +79,11 @@ export default function NewsForm({ tenantId, close }) {
   });
 
   const onSubmit = (form) => {
-    const tenantIdValue = isAdmin ? form.tenantId : "tenant";
+    const tenantIdValue = tenantOnly
+      ? "tenant"
+      : isAdmin
+        ? form.tenantId
+        : "tenant";
     console.log({
       title: form.title,
       content: form.content,
@@ -110,7 +126,7 @@ export default function NewsForm({ tenantId, close }) {
           error={errors.content}
         />
 
-        {isAdmin && (
+        {isAdmin && !tenantOnly && (
           <select {...register("tenantId")} className="...">
             <option value="global">Global</option>
             <option value="tenant">Este negocio</option>
@@ -120,7 +136,7 @@ export default function NewsForm({ tenantId, close }) {
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear noticia"}
+            text={mutation.isPending ? "Creando..." : "Crear"}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

@@ -43,6 +43,29 @@ namespace backend_proyecto.Controllers
             }
         }
 
+        [HttpGet("{tenantId}/exists")]
+        [Authorize]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<bool>> HasClasses(int tenantId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")?.Value!);
+                var hasClasses = await _classServices.HasClasses(tenantId, userId);
+                return Ok(hasClasses);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Authorize]
         [ProducesResponseType(typeof(ResponseClassDTO), StatusCodes.Status201Created)]

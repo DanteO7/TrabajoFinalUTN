@@ -12,7 +12,7 @@ import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
 
-export default function ActivityForm({ tenantId, close }) {
+export default function ActivityForm({ tenantId, close, onCreated }) {
   const queryClient = useQueryClient();
 
   const {
@@ -32,8 +32,11 @@ export default function ActivityForm({ tenantId, close }) {
   const mutation = useMutation({
     mutationKey: ["createActivity"],
     mutationFn: createActivity,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["getActivities", tenantId]);
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["getActivities", tenantId],
+      });
+      onCreated?.();
       setSuccessMessage("Actividad creada correctamente");
       setSuccesModal(true);
       setBackendError(null);

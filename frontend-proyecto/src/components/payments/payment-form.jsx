@@ -12,7 +12,13 @@ import SelectStudentPaymentModal from "./select-student-payment-modal";
 import { X } from "lucide-react";
 import { createPaymentSchema } from "../../schema/payment-schema";
 
-export default function PaymentForm({ tenantId, close, isAdmin = false }) {
+export default function PaymentForm({
+  tenantId,
+  close,
+  isAdmin = false,
+  demoMode = false,
+  onDemoCompleted,
+}) {
   const queryClient = useQueryClient();
 
   const [selected, setSelected] = useState(null);
@@ -26,6 +32,8 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
   const [successMessage, setSuccessMessage] = useState();
 
   const [successModal, setSuccessModal] = useState(false);
+
+  const [demoCompleted, setDemoCompleted] = useState(false);
 
   const {
     register,
@@ -91,6 +99,23 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
 
   const onSubmit = (data) => {
     if (!selected) return;
+
+    if (demoMode) {
+      if (demoCompleted) return;
+
+      setDemoCompleted(true);
+      setSuccessMessage(
+        "La demostración se completó correctamente. No se registró ningún pago real.",
+      );
+      setSuccessModal(true);
+      onDemoCompleted?.();
+
+      setTimeout(() => {
+        close();
+      }, 2000);
+
+      return;
+    }
 
     if (isAdmin) {
       mutation.mutate({
@@ -275,7 +300,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
             type="submit"
             text={mutation.isPending ? "Registrando..." : "Registrar"}
             textSmall={true}
-            disabled={mutation.isPending || !selected}
+            disabled={mutation.isPending || !selected || demoCompleted}
           />
         </div>
       </form>
@@ -300,6 +325,7 @@ export default function PaymentForm({ tenantId, close, isAdmin = false }) {
         <SelectStudentPaymentModal
           tenantId={tenantId}
           isAdmin={isAdmin}
+          demoMode={demoMode}
           close={() => setSelectModal(false)}
           onSelect={(item) => {
             setSelected(item);

@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+
+const resizeTextarea = (textarea) => {
+  if (!textarea) return;
+
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+};
 
 export default function FormInput({
   label,
@@ -15,6 +22,32 @@ export default function FormInput({
   rows = 4,
 }) {
   const [show, setShow] = useState(false);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textarea) {
+      resizeTextarea(textareaRef.current);
+    }
+  }, [textarea, value, rows]);
+
+  const textareaRegister = register
+    ? {
+        ...register,
+        ref: (element) => {
+          textareaRef.current = element;
+          register.ref?.(element);
+        },
+        onChange: (event) => {
+          register.onChange?.(event);
+          resizeTextarea(event.currentTarget);
+        },
+      }
+    : {
+        ref: (element) => {
+          textareaRef.current = element;
+        },
+        onChange: (event) => resizeTextarea(event.currentTarget),
+      };
 
   const inputClassName = `rounded-lg text-[15px] px-3 py-2 w-full border-gray-400 border bg-[#f1eef3] ${
     error ? "border-red-500" : ""
@@ -31,12 +64,12 @@ export default function FormInput({
       <div className="relative">
         {textarea ? (
           <textarea
-            className={`${inputClassName} resize-none`}
+            className={`${inputClassName} resize-none overflow-y-hidden`}
             id={id}
             placeholder={placeholder}
             disabled={disabled}
             rows={rows}
-            {...register}
+            {...textareaRegister}
             value={value}
           />
         ) : (

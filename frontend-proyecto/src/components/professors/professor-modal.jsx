@@ -12,7 +12,12 @@ import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 
-export default function ProfessorModal({ professor, tenantId, close }) {
+export default function ProfessorModal({
+  professor,
+  tenantId,
+  close,
+  onUpdated,
+}) {
   const queryClient = useQueryClient();
 
   const canUpdateProfessor = useHasPermission(tenantId, "PROFESSOR_UPDATE");
@@ -106,11 +111,12 @@ export default function ProfessorModal({ professor, tenantId, close }) {
         specialityIds: selectedSpecialityIds,
       }),
 
-    onSuccess: (updatedProfessor) => {
-      queryClient.invalidateQueries({
+    onSuccess: async (updatedProfessor) => {
+      await queryClient.invalidateQueries({
         queryKey: ["getProfessors", tenantId],
       });
 
+      onUpdated?.(updatedProfessor);
       setCurrentProfessor(updatedProfessor);
       setIsActive(updatedProfessor.isActive);
 
@@ -162,16 +168,10 @@ export default function ProfessorModal({ professor, tenantId, close }) {
           <h2 className="text-2xl font-semibold mb-2">
             {currentProfessor.user.name} {currentProfessor.user.surname}
           </h2>
-          <p className="text-gray-600 mb-6">{currentProfessor.user.email}</p>
+          <p className="text-gray-600 mb-6 text-[15px]">
+            {currentProfessor.user.email}
+          </p>
           <div className="space-y-4">
-            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Email</p>
-
-              <p className="font-semibold text-[#333]">
-                {currentProfessor.user.email}
-              </p>
-            </div>
-
             {currentProfessor.user.phoneNumber && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">Teléfono</p>
