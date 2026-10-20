@@ -9,5 +9,6 @@ namespace backend_proyecto.Models.DTOs
         public decimal? Price { get; set; }
         public int? MaxStudents { get; set; }
         public int? MaxProfessors { get; set; }
+        public bool? IncludesExercisesAndRoutines { get; set; }
     }
 }

@@ -171,6 +171,7 @@ namespace backend_proyecto.Services
                 Name = createTenantDTO.Name,
                 IsActive = true,
                 TenantPlanId = createTenantDTO.TenantPlanId,
+                TenantPlan = plan,
                 MonthlyFeeStatus = MonthlyFeeStatus.PAID,
                 PaymentDueDate = DateTime.UtcNow.AddDays(30)
             };
@@ -261,6 +262,7 @@ namespace backend_proyecto.Services
                 }
 
                 tenant.TenantPlanId = updateTenantDTO.TenantPlanId.Value;
+                tenant.TenantPlan = plan;
             }
 
             if (updateTenantDTO.Address != null)

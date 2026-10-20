@@ -12,24 +12,25 @@ namespace backend_proyecto.Services
         private readonly IExerciseRepository _exerciseRepository;
         private readonly PermissionServices _permissionServices;
         private readonly IMapper _mapper;
-        private readonly CurrentTenantService _currentTenantService;
+        private readonly TenantFeatureAccessService _tenantFeatureAccessService;
 
         public ExerciseServices(
             IExerciseRepository exerciseRepository,
             PermissionServices permissionServices,
             IMapper mapper,
-            CurrentTenantService currentTenantService)
+            TenantFeatureAccessService tenantFeatureAccessService)
         {
             _exerciseRepository = exerciseRepository;
             _permissionServices = permissionServices;
             _mapper = mapper;
-            _currentTenantService = currentTenantService;
+            _tenantFeatureAccessService = tenantFeatureAccessService;
         }
 
         public async Task<List<ResponseExerciseDTO>> GetAllByTenantId(int tenantId)
         {
             await _permissionServices.CheckPermission(Permissions.EXERCISE_READ);
 
+            await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess(tenantId);
 
             var exercises = await _exerciseRepository.GetAllAsync(
                 e => e.TenantId == tenantId
@@ -42,6 +43,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.EXERCISE_READ);
 
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var exercise = await _exerciseRepository.GetOneAsync(
                 e => e.Id == id
             );
@@ -54,6 +56,8 @@ namespace backend_proyecto.Services
                 );
             }
 
+            EnsureExerciseBelongsToTenant(exercise.TenantId, tenantId);
+
             return _mapper.Map<ResponseExerciseDTO>(exercise);
         }
 
@@ -62,7 +66,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.EXERCISE_CREATE);
 
-            var tenantId = _currentTenantService.GetRequiredTenantId();
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
 
             if (string.IsNullOrWhiteSpace(createExerciseDTO.Name))
             {
@@ -116,6 +120,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.EXERCISE_UPDATE);
 
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var exercise = await _exerciseRepository.GetOneAsync(
                 e => e.Id == id
             );
@@ -127,6 +132,8 @@ namespace backend_proyecto.Services
                     $"No se encontró un ejercicio con el Id = '{id}'"
                 );
             }
+
+            EnsureExerciseBelongsToTenant(exercise.TenantId, tenantId);
 
             if (updateExerciseDTO.Name != null)
             {
@@ -179,6 +186,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.EXERCISE_DELETE);
 
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var exercise = await _exerciseRepository.GetOneAsync(
                 e => e.Id == id
             );
@@ -191,7 +199,20 @@ namespace backend_proyecto.Services
                 );
             }
 
+            EnsureExerciseBelongsToTenant(exercise.TenantId, tenantId);
+
             await _exerciseRepository.DeleteOneAsync(exercise);
+        }
+
+        private static void EnsureExerciseBelongsToTenant(int exerciseTenantId, int tenantId)
+        {
+            if (exerciseTenantId != tenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el ejercicio solicitado"
+                );
+            }
         }
     }
 }

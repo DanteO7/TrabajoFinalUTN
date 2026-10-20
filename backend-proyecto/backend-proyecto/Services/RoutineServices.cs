@@ -14,26 +14,27 @@ namespace backend_proyecto.Services
         private readonly IExerciseRepository _exerciseRepository;
         private readonly PermissionServices _permissionServices;
         private readonly IMapper _mapper;
-        private readonly CurrentTenantService _currentTenantService;
+        private readonly TenantFeatureAccessService _tenantFeatureAccessService;
 
         public RoutineServices(
             IRoutineRepository routineRepository,
             IExerciseRepository exerciseRepository,
             PermissionServices permissionServices,
             IMapper mapper,
-            CurrentTenantService currentTenantService)
+            TenantFeatureAccessService tenantFeatureAccessService)
         {
             _routineRepository = routineRepository;
             _exerciseRepository = exerciseRepository;
             _permissionServices = permissionServices;
             _mapper = mapper;
-            _currentTenantService = currentTenantService;
+            _tenantFeatureAccessService = tenantFeatureAccessService;
         }
 
         public async Task<List<ResponseRoutineDTO>> GetAllByTenantId(int tenantId)
         {
             await _permissionServices.CheckPermission(Permissions.ROUTINE_READ);
 
+            await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess(tenantId);
             var routines = await _routineRepository.GetAllByTenantIdAsync(tenantId);
 
             return _mapper.Map<List<ResponseRoutineDTO>>(routines);
@@ -43,6 +44,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.ROUTINE_READ);
 
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var routine = await _routineRepository.GetOneWithExercisesAsync(id);
 
             if (routine == null)
@@ -53,6 +55,8 @@ namespace backend_proyecto.Services
                 );
             }
 
+            EnsureRoutineBelongsToTenant(routine.TenantId, tenantId);
+
             return _mapper.Map<ResponseRoutineDTO>(routine);
         }
 
@@ -61,8 +65,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.ROUTINE_CREATE);
 
-
-            var tenantId = _currentTenantService.GetRequiredTenantId();
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
 
             ValidateRoutineData(
                 createRoutineDTO.Name,
@@ -116,7 +119,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.ROUTINE_UPDATE);
 
-
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var routine = await _routineRepository.GetOneAsync(
                 r => r.Id == id,
                 r => r.RoutineExercises
@@ -129,6 +132,8 @@ namespace backend_proyecto.Services
                     $"No se encontró una rutina con el Id = '{id}'"
                 );
             }
+
+            EnsureRoutineBelongsToTenant(routine.TenantId, tenantId);
 
             if (updateRoutineDTO.Name != null)
             {
@@ -228,7 +233,7 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.ROUTINE_DELETE);
 
-
+            var tenantId = await _tenantFeatureAccessService.EnsureExercisesAndRoutinesAccess();
             var routine = await _routineRepository.GetOneAsync(
                 r => r.Id == id
             );
@@ -241,7 +246,20 @@ namespace backend_proyecto.Services
                 );
             }
 
+            EnsureRoutineBelongsToTenant(routine.TenantId, tenantId);
+
             await _routineRepository.DeleteOneAsync(routine);
+        }
+
+        private static void EnsureRoutineBelongsToTenant(int routineTenantId, int tenantId)
+        {
+            if (routineTenantId != tenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró la rutina solicitada"
+                );
+            }
         }
 
         private async Task<Exercise> GetExerciseForTenant(

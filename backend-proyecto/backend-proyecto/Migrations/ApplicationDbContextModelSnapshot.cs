@@ -1115,6 +1115,9 @@ namespace backend_proyecto.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IncludesExercisesAndRoutines")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("MaxProfessors")
                         .HasColumnType("integer");
 

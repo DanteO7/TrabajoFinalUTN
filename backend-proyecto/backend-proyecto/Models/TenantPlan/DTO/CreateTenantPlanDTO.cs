@@ -16,5 +16,7 @@ namespace backend_proyecto.Models.DTOs
 
         [Required]
         public int MaxProfessors { get; set; }
+
+        public bool IncludesExercisesAndRoutines { get; set; }
     }
 }

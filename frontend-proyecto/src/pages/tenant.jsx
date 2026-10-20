@@ -26,12 +26,11 @@ import {
   FaFacebook,
   FaInstagram,
   FaTiktok,
-  FaTwitter,
   FaLinkedin,
   FaYoutube,
   FaWhatsapp,
 } from "react-icons/fa";
-import { FaListCheck } from "react-icons/fa6";
+import { FaListCheck, FaXTwitter } from "react-icons/fa6";
 import { useTenantStore } from "../store/tenant-store";
 
 export default function Tenant({ id }) {
@@ -46,13 +45,15 @@ export default function Tenant({ id }) {
   } = useQuery({
     queryKey: ["tenantById", id],
     queryFn: () => getTenantById(id),
+    refetchInterval: 30000,
+    refetchIntervalInBackground: true,
   });
 
   const PLATFORM_ICONS = {
     facebook: FaFacebook,
     instagram: FaInstagram,
     tiktok: FaTiktok,
-    x: FaTwitter,
+    x: FaXTwitter,
     linkedin: FaLinkedin,
     youtube: FaYoutube,
     whatsapp: FaWhatsapp,
@@ -147,6 +148,13 @@ export default function Tenant({ id }) {
 
   const cards = userPermissions
     ? sections.filter((section) => {
+        if (
+          ["ejercicios", "rutinas"].includes(section.href) &&
+          tenant?.tenantPlan?.includesExercisesAndRoutines !== true
+        ) {
+          return false;
+        }
+
         const hasPermission = userPermissions.permissions.includes(
           section.permission,
         );

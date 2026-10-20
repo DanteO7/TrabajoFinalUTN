@@ -29,7 +29,10 @@ namespace backend_proyecto.Config
 
             // tenantPlan
             CreateMap<CreateTenantPlanDTO, TenantPlan>();
-            CreateMap<UpdateTenantPlanDTO, TenantPlan>();
+            CreateMap<UpdateTenantPlanDTO, TenantPlan>()
+                .ForAllMembers(opts =>
+                    opts.Condition((src, dest, srcMember) => srcMember != null)
+                );
             CreateMap<TenantPlan, ResponseTenantPlanDTO>();
 
             // studentPlan

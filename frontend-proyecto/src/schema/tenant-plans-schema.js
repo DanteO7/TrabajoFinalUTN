@@ -16,6 +16,7 @@ export const createTenantPlanSchema = z.object({
     .int("Debe ser un número entero")
     .min(1, "Los profesores máximos deben ser mayores a 0")
     .max(50, "Los profesores máximos no pueden ser mayores a 50"),
+  includesExercisesAndRoutines: z.boolean(),
 });
 
 export const updateTenantPlanSchema = z.object({
@@ -36,4 +37,5 @@ export const updateTenantPlanSchema = z.object({
     .min(1, "Los profesores máximos deben ser mayores a 0")
     .max(50, "Los profesores máximos no pueden ser mayores a 50")
     .optional(),
+  includesExercisesAndRoutines: z.boolean().optional(),
 });

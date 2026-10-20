@@ -27,6 +27,8 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
       price: plan?.price,
       maxStudents: plan?.maxStudents,
       maxProfessors: plan?.maxProfessors,
+      includesExercisesAndRoutines:
+        plan?.includesExercisesAndRoutines === true,
     },
   });
 
@@ -42,6 +44,12 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["getTenantPlans"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tenantsPlan"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tenantById"],
       });
 
       setSuccessMessage("Plan actualizado correctamente");
@@ -75,6 +83,7 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
       price: form.price ? parseFloat(form.price) : null,
       maxStudents: form.maxStudents,
       maxProfessors: form.maxProfessors,
+      includesExercisesAndRoutines: form.includesExercisesAndRoutines,
     });
   };
 
@@ -123,6 +132,15 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
           register={register("maxProfessors")}
           error={errors.maxProfessors}
         />
+
+        <label className="flex items-center gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-[#fa7282]"
+            {...register("includesExercisesAndRoutines")}
+          />
+          <span>Incluye ejercicios y rutinas</span>
+        </label>
 
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton text="Cancelar" onClick={close} textSmall={true} />

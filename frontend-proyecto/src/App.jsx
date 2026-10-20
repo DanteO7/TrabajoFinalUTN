@@ -1,7 +1,7 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Suspense, useEffect, lazy } from "react";
-import { Route, Switch } from "wouter";
+import { Redirect, Route, Switch } from "wouter";
 import { useAuthStore } from "./store/auth-store";
 import { me } from "./services/auth";
 import { usePreferencesStore } from "./store/preferences-store";
@@ -12,6 +12,7 @@ import Header from "./components/header";
 import { useLocation } from "wouter";
 import ForgotPassword from "./pages/forgot-password";
 import { AdminRoute } from "./router/admin-route";
+import { getTenantById } from "./services/tenant";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -49,6 +50,26 @@ const CreateTenant = lazy(() => import("./pages/create-tenant"));
 const TenantOnboarding = lazy(() => import("./pages/tenant/onboarding"));
 
 const queryClient = new QueryClient();
+
+function TenantPlanFeatureRoute({ tenantId, children }) {
+  const { data: tenant, isLoading, isError } = useQuery({
+    queryKey: ["tenantById", tenantId],
+    queryFn: () => getTenantById(tenantId),
+    refetchInterval: 30000,
+    refetchIntervalInBackground: true,
+  });
+
+  if (isLoading) return <Loading />;
+
+  if (
+    isError ||
+    tenant?.tenantPlan?.includesExercisesAndRoutines !== true
+  ) {
+    return <Redirect to={`/tu-espacio/${tenantId}`} />;
+  }
+
+  return children;
+}
 
 export default function App() {
   const { login, logout } = useAuthStore();
@@ -210,11 +231,19 @@ export default function App() {
             </ProtectedRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/ejercicios">
-              {(params) => <Exercises tenantId={params.id} />}
+              {(params) => (
+                <TenantPlanFeatureRoute tenantId={params.id}>
+                  <Exercises tenantId={params.id} />
+                </TenantPlanFeatureRoute>
+              )}
             </ProtectedRoute>
 
             <ProtectedRoute path="/tu-espacio/:id/rutinas">
-              {(params) => <Routines tenantId={params.id} />}
+              {(params) => (
+                <TenantPlanFeatureRoute tenantId={params.id}>
+                  <Routines tenantId={params.id} />
+                </TenantPlanFeatureRoute>
+              )}
             </ProtectedRoute>
 
             <ProtectedRoute path="/invitacion/:token">
