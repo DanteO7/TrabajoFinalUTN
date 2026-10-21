@@ -48,6 +48,7 @@ const PaymentsResult = lazy(() => import("./pages/payments-result"));
 const MyPayments = lazy(() => import("./pages/my-payments"));
 const CreateTenant = lazy(() => import("./pages/create-tenant"));
 const TenantOnboarding = lazy(() => import("./pages/tenant/onboarding"));
+const Statistics = lazy(() => import("./pages/tenant/statistics"));
 
 const queryClient = new QueryClient();
 
@@ -85,10 +86,11 @@ export default function App() {
   const shouldShowHeader = !noHeaderRoutes.includes(location);
 
   const { language, theme } = usePreferencesStore();
+  const activeLanguage = language === "en" ? "en" : "es";
 
   useEffect(() => {
-    i18n.changeLanguage(language);
-  }, [language]);
+    i18n.changeLanguage(activeLanguage);
+  }, [activeLanguage]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -244,6 +246,10 @@ export default function App() {
                   <Routines tenantId={params.id} />
                 </TenantPlanFeatureRoute>
               )}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/estadisticas">
+              {(params) => <Statistics tenantId={params.id} />}
             </ProtectedRoute>
 
             <ProtectedRoute path="/invitacion/:token">

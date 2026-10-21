@@ -127,7 +127,10 @@ export default function NewsForm({
         />
 
         {isAdmin && !tenantOnly && (
-          <select {...register("tenantId")} className="...">
+          <select
+            {...register("tenantId")}
+            className="rounded-lg border border-gray-400 bg-[#f1eef3] p-2 text-gray-700 cursor-pointer"
+          >
             <option value="global">Global</option>
             <option value="tenant">Este negocio</option>
           </select>

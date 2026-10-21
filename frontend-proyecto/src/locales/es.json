@@ -6,5 +6,25 @@
     "contact": "Contact",
     "language": "Idioma",
     "theme": "Tema"
+  },
+  "statistics": {
+    "paymentMethods": {
+      "Cash": "Efectivo",
+      "Bank Transfer": "Transferencia bancaria",
+      "Debit Card": "Tarjeta de débito",
+      "Mercado Pago": "Mercado Pago"
+    },
+    "weekdays": {
+      "0": "Domingo",
+      "1": "Lunes",
+      "2": "Martes",
+      "3": "Miércoles",
+      "4": "Jueves",
+      "5": "Viernes",
+      "6": "Sábado"
+    },
+    "messages": {
+      "CLASS_TRACKING_UNAVAILABLE": "El sistema no registra si una clase programada se dictó efectivamente. El estado Completada de una reserva se asigna automáticamente cuando pasa el horario y no representa asistencia."
+    }
   }
 }

@@ -25,7 +25,7 @@ export default function Header() {
 
   return (
     <header className="bg-[#222] w-full h-13 sticky top-0 z-30">
-      <div className="text-[#ededed] grid grid-cols-[1fr_1.6fr_1fr] place-items-center items-center h-full">
+      <div className="text-[#ededed] grid grid-cols-[1fr_1.6fr_1fr] max-[900px]:place-items-center items-center h-full min-[900px]:grid-cols-2 min-[900px]:px-10 max-w-412.5 mx-auto">
         <div className="min-[900px]:hidden">
           <button
             className="flex flex-col gap-1.25 z-50 mx-1.5 mr-5"
@@ -47,11 +47,7 @@ export default function Header() {
           />
         </Link>
 
-        <nav className="hidden min-[900px]:flex gap-8"></nav>
-
-        <div
-          className={`flex gap-5 items-center ${isAdmin && "min-[900px]:mr-25"}`}
-        >
+        <div className={`flex min-[900px]:justify-self-end gap-5 items-center`}>
           {isAuthenticated && (
             <div className={`flex items-center gap-5`}>
               {isAdmin && (
@@ -103,7 +99,7 @@ export default function Header() {
             </Link>
           )}
 
-          <Link className="hidden min-[900px]:flex">
+          <Link href="/ajustes" className="hidden min-[900px]:flex">
             <IoMdSettings
               className="inline-block transition-transform duration-300 hover:scale-105 hover:rotate-70"
               size={22}
@@ -192,13 +188,13 @@ export default function Header() {
                   </MenuItem>
                 </>
               )}
-              {/* <MenuItem
+              <MenuItem
                 href="/ajustes"
                 icon={IoMdSettings}
                 onClick={() => setMenu(false)}
               >
                 Ajustes
-              </MenuItem> */}
+              </MenuItem>
             </ul>
           </nav>
         </div>

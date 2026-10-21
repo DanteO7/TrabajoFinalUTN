@@ -1,4 +1,4 @@
-import { useEffect, forwardRef } from "react";
+import { useEffect, useRef, forwardRef } from "react";
 import { createPortal } from "react-dom";
 
 // Contador global de modales abiertos
@@ -8,6 +8,8 @@ const Modal = forwardRef(function Modal(
   { open, onClose, children, isSuccesOrError },
   ref,
 ) {
+  const mouseDownOutside = useRef(false);
+
   useEffect(() => {
     if (!open) return;
 
@@ -34,9 +36,15 @@ const Modal = forwardRef(function Modal(
   }, [open, onClose]);
 
   const handleOverlayMouseDown = (e) => {
-    if (e.target === e.currentTarget) {
+    mouseDownOutside.current = e.target === e.currentTarget;
+  };
+
+  const handleOverlayMouseUp = (e) => {
+    const mouseUpOutside = e.target === e.currentTarget;
+    if (mouseDownOutside.current && mouseUpOutside) {
       onClose();
     }
+    mouseDownOutside.current = false;
   };
 
   if (!open) return null;
@@ -44,7 +52,8 @@ const Modal = forwardRef(function Modal(
   return createPortal(
     <div
       className="fixed inset-0 z-9999 bg-black/40 backdrop-blur-xs flex items-center justify-center px-4"
-      onMouseUp={handleOverlayMouseDown}
+      onMouseDown={handleOverlayMouseDown}
+      onMouseUp={handleOverlayMouseUp}
     >
       <div
         ref={ref}

@@ -6,7 +6,7 @@ export const usePreferencesStore = create(
   persist(
     (set) => ({
       theme: "light",
-      language: "Español (ES)",
+      language: "es",
 
       setTheme: (theme) => {
         set({ theme });

@@ -5,6 +5,21 @@ export const getTenants = () => request("get", "/tenants");
 
 export const getTenantById = (id) => request("get", `/tenants/${id}`);
 
+export const getTenantStatisticsSummary = (tenantId, period) =>
+  request("get", `/tenants/${tenantId}/statistics/summary`, null, { period });
+
+export const getTenantClassStatistics = (tenantId, period) =>
+  request("get", `/tenants/${tenantId}/statistics/classes`, null, { period });
+
+export const getTenantStudentStatistics = (tenantId) =>
+  request("get", `/tenants/${tenantId}/statistics/students`);
+
+export const getTenantProfessorStatistics = (tenantId, period) =>
+  request("get", `/tenants/${tenantId}/statistics/professors`, null, { period });
+
+export const getTenantPaymentStatistics = (tenantId, period) =>
+  request("get", `/tenants/${tenantId}/statistics/payments`, null, { period });
+
 export const createTenant = (data) => {
   const { user } = useAuthStore.getState();
   return request("post", "/tenants", {

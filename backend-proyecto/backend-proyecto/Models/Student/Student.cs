@@ -9,6 +9,7 @@
         public Tenant Tenant { get; set; } = null!;
         public int StudentPlanId { get; set; }
         public StudentPlan StudentPlan { get; set; } = null!;
+        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
         public string MonthlyFeeStatus { get; set; } = null!;
         public DateTime? MonthlyFeeStatusUpdatedAt { get; set; }
         public DateTime? PaymentDueDate { get; set; }

@@ -83,6 +83,7 @@ builder.Services.AddScoped<RoutineServices>();
 builder.Services.AddScoped<MercadoPagoServices>();
 builder.Services.AddScoped<ClassTemplateServices>();
 builder.Services.AddScoped<ReservationValidationServices>();
+builder.Services.AddScoped<StatisticsService>();
 
 builder.Services.AddScoped<IWaitlistSubject, WaitlistSubject>();
 builder.Services.AddScoped<IWaitlistObserver, WaitlistEmailObserver>();

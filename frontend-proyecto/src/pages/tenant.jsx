@@ -10,6 +10,7 @@ import {
   FaBell,
   FaDumbbell,
   FaMoneyBillWave,
+  FaChartBar,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -117,6 +118,13 @@ export default function Tenant({ id }) {
       permission: "EXERCISE_READ",
     },
     {
+      title: "Estadísticas",
+      description: "Consultá el rendimiento de tu negocio.",
+      icon: <FaChartBar size={35} />,
+      href: "estadisticas",
+      ownerOnly: true,
+    },
+    {
       title: "Pagos",
       description: "Consultá pagos.",
       icon: <FaMoneyBillWave size={35} />,
@@ -148,6 +156,12 @@ export default function Tenant({ id }) {
 
   const cards = userPermissions
     ? sections.filter((section) => {
+        const isOwner = tenant?.role === "Tenant";
+
+        if (section.ownerOnly && !isOwner) {
+          return false;
+        }
+
         if (
           ["ejercicios", "rutinas"].includes(section.href) &&
           tenant?.tenantPlan?.includesExercisesAndRoutines !== true
@@ -155,9 +169,9 @@ export default function Tenant({ id }) {
           return false;
         }
 
-        const hasPermission = userPermissions.permissions.includes(
-          section.permission,
-        );
+        const hasPermission = section.ownerOnly
+          ? isOwner
+          : userPermissions.permissions.includes(section.permission);
 
         const isStudentOnly = section.onlyStudent === true;
 

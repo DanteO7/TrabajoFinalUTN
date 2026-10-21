@@ -94,6 +94,7 @@ namespace backend_proyecto.Services
 
             var student = _mapper.Map<Student>(assignStudentDTO);
             student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
+            student.JoinedAt = TimeHelper.UtcNow();
 
             await _studentRepository.CreateOneAsync(student);
 

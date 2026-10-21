@@ -10,6 +10,9 @@ namespace backend_proyecto.Config.EntityConfigurations
         {
             entity.HasKey(s => s.Id);
             entity.Property(s => s.MonthlyFeeStatus).IsRequired();
+            entity.Property(s => s.JoinedAt)
+                  .IsRequired()
+                  .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(s => s.User)
                   .WithMany()
