@@ -163,6 +163,14 @@ export default function Profile() {
                   disabled={true}
                 />
               </div>
+              <FormInput
+                label="Patologías o condiciones médicas"
+                id="pathologies"
+                value={user?.pathologies || ""}
+                disabled={true}
+                textarea
+                rows={3}
+              />
               <BlackButton
                 text="Editar perfil"
                 onClick={() => setOpenEditProfileModal(true)}

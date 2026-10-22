@@ -145,6 +145,7 @@ namespace backend_proyecto.Controllers
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,
                 Weight = user.Weight,
+                Pathologies = user.Pathologies,
                 Roles = roles
             };
 

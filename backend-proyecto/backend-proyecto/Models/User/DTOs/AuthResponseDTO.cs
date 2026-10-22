@@ -24,6 +24,7 @@ namespace backend_proyecto.Models.DTOs
         public string? PhoneNumber { get; set; }
         public int? Age { get; set; }
         public int? Weight { get; set; }
+        public string? Pathologies { get; set; }
 
         [Required]
         public List<string> Roles { get; set; } = null!;

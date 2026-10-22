@@ -1181,6 +1181,9 @@ namespace backend_proyecto.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Pathologies")
+                        .HasColumnType("text");
+
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");

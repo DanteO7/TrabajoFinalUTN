@@ -140,6 +140,7 @@ namespace backend_proyecto.Services
                 PhoneNumber = user.PhoneNumber,
                 Age = user.Age,
                 Weight = user.Weight,
+                Pathologies = user.Pathologies,
                 Roles = roles
             };
         }

@@ -13,17 +13,20 @@ public class PermissionServices
     private readonly CurrentTenantService _currentTenant;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ITenantRepository _tenantRepository;
+    private readonly TenantSubscriptionService _tenantSubscriptionService;
 
     public PermissionServices(
         ApplicationDbContext context,
         CurrentTenantService currentTenant,
         IHttpContextAccessor httpContextAccessor,
-        ITenantRepository tenantRepository)
+        ITenantRepository tenantRepository,
+        TenantSubscriptionService tenantSubscriptionService)
     {
         _context = context;
         _currentTenant = currentTenant;
         _httpContextAccessor = httpContextAccessor;
         _tenantRepository = tenantRepository;
+        _tenantSubscriptionService = tenantSubscriptionService;
     }
 
     public async Task CheckPermission(
@@ -77,11 +80,27 @@ public class PermissionServices
             );
         }
 
-        if (tenant.IsActive == false)
+        var isAdmin = await _context.Admin
+            .AnyAsync(a => a.UserId == userId);
+
+        var tenantReadSegments = context.Request.Path.Value?
+            .Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var isBasicTenantRead =
+            permissionName == Permissions.TENANT_READ &&
+            HttpMethods.IsGet(context.Request.Method) &&
+            tenantReadSegments is { Length: 3 } &&
+            tenantReadSegments[0] == "api" &&
+            tenantReadSegments[1] == "tenants" &&
+            int.TryParse(tenantReadSegments[2], out _);
+
+        if (!isAdmin &&
+            !isBasicTenantRead &&
+            !await _tenantSubscriptionService.HasCurrentSubscriptionAsync(
+                tenantId.Value))
         {
             throw new HttpResponseError(
-                HttpStatusCode.NotFound,
-                "No existe el tenant o está inactivo"
+                HttpStatusCode.Forbidden,
+                "La suscripción del negocio no está activa."
             );
         }
 

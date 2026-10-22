@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using backend_proyecto.Config;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
@@ -22,6 +23,8 @@ namespace backend_proyecto.Services
         private readonly IStudentRepository _studentRepository;
         private readonly IAdminRepository _adminRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationDbContext _db;
+        private readonly TenantSubscriptionService _tenantSubscriptionService;
 
         public PaymentServices(
             IPaymentRepository paymentRepository,
@@ -34,7 +37,9 @@ namespace backend_proyecto.Services
             PermissionServices permissionServices,
             IStudentRepository studentRepository,
             IAdminRepository adminRepository,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ApplicationDbContext db,
+            TenantSubscriptionService tenantSubscriptionService)
         {
             _paymentRepository = paymentRepository;
             _userRepository = userRepository;
@@ -47,6 +52,8 @@ namespace backend_proyecto.Services
             _studentRepository = studentRepository;
             _adminRepository = adminRepository;
             _httpContextAccessor = httpContextAccessor;
+            _db = db;
+            _tenantSubscriptionService = tenantSubscriptionService;
         }
 
         // =========================================================
@@ -529,18 +536,6 @@ namespace backend_proyecto.Services
                 );
             }
 
-            if (
-                tenant.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
-                tenant.PaymentDueDate != null &&
-                tenant.PaymentDueDate.Value > DateTime.UtcNow
-            )
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "El negocio ya tiene la cuota pagada y vigente."
-                );
-            }
-
             var pendingTenantPayment =
                 await _paymentRepository.GetOneAsync(
                     p =>
@@ -576,8 +571,9 @@ namespace backend_proyecto.Services
             var tenantPaymentDate = DateTime.UtcNow;
 
             var tenantStartedNewCycle =
-                tenant.MonthlyFeeStatus ==
-                MonthlyFeeStatus.OVERDUE;
+                !await _tenantSubscriptionService.HasCurrentSubscriptionAsync(
+                    tenant.Id
+                );
 
             var tenantPayment = new Payment
             {
@@ -593,27 +589,8 @@ namespace backend_proyecto.Services
                 StartedNewCycle = tenantStartedNewCycle
             };
 
-            await _paymentRepository.CreateOneAsync(
-                tenantPayment
-            );
-
-            tenant.MonthlyFeeStatus =
-                MonthlyFeeStatus.PAID;
-
-            tenant.IsActive = true;
-
-            tenant.MonthlyFeeStatusUpdatedAt =
-                tenantPaymentDate;
-
-            if (tenantStartedNewCycle)
-            {
-                tenant.PaymentDueDate =
-                    tenantPaymentDate.AddDays(30);
-            }
-
-            await _tenantRepository.UpdateOneAsync(
-                tenant
-            );
+            _db.Payments.Add(tenantPayment);
+            await _tenantSubscriptionService.RecalculateAsync(tenant.Id);
 
             return _mapper.Map<ResponsePaymentDTO>(
                 tenantPayment
@@ -999,48 +976,17 @@ namespace backend_proyecto.Services
                     );
                 }
 
-                var lastPaidPayment =
-                    await _paymentRepository.Query()
-                        .Where(
-                            p =>
-                                p.UserId == payment.UserId &&
-                                p.TenantId == payment.TenantId &&
-                                p.PlanType == PlanType.TENANT &&
-                                p.Status == PaymentStatus.PAID
-                        )
-                        .OrderByDescending(p => p.PaymentDate)
-                        .FirstOrDefaultAsync();
+            }
 
-                if (
-                    lastPaidPayment == null ||
-                    lastPaidPayment.Id != payment.Id
-                )
-                {
-                    throw new HttpResponseError(
-                        HttpStatusCode.BadRequest,
-                        "Solo se puede eliminar el último pago del negocio."
-                    );
-                }
-
-                if (payment.StartedNewCycle)
-                {
-                    tenant.MonthlyFeeStatus =
-                        MonthlyFeeStatus.OVERDUE;
-
-                    tenant.MonthlyFeeStatusUpdatedAt =
-                        DateTime.UtcNow;
-
-                    tenant.PaymentDueDate = null;
-                }
-                else
-                {
-                    tenant.MonthlyFeeStatus =
-                        MonthlyFeeStatus.PENDING;
-                }
-
-                await _tenantRepository.UpdateOneAsync(
-                    tenant
+            if (payment.PlanType == PlanType.TENANT)
+            {
+                _db.Payments.Remove(payment);
+                await _tenantSubscriptionService.RecalculateAsync(
+                    payment.TenantId,
+                    removedPaidPayment:
+                        payment.Status == PaymentStatus.PAID
                 );
+                return;
             }
 
             await _paymentRepository.DeleteOneAsync(
@@ -1218,15 +1164,19 @@ namespace backend_proyecto.Services
 
             payment.ExternalPaymentId =
                 mercadoPagoPayment.Id.ToString();
+            var approvalDate = DateTime.UtcNow;
 
             switch (mercadoPagoPayment.Status)
             {
                 case "approved":
 
+                    if (payment.Status != PaymentStatus.PAID)
+                    {
+                        payment.PaymentDate = approvalDate;
+                    }
+
                     payment.Status =
                         PaymentStatus.PAID;
-
-                    var approvalDate = DateTime.UtcNow;
 
                     // =================================================
                     // ALUMNO
@@ -1268,46 +1218,6 @@ namespace backend_proyecto.Services
                         }
                     }
 
-                    // =================================================
-                    // TENANT
-                    // =================================================
-
-                    else if (payment.PlanType == PlanType.TENANT)
-                    {
-                        var tenantPayment =
-                            await _tenantRepository.GetOneAsync(
-                                t => t.Id == payment.TenantId
-                            );
-
-                        if (tenantPayment != null)
-                        {
-                            var startedNewCycle =
-                                tenantPayment.MonthlyFeeStatus ==
-                                MonthlyFeeStatus.OVERDUE;
-
-                            payment.StartedNewCycle =
-                                startedNewCycle;
-
-                            tenantPayment.MonthlyFeeStatus =
-                                MonthlyFeeStatus.PAID;
-
-                            tenantPayment.MonthlyFeeStatusUpdatedAt =
-                                approvalDate;
-
-                            tenantPayment.IsActive = true;
-
-                            if (startedNewCycle)
-                            {
-                                tenantPayment.PaymentDueDate =
-                                    approvalDate.AddDays(30);
-                            }
-
-                            await _tenantRepository.UpdateOneAsync(
-                                tenantPayment
-                            );
-                        }
-                    }
-
                     break;
 
                 case "rejected":
@@ -1333,9 +1243,16 @@ namespace backend_proyecto.Services
                     break;
             }
 
-            await _paymentRepository.UpdateOneAsync(
-                payment
-            );
+            if (payment.PlanType == PlanType.TENANT)
+            {
+                await _tenantSubscriptionService.RecalculateAsync(
+                    payment.TenantId
+                );
+            }
+            else
+            {
+                await _paymentRepository.UpdateOneAsync(payment);
+            }
         }
 
         // =========================================================
@@ -1537,18 +1454,6 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "Este negocio no tiene Mercado Pago conectado."
-                );
-            }
-
-            if (
-                tenant.MonthlyFeeStatus == MonthlyFeeStatus.PAID &&
-                tenant.PaymentDueDate != null &&
-                tenant.PaymentDueDate.Value > DateTime.UtcNow
-            )
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "La cuota del negocio todavía está vigente."
                 );
             }
 

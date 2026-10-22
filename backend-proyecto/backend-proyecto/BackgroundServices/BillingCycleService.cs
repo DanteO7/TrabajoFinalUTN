@@ -1,5 +1,6 @@
 ﻿using backend_proyecto.Enums;
 using backend_proyecto.Repositories;
+using backend_proyecto.Services;
 using backend_proyecto.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,6 +33,9 @@ public class BillingCycleService : BackgroundService
                 var tenantRepository =
                     scope.ServiceProvider
                         .GetRequiredService<ITenantRepository>();
+                var tenantSubscriptionService =
+                    scope.ServiceProvider
+                        .GetRequiredService<TenantSubscriptionService>();
 
                 var argentinaNow =
                     TimeHelper.Now();
@@ -48,7 +52,7 @@ public class BillingCycleService : BackgroundService
 
                 await ProcessTenants(
                     tenantRepository,
-                    argentinaNow,
+                    tenantSubscriptionService,
                     utcNow,
                     stoppingToken
                 );
@@ -120,71 +124,25 @@ public class BillingCycleService : BackgroundService
     }
 
     private async Task ProcessTenants(
-    ITenantRepository tenantRepository,
-    DateTime argentinaNow,
-    DateTime utcNow,
-    CancellationToken cancellationToken)
+        ITenantRepository tenantRepository,
+        TenantSubscriptionService tenantSubscriptionService,
+        DateTime utcNow,
+        CancellationToken cancellationToken)
     {
-        var tenants =
+        var tenantIds =
             await tenantRepository.Query()
                 .Where(t =>
-                    t.PaymentDueDate != null &&
-                    (
-                        t.MonthlyFeeStatus ==
-                            MonthlyFeeStatus.PAID ||
-                        t.MonthlyFeeStatus ==
-                            MonthlyFeeStatus.PENDING ||
-                        t.MonthlyFeeStatus ==
-                            MonthlyFeeStatus.OVERDUE
-                    )
-                )
+                    (t.PaymentDueDate != null &&
+                     t.PaymentDueDate <= utcNow) ||
+                    (t.IsActive && t.PaymentDueDate == null))
+                .Select(t => t.Id)
                 .ToListAsync(cancellationToken);
 
-        foreach (var tenant in tenants)
+        foreach (var tenantId in tenantIds)
         {
-            // Si ya está vencido, tiene que estar desactivado.
-            if (tenant.MonthlyFeeStatus == MonthlyFeeStatus.OVERDUE)
-            {
-                if (tenant.IsActive)
-                {
-                    tenant.IsActive = false;
-
-                    await tenantRepository.UpdateOneAsync(
-                        tenant
-                    );
-                }
-
-                continue;
-            }
-
-            var result =
-                CalculateBillingState(
-                    tenant.MonthlyFeeStatus,
-                    tenant.PaymentDueDate,
-                    argentinaNow
-                );
-
-            if (!result.HasChanges)
-            {
-                continue;
-            }
-
-            tenant.MonthlyFeeStatus =
-                result.Status;
-
-            tenant.MonthlyFeeStatusUpdatedAt =
-                utcNow;
-
-            tenant.PaymentDueDate =
-                result.PaymentDueDate;
-
-            if (result.Status == MonthlyFeeStatus.OVERDUE)
-            {
-                tenant.IsActive = false;
-            }
-
-            await tenantRepository.UpdateOneAsync(
-                tenant
+            await tenantSubscriptionService.RecalculateAsync(
+                tenantId,
+                cancellationToken: cancellationToken
             );
         }
     }

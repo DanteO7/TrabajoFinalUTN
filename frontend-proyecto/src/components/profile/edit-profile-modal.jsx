@@ -36,13 +36,14 @@ export default function EditProfileModal({ close }) {
       phoneNumber: user?.phoneNumber || "",
       age: user?.age || "",
       weight: user?.weight || "",
+      pathologies: user?.pathologies || "",
     },
   });
 
   const mutation = useMutation({
     mutationKey: ["updateUser", user?.id],
     mutationFn: updateUser,
-    onSuccess: async (data) => {
+    onSuccess: async (data, variables) => {
       setSuccessMessage("Perfil actualizado correctamente");
       setSuccesModal(true);
       setBackendError(null);
@@ -50,7 +51,10 @@ export default function EditProfileModal({ close }) {
         const completeUser = await me();
         login(completeUser);
       } catch {
-        login(data);
+        login({
+          ...data,
+          pathologies: variables.data.pathologies ?? user?.pathologies ?? "",
+        });
       }
       setTimeout(() => {
         close();
@@ -134,6 +138,19 @@ export default function EditProfileModal({ close }) {
             disabled={isSubmitting || mutation.isPending}
           />
         </div>
+        <FormInput
+          label="Patologías o condiciones médicas"
+          id="pathologies"
+          placeholder="Opcional"
+          register={register("pathologies")}
+          error={errors.pathologies}
+          disabled={isSubmitting || mutation.isPending}
+          textarea
+          rows={3}
+        />
+        <p className="text-sm text-gray-600 -mt-3">
+          Opcional. Indicá si tenés alguna condición médica relevante.
+        </p>
         <div className="grid grid-cols-2 gap-3 mt-4">
           <WhiteButton
             type="button"

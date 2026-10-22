@@ -169,11 +169,11 @@ namespace backend_proyecto.Services
             {
                 OwnerUserId = createTenantDTO.OwnerUserId,
                 Name = createTenantDTO.Name,
-                IsActive = true,
+                IsActive = false,
                 TenantPlanId = createTenantDTO.TenantPlanId,
                 TenantPlan = plan,
-                MonthlyFeeStatus = MonthlyFeeStatus.PAID,
-                PaymentDueDate = DateTime.UtcNow.AddDays(30)
+                MonthlyFeeStatus = MonthlyFeeStatus.PENDING,
+                PaymentDueDate = null
             };
 
             await _tenantRepository.CreateOneAsync(tenant);

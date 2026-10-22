@@ -192,6 +192,8 @@ namespace backend_proyecto.Services
                 user.Age = updatedUser.Age;
             if (updatedUser.Weight != null)
                 user.Weight = updatedUser.Weight;
+            if (updatedUser.Pathologies != null)
+                user.Pathologies = updatedUser.Pathologies;
 
             await _repo.UpdateOneAsync(user);
 

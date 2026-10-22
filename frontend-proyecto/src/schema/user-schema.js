@@ -42,4 +42,5 @@ export const updateUserSchema = z.object({
       "El peso debe estar entre 1 y 300",
     )
     .optional(),
+  pathologies: z.string().optional(),
 });

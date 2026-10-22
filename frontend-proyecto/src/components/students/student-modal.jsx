@@ -216,6 +216,16 @@ export default function StudentModal({ student, tenantId, close }) {
                 {getStatusLabel(currentStudent.monthlyFeeStatus)}
               </span>
             </div>
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+              <p className="text-sm text-gray-600 mb-1">Vencimiento de cuota</p>
+              <p className="font-semibold text-[#333]">
+                {currentStudent.paymentDueDate
+                  ? new Date(currentStudent.paymentDueDate).toLocaleDateString(
+                      "es-AR",
+                    )
+                  : "Sin fecha"}
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">

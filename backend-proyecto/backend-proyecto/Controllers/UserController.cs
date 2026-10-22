@@ -103,6 +103,12 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserWithoutPassDTO>> UpdateOneById(int id, [FromBody] UpdateUserDTO updatedUser)
         {
+            if (!int.TryParse(User.FindFirst("id")?.Value, out var authenticatedUserId))
+                return Unauthorized();
+
+            if (authenticatedUserId != id)
+                return Forbid();
+
             try
             {
                 var user = await _userServices.UpdateOne(id, updatedUser);
