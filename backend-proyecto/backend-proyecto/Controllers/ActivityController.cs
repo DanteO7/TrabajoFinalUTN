@@ -13,9 +13,12 @@ namespace backend_proyecto.Controllers
     public class ActivityController : ControllerBase
     {
         private readonly ActivityServices _activityServices;
-        public ActivityController(ActivityServices activityServices)
+        private readonly CurrentTenantService _currentTenantService;
+
+        public ActivityController(ActivityServices activityServices, CurrentTenantService currentTenantService)
         {
             _activityServices = activityServices;
+            _currentTenantService = currentTenantService;
         }
 
         [HttpGet("{tenantId}")]
@@ -27,8 +30,9 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                EnsureCurrentTenant(tenantId);
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var activities = await _activityServices.GetAllByTenantId(tenantId, userId);
+                var activities = await _activityServices.GetAllByTenantId(userId);
                 return Ok(activities);
             }
             catch (HttpResponseError ex)
@@ -107,6 +111,14 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        private void EnsureCurrentTenant(int tenantId)
+        {
+            if (_currentTenantService.GetRequiredTenantId() != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
             }
         }
     }

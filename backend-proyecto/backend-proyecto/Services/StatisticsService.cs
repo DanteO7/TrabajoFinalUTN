@@ -49,9 +49,9 @@ namespace backend_proyecto.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<StatisticsSummaryDTO> GetSummary(int tenantId, string period)
+        public async Task<StatisticsSummaryDTO> GetSummary(string period)
         {
-            await EnsureOwner(tenantId);
+            var tenantId = await EnsureOwner();
             var range = GetRange(period);
             var reservations = _db.Reservations
                 .Where(r => r.TenantId == tenantId);
@@ -88,9 +88,9 @@ namespace backend_proyecto.Services
             };
         }
 
-        public async Task<StatisticsClassesDTO> GetClasses(int tenantId, string period)
+        public async Task<StatisticsClassesDTO> GetClasses(string period)
         {
-            await EnsureOwner(tenantId);
+            await EnsureOwner();
             _ = GetRange(period);
 
             return new StatisticsClassesDTO
@@ -113,9 +113,9 @@ namespace backend_proyecto.Services
             };
         }
 
-        public async Task<StatisticsStudentsDTO> GetStudents(int tenantId)
+        public async Task<StatisticsStudentsDTO> GetStudents()
         {
-            await EnsureOwner(tenantId);
+            var tenantId = await EnsureOwner();
 
             var now = TimeHelper.Now();
             var tomorrowUtc = LocalDateToUtc(DateOnly.FromDateTime(now).AddDays(1));
@@ -185,10 +185,9 @@ namespace backend_proyecto.Services
         }
 
         public async Task<StatisticsProfessorsDTO> GetProfessors(
-            int tenantId,
             string period)
         {
-            await EnsureOwner(tenantId);
+            var tenantId = await EnsureOwner();
             _ = GetRange(period);
 
             var professors = await _db.Professors
@@ -214,9 +213,9 @@ namespace backend_proyecto.Services
             };
         }
 
-        public async Task<StatisticsPaymentsDTO> GetPayments(int tenantId, string period)
+        public async Task<StatisticsPaymentsDTO> GetPayments(string period)
         {
-            await EnsureOwner(tenantId);
+            var tenantId = await EnsureOwner();
             var range = GetRange(period);
             var payments = GetRecordedPayments(tenantId, range);
             var totalRevenue = await payments.SumAsync(p => (decimal?)p.Amount) ?? 0m;
@@ -313,15 +312,9 @@ namespace backend_proyecto.Services
             return payments;
         }
 
-        private async Task EnsureOwner(int tenantId)
+        private async Task<int> EnsureOwner()
         {
-            var currentTenantId = _currentTenantService.GetRequiredTenantId();
-            if (currentTenantId != tenantId)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.Forbidden,
-                    "No tenés acceso a las estadísticas de este negocio.");
-            }
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
             var userIdValue = _httpContextAccessor.HttpContext?.User.FindFirst("id")?.Value;
             if (!int.TryParse(userIdValue, out var userId))
@@ -339,6 +332,8 @@ namespace backend_proyecto.Services
                     HttpStatusCode.Forbidden,
                     "Solo el dueño del negocio puede consultar sus estadísticas.");
             }
+
+            return tenantId;
         }
 
         private static (DateOnly? Start, DateOnly? EndExclusive) GetRange(string period)

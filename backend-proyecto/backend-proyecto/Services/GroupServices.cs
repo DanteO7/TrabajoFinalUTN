@@ -9,10 +9,12 @@ namespace backend_proyecto.Services
     public class GroupServices
     {
         private readonly ApplicationDbContext _context;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public GroupServices(ApplicationDbContext context)
+        public GroupServices(ApplicationDbContext context, CurrentTenantService currentTenantService)
         {
             _context = context;
+            _currentTenantService = currentTenantService;
         }
 
         // CREAR GRUPOS PREDEFINIDOS
@@ -288,9 +290,9 @@ namespace backend_proyecto.Services
         }
 
         // OBTENER GRUPOS DEL TENANT
-        public async Task<List<Group>> GetGroupsByTenant(
-            int tenantId)
+        public async Task<List<Group>> GetGroupsByTenant()
         {
+            var tenantId = _currentTenantService.GetRequiredTenantId();
             var tenantExists = await _context.Tenants
                 .AnyAsync(t => t.Id == tenantId);
 

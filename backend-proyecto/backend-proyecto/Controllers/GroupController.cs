@@ -14,10 +14,12 @@ namespace backend_proyecto.Controllers
     public class GroupController : ControllerBase
     {
         private readonly GroupServices _groupServices;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public GroupController(GroupServices groupServices)
+        public GroupController(GroupServices groupServices, CurrentTenantService currentTenantService)
         {
             _groupServices = groupServices;
+            _currentTenantService = currentTenantService;
         }
 
         [HttpGet("{tenantId}")]
@@ -29,7 +31,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var groups = await _groupServices.GetGroupsByTenant(tenantId);
+                EnsureCurrentTenant(tenantId);
+                var groups = await _groupServices.GetGroupsByTenant();
                 return Ok(groups);
             }
             catch (HttpResponseError ex)
@@ -129,6 +132,14 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        private void EnsureCurrentTenant(int tenantId)
+        {
+            if (_currentTenantService.GetRequiredTenantId() != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
             }
         }
     }

@@ -13,18 +13,21 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly IMapper _mapper;
         private readonly PermissionServices _permissionServices;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public SpecialityServices(ISpecialityRepository specialityRepository, ITenantRepository tenantRepository, IMapper mapper, PermissionServices permissionServices)
+        public SpecialityServices(ISpecialityRepository specialityRepository, ITenantRepository tenantRepository, IMapper mapper, PermissionServices permissionServices, CurrentTenantService currentTenantService)
         {
             _specialityRepository = specialityRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
             _permissionServices = permissionServices;
+            _currentTenantService = currentTenantService;
         }
         
-        public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int tenantId, int userId)
+        public async Task<List<ResponseSpecialityDTO>> GetAllByTenantId(int userId)
         {
             await _permissionServices.CheckPermission(Permissions.SPECIALITY_READ);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
@@ -54,22 +57,29 @@ namespace backend_proyecto.Services
         public async Task<ResponseSpecialityDTO> CreateOne(CreateSpecialityDTO createSpecialityDTO)
         {
             await _permissionServices.CheckPermission(Permissions.SPECIALITY_CREATE);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createSpecialityDTO.TenantId);
+            if (createSpecialityDTO.TenantId != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createSpecialityDTO.TenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
             if (createSpecialityDTO.Name != null && createSpecialityDTO.Name.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la profesión no puede ser nulo o tener mas de 50 caracteres");
             }
-            if(createSpecialityDTO.Name != null && await _specialityRepository.ExistsByName(createSpecialityDTO.Name, createSpecialityDTO.TenantId))
+            if(createSpecialityDTO.Name != null && await _specialityRepository.ExistsByName(createSpecialityDTO.Name, tenantId))
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una profesión con ese nombre en este negocio");
             }
 
             var speciality = _mapper.Map<Speciality>(createSpecialityDTO);
+            speciality.TenantId = tenantId;
             await _specialityRepository.CreateOneAsync(speciality);
             return _mapper.Map<ResponseSpecialityDTO>(speciality);
         }

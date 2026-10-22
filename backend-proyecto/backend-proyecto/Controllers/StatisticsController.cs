@@ -13,10 +13,12 @@ namespace backend_proyecto.Controllers
     public class StatisticsController : ControllerBase
     {
         private readonly StatisticsService _statisticsService;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public StatisticsController(StatisticsService statisticsService)
+        public StatisticsController(StatisticsService statisticsService, CurrentTenantService currentTenantService)
         {
             _statisticsService = statisticsService;
+            _currentTenantService = currentTenantService;
         }
 
         [HttpGet("summary")]
@@ -26,7 +28,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                return Ok(await _statisticsService.GetSummary(tenantId, period));
+                EnsureCurrentTenant(tenantId);
+                return Ok(await _statisticsService.GetSummary(period));
             }
             catch (HttpResponseError ex)
             {
@@ -45,7 +48,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                return Ok(await _statisticsService.GetClasses(tenantId, period));
+                EnsureCurrentTenant(tenantId);
+                return Ok(await _statisticsService.GetClasses(period));
             }
             catch (HttpResponseError ex)
             {
@@ -62,7 +66,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                return Ok(await _statisticsService.GetStudents(tenantId));
+                EnsureCurrentTenant(tenantId);
+                return Ok(await _statisticsService.GetStudents());
             }
             catch (HttpResponseError ex)
             {
@@ -81,7 +86,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                return Ok(await _statisticsService.GetProfessors(tenantId, period));
+                EnsureCurrentTenant(tenantId);
+                return Ok(await _statisticsService.GetProfessors(period));
             }
             catch (HttpResponseError ex)
             {
@@ -100,7 +106,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                return Ok(await _statisticsService.GetPayments(tenantId, period));
+                EnsureCurrentTenant(tenantId);
+                return Ok(await _statisticsService.GetPayments(period));
             }
             catch (HttpResponseError ex)
             {
@@ -109,6 +116,14 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new { message = ex.Message });
+            }
+        }
+
+        private void EnsureCurrentTenant(int tenantId)
+        {
+            if (_currentTenantService.GetRequiredTenantId() != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant.");
             }
         }
     }

@@ -35,9 +35,10 @@ namespace backend_proyecto.Services
             _context = context;
         }
 
-        public async Task<List<ResponseClassDTO>> GetClassesByDate(int tenantId, DateOnly date, int userId)
+        public async Task<List<ResponseClassDTO>> GetClassesByDate(DateOnly date, int userId)
         {
             await _permissionServices.CheckPermission(Permissions.CLASS_READ);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
@@ -72,9 +73,10 @@ namespace backend_proyecto.Services
             return _mapper.Map<List<ResponseClassDTO>>(classes);
         }
 
-        public async Task<bool> HasClasses(int tenantId, int userId)
+        public async Task<bool> HasClasses(int userId)
         {
             await _permissionServices.CheckPermission(Permissions.CLASS_READ);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
@@ -104,26 +106,32 @@ namespace backend_proyecto.Services
         public async Task<ResponseClassDTO> CreateOne(CreateClassDTO createClassDTO)
         {
             await _permissionServices.CheckPermission(Permissions.CLASS_CREATE);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+
+            if (createClassDTO.TenantId != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
 
             var activity = await _activityRepository.GetOneAsync(a => a.Id == createClassDTO.ActivityId);
-            if (activity == null)
+            if (activity == null || activity.TenantId != tenantId)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
                     $"No se encontró una actividad con el Id = '{createClassDTO.ActivityId}'");
             }
 
             var professor = await _professorRepository.GetOneAsync(p => p.Id == createClassDTO.ProfessorId);
-            if (professor == null)
+            if (professor == null || professor.TenantId != tenantId)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
                     $"No se encontró un profesor con el Id = '{createClassDTO.ProfessorId}'");
             }
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createClassDTO.TenantId);
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
-                    $"No se encontró un tenant con el Id = '{createClassDTO.TenantId}'");
+                    $"No se encontró un tenant con el Id = '{tenantId}'");
             }
 
             // Validar que la clase no sea en el pasado
@@ -169,6 +177,7 @@ namespace backend_proyecto.Services
 
             var classMapped = _mapper.Map<Class>(createClassDTO);
 
+            classMapped.TenantId = tenantId;
             classMapped.ActivityName = activity.Name;
 
             await _classRepository.CreateOneAsync(classMapped);

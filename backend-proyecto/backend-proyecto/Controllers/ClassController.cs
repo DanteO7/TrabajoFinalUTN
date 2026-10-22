@@ -15,9 +15,12 @@ namespace backend_proyecto.Controllers
     public class ClassController : ControllerBase
     {
         private readonly ClassServices _classServices;
-        public ClassController(ClassServices classServices)
+        private readonly CurrentTenantService _currentTenantService;
+
+        public ClassController(ClassServices classServices, CurrentTenantService currentTenantService)
         {
             _classServices = classServices;
+            _currentTenantService = currentTenantService;
         }
 
         [HttpGet("{tenantId}/{date}")]
@@ -29,8 +32,9 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                EnsureCurrentTenant(tenantId);
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var classes = await _classServices.GetClassesByDate(tenantId, date, userId);
+                var classes = await _classServices.GetClassesByDate(date, userId);
                 return Ok(classes);
             }
             catch (HttpResponseError ex)
@@ -52,8 +56,9 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                EnsureCurrentTenant(tenantId);
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
-                var hasClasses = await _classServices.HasClasses(tenantId, userId);
+                var hasClasses = await _classServices.HasClasses(userId);
                 return Ok(hasClasses);
             }
             catch (HttpResponseError ex)
@@ -184,6 +189,14 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        private void EnsureCurrentTenant(int tenantId)
+        {
+            if (_currentTenantService.GetRequiredTenantId() != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
             }
         }
     }

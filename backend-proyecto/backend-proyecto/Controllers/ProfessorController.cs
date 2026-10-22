@@ -15,9 +15,14 @@ namespace backend_proyecto.Controllers
     public class ProfessorController : ControllerBase
     {
         private readonly ProfessorServices _professorServices;
-        public ProfessorController(ProfessorServices professorServices)
+        private readonly ProfessorPermissionServices _professorPermissionServices;
+
+        public ProfessorController(
+            ProfessorServices professorServices,
+            ProfessorPermissionServices professorPermissionServices)
         {
             _professorServices = professorServices;
+            _professorPermissionServices = professorPermissionServices;
         }
 
         [HttpPost("assign")]
@@ -130,6 +135,45 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError,ex.Message);
+            }
+        }
+
+        [HttpGet("{id}/permissions")]
+        [Authorize]
+        public async Task<ActionResult<List<ProfessorPermissionSettingDTO>>> GetPermissionSettings(int id)
+        {
+            try
+            {
+                return Ok(await _professorPermissionServices.GetPermissionSettings(id));
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}/permissions")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePermissionSettings(
+            int id,
+            [FromBody] UpdateProfessorPermissionsDTO update)
+        {
+            try
+            {
+                await _professorPermissionServices.UpdatePermissionSettings(id, update);
+                return Ok(await _professorPermissionServices.GetPermissionSettings(id));
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

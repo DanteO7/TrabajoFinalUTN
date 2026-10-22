@@ -22,6 +22,7 @@ namespace backend_proyecto.Services
         private readonly IWaitlistSubject _waitlistSubject;
         private readonly PermissionServices _permissionServices;
         private readonly ReservationValidationServices _reservationValidationServices;
+        private readonly CurrentTenantService _currentTenantService;
         public ReservationServices(
             IReservationRepository reservationRepository,
             IClassRepository classRepository,
@@ -31,7 +32,8 @@ namespace backend_proyecto.Services
             IMapper mapper,
             IWaitlistSubject waitlistSubject,
             PermissionServices permissionServices,
-            ReservationValidationServices reservationValidationServices)
+            ReservationValidationServices reservationValidationServices,
+            CurrentTenantService currentTenantService)
         {
             _reservationRepository = reservationRepository;
             _classRepository = classRepository;
@@ -42,6 +44,7 @@ namespace backend_proyecto.Services
             _waitlistSubject = waitlistSubject;
             _permissionServices = permissionServices;
             _reservationValidationServices = reservationValidationServices;
+            _currentTenantService = currentTenantService;
         }
 
         public async Task<List<ResponseReservationDTO>> CreateMultiple(
@@ -51,8 +54,17 @@ namespace backend_proyecto.Services
                 Permissions.RESERVATION_CREATE
             );
 
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+            if (bulkDTO.TenantId != tenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "No tenés acceso a este tenant"
+                );
+            }
+
             var tenant = await _tenantRepository.GetOneAsync(
-                t => t.Id == bulkDTO.TenantId
+                t => t.Id == tenantId
             );
 
             if (tenant == null)
@@ -73,6 +85,14 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(
                     HttpStatusCode.NotFound,
                     $"No se encontró una clase con el Id = '{bulkDTO.ClassId}'"
+                );
+            }
+
+            if (classEntity.TenantId != tenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "La clase no pertenece a este tenant"
                 );
             }
 
@@ -132,7 +152,7 @@ namespace backend_proyecto.Services
                     continue;
                 }
 
-                if (student.TenantId != bulkDTO.TenantId)
+                if (student.TenantId != tenantId)
                 {
                     errors.Add(
                         $"Alumno {student.User.Name} {student.User.Surname}: " +
@@ -187,7 +207,7 @@ namespace backend_proyecto.Services
                     new Reservation
                     {
                         ClassId = bulkDTO.ClassId,
-                        TenantId = bulkDTO.TenantId,
+                        TenantId = tenantId,
                         StudentId = studentId,
                         ReservationDate = DateTime.UtcNow,
                         ReservationStatus =

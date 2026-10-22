@@ -17,19 +17,22 @@ namespace backend_proyecto.Services
         private readonly PermissionServices _permissionServices;
         private readonly IMapper _mapper;
         private readonly IClassRepository _classRepository;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, PermissionServices permissionServices, IMapper mapper, IClassRepository classRepository)
+        public ActivityServices(IActivityRepository activityRepository, ITenantRepository tenantRepository, PermissionServices permissionServices, IMapper mapper, IClassRepository classRepository, CurrentTenantService currentTenantService)
         {
             _activityRepository = activityRepository;
             _tenantRepository = tenantRepository;
             _permissionServices = permissionServices;
             _mapper = mapper;
             _classRepository = classRepository;
+            _currentTenantService = currentTenantService;
         }
         
-        public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int tenantId, int userId)
+        public async Task<List<ResponseActivityDTO>> GetAllByTenantId(int userId)
         {
             await _permissionServices.CheckPermission(Permissions.ACTIVITY_READ);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == tenantId,
@@ -71,22 +74,29 @@ namespace backend_proyecto.Services
         public async Task<ResponseActivityDTO> CreateOne(CreateActivityDTO createActivityDTO)
         {
             await _permissionServices.CheckPermission(Permissions.ACTIVITY_CREATE);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createActivityDTO.TenantId);
+            if (createActivityDTO.TenantId != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if (tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createActivityDTO.TenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
             if (createActivityDTO.Name != null && createActivityDTO.Name.Length > 50)
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"El nombre de la actividad no puede ser nulo o tener mas de 50 caracteres");
             }
-            if (createActivityDTO.Name != null && await _activityRepository.ExistsByName(createActivityDTO.Name, createActivityDTO.TenantId))
+            if (createActivityDTO.Name != null && await _activityRepository.ExistsByName(createActivityDTO.Name, tenantId))
             {
                 throw new HttpResponseError(HttpStatusCode.BadRequest, $"Ya existe una actividad con ese nombre en este negocio");
             }
 
             var activity = _mapper.Map<Activity>(createActivityDTO);
+            activity.TenantId = tenantId;
             await _activityRepository.CreateOneAsync(activity);
             return _mapper.Map<ResponseActivityDTO>(activity);
         }

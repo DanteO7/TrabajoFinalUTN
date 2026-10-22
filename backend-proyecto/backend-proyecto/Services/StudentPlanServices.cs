@@ -14,14 +14,16 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IStudentRepository _studentRepository;
         private readonly PermissionServices _permissionServices;
+        private readonly CurrentTenantService _currentTenantService;
 
-        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository, PermissionServices permissionServices)
+        public StudentPlanServices(IStudentPlanRepository studentPlanRepository, ITenantRepository tenantRepository, IMapper mapper, IStudentRepository studentRepository, PermissionServices permissionServices, CurrentTenantService currentTenantService)
         {
             _studentPlanRepository = studentPlanRepository;
             _tenantRepository = tenantRepository;
             _mapper = mapper;
             _studentRepository = studentRepository;
             _permissionServices = permissionServices;
+            _currentTenantService = currentTenantService;
         }
 
         public async Task<List<ResponseStudentPlanDTO>> GetAllByTenantId(int tenantId)
@@ -44,11 +46,17 @@ namespace backend_proyecto.Services
         public async Task<ResponseStudentPlanDTO> CreateOne(CreateStudentPlanDTO createStudentPlanDTO)
         {
             await _permissionServices.CheckPermission(Permissions.STUDENT_PLAN_CREATE);
+            var tenantId = _currentTenantService.GetRequiredTenantId();
 
-            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createStudentPlanDTO.TenantId);
+            if (createStudentPlanDTO.TenantId != tenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden, "No tenés acceso a este tenant");
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
             if(tenant == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createStudentPlanDTO.TenantId}'");
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{tenantId}'");
             }
             if (createStudentPlanDTO.Name != null && createStudentPlanDTO.Name.Length > 50)
             {
@@ -64,6 +72,7 @@ namespace backend_proyecto.Services
             }
 
             var studentPlan = _mapper.Map<StudentPlan>(createStudentPlanDTO);
+            studentPlan.TenantId = tenantId;
             await _studentPlanRepository.CreateOneAsync(studentPlan);
             return _mapper.Map<ResponseStudentPlanDTO>(studentPlan);
         }
