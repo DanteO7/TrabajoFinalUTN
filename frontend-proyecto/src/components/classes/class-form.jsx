@@ -58,7 +58,6 @@ export default function ClassForm({
     queryKey: ["getProfessors", tenantId],
     queryFn: () => getProfessors(tenantId),
   });
-  console.log(professors);
 
   const mutation = useMutation({
     mutationFn: (data) =>

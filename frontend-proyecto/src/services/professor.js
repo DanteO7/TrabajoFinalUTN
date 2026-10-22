@@ -12,3 +12,9 @@ export const deleteProfessor = (id) => request("delete", `/professors/${id}`);
 
 export const updateProfessor = (id, data) =>
   request("put", `/professors/${id}`, data);
+
+export const getProfessorPermissions = (id) =>
+  request("get", `/professors/${id}/permissions`);
+
+export const updateProfessorPermissions = (id, permissions) =>
+  request("put", `/professors/${id}/permissions`, { permissions });

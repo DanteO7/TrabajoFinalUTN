@@ -49,9 +49,9 @@ namespace backend_proyecto.Services
                 .Where(name => !name.StartsWith("ADMIN_"))
                 .Distinct()
                 .ToListAsync();
-
             applicablePermissions = applicablePermissions
-                .Union(inheritedPermissions)
+                .Append(Permissions.TENANT_READ)
+                .Distinct(StringComparer.Ordinal)
                 .OrderBy(name => name)
                 .ToList();
 
@@ -80,13 +80,14 @@ namespace backend_proyecto.Services
                 {
                     var isInherited = inheritedSet.Contains(name);
                     var isOverridden = overrides.TryGetValue(name, out var isAllowed);
+                    var isTenantRead = name == Permissions.TENANT_READ;
 
                     return new ProfessorPermissionSettingDTO
                     {
                         Name = name,
-                        IsInherited = isInherited,
-                        IsOverridden = isOverridden,
-                        IsAllowed = isOverridden ? isAllowed : isInherited
+                        IsInherited = isTenantRead || isInherited,
+                        IsOverridden = !isTenantRead && isOverridden,
+                        IsAllowed = isTenantRead || (isOverridden ? isAllowed : isInherited)
                     };
                 })
                 .ToList();
@@ -98,7 +99,8 @@ namespace backend_proyecto.Services
         {
             var (tenantId, professor, tenant) = await GetAuthorizedProfessor(professorId);
 
-            if (update?.Permissions == null)
+            if (update?.Permissions == null ||
+                update.Permissions.Any(permission => permission == null))
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
@@ -118,6 +120,16 @@ namespace backend_proyecto.Services
                 .Select(permission => permission.Name)
                 .ToList();
 
+            if (update.Permissions.Any(permission =>
+                    permission.Name == Permissions.TENANT_READ &&
+                    !permission.IsAllowed))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "El permiso para consultar el negocio es obligatorio y no se puede desactivar."
+                );
+            }
+
             if (submittedNames.Any(string.IsNullOrWhiteSpace) ||
                 submittedNames.Distinct(StringComparer.Ordinal).Count() != submittedNames.Count)
             {
@@ -127,10 +139,7 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var applicableNames = await GetApplicablePermissionNames(
-                tenantId,
-                professor.UserId
-            );
+            var applicableNames = await GetApplicablePermissionNames(tenantId);
 
             var invalidNames = submittedNames
                 .Except(applicableNames, StringComparer.Ordinal)
@@ -199,9 +208,7 @@ namespace backend_proyecto.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<List<string>> GetApplicablePermissionNames(
-            int tenantId,
-            int userId)
+        private async Task<List<string>> GetApplicablePermissionNames(int tenantId)
         {
             var professorGroupPermissions = _context.GroupPermissions
                 .Where(gp =>
@@ -211,19 +218,14 @@ namespace backend_proyecto.Services
                 )
                 .Select(gp => gp.Permission.Name);
 
-            var inheritedPermissions = _context.UserGroups
-                .Where(ug =>
-                    ug.UserId == userId &&
-                    ug.Group.TenantId == tenantId
-                )
-                .SelectMany(ug => ug.Group.GroupPermissions)
-                .Select(gp => gp.Permission.Name);
-
-            return await professorGroupPermissions
-                .Union(inheritedPermissions)
+            var permissions = await professorGroupPermissions
                 .Where(name => !name.StartsWith("ADMIN_"))
-                .Distinct()
                 .ToListAsync();
+
+            return permissions
+                .Append(Permissions.TENANT_READ)
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
         }
 
         private async Task<(int TenantId, Professor Professor, Tenant Tenant)> GetAuthorizedProfessor(

@@ -97,6 +97,26 @@ namespace backend_proyecto.Middlewares
                     );
                 }
 
+                var isOwner = await db.Tenants
+                    .AnyAsync(t => t.Id == tenantId && t.OwnerUserId == userId);
+                if (!isOwner)
+                {
+                    var inactiveProfessor = await db.Professors
+                        .AnyAsync(p =>
+                            p.UserId == userId &&
+                            p.TenantId == tenantId &&
+                            !p.IsActive
+                        );
+
+                    if (inactiveProfessor)
+                    {
+                        throw new HttpResponseError(
+                            HttpStatusCode.Forbidden,
+                            "Tu acceso a este negocio está deshabilitado. Contactá al dueño del negocio."
+                        );
+                    }
+                }
+
                 if (!IsSubscriptionAccessRoute(context) &&
                     !await tenantSubscriptionService.HasCurrentSubscriptionAsync(
                         tenantId,

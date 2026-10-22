@@ -314,6 +314,8 @@ public class PermissionServices
                     );
                 }
             }
+
+            permissions.Add(Permissions.TENANT_READ);
         }
 
         return permissions;

@@ -11,6 +11,7 @@ import {
   FaDumbbell,
   FaMoneyBillWave,
   FaChartBar,
+  FaUserShield,
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { getTenantById } from "../services/tenant";
@@ -122,6 +123,13 @@ export default function Tenant({ id }) {
       description: "Consultá el rendimiento de tu negocio.",
       icon: <FaChartBar size={35} />,
       href: "estadisticas",
+      ownerOnly: true,
+    },
+    {
+      title: "Permisos",
+      description: "Configurá los permisos de tus profesores.",
+      icon: <FaUserShield size={35} />,
+      href: "permisos",
       ownerOnly: true,
     },
     {

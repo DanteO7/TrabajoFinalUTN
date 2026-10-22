@@ -1,4 +1,8 @@
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Suspense, useEffect, lazy } from "react";
 import { Redirect, Route, Switch } from "wouter";
@@ -49,11 +53,16 @@ const MyPayments = lazy(() => import("./pages/my-payments"));
 const CreateTenant = lazy(() => import("./pages/create-tenant"));
 const TenantOnboarding = lazy(() => import("./pages/tenant/onboarding"));
 const Statistics = lazy(() => import("./pages/tenant/statistics"));
+const Permissions = lazy(() => import("./pages/tenant/permissions"));
 
 const queryClient = new QueryClient();
 
 function TenantPlanFeatureRoute({ tenantId, children }) {
-  const { data: tenant, isLoading, isError } = useQuery({
+  const {
+    data: tenant,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["tenantById", tenantId],
     queryFn: () => getTenantById(tenantId),
     refetchInterval: 30000,
@@ -62,10 +71,27 @@ function TenantPlanFeatureRoute({ tenantId, children }) {
 
   if (isLoading) return <Loading />;
 
-  if (
-    isError ||
-    tenant?.tenantPlan?.includesExercisesAndRoutines !== true
-  ) {
+  if (isError || tenant?.tenantPlan?.includesExercisesAndRoutines !== true) {
+    return <Redirect to={`/tu-espacio/${tenantId}`} />;
+  }
+
+  return children;
+}
+
+function OwnerTenantRoute({ tenantId, children }) {
+  const user = useAuthStore((state) => state.user);
+  const {
+    data: tenant,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["tenantById", tenantId],
+    queryFn: () => getTenantById(tenantId),
+  });
+
+  if (isLoading) return <Loading />;
+
+  if (isError || Number(tenant?.ownerUserId) !== Number(user?.id)) {
     return <Redirect to={`/tu-espacio/${tenantId}`} />;
   }
 
@@ -250,6 +276,14 @@ export default function App() {
 
             <ProtectedRoute path="/tu-espacio/:id/estadisticas">
               {(params) => <Statistics tenantId={params.id} />}
+            </ProtectedRoute>
+
+            <ProtectedRoute path="/tu-espacio/:id/permisos">
+              {(params) => (
+                <OwnerTenantRoute tenantId={params.id}>
+                  <Permissions tenantId={params.id} />
+                </OwnerTenantRoute>
+              )}
             </ProtectedRoute>
 
             <ProtectedRoute path="/invitacion/:token">
