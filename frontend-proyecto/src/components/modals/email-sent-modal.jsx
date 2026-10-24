@@ -21,10 +21,10 @@ export default function EmailSentModal({
         <MdOutlineEmail className="text-white" size={80} />
       </div>
       <div className="flex flex-col items-center justify-center text-center px-10 gap-2 my-5">
-        <h4 className="font-semibold text-2xl mb-1">Email enviado!</h4>
+        <h4 className="font-semibold text-2xl mb-1">Revisá tu correo</h4>
         <p className="text-xl">
-          Se ha enviado un mail a: <b>{email}</b>. Revisa la bandeja de entrada
-          o spam
+          Si <b>{email}</b> está asociado a una cuenta, recibirás instrucciones
+          para restablecer la contraseña. Revisá también la carpeta de spam.
         </p>
         <div className="flex flex-col my-4 gap-2">
           <span>¿No te llegó?</span>

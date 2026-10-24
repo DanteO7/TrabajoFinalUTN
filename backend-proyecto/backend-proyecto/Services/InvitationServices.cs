@@ -222,7 +222,7 @@ namespace backend_proyecto.Services
         }
         public async Task DeleteInvitation(int id)
         {
-            await _permissionServices.CheckPermission(Permissions.ROUTINE_DELETE);
+            await _permissionServices.CheckPermission(Permissions.INVITATION_DELETE);
 
             var invitation = await _invitationRepository.GetOneAsync(i => i.Id == id);
             if (invitation == null)

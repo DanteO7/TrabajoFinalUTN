@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import React from "react";
+import { createElement } from "react";
 
 export default function MenuItem({ href, icon: Icon, children, onClick }) {
   const [location] = useLocation();
@@ -24,7 +24,7 @@ export default function MenuItem({ href, icon: Icon, children, onClick }) {
         }
       `}
     >
-      <Icon size={20} />
+      {createElement(Icon, { size: 20 })}
       <span>{children}</span>
     </Link>
   );

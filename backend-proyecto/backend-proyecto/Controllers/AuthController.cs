@@ -211,23 +211,27 @@ namespace backend_proyecto.Controllers
             [FromBody] ForgotPasswordDTO dto,
             [FromServices] EmailServices emailServices)
         {
-            var userId = int.Parse(User.FindFirst("id")?.Value!);
+            const string responseMessage =
+                "Si el correo está asociado a una cuenta, recibirás instrucciones para restablecer la contraseña.";
 
-            var user = await _userServices.GetOneById(userId);
+            var user = await _userServices.GetOneByEmail(dto.Email);
+            if (user == null || user.IsGoogleAccount)
+                return Ok(new { message = responseMessage });
 
-            if (user != null && user.IsGoogleAccount)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "Tu cuenta utiliza Google para iniciar sesión. No necesitás recuperar una contraseña en TurnoFácil."
-                );
-            }
+            var isOwnAuthenticatedRequest =
+                User.Identity?.IsAuthenticated == true &&
+                int.TryParse(User.FindFirst("id")?.Value, out var authenticatedUserId) &&
+                authenticatedUserId == user.Id;
+
             try
             {
                 await emailServices.ForgotPassword(dto.Email);
             }
             catch (CooldownException ex)
             {
+                if (!isOwnAuthenticatedRequest)
+                    return Ok(new { message = responseMessage });
+
                 return StatusCode(429, new
                 {
                     message = ex.Message,
@@ -235,10 +239,7 @@ namespace backend_proyecto.Controllers
                 });
             }
 
-            return Ok(new
-            {
-                message = "Email enviado correctamente"
-            });
+            return Ok(new { message = responseMessage });
         }
         [HttpPost("google-register")]
         public async Task<ActionResult<AuthResponseDTO>> GoogleRegister(

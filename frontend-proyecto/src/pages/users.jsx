@@ -61,7 +61,11 @@ export default function Users() {
       </div>
 
       {userSelected && (
-        <UserModal user={userSelected} close={() => setUserSelected(null)} />
+        <UserModal
+          user={userSelected}
+          close={() => setUserSelected(null)}
+          onDeleted={() => setUserSelected(null)}
+        />
       )}
     </MainLayout>
   );

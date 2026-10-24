@@ -3,6 +3,15 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoArrowBack } from "react-icons/io5";
 import { Redirect, useLocation } from "wouter";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import MainLayout from "../../layouts/main-layout";
 import Loading from "../../components/loading";
 import {
@@ -26,6 +35,14 @@ const formatCurrency = (value) =>
     style: "currency",
     currency: "ARS",
     maximumFractionDigits: 2,
+  }).format(value ?? 0);
+
+const formatCompactCurrency = (value) =>
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    notation: "compact",
+    maximumFractionDigits: 1,
   }).format(value ?? 0);
 
 const LEGACY_DELIVERY_TRACKING_UNAVAILABLE =
@@ -306,31 +323,48 @@ export default function Statistics({ tenantId }) {
                 {students.data?.monthlyEvolution.some(
                   (entry) => entry.newStudents > 0,
                 ) ? (
-                  <div className="space-y-2">
-                    {(() => {
-                      const maxMonthlyStudents = Math.max(
-                        ...students.data.monthlyEvolution.map(
-                          (entry) => entry.newStudents,
-                        ),
-                      );
-
-                      return students.data.monthlyEvolution.map((entry) => (
-                        <div key={entry.month}>
-                          <div className="mb-1 flex justify-between text-sm">
-                            <span>{entry.month}</span>
-                            <span>{entry.newStudents}</span>
-                          </div>
-                          <div className="h-2 rounded bg-[#F1EEF3] border border-gray-400">
-                            <div
-                              className="h-2 rounded bg-[#fc697b]"
-                              style={{
-                                width: `${(entry.newStudents / maxMonthlyStudents) * 100}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ));
-                    })()}
+                  <div className="h-72 w-full min-w-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={students.data.monthlyEvolution}
+                        margin={{ top: 8, right: 8, left: 8, bottom: 48 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#d1cbd3" />
+                        <XAxis
+                          dataKey="month"
+                          angle={-35}
+                          textAnchor="end"
+                          height={56}
+                          tick={{ fill: "#6b7280", fontSize: 11 }}
+                          interval="preserveStartEnd"
+                        />
+                        <YAxis
+                          allowDecimals={false}
+                          tick={{ fill: "#6b7280", fontSize: 12 }}
+                        />
+                        <Tooltip
+                          formatter={(value) => [
+                            value,
+                            t("statistics.tooltips.newStudents", {
+                              defaultValue: "Altas",
+                            }),
+                          ]}
+                          contentStyle={{
+                            backgroundColor: "#F1EEF3",
+                            borderColor: "#9ca3af",
+                            borderRadius: 8,
+                          }}
+                        />
+                        <Bar
+                          dataKey="newStudents"
+                          name={t("statistics.tooltips.newStudents", {
+                            defaultValue: "Altas",
+                          })}
+                          fill="#fc697b"
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 ) : (
                   <Empty />
@@ -355,9 +389,6 @@ export default function Statistics({ tenantId }) {
                 )}
               </div>
             </div>
-            <p className="mt-6 rounded-lg bg-[#F1EEF3] border border-gray-400 p-3 text-sm text-gray-600">
-              Profesores activos: {students.data?.activeProfessors}
-            </p>
           </LoadingOrError>
         </Section>
 
@@ -419,35 +450,49 @@ export default function Statistics({ tenantId }) {
               <div>
                 <h3 className="mb-3 font-semibold">Ingresos por período</h3>
                 {payments.data?.revenueByPeriod.length ? (
-                  <div className="space-y-2">
-                    {(() => {
-                      const maxRevenue = Math.max(
-                        ...payments.data.revenueByPeriod.map(
-                          (entry) => entry.amount,
-                        ),
-                      );
-
-                      return payments.data.revenueByPeriod.map((entry) => (
-                        <div key={entry.period}>
-                          <div className="mb-1 flex justify-between gap-3 text-sm">
-                            <span>{entry.period}</span>
-                            <span>{formatCurrency(entry.amount)}</span>
-                          </div>
-                          <div className="h-2 rounded bg-[#F1EEF3] border border-gray-400">
-                            <div
-                              className="h-2 rounded bg-[#fc697b]"
-                              style={{
-                                width: `${
-                                  maxRevenue > 0
-                                    ? (entry.amount / maxRevenue) * 100
-                                    : 0
-                                }%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      ));
-                    })()}
+                  <div className="h-72 w-full min-w-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={payments.data.revenueByPeriod}
+                        margin={{ top: 8, right: 8, left: 8, bottom: 48 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#d1cbd3" />
+                        <XAxis
+                          dataKey="period"
+                          angle={-35}
+                          textAnchor="end"
+                          height={56}
+                          tick={{ fill: "#6b7280", fontSize: 11 }}
+                          interval="preserveStartEnd"
+                        />
+                        <YAxis
+                          tickFormatter={formatCompactCurrency}
+                          tick={{ fill: "#6b7280", fontSize: 11 }}
+                          width={72}
+                        />
+                        <Tooltip
+                          formatter={(value) => [
+                            formatCurrency(Number(value)),
+                            t("statistics.tooltips.revenue", {
+                              defaultValue: "Ingresos",
+                            }),
+                          ]}
+                          contentStyle={{
+                            backgroundColor: "#F1EEF3",
+                            borderColor: "#9ca3af",
+                            borderRadius: 8,
+                          }}
+                        />
+                        <Bar
+                          dataKey="amount"
+                          name={t("statistics.tooltips.revenue", {
+                            defaultValue: "Ingresos",
+                          })}
+                          fill="#fc697b"
+                          radius={[4, 4, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 ) : (
                   <Empty />

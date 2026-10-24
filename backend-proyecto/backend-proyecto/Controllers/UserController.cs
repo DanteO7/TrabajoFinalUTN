@@ -1,9 +1,11 @@
 ﻿using backend_projeto.Models.DTOs;
 using backend_proyecto.Enums;
 using backend_proyecto.Models.DTOs;
+using backend_proyecto.Repositories;
 using backend_proyecto.Services;
 using backend_proyecto.Utils.Errors;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -14,10 +16,14 @@ namespace backend_proyecto.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserServices _userServices;
+        private readonly IAdminRepository _adminRepository;
 
-        public UserController(IUserServices userServices)
+        public UserController(
+            IUserServices userServices,
+            IAdminRepository adminRepository)
         {
             _userServices = userServices;
+            _adminRepository = adminRepository;
         }
 
         [HttpGet]
@@ -32,6 +38,9 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                if (!await IsCurrentUserAdminAsync())
+                    return Forbid();
+
                 page = page <= 0 ? 1 : page;
                 pageSize = pageSize <= 0 ? 10 : pageSize;
                 pageSize = pageSize > 50 ? 50 : pageSize;
@@ -58,6 +67,12 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserWithoutPassDTO>> GetOneById(int id)
         {
+            if (!TryGetCurrentUserId(out var currentUserId))
+                return Unauthorized();
+
+            if (id != currentUserId && !await IsCurrentUserAdminAsync())
+                return Forbid();
+
             try
             {
                 var user = await _userServices.GetOneById(id);
@@ -80,6 +95,20 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteOneById(int id)
         {
+            if (!TryGetCurrentUserId(out var currentUserId))
+                return Unauthorized();
+
+            if (!await IsCurrentUserAdminAsync())
+                return Forbid();
+
+            if (id == currentUserId)
+            {
+                return Conflict(new
+                {
+                    message = "No podés eliminar tu propia cuenta."
+                });
+            }
+
             try
             {
                 await _userServices.DeleteOne(id);
@@ -88,6 +117,13 @@ namespace backend_proyecto.Controllers
             catch (HttpResponseError ex)
             {
                 return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (DbUpdateException)
+            {
+                return Conflict(new
+                {
+                    message = "No se puede eliminar el usuario porque tiene datos asociados. Conservá esos registros o desvinculalos antes de volver a intentarlo."
+                });
             }
             catch (Exception ex)
             {
@@ -103,10 +139,10 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserWithoutPassDTO>> UpdateOneById(int id, [FromBody] UpdateUserDTO updatedUser)
         {
-            if (!int.TryParse(User.FindFirst("id")?.Value, out var authenticatedUserId))
+            if (!TryGetCurrentUserId(out var authenticatedUserId))
                 return Unauthorized();
 
-            if (authenticatedUserId != id)
+            if (authenticatedUserId != id && !await IsCurrentUserAdminAsync())
                 return Forbid();
 
             try
@@ -132,6 +168,12 @@ namespace backend_proyecto.Controllers
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserWithoutPassDTO>> ChangeEmail(int id, [FromBody] ChangeEmailDTO changeEmailDTO)
         {
+            if (!TryGetCurrentUserId(out var currentUserId))
+                return Unauthorized();
+
+            if (id != currentUserId && !await IsCurrentUserAdminAsync())
+                return Forbid();
+
             try
             {
                 var user = await _userServices.ChangeEmail(id, changeEmailDTO);
@@ -154,6 +196,16 @@ namespace backend_proyecto.Controllers
             }
         }
 
+        private bool TryGetCurrentUserId(out int userId)
+        {
+            return int.TryParse(User.FindFirst("id")?.Value, out userId);
+        }
+
+        private async Task<bool> IsCurrentUserAdminAsync()
+        {
+            return TryGetCurrentUserId(out var userId) &&
+                   await _adminRepository.ExistsByUserId(userId);
+        }
 
         [HttpPatch("password")]
         [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]

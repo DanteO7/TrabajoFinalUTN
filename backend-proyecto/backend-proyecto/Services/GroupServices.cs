@@ -265,6 +265,45 @@ namespace backend_proyecto.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task EnsureOwnerCanManageGroup(
+            int groupId,
+            int userId)
+        {
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+            var tenant = await _context.Tenants
+                .FirstOrDefaultAsync(t => t.Id == tenantId);
+
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Tenant no encontrado"
+                );
+            }
+
+            if (tenant.OwnerUserId != userId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo el dueño del negocio puede modificar grupos."
+                );
+            }
+
+            var groupBelongsToTenant = await _context.Groups
+                .AnyAsync(group =>
+                    group.Id == groupId &&
+                    group.TenantId == tenantId
+                );
+
+            if (!groupBelongsToTenant)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "Grupo no encontrado en el negocio actual"
+                );
+            }
+        }
+
         // REMOVER USUARIO DE GRUPO
         public async Task RemoveUserFromGroup(
             int userId,

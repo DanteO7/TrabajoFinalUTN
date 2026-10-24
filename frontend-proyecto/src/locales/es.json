@@ -7,6 +7,13 @@
     "language": "Idioma",
     "theme": "Tema"
   },
+  "users": {
+    "deleteAction": "Eliminar usuario",
+    "deleteTitle": "¿Eliminar este usuario?",
+    "deleteConfirmation": "Esta acción no se puede deshacer. Solo se eliminará la cuenta si no tiene datos asociados.",
+    "cancel": "Cancelar",
+    "deleteError": "No se pudo eliminar el usuario. Intentá nuevamente."
+  },
   "statistics": {
     "paymentMethods": {
       "Cash": "Efectivo",

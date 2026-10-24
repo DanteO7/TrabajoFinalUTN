@@ -77,6 +77,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                await EnsureOwnerCanManageGroup(groupId);
                 await _groupServices.RemoveUserFromGroup(userId, groupId);
                 return Ok("User removed from group");
             }
@@ -100,6 +101,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                await EnsureOwnerCanManageGroup(groupId);
                 await _groupServices.AssignPermissionsToGroup(groupId, permissions);
                 return Ok("Permissions added");
             }
@@ -122,6 +124,7 @@ namespace backend_proyecto.Controllers
         {
             try
             {
+                await EnsureOwnerCanManageGroup(groupId);
                 await _groupServices.RemovePermissionFromGroup(groupId, permissionName);
                 return Ok("Permission removed");
             }
@@ -133,6 +136,19 @@ namespace backend_proyecto.Controllers
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        private async Task EnsureOwnerCanManageGroup(int groupId)
+        {
+            if (!int.TryParse(User.FindFirst("id")?.Value, out var userId))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Unauthorized,
+                    "Usuario no autenticado"
+                );
+            }
+
+            await _groupServices.EnsureOwnerCanManageGroup(groupId, userId);
         }
 
         private void EnsureCurrentTenant(int tenantId)

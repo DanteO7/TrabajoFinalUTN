@@ -150,6 +150,35 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
             }
+
+            var hasRelatedData =
+                await _db.Students.AnyAsync(student => student.UserId == id) ||
+                await _db.Professors.AnyAsync(professor => professor.UserId == id) ||
+                await _db.Tenants.AnyAsync(tenant => tenant.OwnerUserId == id) ||
+                await _db.Payments.AnyAsync(payment => payment.UserId == id) ||
+                await _db.Admin.AnyAsync(admin => admin.UserId == id) ||
+                await _db.NewsRead.AnyAsync(newsRead => newsRead.UserId == id) ||
+                await _db.News.AnyAsync(news => news.CreatedByUserId == id) ||
+                await _db.UserGroups.AnyAsync(userGroup => userGroup.UserId == id);
+
+            if (hasRelatedData)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Conflict,
+                    "No se puede eliminar el usuario porque tiene datos asociados. Conservá esos registros o desvinculalos antes de volver a intentarlo."
+                );
+            }
+
+            var passwordResets = await _db.PasswordResets
+                .Where(reset => reset.Email == user.Email)
+                .ToListAsync();
+            var emailVerifications = await _db.EmailVerifications
+                .Where(verification => verification.Email == user.Email)
+                .ToListAsync();
+
+            _db.PasswordResets.RemoveRange(passwordResets);
+            _db.EmailVerifications.RemoveRange(emailVerifications);
+
             await _repo.DeleteOneAsync(user);
         }
 

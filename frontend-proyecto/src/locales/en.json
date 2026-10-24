@@ -7,6 +7,13 @@
     "language": "Language",
     "theme": "Theme"
   },
+  "users": {
+    "deleteAction": "Delete user",
+    "deleteTitle": "Delete this user?",
+    "deleteConfirmation": "This action cannot be undone. The account will only be deleted if it has no associated data.",
+    "cancel": "Cancel",
+    "deleteError": "The user could not be deleted. Please try again."
+  },
   "statistics": {
     "paymentMethods": {
       "Cash": "Cash",

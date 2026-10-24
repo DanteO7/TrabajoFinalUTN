@@ -43,6 +43,14 @@ export default function ForgotPassword() {
       setOpenForgotPassword(true);
     },
     onError: (error) => {
+      if (error.response?.status === 429) {
+        const remainingSeconds = Number(
+          error.response.data?.remainingSeconds,
+        );
+        if (remainingSeconds > 0) setSeconds(remainingSeconds);
+        return;
+      }
+
       const data = error?.response?.data;
       let msg = "Error al reenviar el código";
       if (typeof data === "string") msg = data;
