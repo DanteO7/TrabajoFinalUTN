@@ -348,7 +348,7 @@ namespace backend_proyecto.Services
                     margin:24px 0;
                     padding:20px;
                     background-color:#F1EEF3;
-                    border:1px solid #eee8eb;
+                    border:1px solid #99A1AF;
                     border-radius:12px;
                 "">
                     <p style=""margin:0 0 6px;font-size:12px;color:#857780;"">SOLICITANTE</p>
@@ -411,7 +411,7 @@ namespace backend_proyecto.Services
                 <p style=""
                     margin:24px 0 0;
                     padding-top:20px;
-                    border-top:1px solid #eee8eb;
+                    border-top:1px solid #99A1AF;
                     font-size:14px;
                     line-height:1.7;
                     color:#857780;
