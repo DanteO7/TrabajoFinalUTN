@@ -221,7 +221,7 @@ export default function ProfessorPermissionsModal({
             {errorMessage(tenantError ?? error)}
           </div>
         ) : isOwner ? (
-          <div className="rounded-lg border border-purple-300 bg-purple-50 p-4 text-purple-900">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             El dueño del negocio tiene todos los permisos habilitados y no se
             pueden modificar.
           </div>
