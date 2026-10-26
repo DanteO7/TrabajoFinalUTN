@@ -36,16 +36,16 @@ namespace backend_proyecto.Services
                 <body style=""
                     margin:0;
                     padding:0;
-                    background-color:#f7f5f6;
+                    background-color:#EDE9EE;
                     font-family:Arial,Helvetica,sans-serif;
                     color:#29252b;
                 "">
                     <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0""
-                        style=""background-color:#f7f5f6;padding:32px 12px;"">
+                        style=""background-color:#EDE9EE;padding:32px 12px;"">
                         <tr>
                             <td align=""center"">
                                 <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0""
-                                    style=""max-width:560px;background-color:#ffffff;border:1px solid #eee8eb;border-radius:16px;overflow:hidden;"">
+                                    style=""max-width:560px;background-color:#F1EEF3;border:1px solid #99A1AF;border-radius:16px;overflow:hidden;"">
 
                                     <tr>
                                         <td style=""height:6px;background-color:{BrandColor};font-size:0;line-height:0;"">
@@ -54,19 +54,22 @@ namespace backend_proyecto.Services
                                     </tr>
 
                                     <tr>
-                                        <td style=""padding:28px 32px 12px;text-align:center;"">
-                                            <div style=""
-                                                display:inline-block;
-                                                background-color:#fff0f2;
-                                                color:{BrandColor};
-                                                border-radius:10px;
-                                                padding:9px 14px;
-                                                font-size:20px;
-                                                font-weight:bold;
-                                                letter-spacing:-0.5px;
-                                            "">
-                                                TurnoFácil
-                                            </div>
+                                        <td style=""padding:30px 24px 20px;text-align:center; "">
+                                            <img
+                                                src=""{SiteUrl}/logo.png""
+                                                alt=""TurnoFácil""
+                                                width=""180""
+                                                style=""
+                                                    display:block;
+                                                    width:180px;
+                                                    max-width:100%;
+                                                    height:auto;
+                                                    margin:0 auto;
+                                                    border:0;
+                                                    outline:none;
+                                                    text-decoration:none;
+                                                ""
+                                            />
                                         </td>
                                     </tr>
 
@@ -242,7 +245,7 @@ namespace backend_proyecto.Services
 
                 <div style=""
                     padding:14px 16px;
-                    background-color:#f8f6f7;
+                    background-color:#F1EEF3;
                     border-radius:9px;
                     margin-top:20px;
                 "">
@@ -344,7 +347,7 @@ namespace backend_proyecto.Services
                 <div style=""
                     margin:24px 0;
                     padding:20px;
-                    background-color:#f8f6f7;
+                    background-color:#F1EEF3;
                     border:1px solid #eee8eb;
                     border-radius:12px;
                 "">
