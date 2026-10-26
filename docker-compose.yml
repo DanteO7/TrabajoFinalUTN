@@ -51,6 +51,9 @@ services:
       postgres:
         condition: service_healthy
 
+    volumes:
+      - backend-data-protection-keys:/root/.aspnet/DataProtection-Keys
+
     networks:
       - proxy-network
 
@@ -90,6 +93,7 @@ services:
 
 volumes:
   postgres-data:
+  backend-data-protection-keys:
 
 networks:
   proxy-network:
