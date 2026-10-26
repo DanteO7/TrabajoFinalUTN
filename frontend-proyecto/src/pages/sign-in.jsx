@@ -39,7 +39,7 @@ export default function SignIn() {
       login(data);
 
       if (data?.roles?.length > 0) {
-        setLocation("/tu-espacio");
+        setLocation("/mi-espacio");
       } else {
         setLocation("/");
       }
@@ -65,7 +65,7 @@ export default function SignIn() {
       login(data);
 
       if (data?.roles?.length > 0) {
-        setLocation("/tu-espacio");
+        setLocation("/mi-espacio");
       } else {
         setLocation("/");
       }

@@ -54,7 +54,7 @@ export default function PaymentsResult() {
   }
 
   const goToPayments = () => {
-    navigate(`/tu-espacio/${payment.tenantId}/pagos`);
+    navigate(`/mi-espacio/${payment.tenantId}/pagos`);
   };
 
   if (payment.status === "Paid") {

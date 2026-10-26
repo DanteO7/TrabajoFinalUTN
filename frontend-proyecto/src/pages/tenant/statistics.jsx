@@ -150,7 +150,7 @@ export default function Statistics({ tenantId }) {
   });
 
   if (tenant.isLoading) return <Loading />;
-  if (!isOwner) return <Redirect to={`/tu-espacio/${tenantId}`} />;
+  if (!isOwner) return <Redirect to={`/mi-espacio/${tenantId}`} />;
 
   const summaryCards = [
     { title: "Alumnos activos", value: summary.data?.activeStudents },
@@ -172,7 +172,7 @@ export default function Statistics({ tenantId }) {
     <MainLayout>
       <main className="mx-auto mt-12 flex w-full max-w-6xl flex-col gap-6">
         <button
-          onClick={() => setLocation(`/tu-espacio/${tenantId}`)}
+          onClick={() => setLocation(`/mi-espacio/${tenantId}`)}
           className="flex items-center gap-2 self-start text-gray-500 transition hover:text-black"
         >
           <IoArrowBack color="#fc697b" />

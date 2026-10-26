@@ -152,9 +152,11 @@ export default function ProfessorPermissionsModal({
     () =>
       permissions.filter(
         (permission) =>
-          !["RESERVATION_CHANGE_STATUS", "GROUP_READ"].includes(
-            permission.name,
-          ),
+          ![
+            "RESERVATION_CHANGE_STATUS",
+            "GROUP_READ",
+            "STUDENT_CREATE",
+          ].includes(permission.name),
       ),
     [permissions],
   );

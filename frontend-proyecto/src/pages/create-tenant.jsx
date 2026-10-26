@@ -31,7 +31,7 @@ export default function CreateTenant() {
     mutationFn: () => sendTenantCreatedEmail(createdTenantId),
     onSuccess: () => {
       setShowEmailModal(false);
-      setLocation("/tu-espacio");
+      setLocation("/mi-espacio");
     },
     onError: (error) => {
       const data = error?.response?.data;

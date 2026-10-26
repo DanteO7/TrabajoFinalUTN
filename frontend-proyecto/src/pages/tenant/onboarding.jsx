@@ -214,7 +214,7 @@ export default function TenantOnboarding({ tenantId }) {
         <RedButton
           text="Ir a mi negocio"
           type="button"
-          onClick={() => navigate(`/tu-espacio/${tenantId}`)}
+          onClick={() => navigate(`/mi-espacio/${tenantId}`)}
           textSmall
         />
       </div>
@@ -234,7 +234,7 @@ export default function TenantOnboarding({ tenantId }) {
       await completeStepMutation.mutateAsync(step.id);
 
       if (step.id === "finish") {
-        navigate(`/tu-espacio/${tenantId}`);
+        navigate(`/mi-espacio/${tenantId}`);
         return;
       }
 
@@ -270,7 +270,7 @@ export default function TenantOnboarding({ tenantId }) {
   };
 
   const handleLater = () => {
-    navigate(`/tu-espacio/${tenantId}`);
+    navigate(`/mi-espacio/${tenantId}`);
   };
 
   if (!step) return null;

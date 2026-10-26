@@ -13,7 +13,7 @@ export default function Terms() {
           onClick={handleBack}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer "
         >
-          <IoArrowBack color="fc697b" />
+          <IoArrowBack color="#fc697b" />
           Volver
         </button>
         <h2 className="text-4xl font-semibold">Términos y Condiciones</h2>
@@ -77,10 +77,10 @@ export default function Terms() {
           </p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">7. Suspensión de cuentas</h3>
+          <h3 className="font-semibold text-xl">7. Elimación de cuentas</h3>
           <p>
-            Podremos suspender o eliminar cuentas que incumplan estos términos o
-            que utilicen la plataforma de manera indebida.
+            Podremos eliminar cuentas que incumplan estos términos o que
+            utilicen la plataforma de manera indebida.
           </p>
         </div>
         <div className="my-7">

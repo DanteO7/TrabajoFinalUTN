@@ -72,7 +72,7 @@ function TenantPlanFeatureRoute({ tenantId, children }) {
   if (isLoading) return <Loading />;
 
   if (isError || tenant?.tenantPlan?.includesExercisesAndRoutines !== true) {
-    return <Redirect to={`/tu-espacio/${tenantId}`} />;
+    return <Redirect to={`/mi-espacio/${tenantId}`} />;
   }
 
   return children;
@@ -92,7 +92,7 @@ function OwnerTenantRoute({ tenantId, children }) {
   if (isLoading) return <Loading />;
 
   if (isError || Number(tenant?.ownerUserId) !== Number(user?.id)) {
-    return <Redirect to={`/tu-espacio/${tenantId}`} />;
+    return <Redirect to={`/mi-espacio/${tenantId}`} />;
   }
 
   return children;
@@ -170,11 +170,11 @@ export default function App() {
               <ForgotPassword />
             </Route>
 
-            <Route path={"/tu-espacio"}>
+            <Route path={"/mi-espacio"}>
               <YourSpace />
             </Route>
 
-            <ProtectedRoute path="/tu-espacio/:id">
+            <ProtectedRoute path="/mi-espacio/:id">
               {(params) => <Tenant id={params.id} />}
             </ProtectedRoute>
 
@@ -218,47 +218,47 @@ export default function App() {
               <CreateTenant />
             </AdminRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/alumnos">
+            <ProtectedRoute path="/mi-espacio/:id/alumnos">
               {(params) => <Students tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/profesores">
+            <ProtectedRoute path="/mi-espacio/:id/profesores">
               {(params) => <Professors tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/clases">
+            <ProtectedRoute path="/mi-espacio/:id/clases">
               {(params) => <Classes tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/actividades">
+            <ProtectedRoute path="/mi-espacio/:id/actividades">
               {(params) => <Activities tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/profesiones">
+            <ProtectedRoute path="/mi-espacio/:id/profesiones">
               {(params) => <Specialities tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/pagos">
+            <ProtectedRoute path="/mi-espacio/:id/pagos">
               {(params) => <Payments tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/grupos">
+            <ProtectedRoute path="/mi-espacio/:id/grupos">
               {(params) => <Groups tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/planes">
+            <ProtectedRoute path="/mi-espacio/:id/planes">
               {(params) => <StudentPlans tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/reservas">
+            <ProtectedRoute path="/mi-espacio/:id/reservas">
               {(params) => <Reservations tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/novedades">
+            <ProtectedRoute path="/mi-espacio/:id/novedades">
               {(params) => <News tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/ejercicios">
+            <ProtectedRoute path="/mi-espacio/:id/ejercicios">
               {(params) => (
                 <TenantPlanFeatureRoute tenantId={params.id}>
                   <Exercises tenantId={params.id} />
@@ -266,7 +266,7 @@ export default function App() {
               )}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/rutinas">
+            <ProtectedRoute path="/mi-espacio/:id/rutinas">
               {(params) => (
                 <TenantPlanFeatureRoute tenantId={params.id}>
                   <Routines tenantId={params.id} />
@@ -274,11 +274,11 @@ export default function App() {
               )}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/estadisticas">
+            <ProtectedRoute path="/mi-espacio/:id/estadisticas">
               {(params) => <Statistics tenantId={params.id} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/permisos">
+            <ProtectedRoute path="/mi-espacio/:id/permisos">
               {(params) => (
                 <OwnerTenantRoute tenantId={params.id}>
                   <Permissions tenantId={params.id} />
@@ -290,7 +290,7 @@ export default function App() {
               {(params) => <Invitation token={params.token} />}
             </ProtectedRoute>
 
-            <ProtectedRoute path="/tu-espacio/:id/primeros-pasos">
+            <ProtectedRoute path="/mi-espacio/:id/primeros-pasos">
               {(params) => <TenantOnboarding tenantId={params.id} />}
             </ProtectedRoute>
 

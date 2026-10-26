@@ -2,7 +2,15 @@ import { CalendarDays, Clock3 } from "lucide-react";
 
 export default function ReservationCard({ reservation, onClick }) {
   const completed = reservation.reservationStatus === "Completed";
+  const formatDateWithDay = (dateString) => {
+    const [year, month, day] = dateString.split("T")[0].split("-");
+    const date = new Date(year, month - 1, day);
 
+    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
+    const dateFormatted = date.toLocaleDateString("es-AR");
+
+    return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
+  };
   return (
     <div
       onClick={onClick}
@@ -25,7 +33,7 @@ export default function ReservationCard({ reservation, onClick }) {
         <div>
           <div className="flex items-center gap-2">
             <CalendarDays size={18} />
-            {new Date(reservation.class.date).toLocaleDateString("es-AR")}
+            {formatDateWithDay(reservation.class.date)}
           </div>
 
           <div className="flex items-center gap-2">

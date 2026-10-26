@@ -60,7 +60,7 @@ export default function SignUp() {
       login(data);
 
       if (data?.roles?.length > 0) {
-        setLocation("/tu-espacio");
+        setLocation("/mi-espacio");
       } else {
         setLocation("/");
       }

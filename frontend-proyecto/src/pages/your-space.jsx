@@ -26,7 +26,7 @@ export default function YourSpace() {
       <div className="w-full mt-10 flex flex-col items-center gap-7 lg:gap-10 lg:mt-15">
         <div className="text-center">
           <h2 className="font-semibold text-2xl mb-3 lg:text-4xl lg:mb-5">
-            Tu espacio
+            Mi espacio
           </h2>
 
           <p>
@@ -62,7 +62,7 @@ export default function YourSpace() {
                       {t.isActive ? (
                         <Link
                           className="w-full flex"
-                          href={`tu-espacio/${t.id}`}
+                          href={`mi-espacio/${t.id}`}
                         >
                           <MyTenantCard myTenant={t} />
                         </Link>

@@ -161,7 +161,7 @@ export default function MyPayments() {
                 className="p-2 rounded-full transition cursor-pointer"
                 aria-label="Mes anterior"
               >
-                <FaChevronLeft size={22} color="fc697b" />
+                <FaChevronLeft size={22} color="#fc697b" />
               </button>
 
               <div className="min-w-47.5 text-center">
@@ -175,7 +175,7 @@ export default function MyPayments() {
                 className="p-2 rounded-full transition cursor-pointer"
                 aria-label="Mes siguiente"
               >
-                <FaChevronRight size={22} color="fc697b" />
+                <FaChevronRight size={22} color="#fc697b" />
               </button>
             </div>
             {isLoading ? (

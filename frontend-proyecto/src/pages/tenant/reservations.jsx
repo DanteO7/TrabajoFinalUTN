@@ -60,10 +60,10 @@ export default function Reservations({ tenantId }) {
     <MainLayout>
       <div className="w-full max-w-6xl mt-12">
         <button
-          onClick={() => setLocation(`/tu-espacio/${tenantId}`)}
+          onClick={() => setLocation(`/mi-espacio/${tenantId}`)}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack color="fc697b" />
+          <IoArrowBack color="#fc697b" />
           Volver
         </button>
 
@@ -102,7 +102,7 @@ export default function Reservations({ tenantId }) {
             <p className="text-gray-500">
               Cuando reserves una clase aparecerá acá.
             </p>
-            <Link href={`/tu-espacio/${tenantId}/clases`}>
+            <Link href={`/mi-espacio/${tenantId}/clases`}>
               <BlackButton text="Ir a clases" wfit textSmall />
             </Link>
           </div>

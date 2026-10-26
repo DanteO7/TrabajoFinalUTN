@@ -58,10 +58,10 @@ export default function Students({ tenantId }) {
     <MainLayout>
       <div className="w-full max-w-6xl mt-12">
         <button
-          onClick={() => setLocation(`/tu-espacio/${tenantId}`)}
+          onClick={() => setLocation(`/mi-espacio/${tenantId}`)}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack color="fc697b" />
+          <IoArrowBack color="#fc697b" />
           Volver
         </button>
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const getTenantIdFromUrl = () => {
-  const match = window.location.pathname.match(/^\/tu-espacio\/(\d+)/);
+  const match = window.location.pathname.match(/^\/mi-espacio\/(\d+)/);
 
   return match ? Number(match[1]) : null;
 };

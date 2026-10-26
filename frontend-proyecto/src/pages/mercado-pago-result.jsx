@@ -22,7 +22,7 @@ export default function MercadoPagoResult() {
           <ColorButton
             text="Volver a pagos"
             textSmall
-            onClick={() => navigate(`/tu-espacio/${tenantId}/pagos`)}
+            onClick={() => navigate(`/mi-espacio/${tenantId}/pagos`)}
             bgColor="#1fc762"
             textColor="#efefef"
             hoverColor="#18b356"
@@ -40,7 +40,7 @@ export default function MercadoPagoResult() {
           <RedButton
             text="Volver a pagos"
             textSmall
-            onClick={() => navigate(`/tu-espacio/${tenantId}/pagos`)}
+            onClick={() => navigate(`/mi-espacio/${tenantId}/pagos`)}
           />
         </div>
       )}

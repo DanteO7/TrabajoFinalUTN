@@ -190,10 +190,6 @@ export default function Tenant({ id }) {
     : [];
 
   const roleConfig = {
-    Admin: {
-      text: "Administrador",
-      className: "bg-red-300 text-red-600",
-    },
     Tenant: {
       text: "Dueño",
       className: "bg-purple-300 text-purple-600",
@@ -226,11 +222,11 @@ export default function Tenant({ id }) {
     <MainLayout>
       <div className="w-full max-w-6xl mt-12">
         <button
-          onClick={() => setLocation("/tu-espacio")}
+          onClick={() => setLocation("/mi-espacio")}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack color="fc697b" />
-          Tu espacio
+          <IoArrowBack color="#fc697b" />
+          Mi espacio
         </button>
         {isLoading ? (
           <Loading />
@@ -252,7 +248,7 @@ export default function Tenant({ id }) {
                     <RedButton
                       text="Completar primeros pasos"
                       onClick={() =>
-                        setLocation(`/tu-espacio/${tenant.id}/primeros-pasos`)
+                        setLocation(`/mi-espacio/${tenant.id}/primeros-pasos`)
                       }
                       wfit
                       textSmall
@@ -335,7 +331,7 @@ export default function Tenant({ id }) {
             </p>
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {newsCard && (
-                <Link href={`/tu-espacio/${tenant?.id}/novedades`}>
+                <Link href={`/mi-espacio/${tenant?.id}/novedades`}>
                   <div
                     className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center`}
                   >
@@ -360,7 +356,7 @@ export default function Tenant({ id }) {
               {otherCards?.map((section) => (
                 <Link
                   key={section.href}
-                  href={`/tu-espacio/${tenant?.id}/${section.href}`}
+                  href={`/mi-espacio/${tenant?.id}/${section.href}`}
                 >
                   <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>

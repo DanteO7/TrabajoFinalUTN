@@ -70,7 +70,7 @@ export default function AppPayments() {
           onClick={() => setLocation("/admin")}
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
-          <IoArrowBack color="fc697b" />
+          <IoArrowBack color="#fc697b" />
           Volver
         </button>
 
@@ -98,7 +98,7 @@ export default function AppPayments() {
                     className="p-2 rounded-full transition cursor-pointer"
                     aria-label="Mes anterior"
                   >
-                    <FaChevronLeft size={22} color="fc697b" />
+                    <FaChevronLeft size={22} color="#fc697b" />
                   </button>
 
                   <div className="min-w-47.5 text-center">
@@ -112,7 +112,7 @@ export default function AppPayments() {
                     className="p-2 rounded-full transition cursor-pointer"
                     aria-label="Mes siguiente"
                   >
-                    <FaChevronRight size={22} color="fc697b" />
+                    <FaChevronRight size={22} color="#fc697b" />
                   </button>
                 </div>
                 <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-4 mt-8">
