@@ -28,8 +28,9 @@ const compareValue = (value, expected) => ({
 });
 
 const inspectForm = (values, expectedName, expectedTenantPlanId) => {
-  const nameInput = document.querySelector('input[name="name"]');
-  const planSelect = document.querySelector('select[name="tenantPlanId"]');
+  const form = document.querySelector("#create-tenant-form");
+  const nameInput = form?.querySelector('input[name="name"]');
+  const planSelect = form?.querySelector('select[name="tenantPlanId"]');
 
   return {
     internal: {
@@ -125,7 +126,7 @@ export default function CreateTenant() {
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && !isLoading && !isLoadingPlans) {
       const resetValues = {
         name: data.name,
         tenantPlanId: String(data.tenantPlanId),
@@ -135,16 +136,14 @@ export default function CreateTenant() {
 
       const valuesAfterReset = getValues();
       console.info("[crear-negocio diagnóstico] reset", {
-        values: {
-          name: compareValue(valuesAfterReset.name, resetValues.name),
-          tenantPlanId: compareValue(
-            valuesAfterReset.tenantPlanId,
-            resetValues.tenantPlanId,
-          ),
-        },
+        ...inspectForm(
+          valuesAfterReset,
+          resetValues.name,
+          resetValues.tenantPlanId,
+        ),
       });
     }
-  }, [data, getValues, reset]);
+  }, [data, getValues, isLoading, isLoadingPlans, reset]);
 
   useEffect(() => {
     if (!data) return;
@@ -229,6 +228,7 @@ export default function CreateTenant() {
         <h1 className="text-4xl font-semibold text-center">Crear negocio</h1>
 
         <form
+          id="create-tenant-form"
           onSubmit={handleSubmit(onSubmit)}
           className="mt-6 space-y-4 rounded-lg border p-6"
         >
