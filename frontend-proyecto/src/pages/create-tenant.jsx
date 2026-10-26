@@ -17,6 +17,41 @@ import FormInput from "../components/inputs/form-input";
 import SendEmailUserModal from "../components/modals/send-email-user-modal";
 import { useState } from "react";
 
+const describeValue = (value) => ({
+  type: value === null ? "null" : typeof value,
+  present: value !== undefined && value !== null && value !== "",
+});
+
+const compareValue = (value, expected) => ({
+  ...describeValue(value),
+  matchesExpected: value === expected,
+});
+
+const inspectForm = (values, expectedName, expectedTenantPlanId) => {
+  const nameInput = document.querySelector('input[name="name"]');
+  const planSelect = document.querySelector('select[name="tenantPlanId"]');
+
+  return {
+    internal: {
+      name: compareValue(values.name, expectedName),
+      tenantPlanId: compareValue(values.tenantPlanId, expectedTenantPlanId),
+    },
+    inputs: {
+      name: {
+        mounted: Boolean(nameInput),
+        matchesInternal: nameInput?.value === values.name,
+        matchesExpected: nameInput?.value === expectedName,
+      },
+      tenantPlanId: {
+        mounted: Boolean(planSelect),
+        matchesInternal: planSelect?.value === values.tenantPlanId,
+        matchesExpected: planSelect?.value === expectedTenantPlanId,
+        optionCount: planSelect?.options.length ?? 0,
+      },
+    },
+  };
+};
+
 export default function CreateTenant() {
   const [, setLocation] = useLocation();
 
@@ -50,6 +85,24 @@ export default function CreateTenant() {
     enabled: !!token,
   });
 
+  useEffect(() => {
+    if (data === undefined) return;
+
+    const isObject = data !== null && typeof data === "object";
+    console.info("[crear-negocio diagnóstico] respuesta", {
+      type: data === null ? "null" : typeof data,
+      keys: isObject ? Object.keys(data) : [],
+      fields: {
+        name: describeValue(isObject ? data.name : undefined),
+        tenantPlanId: describeValue(
+          isObject ? data.tenantPlanId : undefined,
+        ),
+        userName: describeValue(isObject ? data.userName : undefined),
+        userEmail: describeValue(isObject ? data.userEmail : undefined),
+      },
+    });
+  }, [data]);
+
   const { data: plans = [], isLoading: isLoadingPlans } = useQuery({
     queryKey: ["tenantsPlan"],
     queryFn: getTenantPlans,
@@ -59,6 +112,8 @@ export default function CreateTenant() {
     register,
     handleSubmit,
     reset,
+    getValues,
+    subscribe,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(createTenantSchema),
@@ -71,12 +126,53 @@ export default function CreateTenant() {
 
   useEffect(() => {
     if (data) {
-      reset({
+      const resetValues = {
         name: data.name,
         tenantPlanId: String(data.tenantPlanId),
+      };
+
+      reset(resetValues);
+
+      const valuesAfterReset = getValues();
+      console.info("[crear-negocio diagnóstico] reset", {
+        values: {
+          name: compareValue(valuesAfterReset.name, resetValues.name),
+          tenantPlanId: compareValue(
+            valuesAfterReset.tenantPlanId,
+            resetValues.tenantPlanId,
+          ),
+        },
       });
     }
-  }, [data, reset]);
+  }, [data, getValues, reset]);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const expectedName = data.name;
+    const expectedTenantPlanId = String(data.tenantPlanId);
+
+    return subscribe({
+      name: ["name", "tenantPlanId"],
+      formState: { values: true },
+      callback: ({ values }) => {
+        console.info("[crear-negocio diagnóstico] actualización del formulario", {
+          ...inspectForm(values, expectedName, expectedTenantPlanId),
+        });
+      },
+    });
+  }, [data, subscribe]);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const expectedName = data.name;
+    const expectedTenantPlanId = String(data.tenantPlanId);
+
+    console.info("[crear-negocio diagnóstico] render del formulario", {
+      ...inspectForm(getValues(), expectedName, expectedTenantPlanId),
+    });
+  }, [data, getValues, isLoadingPlans, plans.length]);
 
   const mutation = useMutation({
     mutationFn: (formData) => createTenantFromToken(token, formData),
