@@ -217,7 +217,7 @@ namespace backend_proyecto.Services
             await _tenantRepository.DeleteOneAsync(tenant);
         }
 
-        public async Task<ResponseTenantDTO> UpdateOne(int id, UpdateTenantDTO updateTenantDTO)
+        public async Task<ResponseTenantDTO> UpdateOne(int id, int ownerUserId, UpdateTenantDTO updateTenantDTO)
         {
             await _permissionServices.CheckPermission(Permissions.TENANT_UPDATE);
 
@@ -240,7 +240,7 @@ namespace backend_proyecto.Services
                 }
                 tenant.Name = updateTenantDTO.Name;
             }
-            var tenantWithSameName = await _tenantRepository.GetOneAsync(t => t.Id != id && t.Name == updateTenantDTO.Name);
+            var tenantWithSameName = await _tenantRepository.GetOneAsync(t => t.Id != id && t.OwnerUserId == ownerUserId &&  t.Name == updateTenantDTO.Name);
 
             if (tenantWithSameName != null)
             {

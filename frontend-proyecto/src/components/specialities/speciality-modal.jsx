@@ -14,8 +14,12 @@ import WhiteButton from "../buttons/white-button";
 import FormInput from "../inputs/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateSpecialitySchema } from "../../schema/speciality-schema";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function SpecialityModal({ speciality, tenantId, close }) {
+  const canUpdateSpeciality = useHasPermission(tenantId, "SPECIALITY_UPDATE");
+  const canDeleteSpeciality = useHasPermission(tenantId, "SPECIALITY_DELETE");
+
   const [editing, setEditing] = useState(false);
   const [currentSpeciality, setCurrentSpeciality] = useState(speciality);
 
@@ -137,21 +141,30 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
             {currentSpeciality.description || "Sin descripción"}
           </p>
 
-          <div className="flex gap-2 mt-8">
-            <RedButton
-              text="Eliminar"
-              disabled={deleteMutation.isPending}
-              onClick={() => setConfirmModal(true)}
-              textSmall={true}
-              img={<Trash2 size={18} />}
-            />
-            <BlackButton
-              text="Editar"
-              onClick={() => setEditing(true)}
-              textSmall={true}
-              img={<Pencil size={18} />}
-            />
-          </div>
+          {(canUpdateSpeciality || canDeleteSpeciality) && (
+            <div
+              className={`grid ${canUpdateSpeciality && canDeleteSpeciality ? "grid-cols-2" : "grid-cols-1"} gap-3 mt-4`}
+            >
+              {canDeleteSpeciality && (
+                <RedButton
+                  text="Eliminar"
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
+              )}
+
+              {canUpdateSpeciality && (
+                <BlackButton
+                  text="Editar"
+                  onClick={() => setEditing(true)}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
+            </div>
+          )}
         </>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">

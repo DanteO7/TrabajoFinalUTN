@@ -47,7 +47,7 @@ namespace backend_proyecto.Services
             }
 
             var professor = _mapper.Map<Professor>(assignProfessorDTO);
-            professor.IsActive = false;
+            professor.IsActive = true;
 
             await _professorRepository.CreateOneAsync(professor);
 

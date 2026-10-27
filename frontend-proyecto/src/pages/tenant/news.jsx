@@ -107,7 +107,7 @@ export default function News({ tenantId }) {
                         markMutation.mutate(novedad.id);
                       }
                     }}
-                    className={`cursor-pointer rounded-lg bg-[#efecf0] border p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+                    className={`cursor-pointer rounded-lg bg-[#efecf0] border border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
                       !novedad.isRead && "bg-red-100"
                     }`}
                   >

@@ -15,9 +15,13 @@ import RedButton from "../buttons/red-button";
 import { Copy } from "lucide-react";
 import { Check } from "lucide-react";
 import FormInput from "../inputs/form-input";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function LinkModal({ tenantId, close, role, onCompleted }) {
   const queryClient = useQueryClient();
+
+  const canCreateInvitations = useHasPermission(tenantId, "INVITATION_CREATE");
+  const canDeleteInvitations = useHasPermission(tenantId, "INVITATION_DELETE");
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -109,7 +113,7 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
         <p className="text-center text-gray-500">Cargando...</p>
       ) : hasValidLink ? (
         <>
-          <div className="border rounded-lg p-4 mb-4 flex flex-col gap-3">
+          <div className="border rounded-lg p-4 flex flex-col gap-3">
             <p className="font-semibold">Link de invitación activo</p>
 
             <FormInput value={currentInvitation.link} />
@@ -131,24 +135,31 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
             </p>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <WhiteButton
-              disabled={mutation.isPending}
-              text={mutation.isPending ? "Generando..." : "Generar nuevo link"}
-              onClick={() => mutation.mutate()}
-              textSmall={true}
-            />
-            {hasValidLink && (
-              <RedButton
-                text={
-                  deleteMutation.isPending ? "Eliminando..." : "Eliminar link"
-                }
-                disabled={deleteMutation.isPending}
-                onClick={() => deleteMutation.mutate(currentInvitation.id)}
-                textSmall={true}
-              />
-            )}
-          </div>
+          {(canCreateInvitations || canDeleteInvitations) && (
+            <div className="flex flex-col gap-2 mt-4">
+              {canCreateInvitations && (
+                <WhiteButton
+                  disabled={mutation.isPending}
+                  text={
+                    mutation.isPending ? "Generando..." : "Generar nuevo link"
+                  }
+                  onClick={() => mutation.mutate()}
+                  textSmall={true}
+                />
+              )}
+
+              {hasValidLink && canDeleteInvitations && (
+                <RedButton
+                  text={
+                    deleteMutation.isPending ? "Eliminando..." : "Eliminar link"
+                  }
+                  disabled={deleteMutation.isPending}
+                  onClick={() => deleteMutation.mutate(currentInvitation.id)}
+                  textSmall={true}
+                />
+              )}
+            </div>
+          )}
         </>
       ) : (
         <>

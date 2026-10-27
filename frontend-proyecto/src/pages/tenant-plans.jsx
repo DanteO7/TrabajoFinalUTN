@@ -70,13 +70,17 @@ export default function TenantPlans() {
           <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
             Planes de negocio
           </h1>
-
-          <BlackButton
-            text="+ Nuevo plan"
-            onClick={() => setOpenCreateForm(true)}
-            textSmall={true}
-            wfit={true}
-          />
+          <div className="flex max-[900px]:flex-col justify-between gap-3 min-[900px]:items-center">
+            <p className="text-gray-500">
+              Desde acá podés administrar todos los planes de negocio de la app.
+            </p>
+            <BlackButton
+              text="+ Nuevo plan"
+              onClick={() => setOpenCreateForm(true)}
+              textSmall={true}
+              wfit={true}
+            />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

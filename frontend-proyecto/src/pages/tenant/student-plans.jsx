@@ -71,19 +71,25 @@ export default function StudentPlans({ tenantId }) {
           Volver
         </button>
 
-        <div className=" mb-6 flex flex-col gap-3 min-[900px]:gap-5">
+        <div className="mb-6 flex flex-col gap-3 min-[900px]:gap-5">
           <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
             Planes de alumno
           </h1>
+          <div className="flex max-[900px]:flex-col justify-between gap-3 min-[900px]:items-center">
+            <p className="text-gray-500">
+              Desde acá podés administrar todos los planes de alumnos del
+              negocio.
+            </p>
 
-          {canCreateStudentPlan && (
-            <BlackButton
-              text="+ Nuevo plan"
-              onClick={() => setOpenCreateForm(true)}
-              textSmall={true}
-              wfit={true}
-            />
-          )}
+            {canCreateStudentPlan && (
+              <BlackButton
+                text="+ Nuevo plan"
+                onClick={() => setOpenCreateForm(true)}
+                textSmall={true}
+                wfit={true}
+              />
+            )}
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

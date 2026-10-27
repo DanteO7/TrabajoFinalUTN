@@ -9,6 +9,7 @@ import SpecialityModal from "../../components/specialities/speciality-modal";
 import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function Specialities({ tenantId }) {
   const [, setLocation] = useLocation();
@@ -16,6 +17,7 @@ export default function Specialities({ tenantId }) {
   const [inputValue, setInputValue] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [selectedSpeciality, setSelectedSpeciality] = useState(null);
+  const canCreateSpecialities = useHasPermission(tenantId, "SPECIALITY_CREATE");
 
   const {
     data: specialities = [],
@@ -67,14 +69,16 @@ export default function Specialities({ tenantId }) {
                   onChange={setInputValue}
                   placeholder="Buscar profesión..."
                 />
-                <div className="justify-self-end">
-                  <BlackButton
-                    text="+ Nueva profesión"
-                    onClick={() => setOpenModal(true)}
-                    textSmall={true}
-                    wfit={true}
-                  />
-                </div>
+                {canCreateSpecialities && (
+                  <div className="justify-self-end">
+                    <BlackButton
+                      text="+ Nueva profesión"
+                      onClick={() => setOpenModal(true)}
+                      textSmall={true}
+                      wfit={true}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -98,14 +102,16 @@ export default function Specialities({ tenantId }) {
                   <p className="text-gray-500 mt-2 mb-6">
                     Creá tu primera profesión para comenzar.
                   </p>
-                  <div className="flex items-center justify-center">
-                    <BlackButton
-                      text="+ Crear profesión"
-                      onClick={() => setOpenModal(true)}
-                      textSmall={true}
-                      wfit={true}
-                    />
-                  </div>
+                  {canCreateSpecialities && (
+                    <div className="flex items-center justify-center">
+                      <BlackButton
+                        text="+ Crear profesión"
+                        onClick={() => setOpenModal(true)}
+                        textSmall={true}
+                        wfit={true}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
             </div>

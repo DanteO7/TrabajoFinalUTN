@@ -440,7 +440,7 @@ export default function ClassModal({
               : `${currentClass.professor.user.name} ${currentClass.professor.user.surname}`}
           </p>
 
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">
                 {isTemplate ? "Día" : "Fecha"}

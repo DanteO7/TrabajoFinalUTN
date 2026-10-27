@@ -171,7 +171,9 @@ export default function ActivityModal({ activity, tenantId, close }) {
           </p>
 
           {(canUpdateActivity || canDeleteActivity) && (
-            <div className="grid grid-cols-2 gap-3 mt-4">
+            <div
+              className={`grid ${canUpdateActivity && canDeleteActivity ? "grid-cols-2" : "grid-cols-1"} gap-3 mt-4`}
+            >
               {canDeleteActivity && (
                 <RedButton
                   text="Eliminar"

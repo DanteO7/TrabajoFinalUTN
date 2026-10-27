@@ -12,14 +12,14 @@ import BlackButton from "../buttons/black-button";
 import { Trash2 } from "lucide-react";
 import WhiteButton from "../buttons/white-button";
 import { deleteNews, updateNews } from "../../services/news";
-import { useAuthStore } from "../../store/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateNewSchema } from "../../schema/news-schema";
+import { useHasPermission } from "../../store/tenant-store";
 
-export default function NewsModal({ news, tenantId, close, canCreateNews }) {
-  const { user } = useAuthStore();
-
-  const isAdmin = user?.roles?.includes("Admin");
+export default function NewsModal({ news, tenantId, close }) {
+  const canUpdateNews = useHasPermission(tenantId, "NEWS_UPDATE");
+  const canDeleteNews = useHasPermission(tenantId, "NEWS_DELETE");
+  console.log(news);
 
   const [editing, setEditing] = useState(false);
   const [currentNew, setCurrentNew] = useState(news);
@@ -142,23 +142,33 @@ export default function NewsModal({ news, tenantId, close, canCreateNews }) {
           <p className="text-gray-600 whitespace-pre-wrap">
             {currentNew.content}
           </p>
+          {news.tenantId && (
+            <>
+              {(canUpdateNews || canDeleteNews) && (
+                <div
+                  className={`grid ${canUpdateNews && canDeleteNews ? "grid-cols-2" : "grid-cols-1"} gap-3 mt-4`}
+                >
+                  {canDeleteNews && (
+                    <RedButton
+                      text="Eliminar"
+                      disabled={deleteMutation.isPending}
+                      onClick={() => setConfirmModal(true)}
+                      textSmall={true}
+                      img={<Trash2 size={18} />}
+                    />
+                  )}
 
-          {(isAdmin || (canCreateNews && news.tenantId != null)) && (
-            <div className="flex gap-2 mt-8">
-              <RedButton
-                text="Eliminar"
-                disabled={deleteMutation.isPending}
-                onClick={() => setConfirmModal(true)}
-                textSmall={true}
-                img={<Trash2 size={18} />}
-              />
-              <BlackButton
-                text="Editar"
-                onClick={() => setEditing(true)}
-                textSmall={true}
-                img={<Pencil size={18} />}
-              />
-            </div>
+                  {canUpdateNews && (
+                    <BlackButton
+                      text="Editar"
+                      onClick={() => setEditing(true)}
+                      textSmall={true}
+                      img={<Pencil size={18} />}
+                    />
+                  )}
+                </div>
+              )}
+            </>
           )}
         </>
       ) : (

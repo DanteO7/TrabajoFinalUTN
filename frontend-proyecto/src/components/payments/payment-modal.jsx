@@ -314,7 +314,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             )}
           </div>
           {(canUpdatePayment || canDeletePayment) && (
-            <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px] mt-8">
+            <div
+              className={`grid ${canUpdatePayment && canDeletePayment ? "grid-cols-2" : "grid-cols-1"} gap-3 max-[360px]:text-[13px] mt-8`}
+            >
               {canDeletePayment && (
                 <RedButton
                   text="Eliminar"

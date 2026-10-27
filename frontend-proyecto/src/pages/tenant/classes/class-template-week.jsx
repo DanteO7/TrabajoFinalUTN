@@ -18,6 +18,7 @@ import ClassCard from "../../../components/classes/class-card";
 import SuccessModal from "../../../components/modals/success-modal";
 import ErrorModal from "../../../components/modals/error-modal";
 import ConfirmModal from "../../../components/modals/confirm-modal";
+import { Plus } from "lucide-react";
 
 export default function ClassTemplateWeek({ tenantId }) {
   const queryClient = useQueryClient();
@@ -131,7 +132,6 @@ export default function ClassTemplateWeek({ tenantId }) {
   };
 
   const handlePointerDown = (event, classTemplate, dayOfWeek) => {
-    // Una nueva interacción reinicia cualquier bloqueo anterior.
     ignoreNextClick.current = false;
 
     if (!canDeleteClass || event.pointerType !== "touch") return;
@@ -146,8 +146,6 @@ export default function ClassTemplateWeek({ tenantId }) {
     longPressTimer.current = setTimeout(() => {
       ignoreNextClick.current = true;
 
-      // Seleccionar la plantilla sin alternar su selección
-      // si ya estaba seleccionada.
       setSelectedClassTemplateIds((prev) =>
         prev.includes(classTemplate.id) ? prev : [...prev, classTemplate.id],
       );
@@ -168,7 +166,6 @@ export default function ClassTemplateWeek({ tenantId }) {
 
     const deltaY = Math.abs(event.clientY - pointerStartPosition.current.y);
 
-    // Si el dedo se mueve, asumimos que el usuario está desplazándose.
     if (deltaX > 10 || deltaY > 10) {
       clearTimeout(longPressTimer.current);
       pointerStartPosition.current = null;
@@ -242,14 +239,16 @@ export default function ClassTemplateWeek({ tenantId }) {
   }
 
   return (
-    <div className="mt-10 flex flex-col gap-4">
+    <div className="mt-6 flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <BlackButton
-          onClick={() => setOpenCopyWeekModal(true)}
-          text="Copiar semana"
-          wfit
-          textSmall
-        />
+        {canCreateClass && (
+          <BlackButton
+            onClick={() => setOpenCopyWeekModal(true)}
+            text="Copiar semana"
+            wfit
+            textSmall
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-4">
@@ -359,71 +358,87 @@ export default function ClassTemplateWeek({ tenantId }) {
                         />
                       </div>
                     )}
+                    <div className="grid gap-3">
+                      {classesOfDay.length > 0 ? (
+                        <div className="grid gap-3">
+                          {classesOfDay.map((classTemplate) => {
+                            const isSelected =
+                              selectedClassTemplateIds.includes(
+                                classTemplate.id,
+                              );
 
-                    {classesOfDay.length > 0 ? (
-                      <div className="grid gap-3">
-                        {classesOfDay.map((classTemplate) => {
-                          const isSelected = selectedClassTemplateIds.includes(
-                            classTemplate.id,
-                          );
-
-                          return (
-                            <ClassCard
-                              key={classTemplate.id}
-                              classItem={classTemplate}
-                              isSelected={isSelected}
-                              canSelect={canDeleteClass}
-                              onToggleSelection={() =>
-                                toggleClassSelection(
-                                  classTemplate.id,
-                                  day.value,
-                                )
-                              }
-                              onPointerDown={(event) =>
-                                handlePointerDown(
-                                  event,
-                                  classTemplate,
-                                  day.value,
-                                )
-                              }
-                              onPointerMove={handlePointerMove}
-                              onPointerUp={handlePointerEnd}
-                              onPointerCancel={handlePointerEnd}
-                              onClickCapture={(event) => {
-                                if (ignoreNextClick.current) {
-                                  ignoreNextClick.current = false;
-                                  event.preventDefault();
-                                  event.stopPropagation();
+                            return (
+                              <ClassCard
+                                key={classTemplate.id}
+                                classItem={classTemplate}
+                                isSelected={isSelected}
+                                canSelect={canDeleteClass}
+                                onToggleSelection={() =>
+                                  toggleClassSelection(
+                                    classTemplate.id,
+                                    day.value,
+                                  )
                                 }
-                              }}
-                              onContextMenu={(event) => {
-                                event.preventDefault();
+                                onPointerDown={(event) =>
+                                  handlePointerDown(
+                                    event,
+                                    classTemplate,
+                                    day.value,
+                                  )
+                                }
+                                onPointerMove={handlePointerMove}
+                                onPointerUp={handlePointerEnd}
+                                onPointerCancel={handlePointerEnd}
+                                onClickCapture={(event) => {
+                                  if (ignoreNextClick.current) {
+                                    ignoreNextClick.current = false;
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                  }
+                                }}
+                                onContextMenu={(event) => {
+                                  event.preventDefault();
 
-                                if (!canDeleteClass) return;
+                                  if (!canDeleteClass) return;
 
-                                setSelectedClassTemplateIds((prev) =>
-                                  prev.includes(classTemplate.id)
-                                    ? prev
-                                    : [...prev, classTemplate.id],
-                                );
+                                  setSelectedClassTemplateIds((prev) =>
+                                    prev.includes(classTemplate.id)
+                                      ? prev
+                                      : [...prev, classTemplate.id],
+                                  );
 
-                                setSelectionModeByDay((prev) => ({
-                                  ...prev,
-                                  [day.value]: true,
-                                }));
+                                  setSelectionModeByDay((prev) => ({
+                                    ...prev,
+                                    [day.value]: true,
+                                  }));
 
-                                setActiveSelectionDay(day.value);
-                              }}
-                              onClick={() => handleCardClick(classTemplate)}
-                            />
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <p className="py-6 text-center text-gray-500">
-                        No hay clases configuradas para este día.
-                      </p>
-                    )}
+                                  setActiveSelectionDay(day.value);
+                                }}
+                                onClick={() => handleCardClick(classTemplate)}
+                              />
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="py-6 text-center text-gray-500">
+                          No hay clases configuradas para este día.
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedDay(day.value);
+                          setOpenCreateModal(true);
+                        }}
+                        className="flex min-h-24.5 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-gray-400 bg-[#F1EEF3] shadow-md transition-all duration-300 hover:border-gray-500 hover:bg-[#EFECF0]"
+                      >
+                        <Plus
+                          size={32}
+                          strokeWidth={1.5}
+                          className="text-gray-500"
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

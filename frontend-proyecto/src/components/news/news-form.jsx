@@ -84,11 +84,6 @@ export default function NewsForm({
       : isAdmin
         ? form.tenantId
         : "tenant";
-    console.log({
-      title: form.title,
-      content: form.content,
-      tenantId: tenantIdValue === "global" ? null : tenantId,
-    });
 
     mutation.mutate({
       title: form.title,

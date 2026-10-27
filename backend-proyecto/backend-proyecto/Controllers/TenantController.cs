@@ -159,7 +159,8 @@ namespace backend_proyecto.Controllers
         {
             try
             {
-                var tenant = await _tenantServices.UpdateOne(id, dto);
+                var ownerUserId = int.Parse(User.FindFirst("id")?.Value!);
+                var tenant = await _tenantServices.UpdateOne(id, ownerUserId, dto);
                 return Ok(tenant);
             }
             catch (HttpResponseError ex)

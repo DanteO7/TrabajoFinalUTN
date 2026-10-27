@@ -10,11 +10,14 @@ import StudentModal from "../../components/students/student-modal";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function Students({ tenantId }) {
   const [, setLocation] = useLocation();
 
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
+
+  const canReadInvitations = useHasPermission(tenantId, "INVITATION_READ");
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -91,12 +94,14 @@ export default function Students({ tenantId }) {
                   placeholder="Buscar alumno..."
                 />
 
-                <BlackButton
-                  text="+ Invitar alumno"
-                  onClick={() => setOpenModal(true)}
-                  textSmall={true}
-                  wfit={isSmallScreen}
-                />
+                {canReadInvitations && (
+                  <BlackButton
+                    text="+ Invitar alumno"
+                    onClick={() => setOpenModal(true)}
+                    textSmall={true}
+                    wfit={isSmallScreen}
+                  />
+                )}
               </div>
             )}
 
@@ -144,12 +149,14 @@ export default function Students({ tenantId }) {
                     Invitá tu primer alumno para comenzar.
                   </p>
 
-                  <BlackButton
-                    text="+ Invitar alumno"
-                    onClick={() => setOpenModal(true)}
-                    textSmall={true}
-                    wfit={true}
-                  />
+                  {canReadInvitations && (
+                    <BlackButton
+                      text="+ Invitar alumno"
+                      onClick={() => setOpenModal(true)}
+                      textSmall={true}
+                      wfit={true}
+                    />
+                  )}
                 </div>
               )}
             </div>
