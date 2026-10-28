@@ -35,10 +35,13 @@ export default function SignIn() {
     mutationFn: signIn,
     onSuccess: (data) => {
       clearPermissions();
-
       login(data);
 
-      if (data?.roles?.length > 0) {
+      const redirectUrl = getRedirectUrl();
+
+      if (redirectUrl) {
+        setLocation(redirectUrl);
+      } else if (data?.roles?.length > 0) {
         setLocation("/mi-espacio");
       } else {
         setLocation("/");
@@ -64,7 +67,11 @@ export default function SignIn() {
       clearPermissions();
       login(data);
 
-      if (data?.roles?.length > 0) {
+      const redirectUrl = getRedirectUrl();
+
+      if (redirectUrl) {
+        setLocation(redirectUrl);
+      } else if (data?.roles?.length > 0) {
         setLocation("/mi-espacio");
       } else {
         setLocation("/");
@@ -87,6 +94,18 @@ export default function SignIn() {
   const onSubmit = (credentials) => {
     setBackendError(null);
     mutation.mutate(credentials);
+  };
+
+  const returnUrl = new URLSearchParams(window.location.search).get(
+    "returnUrl",
+  );
+
+  const getRedirectUrl = () => {
+    if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
+      return returnUrl;
+    }
+
+    return null;
   };
 
   return (
