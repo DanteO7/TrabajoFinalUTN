@@ -7,7 +7,16 @@ export function ProtectedRoute({ component: Component, ...rest }) {
 
   if (isLoading) return <Loading />;
 
-  if (!isAuthenticated) return <Redirect to="/iniciar-sesion" />;
+  if (!isAuthenticated) {
+    const currentUrl =
+      window.location.pathname + window.location.search + window.location.hash;
+
+    const loginUrl = `/iniciar-sesion?returnUrl=${encodeURIComponent(
+      currentUrl,
+    )}`;
+
+    return <Redirect to={loginUrl} />;
+  }
 
   return <Route {...rest} component={Component} />;
 }

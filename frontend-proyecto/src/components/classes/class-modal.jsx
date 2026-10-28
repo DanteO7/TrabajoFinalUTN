@@ -502,7 +502,9 @@ export default function ClassModal({
 
           {canUpdateClass || canDeleteClass ? (
             classStarted ? (
-              <WhiteButton text="No disponible" textSmall />
+              <div className="mt-8">
+                <WhiteButton text="No disponible" textSmall />
+              </div>
             ) : (
               <div className="flex gap-2 mt-8">
                 {canDeleteClass && (

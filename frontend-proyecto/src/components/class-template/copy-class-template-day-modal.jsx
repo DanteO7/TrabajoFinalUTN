@@ -94,6 +94,7 @@ export default function CopyClassTemplateDayModal({
       <div className="flex justify-center">
         <DayPicker
           mode="single"
+          weekStartsOn={1}
           selected={selectedDate}
           defaultMonth={today}
           disabled={{ before: today }}

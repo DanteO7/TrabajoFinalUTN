@@ -236,8 +236,9 @@ export default function OfficialClasses({ tenantId }) {
         <div className="mx-auto">
           <DayPicker
             mode="single"
+            weekStartsOn={1}
             selected={selectedDate}
-            month={selectedDate}
+            defaultMonth={selectedDate}
             onSelect={(date) => {
               if (date) {
                 clearSelection();

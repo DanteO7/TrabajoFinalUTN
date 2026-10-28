@@ -502,10 +502,11 @@ namespace backend_proyecto.Services
             var tenantId =
                 _currentTenantService.GetRequiredTenantId();
 
-            if (
-                dto.DestinationDate <
-                DateOnly.FromDateTime(TimeHelper.Now())
-            )
+            var now = TimeHelper.Now();
+            var today = DateOnly.FromDateTime(now);
+            var currentTime = TimeOnly.FromDateTime(now);
+
+            if (dto.DestinationDate < today)
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
@@ -536,13 +537,30 @@ namespace backend_proyecto.Services
                 );
             }
 
+            // Si el destino es hoy, excluir las clases cuya hora
+            // de inicio ya pasó. Para otros días, conservar todas.
+            var classesToCopy = classTemplates
+                .Where(template =>
+                    dto.DestinationDate > today ||
+                    template.StartTime > currentTime
+                )
+                .ToList();
+
+            if (!classesToCopy.Any())
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No hay clases pendientes de copiar para el horario restante de hoy"
+                );
+            }
+
+            var errors = new List<string>();
+
             /*
              * Verificar conflictos con clases que
              * ya existen en el calendario.
              */
-            var errors = new List<string>();
-
-            foreach (var template in classTemplates)
+            foreach (var template in classesToCopy)
             {
                 var overlappingClass =
                     await _classRepository.GetOneAsync(
@@ -567,12 +585,12 @@ namespace backend_proyecto.Services
              * Verificar conflictos entre las propias
              * plantillas que se van a copiar.
              */
-            for (var i = 0; i < classTemplates.Count; i++)
+            for (var i = 0; i < classesToCopy.Count; i++)
             {
-                for (var j = i + 1; j < classTemplates.Count; j++)
+                for (var j = i + 1; j < classesToCopy.Count; j++)
                 {
-                    var first = classTemplates[i];
-                    var second = classTemplates[j];
+                    var first = classesToCopy[i];
+                    var second = classesToCopy[j];
 
                     if (
                         first.StartTime < second.EndTime &&
@@ -601,7 +619,7 @@ namespace backend_proyecto.Services
              */
             var classes = new List<Class>();
 
-            foreach (var template in classTemplates)
+            foreach (var template in classesToCopy)
             {
                 var classEntity =
                     _mapper.Map<Class>(template);
@@ -616,13 +634,10 @@ namespace backend_proyecto.Services
             /*
              * Validar los alumnos de todas las clases.
              */
-            for (var i = 0; i < classTemplates.Count; i++)
+            for (var i = 0; i < classesToCopy.Count; i++)
             {
-                var template =
-                    classTemplates[i];
-
-                var classEntity =
-                    classes[i];
+                var template = classesToCopy[i];
+                var classEntity = classes[i];
 
                 foreach (var templateStudent in template.Students)
                 {
@@ -663,33 +678,21 @@ namespace backend_proyecto.Services
                 /*
                  * Crear las reservas de los alumnos.
                  */
-                for (var i = 0; i < classTemplates.Count; i++)
+                for (var i = 0; i < classesToCopy.Count; i++)
                 {
-                    var template =
-                        classTemplates[i];
-
-                    var classEntity =
-                        classes[i];
+                    var template = classesToCopy[i];
+                    var classEntity = classes[i];
 
                     foreach (var templateStudent in template.Students)
                     {
                         classEntity.Reservations.Add(
                             new Reservation
                             {
-                                ClassId =
-                                    classEntity.Id,
-
-                                TenantId =
-                                    tenantId,
-
-                                StudentId =
-                                    templateStudent.StudentId,
-
-                                ReservationDate =
-                                    DateTime.UtcNow,
-
-                                ReservationStatus =
-                                    ReservationStatus.PENDING
+                                ClassId = classEntity.Id,
+                                TenantId = tenantId,
+                                StudentId = templateStudent.StudentId,
+                                ReservationDate = DateTime.UtcNow,
+                                ReservationStatus = ReservationStatus.PENDING
                             }
                         );
                     }
@@ -740,25 +743,27 @@ namespace backend_proyecto.Services
             var tenantId =
                 _currentTenantService.GetRequiredTenantId();
 
-            if (
-                dto.DestinationMonday.DayOfWeek !=
-                DayOfWeek.Monday
-            )
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.BadRequest,
-                    "La fecha de destino debe ser un lunes"
-                );
-            }
+            var now = TimeHelper.Now();
+            var today = DateOnly.FromDateTime(now);
+            var currentTime = TimeOnly.FromDateTime(now);
 
-            if (
-                dto.DestinationMonday <
-                DateOnly.FromDateTime(TimeHelper.Now())
-            )
+            // Día de la semana seleccionado por el usuario.
+            var selectedDayOfWeek = dto.DestinationMonday.DayOfWeek;
+
+            // Normalizar la fecha seleccionada al lunes de esa semana.
+            var destinationMonday = dto.DestinationMonday.AddDays(
+                -(((int)dto.DestinationMonday.DayOfWeek + 6) % 7)
+            );
+
+            var currentMonday = today.AddDays(
+                -(((int)today.DayOfWeek + 6) % 7)
+            );
+
+            if (destinationMonday < currentMonday)
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
-                    "No puedes copiar una semana a una fecha pasada"
+                    "No puedes copiar clases a una semana pasada"
                 );
             }
 
@@ -782,16 +787,37 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var destinationClasses =
-                classTemplates
-                    .Select(ct => new
-                    {
-                        Template = ct,
-                        Date = dto.DestinationMonday.AddDays(
-                            ((int)ct.DayOfWeek + 6) % 7
-                        )
-                    })
-                    .ToList();
+            var destinationClasses = classTemplates
+                .Where(ct =>
+                    // Excluir los días anteriores al seleccionado.
+                    ((int)ct.DayOfWeek + 6) % 7 >=
+                    ((int)selectedDayOfWeek + 6) % 7
+                )
+                .Select(ct => new
+                {
+                    Template = ct,
+                    Date = destinationMonday.AddDays(
+                        ((int)ct.DayOfWeek + 6) % 7
+                    )
+                })
+                // Excluir fechas pasadas y clases cuya hora de inicio
+                // ya pasó en el día actual.
+                .Where(item =>
+                    item.Date > today ||
+                    (
+                        item.Date == today &&
+                        item.Template.StartTime > currentTime
+                    )
+                )
+                .ToList();
+
+            if (!destinationClasses.Any())
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No hay clases pendientes de copiar desde el día seleccionado"
+                );
+            }
 
             var errors = new List<string>();
 
@@ -1007,19 +1033,17 @@ namespace backend_proyecto.Services
              * Obtener las clases creadas para devolver
              * los DTOs completos.
              */
-            var createdClasses =
-                await _classRepository
-                    .Query()
-                    .Where(c =>
-                        c.TenantId == tenantId &&
-                        c.Date >= dto.DestinationMonday &&
-                        c.Date <=
-                            dto.DestinationMonday.AddDays(6)
-                    )
-                    .Include(c => c.Activity)
-                    .Include(c => c.Professor)
-                        .ThenInclude(p => p.User)
-                    .ToListAsync();
+            var createdClasses = await _classRepository
+                .Query()
+                .Where(c =>
+                    c.TenantId == tenantId &&
+                    c.Date >= destinationMonday &&
+                    c.Date <= destinationMonday.AddDays(6)
+                )
+                .Include(c => c.Activity)
+                .Include(c => c.Professor)
+                    .ThenInclude(p => p.User)
+                .ToListAsync();
 
             return _mapper.Map<List<ResponseClassDTO>>(
                 createdClasses

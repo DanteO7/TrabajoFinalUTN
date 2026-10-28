@@ -76,18 +76,20 @@ export default function CopyClassTemplateWeekModal({
       <h2 className="text-2xl font-semibold mb-2">Copiar semana</h2>
 
       <p className="text-gray-600 mb-6">
-        Seleccioná el lunes de la semana a la que querés copiar todas las clases
-        de la semana modelo.
+        Seleccioná el día a partir del cual querés copiar las clases de la
+        semana modelo. Se copiarán las clases de ese día y los siguientes,
+        respetando los días y horarios originales. Se omitirán los días
+        anteriores y las clases cuyos horarios ya hayan pasado.
       </p>
 
       <div className="flex justify-center">
         <DayPicker
           mode="single"
+          weekStartsOn={1}
           selected={selectedDate}
           defaultMonth={today}
           disabled={{
             before: today,
-            dayOfWeek: [0, 2, 3, 4, 5, 6],
           }}
           onSelect={(date) => {
             if (date) {

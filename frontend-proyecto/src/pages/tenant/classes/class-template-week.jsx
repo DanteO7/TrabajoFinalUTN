@@ -24,6 +24,7 @@ export default function ClassTemplateWeek({ tenantId }) {
   const queryClient = useQueryClient();
 
   const [openDay, setOpenDay] = useState(null);
+  const [pendingDay, setPendingDay] = useState(null);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -48,6 +49,8 @@ export default function ClassTemplateWeek({ tenantId }) {
 
   const canCreateClass = useHasPermission(tenantId, "CLASS_CREATE");
   const canDeleteClass = useHasPermission(tenantId, "CLASS_DELETE");
+
+  const dayRefs = useRef({});
 
   const {
     data: classTemplates = [],
@@ -270,11 +273,24 @@ export default function ClassTemplateWeek({ tenantId }) {
           return (
             <div
               key={day.value}
-              className="overflow-hidden rounded-lg border border-gray-400 shadow-md"
+              ref={(element) => {
+                dayRefs.current[day.value] = element;
+              }}
+              className="scroll-mt-20 overflow-hidden rounded-lg border border-gray-400 shadow-md"
             >
               <button
                 type="button"
-                onClick={() => setOpenDay(isOpen ? null : day.value)}
+                onClick={() => {
+                  if (isOpen) {
+                    setOpenDay(null);
+                    setPendingDay(null);
+                  } else if (openDay !== null) {
+                    setPendingDay(day.value);
+                    setOpenDay(null);
+                  } else {
+                    setOpenDay(day.value);
+                  }
+                }}
                 className="flex w-full cursor-pointer items-center justify-between bg-[#EFECF0] px-5 py-4 transition"
               >
                 <span className="text-lg font-semibold">{day.label}</span>
@@ -286,7 +302,25 @@ export default function ClassTemplateWeek({ tenantId }) {
               </button>
 
               <div
-                className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                onTransitionEnd={(event) => {
+                  if (event.propertyName !== "grid-template-rows") return;
+
+                  // Terminó de cerrarse el día actual.
+                  if (!isOpen && pendingDay !== null && openDay === null) {
+                    setOpenDay(pendingDay);
+                    setPendingDay(null);
+                    return;
+                  }
+
+                  // Terminó de abrirse el día seleccionado.
+                  if (isOpen) {
+                    dayRefs.current[day.value]?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                }}
+                className={`grid transition-[grid-template-rows] duration-200 ease-in-out ${
                   isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                 }`}
               >

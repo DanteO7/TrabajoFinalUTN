@@ -157,7 +157,7 @@ namespace backend_proyecto.Services
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(1)
+                Expires = DateTime.UtcNow.AddDays(14)
             });
         }
 
