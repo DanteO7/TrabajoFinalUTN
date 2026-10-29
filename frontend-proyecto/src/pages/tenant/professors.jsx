@@ -16,6 +16,7 @@ export default function Professors({ tenantId }) {
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
   const canCreateInvitation = useHasPermission(tenantId, "INVITATION_CREATE");
+  const canReadInvitations = useHasPermission(tenantId, "INVITATION_READ");
 
   const [, setLocation] = useLocation();
   const [inputValue, setInputValue] = useState("");
@@ -78,12 +79,14 @@ export default function Professors({ tenantId }) {
                   placeholder="Buscar profesor..."
                 />
 
-                <BlackButton
-                  text="+ Invitar profesor"
-                  onClick={() => setOpenModal(true)}
-                  textSmall={true}
-                  wfit={isSmallScreen}
-                />
+                {canReadInvitations && (
+                  <BlackButton
+                    text="+ Invitar profesor"
+                    onClick={() => setOpenModal(true)}
+                    textSmall={true}
+                    wfit={isSmallScreen}
+                  />
+                )}
               </div>
             )}
 
@@ -145,14 +148,16 @@ export default function Professors({ tenantId }) {
                         Invitá tu primer profesor para comenzar.
                       </p>
 
-                      <div className="flex items-center justify-center">
-                        <BlackButton
-                          text="+ Invitar profesor"
-                          onClick={() => setOpenModal(true)}
-                          textSmall={true}
-                          wfit={true}
-                        />
-                      </div>
+                      {canReadInvitations && (
+                        <div className="flex items-center justify-center">
+                          <BlackButton
+                            text="+ Invitar profesor"
+                            onClick={() => setOpenModal(true)}
+                            textSmall={true}
+                            wfit={true}
+                          />
+                        </div>
+                      )}
                     </>
                   ) : (
                     <p className="text-gray-500 px-2 mt-2 mb-6">

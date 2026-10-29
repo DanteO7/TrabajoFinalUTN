@@ -630,11 +630,13 @@ export default function ClassModal({
             >
               <option value="">Selecciona un profesor</option>
 
-              {professors.map((professor) => (
-                <option key={professor.id} value={professor.id}>
-                  {professor.user.name} {professor.user.surname}
-                </option>
-              ))}
+              {professors
+                .filter((professor) => professor.isActive === true)
+                .map((professor) => (
+                  <option key={professor.id} value={professor.id}>
+                    {professor.user.name} {professor.user.surname}
+                  </option>
+                ))}
             </select>
 
             {errors.professorId && (

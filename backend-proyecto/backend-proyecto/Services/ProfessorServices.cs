@@ -120,11 +120,43 @@ namespace backend_proyecto.Services
             await _permissionServices.CheckPermission(Permissions.PROFESSOR_DELETE);
 
             var professor = await _professorRepository.GetOneAsync(p => p.Id == id);
+
             if (professor == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un usuario con el Id = '{id}'");
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un profesor con el Id = '{id}'"
+                );
             }
-            await _professorRepository.DeleteOneAsync(professor);
+
+            var userId = professor.UserId;
+            var tenantId = professor.TenantId;
+
+            var professorGroupIds = await _context.Groups
+                .Where(g =>
+                    g.TenantId == tenantId &&
+                    (g.Name == "BASIC_PROFESSOR" ||
+                     g.Name == "ADVANCED_PROFESSOR"))
+                .Select(g => g.Id)
+                .ToListAsync();
+
+            var userGroups = await _context.UserGroups
+                .Where(ug =>
+                    ug.UserId == userId &&
+                    professorGroupIds.Contains(ug.GroupId))
+                .ToListAsync();
+
+            _context.UserGroups.RemoveRange(userGroups);
+
+            var professorPermissions = await _context.ProfessorPermissions
+                .Where(pp => pp.ProfessorId == professor.Id)
+                .ToListAsync();
+
+            _context.ProfessorPermissions.RemoveRange(professorPermissions);
+
+            _context.Professors.Remove(professor);
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<ResponseProfessorDTO> UpdateOne(int professorId, UpdateProfessorDTO updateProfessorDTO)
