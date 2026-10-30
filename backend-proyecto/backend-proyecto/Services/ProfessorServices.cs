@@ -129,6 +129,17 @@ namespace backend_proyecto.Services
                 );
             }
 
+            var hasClasses = await _context.Classes
+                .AnyAsync(c => c.ProfessorId == professor.Id);
+
+            if (hasClasses)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede eliminar este profesor porque tiene clases asignadas. Podés ponerlo inactivo en su lugar."
+                );
+            }
+
             var userId = professor.UserId;
             var tenantId = professor.TenantId;
 

@@ -13,6 +13,7 @@
         public string Password { get; set; } = null!;    
         public bool HasActiveTenantRequest { get; set; } = false;
         public string? GoogleId { get; set; }
-        public bool IsGoogleAccount { get; set; } = false;
+        public bool IsGoogleAccount { get; set; } = false; 
+        public bool IsActive { get; set; } = true;
     }
 }

@@ -14,6 +14,9 @@ export default function YourSpace() {
   const { isAuthenticated } = useAuthStore();
 
   const [openInactiveModal, setOpenInactiveModal] = useState(false);
+  const [openInactiveProfessorModal, setOpenInactiveProfessorModal] =
+    useState(false);
+
   const [showInactive, setShowInactive] = useState(false);
 
   const { data: myTenants, isLoading } = useQuery({
@@ -60,12 +63,22 @@ export default function YourSpace() {
                   .map((t) => (
                     <Fragment key={t.id}>
                       {t.isActive ? (
-                        <Link
-                          className="w-full flex"
-                          href={`mi-espacio/${t.id}`}
-                        >
-                          <MyTenantCard myTenant={t} />
-                        </Link>
+                        t.role === "Professor" &&
+                        t.isProfessorActive === false ? (
+                          <div
+                            onClick={() => setOpenInactiveProfessorModal(true)}
+                            className="cursor-pointer"
+                          >
+                            <MyTenantCard myTenant={t} />
+                          </div>
+                        ) : (
+                          <Link
+                            className="w-full flex"
+                            href={`mi-espacio/${t.id}`}
+                          >
+                            <MyTenantCard myTenant={t} />
+                          </Link>
+                        )
                       ) : (
                         <div
                           onClick={() => setOpenInactiveModal(true)}
@@ -86,6 +99,13 @@ export default function YourSpace() {
         <ErrorModal
           close={() => setOpenInactiveModal(false)}
           message="Este negocio está inactivo, por favor hable con el dueño o renueve su cuota para activarlo"
+          isSuccesOrError
+        />
+      )}
+      {openInactiveProfessorModal && (
+        <ErrorModal
+          close={() => setOpenInactiveProfessorModal(false)}
+          message="Tu cuenta de profesor está inactiva en este negocio. Contactá al dueño para que la reactive."
           isSuccesOrError
         />
       )}

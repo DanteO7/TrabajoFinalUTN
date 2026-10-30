@@ -1,4 +1,3 @@
-import React from "react";
 import BlackButton from "../buttons/black-button";
 
 export default function MyTenantCard({ myTenant }) {
@@ -17,6 +16,7 @@ export default function MyTenantCard({ myTenant }) {
     },
   };
   const role = roleConfig[myTenant.role];
+  console.log(myTenant);
 
   return (
     <div className="bg-[#efecf0] flex flex-col border border-gray-400 w-full cursor-pointer place-self-center p-5 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300">

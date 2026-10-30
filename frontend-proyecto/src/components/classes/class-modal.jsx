@@ -529,7 +529,9 @@ export default function ClassModal({
             )
           ) : canCreateReservation ? (
             classStarted ? (
-              <WhiteButton text="No disponible" textSmall />
+              <div className="mt-8">
+                <WhiteButton text="No disponible" textSmall />
+              </div>
             ) : isReserved ? (
               <div>
                 {canDeleteReservation && (

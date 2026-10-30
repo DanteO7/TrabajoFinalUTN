@@ -74,6 +74,11 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
                             ? "Professor"
                             : "Student",
 
+                    IsProfessorActive = t.Professors
+                        .Where(p => p.UserId == userId)
+                        .Select(p => (bool?)p.IsActive)
+                        .FirstOrDefault(),
+
                     OwnerName =
                         t.OwnerUser.Name + " " +
                         t.OwnerUser.Surname,

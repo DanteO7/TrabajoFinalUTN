@@ -189,6 +189,16 @@ export default function StudentModal({ student, tenantId, close }) {
                 )}
               </div>
             )}
+            {currentStudent.user.pathologies && (
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+                <p className="text-sm text-gray-600 mb-1">
+                  Patologías o condiciones médicas
+                </p>
+                <p className="font-semibold text-[#333]">
+                  {currentStudent.user.pathologies}
+                </p>
+              </div>
+            )}
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">Plan</p>
               <div className="flex justify-between items-start">

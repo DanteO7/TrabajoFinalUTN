@@ -153,6 +153,7 @@ export default function ProfessorModal({
       );
     },
   });
+  console.log(currentProfessor);
 
   return (
     <Modal open onClose={close}>
@@ -205,7 +206,16 @@ export default function ProfessorModal({
                 )}
               </div>
             )}
-
+            {currentProfessor.user.pathologies && (
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+                <p className="text-sm text-gray-600 mb-1">
+                  Patologías o condiciones médicas
+                </p>
+                <p className="font-semibold text-[#333]">
+                  {currentProfessor.user.pathologies}
+                </p>
+              </div>
+            )}
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">Estado</p>
 

@@ -122,7 +122,7 @@ namespace backend_proyecto.Controllers
             {
                 return Conflict(new
                 {
-                    message = "No se puede eliminar el usuario porque tiene datos asociados. Conservá esos registros o desvinculalos antes de volver a intentarlo."
+                    message = "No se puede eliminar el usuario porque tiene datos asociados."
                 });
             }
             catch (Exception ex)

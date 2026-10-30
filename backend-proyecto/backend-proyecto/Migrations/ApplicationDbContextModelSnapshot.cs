@@ -1166,6 +1166,11 @@ namespace backend_proyecto.Migrations
                     b.Property<bool>("HasActiveTenantRequest")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("IsGoogleAccount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

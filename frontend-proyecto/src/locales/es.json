@@ -8,11 +8,12 @@
     "theme": "Tema"
   },
   "users": {
-    "deleteAction": "Eliminar usuario",
+    "deleteAction": "Eliminar",
     "deleteTitle": "¿Eliminar este usuario?",
     "deleteConfirmation": "Esta acción no se puede deshacer. Solo se eliminará la cuenta si no tiene datos asociados.",
     "cancel": "Cancelar",
-    "deleteError": "No se pudo eliminar el usuario. Intentá nuevamente."
+    "deleteError": "No se pudo eliminar el usuario. Intentá nuevamente.",
+    "suspendAction": "Suspender"
   },
   "statistics": {
     "paymentMethods": {

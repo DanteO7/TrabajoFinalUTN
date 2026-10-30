@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using backend_proyecto.Config;
 using backend_proyecto.Enums;
 using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
@@ -6,6 +7,7 @@ using backend_proyecto.Repositories;
 using backend_proyecto.Utils;
 using backend_proyecto.Utils.Errors;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -21,7 +23,8 @@ namespace backend_proyecto.Services
         private readonly IReservationRepository _reservationRepository;
         private readonly PermissionServices _permissionServices;
         private readonly GroupServices _groupServices;
-        private readonly IPaymentRepository _paymentRepository;
+        private readonly IPaymentRepository _paymentRepository; 
+        private readonly ApplicationDbContext _context;
 
         public StudentServices(
             IStudentRepository studentRepository,
@@ -33,7 +36,8 @@ namespace backend_proyecto.Services
             IReservationRepository reservationRepository,
             PermissionServices permissionServices,
             GroupServices groupServices,
-            IPaymentRepository paymentRepository)
+            IPaymentRepository paymentRepository,
+            ApplicationDbContext context)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
@@ -45,6 +49,7 @@ namespace backend_proyecto.Services
             _permissionServices = permissionServices;
             _groupServices = groupServices;
             _paymentRepository = paymentRepository;
+            _context = context;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -186,10 +191,38 @@ namespace backend_proyecto.Services
             await _permissionServices.CheckPermission(Permissions.STUDENT_DELETE);
 
             var student = await _studentRepository.GetOneAsync(s => s.Id == id);
+
             if (student == null)
             {
-                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un estudiante con el Id = '{id}'"
+                );
             }
+
+            var hasPayments = await _context.Payments
+                .AnyAsync(p =>
+                    p.UserId == student.UserId &&
+                    p.TenantId == student.TenantId);
+
+            if (hasPayments)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede eliminar este alumno porque tiene pagos asociados. Podés darlo de baja para conservar su historial."
+                );
+            }
+
+            var hasReservations = await _context.Reservations.AnyAsync(r => r.StudentId == student.Id);
+
+            if (hasReservations)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se puede eliminar este alumno porque tiene reservas asociadas. Podés darlo de baja para conservar su historial."
+                );
+            }
+
             await _studentRepository.DeleteOneAsync(student);
         }
         public async Task<ResponseStudentDTO> UpdateOne(int id, UpdateStudentDTO updateStudentDTO)

@@ -9,6 +9,8 @@ import ErrorModal from "../modals/error-modal";
 import { useAuthStore } from "../../store/auth-store";
 import { deleteUser, getUserById } from "../../services/user";
 import { getUserTenants } from "../../services/tenant";
+import RedButton from "../buttons/red-button";
+import BlackButton from "../buttons/black-button";
 
 export default function UserModal({ user, close, onDeleted }) {
   const { t } = useTranslation();
@@ -140,13 +142,20 @@ export default function UserModal({ user, close, onDeleted }) {
               )}
 
               {isAdmin && !isCurrentUser && (
-                <button
-                  type="button"
-                  onClick={() => setConfirmDelete(true)}
-                  className="mt-4 rounded-lg bg-[#ec5e66] px-4 py-2 text-white transition hover:bg-[#cc4148]"
-                >
-                  {t("users.deleteAction")}
-                </button>
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <RedButton
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    textSmall
+                    text={t("users.deleteAction")}
+                  />
+                  <BlackButton
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    textSmall
+                    text={t("users.suspendAction")}
+                  />
+                </div>
               )}
             </>
           )}

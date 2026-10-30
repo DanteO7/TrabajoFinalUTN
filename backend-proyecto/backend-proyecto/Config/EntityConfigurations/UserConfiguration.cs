@@ -41,6 +41,10 @@ namespace backend_proyecto.Config.EntityConfigurations
 
             entity.HasIndex(u => u.GoogleId)
                 .IsUnique();
+
+            entity.Property(u => u.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
         }
     }
 }

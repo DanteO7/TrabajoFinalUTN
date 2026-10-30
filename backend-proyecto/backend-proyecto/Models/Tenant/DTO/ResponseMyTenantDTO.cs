@@ -15,5 +15,6 @@
         public DateTime? PaymentDueDate { get; set; }
         public bool MercadoPagoConnected { get; set; }
         public decimal PlanPrice { get; set; }
+        public bool? IsProfessorActive { get; set; }
     }
 }
