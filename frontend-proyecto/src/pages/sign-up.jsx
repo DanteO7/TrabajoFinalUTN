@@ -13,13 +13,15 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useTenantStore } from "../store/tenant-store";
 import { useAuthStore } from "../store/auth-store";
 import { FcGoogle } from "react-icons/fc";
+import { getReturnUrlPath, getSafeReturnUrl } from "../utils/return-url";
 
-export default function SignUp() {
+export default function SignUp({ returnUrl }) {
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [, setLocation] = useLocation();
   const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
+  const safeReturnUrl = getSafeReturnUrl(returnUrl);
 
   const {
     register,
@@ -37,7 +39,7 @@ export default function SignUp() {
     onSuccess: () => {
       const formData = getValues();
       localStorage.setItem("pendingSignUp", JSON.stringify(formData));
-      setLocation("/verificar-codigo");
+      setLocation(getReturnUrlPath(safeReturnUrl, "/verificar-codigo"));
     },
     onError: (error) => {
       const data = error?.response?.data;
@@ -59,7 +61,9 @@ export default function SignUp() {
       clearPermissions();
       login(data);
 
-      if (data?.roles?.length > 0) {
+      if (safeReturnUrl) {
+        setLocation(safeReturnUrl);
+      } else if (data?.roles?.length > 0) {
         setLocation("/mi-espacio");
       } else {
         setLocation("/");
@@ -200,7 +204,7 @@ export default function SignUp() {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          <Link href="/iniciar-sesion">
+          <Link href={getReturnUrlPath(safeReturnUrl, "/iniciar-sesion")}>
             <WhiteButton textSmall={true} text="Inicia sesión" />
           </Link>
         </form>

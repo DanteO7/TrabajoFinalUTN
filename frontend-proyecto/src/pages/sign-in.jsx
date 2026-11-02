@@ -13,6 +13,7 @@ import WhiteButton from "../components/buttons/white-button";
 import FormInput from "../components/inputs/form-input";
 import { GoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
+import { getReturnUrlFromLocation, getReturnUrlPath } from "../utils/return-url";
 
 const getBackendErrorMessage = (data, fallback) => {
   if (typeof data === "string") return data;
@@ -97,16 +98,10 @@ export default function SignIn() {
     mutation.mutate(credentials);
   };
 
-  const returnUrl = new URLSearchParams(window.location.search).get(
-    "returnUrl",
-  );
+  const returnUrl = getReturnUrlFromLocation();
 
   const getRedirectUrl = () => {
-    if (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")) {
-      return returnUrl;
-    }
-
-    return null;
+    return returnUrl;
   };
 
   return (
@@ -205,7 +200,7 @@ export default function SignIn() {
             <span className="text-gray-500">si no tenes cuenta</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
-          <Link href="/registrarse">
+          <Link href={getReturnUrlPath(returnUrl, "/registrarse")}>
             <WhiteButton
               text="Registrate"
               disabled={isSubmitting || mutation.isPending}

@@ -9,23 +9,25 @@ import { useTenantStore } from "../store/tenant-store";
 import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 import FormInput from "../components/inputs/form-input";
+import { getReturnUrlPath, getSafeReturnUrl } from "../utils/return-url";
 
-export default function VerifyCode() {
+export default function VerifyCode({ returnUrl }) {
   const [, setLocation] = useLocation();
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [seconds, setSeconds] = useState(0);
   const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
+  const safeReturnUrl = getSafeReturnUrl(returnUrl);
 
   const formData = useMemo(() => {
     const pendingData = localStorage.getItem("pendingSignUp");
     if (!pendingData) {
-      setLocation("/registrarse");
+      setLocation(getReturnUrlPath(safeReturnUrl, "/registrarse"));
       return null;
     }
     return JSON.parse(pendingData);
-  }, [setLocation]);
+  }, [safeReturnUrl, setLocation]);
 
   const {
     register,
@@ -51,7 +53,9 @@ export default function VerifyCode() {
       clearPermissions();
       login(data);
 
-      if (data?.roles?.length > 0) {
+      if (safeReturnUrl) {
+        setLocation(safeReturnUrl);
+      } else if (data?.roles?.length > 0) {
         setLocation("/mi-espacio");
       } else {
         setLocation("/");
@@ -161,7 +165,7 @@ export default function VerifyCode() {
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
-          <Link href="/registrarse">
+          <Link href={getReturnUrlPath(safeReturnUrl, "/registrarse")}>
             <WhiteButton textSmall={true} text="Volver" />
           </Link>
         </form>

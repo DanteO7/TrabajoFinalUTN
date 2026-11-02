@@ -17,6 +17,7 @@ import { useLocation } from "wouter";
 import ForgotPassword from "./pages/forgot-password";
 import { AdminRoute } from "./router/admin-route";
 import { getTenantById } from "./services/tenant";
+import { getReturnUrlFromLocation } from "./utils/return-url";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -148,11 +149,11 @@ export default function App() {
             </Route>
 
             <Route path={"/registrarse"}>
-              <SignUp />
+              <SignUp returnUrl={getReturnUrlFromLocation()} />
             </Route>
 
             <Route path={"/verificar-codigo"}>
-              <VerifyCode />
+              <VerifyCode returnUrl={getReturnUrlFromLocation()} />
             </Route>
 
             <Route path={"/perfil"}>
