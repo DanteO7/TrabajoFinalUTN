@@ -58,10 +58,7 @@ export default function SignIn() {
     onError: (error) => {
       const data = error?.response?.data;
       setBackendError(
-        getBackendErrorMessage(
-          data,
-          "Ocurrió un error al iniciar sesión",
-        ),
+        getBackendErrorMessage(data, "Ocurrió un error al iniciar sesión"),
       );
       setErrorModal(true);
     },
@@ -114,7 +111,7 @@ export default function SignIn() {
 
   return (
     <div className="bg-[#ede9ee] h-screen text-[11px] flex">
-      <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-gray-800 flex-col">
+      <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
           <p className=" text-gray-400 font-semibold text-2xl">

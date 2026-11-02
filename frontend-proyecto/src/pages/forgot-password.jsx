@@ -44,9 +44,7 @@ export default function ForgotPassword() {
     },
     onError: (error) => {
       if (error.response?.status === 429) {
-        const remainingSeconds = Number(
-          error.response.data?.remainingSeconds,
-        );
+        const remainingSeconds = Number(error.response.data?.remainingSeconds);
         if (remainingSeconds > 0) setSeconds(remainingSeconds);
         return;
       }
@@ -68,7 +66,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="bg-[#ede9ee] min-h-screen text-[11px] flex">
-      <div className="hidden min-[900px]:flex w-[60%] bg-gray-800 pt-2">
+      <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
           <p className="text-gray-400 font-semibold text-2xl">Verificación</p>

@@ -56,7 +56,7 @@ namespace backend_proyecto.Services
                                     <tr>
                                         <td style=""padding:30px 24px 20px;text-align:center; "">
                                             <img
-                                                src=""{SiteUrl}/logo.png""
+                                                src=""{SiteUrl}/logo.webp""
                                                 alt=""TurnoFácil""
                                                 width=""180""
                                                 style=""

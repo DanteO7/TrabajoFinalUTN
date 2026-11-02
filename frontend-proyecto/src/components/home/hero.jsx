@@ -5,11 +5,11 @@ export default function Hero({ onOpenModal, openForbiddenModal }) {
   const { isAuthenticated } = useAuthStore();
 
   return (
-    <section className="bg-gray-500 w-dvw h-[calc(100vh-52px)]">
-      <div className="flex flex-col justify-center h-full p-8 gap-5 md:p-[10%] lg:pr-120 ">
-        <img src="/logo.png" alt="logo de turno facil" className="w-150" />
+    <section className="bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo.jpg')] bg-cover bg-position-[83%_center] min:[900px]:bg-center bg-no-repeat w-dvw h-[calc(100vh-52px)]">
+      <div className="flex flex-col justify-center h-full p-8 gap-5 md:p-[10%] md:pr-[40%] lg:pr-[50%] ">
+        <img src="/logo.webp" alt="logo de turno facil" className="w-150" />
 
-        <span className="md:text-2xl">
+        <span className="md:text-2xl text-[#efefef]">
           La forma más simple de organizar tu negocio. Automatizá turnos,
           controlá cupos y gestioná alumnos y profesores desde cualquier
           dispositivo.

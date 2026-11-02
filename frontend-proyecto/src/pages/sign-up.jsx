@@ -206,7 +206,7 @@ export default function SignUp() {
         </form>
       </div>
 
-      <div className="hidden min-[900px]:flex w-[60%] bg-gray-800 pt-2">
+      <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
           <p className="text-gray-400 font-semibold text-2xl">Registrarse</p>

@@ -43,7 +43,7 @@ export default function Header() {
 
         <Link href="/" onClick={handleHomeClick}>
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="logo de turno facil"
             className="w-28 cursor-pointer"
           />
