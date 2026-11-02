@@ -41,6 +41,7 @@ const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
 const Terms = lazy(() => import("./pages/terms"));
 const Tenant = lazy(() => import("./pages/tenant"));
 const Users = lazy(() => import("./pages/users"));
+const Tenants = lazy(() => import("./pages/tenants"));
 const Reservations = lazy(() => import("./pages/tenant/reservations"));
 const TenantPlans = lazy(() => import("./pages/tenant-plans"));
 const News = lazy(() => import("./pages/tenant/news"));
@@ -202,19 +203,23 @@ export default function App() {
               <MyPayments />
             </Route>
 
-            <AdminRoute path={"/usuarios"}>
+            <AdminRoute path={"/usuarios"} unauthorizedComponent={NotFound}>
               <Users />
             </AdminRoute>
 
-            <AdminRoute path={"/planes"}>
+            <AdminRoute path={"/negocios"} unauthorizedComponent={NotFound}>
+              <Tenants />
+            </AdminRoute>
+
+            <AdminRoute path={"/planes"} unauthorizedComponent={NotFound}>
               <TenantPlans />
             </AdminRoute>
 
-            <AdminRoute path={"/pagos-app"}>
+            <AdminRoute path={"/pagos-app"} unauthorizedComponent={NotFound}>
               <AppPayments />
             </AdminRoute>
 
-            <AdminRoute path={"/crear-negocio"}>
+            <AdminRoute path={"/crear-negocio"} unauthorizedComponent={NotFound}>
               <CreateTenant />
             </AdminRoute>
 

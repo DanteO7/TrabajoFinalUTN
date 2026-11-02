@@ -30,6 +30,12 @@ export const createTenant = (data) => {
 
 export const deleteTenant = (id) => request("delete", `/tenants/${id}`);
 
+export const activateTenant = (id) =>
+  request("patch", `/tenants/${id}/activate`);
+
+export const deactivateTenant = (id) =>
+  request("patch", `/tenants/${id}/deactivate`);
+
 export const updateTenant = (id, data) =>
   request("put", `/tenants/${id}`, data);
 

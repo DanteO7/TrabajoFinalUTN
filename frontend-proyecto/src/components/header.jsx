@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { IoPersonSharp } from "react-icons/io5";
 import { IoMdSettings } from "react-icons/io";
-import { FaBook, FaHome, FaMoneyBillWave } from "react-icons/fa";
+import { FaBook, FaBuilding, FaHome, FaMoneyBillWave } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa";
 import { Link, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/auth-store";
 import MenuItem from "./menu-item";
 import { MdSpaceDashboard } from "react-icons/md";
 
 export default function Header() {
+  const { t } = useTranslation();
   const [menu, setMenu] = useState(false);
   const [location] = useLocation();
   const { isAuthenticated, user } = useAuthStore();
@@ -63,6 +65,12 @@ export default function Header() {
                     href="/usuarios"
                   >
                     Usuarios
+                  </Link>
+                  <Link
+                    className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
+                    href="/negocios"
+                  >
+                    {t("header.businesses")}
                   </Link>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-all duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
@@ -170,6 +178,14 @@ export default function Header() {
                     onClick={() => setMenu(false)}
                   >
                     Usuarios
+                  </MenuItem>
+
+                  <MenuItem
+                    href="/negocios"
+                    icon={FaBuilding}
+                    onClick={() => setMenu(false)}
+                  >
+                    {t("header.businesses")}
                   </MenuItem>
 
                   <MenuItem

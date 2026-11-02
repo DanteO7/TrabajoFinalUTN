@@ -62,7 +62,7 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(
                     HttpStatusCode.Forbidden,
-                    "Solo un administrador puede buscar todos los negocio"
+                    "Solo un administrador puede buscar todos los negocios"
                 );
             }
             var tenants = await _tenantRepository.GetAllAsync(null, t => t.OwnerUser, t => t.TenantPlan);
@@ -71,7 +71,12 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseTenantDTO> GetById(int id, int userId)
         {
-            await _permissionServices.CheckPermission(Permissions.TENANT_READ);
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                await _permissionServices.CheckPermission(Permissions.TENANT_READ);
+            }
 
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == id,
@@ -89,7 +94,7 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var hasAccess =
+            var hasAccess = isAdmin ||
                 tenant.OwnerUserId == userId ||
                 tenant.Professors.Any(p => p.UserId == userId) ||
                 tenant.Students.Any(s => s.UserId == userId);
@@ -97,14 +102,13 @@ namespace backend_proyecto.Services
             if (!hasAccess)
             {
                 throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    "No existe el tenant"
+                    HttpStatusCode.Forbidden,
+                    "No tenés permiso para consultar este negocio"
                 );
             }
 
-
             var response = _mapper.Map<ResponseTenantDTO>(tenant);
-            response.Role = GetRole(tenant, userId);
+            response.Role = isAdmin ? "Admin" : GetRole(tenant, userId);
 
             return response;
         }
@@ -214,7 +218,41 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No existe Tenant con el Id = '{id}'");
             }
+
+            if (await _tenantRepository.HasInvitations(id))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Conflict,
+                    "No se puede eliminar el negocio porque tiene invitaciones asociadas"
+                );
+            }
+
             await _tenantRepository.DeleteOneAsync(tenant);
+        }
+
+        public async Task SetTenantActive(int id, int userId, bool isActive)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede cambiar el estado de un negocio"
+                );
+            }
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == id);
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No existe Tenant con el Id = '{id}'"
+                );
+            }
+
+            tenant.IsActive = isActive;
+            await _tenantRepository.SaveAsync();
         }
 
         public async Task<ResponseTenantDTO> UpdateOne(int id, int ownerUserId, UpdateTenantDTO updateTenantDTO)

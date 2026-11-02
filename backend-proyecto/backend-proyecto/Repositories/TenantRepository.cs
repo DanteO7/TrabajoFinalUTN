@@ -10,6 +10,7 @@ public interface ITenantRepository : IRepository<Tenant>
 {
     Task<bool> ExistsByUserId(int userId);
     Task<bool> ExistsByOwnerAndId(int userId, int tenantId);
+    Task<bool> HasInvitations(int tenantId);
     Task<List<ResponseMyTenantDTO>> GetMyTenants(int currentUserId, int? targetUserId = null, bool onlyOwned = false);
     Task<int> CountAsync(Expression<Func<Tenant, bool>> predicate);
     Task<Tenant?> GetByMercadoPagoUserIdAsync(
@@ -35,6 +36,11 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
     public async Task<bool> ExistsByOwnerAndId(int userId, int tenantId)
     {
         return await dbSet.AnyAsync(t => t.OwnerUserId == userId && t.Id == tenantId);
+    }
+
+    public async Task<bool> HasInvitations(int tenantId)
+    {
+        return await _db.Invitations.AnyAsync(i => i.TenantId == tenantId);
     }
 
     public async Task<List<ResponseMyTenantDTO>> GetMyTenants(

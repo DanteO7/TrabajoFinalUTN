@@ -30,6 +30,7 @@ namespace backend_proyecto.Controllers
         [HttpGet]
         [Authorize]
         [ProducesResponseType(typeof(List<ResponseTenantDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<ResponseTenantDTO>>> GetAll()
@@ -52,10 +53,11 @@ namespace backend_proyecto.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
-        [ProducesResponseType(typeof(UserWithoutPassDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserWithoutPassDTO>> GetOneById(int id)
+        public async Task<ActionResult<ResponseTenantDTO>> GetOneById(int id)
         {
             try
             {
@@ -97,6 +99,7 @@ namespace backend_proyecto.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(typeof(ResponseTenantDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
@@ -129,6 +132,8 @@ namespace backend_proyecto.Controllers
         [HttpDelete("{id}")]
         [Authorize]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteOneById(int id)
@@ -138,6 +143,52 @@ namespace backend_proyecto.Controllers
                 var userId = int.Parse(User.FindFirst("id")?.Value!);
                 await _tenantServices.DeleteOne(id, userId);
                 return Ok("Tenant Successfully Deleted");
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/activate")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> ActivateOneById(int id)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+                await _tenantServices.SetTenantActive(id, userId, true);
+                return NoContent();
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/deactivate")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeactivateOneById(int id)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst("id")!.Value);
+                await _tenantServices.SetTenantActive(id, userId, false);
+                return NoContent();
             }
             catch (HttpResponseError ex)
             {
