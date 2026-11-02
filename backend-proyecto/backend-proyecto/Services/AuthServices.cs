@@ -6,7 +6,6 @@ using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
 using Google.Apis.Auth;
-using Humanizer.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +27,6 @@ namespace backend_proyecto.Services
         private readonly IAdminRepository _adminRepository;
         private readonly ITenantRepository _tenantRepository;
         private readonly ApplicationDbContext _db;
-        private readonly IConfiguration _configuration;
 
         public AuthServices(
             IUserServices userServices, 
@@ -38,8 +36,7 @@ namespace backend_proyecto.Services
             IStudentRepository studentRepo, 
             IAdminRepository adminRepository, 
             ITenantRepository tenantRepository, 
-            ApplicationDbContext db,
-            IConfiguration configuration)
+            ApplicationDbContext db)
         {
             _userServices = userServices;
             _encoderServices = encoderServices;
@@ -51,7 +48,6 @@ namespace backend_proyecto.Services
             _adminRepository = adminRepository;
             _tenantRepository = tenantRepository;
             _db = db;
-            _configuration = configuration;
         }
 
         public async Task<AuthResponseDTO> Register(RegisterDTO register, HttpContext context)
@@ -113,6 +109,14 @@ namespace backend_proyecto.Services
             if (!_encoderServices.Verify(login.Password, user.Password))
                 throw new HttpResponseError(HttpStatusCode.BadRequest, "Credenciales invalidas.");
 
+            if (!user.IsActive)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Tu cuenta está suspendida. Contactá al soporte para obtener más información."
+                );
+            }
+
             var userDto = _mapper.Map<UserWithoutPassDTO>(user);
             var token = await GenerateJwt(userDto);
             SetCookie(token, context);
@@ -146,19 +150,26 @@ namespace backend_proyecto.Services
         }
         public Task Logout(HttpContext context)
         {
-            context.Response.Cookies.Delete("auth_token");
+            context.Response.Cookies.Delete("auth_token", AuthCookieOptions());
             return Task.CompletedTask;
         }
 
         public void SetCookie(string token, HttpContext context)
         {
-            context.Response.Cookies.Append("auth_token", token, new CookieOptions
+            var options = AuthCookieOptions();
+            options.Expires = DateTime.UtcNow.AddDays(14);
+            context.Response.Cookies.Append("auth_token", token, options);
+        }
+
+        private static CookieOptions AuthCookieOptions()
+        {
+            return new CookieOptions
             {
+                Path = "/",
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(14)
-            });
+                SameSite = SameSiteMode.None
+            };
         }
 
         public async Task<string> GenerateJwt(UserWithoutPassDTO user)
@@ -205,7 +216,7 @@ namespace backend_proyecto.Services
                     {
                         Audience = new[]
                         {
-                    _configuration["Google:ClientId"]!
+                    _config["Google:ClientId"]!
                         }
                     }
                 );
@@ -242,6 +253,8 @@ namespace backend_proyecto.Services
 
             if (existingGoogleUser != null)
             {
+                EnsureUserIsActive(existingGoogleUser);
+
                 // Ya tiene cuenta de Google: iniciar sesión
                 var userDto = _mapper.Map<UserWithoutPassDTO>(
                     existingGoogleUser
@@ -260,6 +273,8 @@ namespace backend_proyecto.Services
 
             if (existingUser != null)
             {
+                EnsureUserIsActive(existingUser);
+
                 throw new HttpResponseError(
                     HttpStatusCode.Conflict,
                     "Ya existe una cuenta con ese email. Iniciá sesión con tu método habitual."
@@ -278,6 +293,17 @@ namespace backend_proyecto.Services
             SetCookie(createdToken, context);
 
             return await BuildAuthResponse(createdUser);
+        }
+
+        private static void EnsureUserIsActive(User user)
+        {
+            if (!user.IsActive)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Tu cuenta está suspendida. Contactá al soporte para obtener más información."
+                );
+            }
         }
     }
 }

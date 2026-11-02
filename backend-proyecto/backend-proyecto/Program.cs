@@ -223,6 +223,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
+app.UseMiddleware<UserActiveMiddleware>();
+
 app.UseMiddleware<TenantMiddleware>();
 
 app.UseAuthorization();

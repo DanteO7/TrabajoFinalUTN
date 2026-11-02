@@ -19,14 +19,21 @@ namespace backend_proyecto.Services
         private readonly IMapper _mapper;
         private readonly IEncoderServices _encoderServices;
         private readonly ApplicationDbContext _db;
+        private readonly IAdminRepository _adminRepository;
 
 
-        public UserServices(IUserRepository repo, IMapper mapper, IEncoderServices encoderServices, ApplicationDbContext db)
+        public UserServices(
+            IUserRepository repo,
+            IMapper mapper,
+            IEncoderServices encoderServices,
+            ApplicationDbContext db,
+            IAdminRepository adminRepository)
         {
             _repo = repo;
             _mapper = mapper;
             _encoderServices = encoderServices;
             _db = db;
+            _adminRepository = adminRepository;
         }
 
         public async Task<PagedResponse<UserWithoutPassDTO>> GetAll(
@@ -180,6 +187,53 @@ namespace backend_proyecto.Services
             _db.EmailVerifications.RemoveRange(emailVerifications);
 
             await _repo.DeleteOneAsync(user);
+        }
+
+        public async Task SuspendOne(int id, int userId)
+        {
+            await EnsureCurrentUserIsAdmin(userId);
+
+            var user = await _repo.GetOneAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un usuario con el Id = '{id}'"
+                );
+            }
+
+            user.IsActive = false;
+            await _repo.UpdateOneAsync(user);
+        }
+
+        public async Task ActivateOne(int id, int userId)
+        {
+            await EnsureCurrentUserIsAdmin(userId);
+
+            var user = await _repo.GetOneAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un usuario con el Id = '{id}'"
+                );
+            }
+
+            user.IsActive = true;
+            await _repo.UpdateOneAsync(user);
+        }
+
+        private async Task EnsureCurrentUserIsAdmin(int userId)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+
+            if (!isAdmin)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "Solo un administrador puede realizar esta acción."
+                );
+            }
         }
 
         public async Task<UserWithoutPassDTO> UpdateOne(int id, UpdateUserDTO updatedUser)

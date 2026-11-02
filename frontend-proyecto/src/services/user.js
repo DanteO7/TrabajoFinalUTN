@@ -6,6 +6,10 @@ export const getUserById = (id) => request("get", `/users/${id}`);
 
 export const deleteUser = (id) => request("delete", `/users/${id}`);
 
+export const suspendUser = (id) => request("patch", `/users/${id}/suspend`);
+
+export const activateUser = (id) => request("patch", `/users/${id}/activate`);
+
 export const updateUser = ({ id, data }) =>
   request("put", `/users/${id}`, data);
 

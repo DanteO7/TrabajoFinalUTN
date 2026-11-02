@@ -13,7 +13,23 @@
     "deleteConfirmation": "This action cannot be undone. The account will only be deleted if it has no associated data.",
     "cancel": "Cancel",
     "deleteError": "The user could not be deleted. Please try again.",
-    "suspendAction": "Suspend"
+    "suspendAction": "Suspend",
+    "suspendAccount": "Suspend account",
+    "suspendTitle": "Suspend this user?",
+    "suspendConfirmation": "The account will no longer be able to sign in or use the application. Its data and relationships will be kept.",
+    "suspending": "Suspending...",
+    "suspendError": "The user could not be suspended. Please try again.",
+    "suspendSuccess": "The account was suspended successfully.",
+    "activateAction": "Activate",
+    "activateAccount": "Activate account",
+    "activateTitle": "Activate this user?",
+    "activateConfirmation": "The account will be able to sign in and use the application again.",
+    "activating": "Activating...",
+    "activateError": "The user could not be activated. Please try again.",
+    "activateSuccess": "The account was activated successfully.",
+    "accountStatus": "Account status",
+    "active": "Active",
+    "suspended": "Suspended"
   },
   "statistics": {
     "paymentMethods": {

@@ -13,7 +13,23 @@
     "deleteConfirmation": "Esta acción no se puede deshacer. Solo se eliminará la cuenta si no tiene datos asociados.",
     "cancel": "Cancelar",
     "deleteError": "No se pudo eliminar el usuario. Intentá nuevamente.",
-    "suspendAction": "Suspender"
+    "suspendAction": "Suspender",
+    "suspendAccount": "Suspender cuenta",
+    "suspendTitle": "¿Suspender este usuario?",
+    "suspendConfirmation": "La cuenta dejará de poder iniciar sesión y usar la aplicación. Sus datos y relaciones se conservarán.",
+    "suspending": "Suspendiendo...",
+    "suspendError": "No se pudo suspender el usuario. Intentá nuevamente.",
+    "suspendSuccess": "La cuenta fue suspendida correctamente.",
+    "activateAction": "Activar",
+    "activateAccount": "Activar cuenta",
+    "activateTitle": "¿Activar este usuario?",
+    "activateConfirmation": "La cuenta podrá volver a iniciar sesión y utilizar la aplicación.",
+    "activating": "Activando...",
+    "activateError": "No se pudo activar el usuario. Intentá nuevamente.",
+    "activateSuccess": "La cuenta fue activada correctamente.",
+    "accountStatus": "Estado de la cuenta",
+    "active": "Activa",
+    "suspended": "Suspendida"
   },
   "statistics": {
     "paymentMethods": {

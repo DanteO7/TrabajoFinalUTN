@@ -14,6 +14,14 @@ import FormInput from "../components/inputs/form-input";
 import { GoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 
+const getBackendErrorMessage = (data, fallback) => {
+  if (typeof data === "string") return data;
+  if (data?.errors) return Object.values(data.errors).flat().join(" - ");
+  if (data?.message) return data.message;
+  if (data?.title) return data.title;
+  return fallback;
+};
+
 export default function SignIn() {
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
@@ -49,12 +57,12 @@ export default function SignIn() {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al iniciar sesión";
-      if (typeof data === "string") msg = data;
-      else if (data?.errors)
-        msg = Object.values(data.errors).flat().join(" - ");
-      else if (data?.title) msg = data.title;
-      setBackendError(msg);
+      setBackendError(
+        getBackendErrorMessage(
+          data,
+          "Ocurrió un error al iniciar sesión",
+        ),
+      );
       setErrorModal(true);
     },
   });
@@ -80,13 +88,9 @@ export default function SignIn() {
 
     onError: (error) => {
       const data = error?.response?.data;
-
-      const msg =
-        typeof data === "string"
-          ? data
-          : data?.message || "No se pudo continuar con Google.";
-
-      setBackendError(msg);
+      setBackendError(
+        getBackendErrorMessage(data, "No se pudo continuar con Google."),
+      );
       setErrorModal(true);
     },
   });

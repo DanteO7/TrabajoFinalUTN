@@ -66,6 +66,7 @@ namespace backend_proyecto.Controllers
 
         [HttpPost("login")]
         [ProducesResponseType(typeof(LoginResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO loginDTO)
@@ -242,6 +243,8 @@ namespace backend_proyecto.Controllers
             return Ok(new { message = responseMessage });
         }
         [HttpPost("google-register")]
+        [ProducesResponseType(typeof(AuthResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<AuthResponseDTO>> GoogleRegister(
             [FromBody] GoogleRegisterDTO dto)
         {

@@ -124,16 +124,19 @@ export default function Invitation({ token }) {
                   <p className="text-gray-500">Cargando planes...</p>
                 ) : plans.length > 0 ? (
                   <div className="space-y-2">
-                    {plans.map((plan) => (
-                      <div
-                        key={plan.id}
-                        onClick={() => setSelectedPlan(plan.id)}
-                        className={`p-4 rounded-lg border cursor-pointer transition ${
-                          selectedPlan === plan.id
-                            ? "border-black border-2 bg-[#F4F0F5]"
-                            : "border-gray-400 hover:border-gray-600"
-                        }`}
-                      >
+                    {plans.map((plan) => {
+                      const isSelected = String(selectedPlan) === String(plan.id);
+
+                      return (
+                        <div
+                          key={plan.id}
+                          onClick={() => setSelectedPlan(plan.id)}
+                          className={`p-4 rounded-lg border cursor-pointer transition ${
+                            isSelected
+                              ? "border-black border-2 bg-[#F4F0F5]"
+                              : "border-gray-400 hover:border-gray-600"
+                          }`}
+                        >
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-semibold text-[#333]">
@@ -147,8 +150,9 @@ export default function Invitation({ token }) {
                             ${plan.price.toLocaleString("es-AR")}
                           </p>
                         </div>
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-gray-500">No hay planes disponibles</p>

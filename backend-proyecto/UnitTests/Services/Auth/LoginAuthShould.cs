@@ -114,7 +114,19 @@ namespace UnitTests.Services.Auth
             Assert.NotNull(result.Roles);
             Assert.IsType<AuthResponseDTO>(result);
 
-            _cookiesMock.Verify(c => c.Append("auth_token", It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Once);
+            _cookiesMock.Verify(
+                c => c.Append(
+                    "auth_token",
+                    It.IsAny<string>(),
+                    It.Is<CookieOptions>(options =>
+                        options.Path == "/" &&
+                        options.Domain == null &&
+                        options.HttpOnly &&
+                        options.Secure &&
+                        options.SameSite == SameSiteMode.None)
+                ),
+                Times.Once
+            );
         }
 
         // =====================
@@ -137,7 +149,7 @@ namespace UnitTests.Services.Auth
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
-            Assert.Equal("Invalid Credentials.", ex.Message);
+            Assert.Equal("Credenciales invalidas.", ex.Message);
 
             _encoderServicesMock.Verify(e => e.Verify(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             _cookiesMock.Verify(c => c.Append(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Never);
@@ -168,9 +180,37 @@ namespace UnitTests.Services.Auth
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, ex.StatusCode);
-            Assert.Equal("Invalid Credentials.", ex.Message);
+            Assert.Equal("Credenciales invalidas.", ex.Message);
 
             _cookiesMock.Verify(c => c.Append(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CookieOptions>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RejectSuspendedUserAfterValidatingCredentials()
+        {
+            var dto = ValidDto();
+            var user = ValidUser();
+            user.IsActive = false;
+
+            _userServicesMock
+                .Setup(s => s.GetOneByEmail(dto.Email))
+                .ReturnsAsync(user);
+            _encoderServicesMock
+                .Setup(e => e.Verify(dto.Password, user.Password))
+                .Returns(true);
+
+            var ex = await Assert.ThrowsAsync<HttpResponseError>(() =>
+                _authServices.Login(dto, _httpContextMock.Object));
+
+            Assert.Equal(HttpStatusCode.Forbidden, ex.StatusCode);
+            Assert.Equal(
+                "Tu cuenta está suspendida. Contactá al soporte para obtener más información.",
+                ex.Message
+            );
+            _cookiesMock.Verify(
+                c => c.Append("auth_token", It.IsAny<string>(), It.IsAny<CookieOptions>()),
+                Times.Never
+            );
         }
     }
 }

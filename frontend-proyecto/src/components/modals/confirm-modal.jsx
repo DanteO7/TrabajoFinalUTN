@@ -11,6 +11,7 @@ export default function ConfirmModal({
   onConfirm,
   close,
   isPending = false,
+  pendingText = "Eliminando...",
 }) {
   return (
     <Modal open onClose={close} isSuccesOrError={true}>
@@ -44,7 +45,7 @@ export default function ConfirmModal({
           <RedButton
             onClick={onConfirm}
             disabled={isPending}
-            text={isPending ? "Eliminando..." : confirmText}
+            text={isPending ? pendingText : confirmText}
             textSmall
           />
         </div>

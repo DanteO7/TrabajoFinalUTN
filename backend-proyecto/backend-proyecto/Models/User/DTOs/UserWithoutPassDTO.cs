@@ -11,5 +11,6 @@
         public int? Weight { get; set; }
         public string? Pathologies { get; set; }
         public bool IsGoogleAccount { get; set; } = false;
+        public bool IsActive { get; set; } = true;
     }
 }

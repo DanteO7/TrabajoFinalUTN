@@ -17,13 +17,16 @@ namespace backend_proyecto.Controllers
     {
         private readonly IUserServices _userServices;
         private readonly IAdminRepository _adminRepository;
+        private readonly AuthServices _authServices;
 
         public UserController(
             IUserServices userServices,
-            IAdminRepository adminRepository)
+            IAdminRepository adminRepository,
+            AuthServices authServices)
         {
             _userServices = userServices;
             _adminRepository = adminRepository;
+            _authServices = authServices;
         }
 
         [HttpGet]
@@ -128,6 +131,66 @@ namespace backend_proyecto.Controllers
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}/suspend")]
+        [Authorize]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> SuspendOne(int id)
+        {
+            if (!TryGetCurrentUserId(out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                await _userServices.SuspendOne(id, currentUserId);
+
+                if (id == currentUserId)
+                    await _authServices.Logout(HttpContext);
+
+                return Ok(new
+                {
+                    message = "La cuenta fue suspendida correctamente."
+                });
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = ex.Message });
+            }
+        }
+
+        [HttpPatch("{id}/activate")]
+        [Authorize]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> ActivateOne(int id)
+        {
+            if (!TryGetCurrentUserId(out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                await _userServices.ActivateOne(id, currentUserId);
+                return Ok(new
+                {
+                    message = "La cuenta fue activada correctamente."
+                });
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = ex.Message });
             }
         }
 

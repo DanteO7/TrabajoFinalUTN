@@ -33,7 +33,8 @@ namespace UnitTests.Services.User
                 _userRepoMock.Object,
                 _mapperMock.Object,
                 _encoderServicesMock.Object,
-                _db
+                _db,
+                new Mock<IAdminRepository>().Object
             );
         }
 
