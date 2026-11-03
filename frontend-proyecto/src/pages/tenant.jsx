@@ -363,7 +363,7 @@ export default function Tenant({ id }) {
                   key={section.href}
                   href={`/mi-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
+                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>
 
                     <div>

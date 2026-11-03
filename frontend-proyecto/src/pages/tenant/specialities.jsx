@@ -88,7 +88,7 @@ export default function Specialities({ tenantId }) {
                   <div
                     key={speciality.id}
                     onClick={() => setSelectedSpeciality(speciality)}
-                    className="cursor-pointer rounded-lg border bg-[#efecf0] border-gray-400 bg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
+                    className="cursor-pointer rounded-lg border bg-[#efecf0] border-gray-400 bg p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                   >
                     <h3 className="font-semibold text-xl">{speciality.name}</h3>
                   </div>

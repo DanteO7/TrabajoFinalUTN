@@ -96,7 +96,7 @@ export default function Professors({ tenantId }) {
                   <div
                     key={professor.id}
                     onClick={() => setSelectedProfessor(professor)}
-                    className="cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
+                    className="cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-xl">

@@ -95,7 +95,7 @@ export default function Exercises({ tenantId }) {
                     <div
                       key={exercise.id}
                       onClick={() => setSelectedExercise(exercise)}
-                      className="cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
+                      className="cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                     >
                       <h3 className="font-semibold text-xl">{exercise.name}</h3>
 

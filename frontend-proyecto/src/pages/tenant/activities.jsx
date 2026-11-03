@@ -95,7 +95,7 @@ export default function Activities({ tenantId }) {
                   <div
                     key={activity.id}
                     onClick={() => setSelectedActivity(activity)}
-                    className="bg-[#efecf0] cursor-pointer rounded-lg border border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
+                    className="bg-[#efecf0] cursor-pointer rounded-lg border border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                   >
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
 

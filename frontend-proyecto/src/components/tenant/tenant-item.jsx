@@ -7,7 +7,7 @@ export default function TenantItem({ tenant, onSelect, t }) {
     <button
       type="button"
       onClick={() => onSelect(tenant)}
-      className="w-full min-w-0 max-w-full cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-5 text-left shadow-md transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-xl min-[500px]:p-5"
+      className="w-full min-w-0 max-w-full cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-5 text-left shadow-md transition] duration-300 hover:-translate-y-1 hover:shadow-xl min-[500px]:p-5"
     >
       <div className="flex min-w-0 items-start justify-between gap-2 min-[500px]:gap-4">
         <div className="min-w-0 flex-1">

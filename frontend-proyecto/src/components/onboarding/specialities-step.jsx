@@ -87,7 +87,7 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
                   key={professor.id}
                   type="button"
                   onClick={() => setSelectedProfessor(professor)}
-                  className="min-h-28 min-w-0 w-full cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-4 text-left shadow-md transition-[transform,box-shadow] duration-300 hover:shadow-xl hover:-translate-y-1 sm:p-6"
+                  className="min-h-28 min-w-0 w-full cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-4 text-left shadow-md transition] duration-300 hover:shadow-xl hover:-translate-y-1 sm:p-6"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="min-w-0 flex-1 wrap-break-word font-semibold text-lg sm:text-xl">

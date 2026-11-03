@@ -94,7 +94,7 @@ export default function Routines({ tenantId }) {
                     <div
                       key={routine.id}
                       onClick={() => setSelectedRoutine(routine)}
-                      className="cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
+                      className="cursor-pointer rounded-lg border border-gray-400 bg-[#efecf0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                     >
                       <h3 className="font-semibold text-xl">{routine.name}</h3>
 
