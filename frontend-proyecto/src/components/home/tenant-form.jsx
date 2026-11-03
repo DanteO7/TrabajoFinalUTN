@@ -149,7 +149,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         <div>
           <label className="block text-sm font-medium mb-1">Plan</label>
           <select
-            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+            className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             {...register("tenantPlanId")}
           >
             <option value="">
@@ -212,7 +212,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
             className="flex items-center justify-center gap-2 w-full rounded-lg px-3 py-3
             bg-[#f1eef3] border border-gray-400 text-gray-700
             hover:bg-[#e9e4ec] hover:border-gray-500
-            transition-all duration-200 cursor-pointer"
+            transition-colors duration-200 cursor-pointer"
           >
             <Upload size={18} />
             <span className="font-medium">

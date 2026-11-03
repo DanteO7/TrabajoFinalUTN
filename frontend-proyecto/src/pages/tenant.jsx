@@ -19,7 +19,7 @@ import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
 import Loading from "../components/loading";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import BlackButton from "../components/buttons/black-button";
 import RedButton from "../components/buttons/red-button";
 import { getUnreadNewsCount } from "../services/news";
@@ -161,6 +161,11 @@ export default function Tenant({ id }) {
   );
 
   const userRoles = useTenantStore((state) => state.getUserRoles(id));
+  const permissionSet = useMemo(
+    () => new Set(userPermissions?.permissions ?? []),
+    [userPermissions?.permissions],
+  );
+  const roleSet = useMemo(() => new Set(userRoles), [userRoles]);
 
   const cards = userPermissions
     ? sections.filter((section) => {
@@ -179,11 +184,11 @@ export default function Tenant({ id }) {
 
         const hasPermission = section.ownerOnly
           ? isOwner
-          : userPermissions.permissions.includes(section.permission);
+          : permissionSet.has(section.permission);
 
         const isStudentOnly = section.onlyStudent === true;
 
-        const isStudent = userRoles.includes("Student");
+        const isStudent = roleSet.has("Student");
 
         return hasPermission && (!isStudentOnly || isStudent);
       })
@@ -273,7 +278,7 @@ export default function Tenant({ id }) {
                           <Icon
                             key={platform}
                             size={30}
-                            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+                            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-colors duration-200"
                             onClick={() => window.open(url, "_blank")}
                           />
                         );
@@ -333,7 +338,7 @@ export default function Tenant({ id }) {
               {newsCard && (
                 <Link href={`/mi-espacio/${tenant?.id}/novedades`}>
                   <div
-                    className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center`}
+                    className={`relative bg-[#efecf0] cursor-pointer rounded-lg ${unreadCount?.unreadCount > 0 && "bg-red-100"} border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[background-color,transform,box-shadow] duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center`}
                   >
                     {unreadCount?.unreadCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-[#fc697b] text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
@@ -358,7 +363,7 @@ export default function Tenant({ id }) {
                   key={section.href}
                   href={`/mi-espacio/${tenant?.id}/${section.href}`}
                 >
-                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
+                  <div className="cursor-pointer bg-[#efecf0] rounded-lg border border-gray-400 px-4 py-3 min-[900px]:p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300 flex min-[900px]:flex-col gap-4 max-[900px]:items-center">
                     <div className="text-[#fa7282]">{section.icon}</div>
 
                     <div>

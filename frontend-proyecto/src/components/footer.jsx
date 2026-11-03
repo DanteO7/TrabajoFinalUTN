@@ -25,21 +25,21 @@ export default function Footer() {
         </div>
         <div className="flex gap-5 text-3xl">
           <FaInstagram
-            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-colors duration-200"
             onClick={() =>
               window.open("https://www.instagram.com/dante_ksx", "_blank")
             }
           />
           <FaWhatsapp
-            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-colors duration-200"
             onClick={() => window.open("https://wa.me/5493400532514", "_blank")}
           />
           <FaGithub
-            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-colors duration-200"
             onClick={() => window.open("https://github.com/DanteO7", "_blank")}
           />
           <FaYoutube
-            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-all duration-200"
+            className="cursor-pointer hover:text-black hover:dark:text-[#ccc] transition-colors duration-200"
             onClick={() =>
               window.open(
                 "https://www.linkedin.com/in/dante-orsetti-05a1453b6/",

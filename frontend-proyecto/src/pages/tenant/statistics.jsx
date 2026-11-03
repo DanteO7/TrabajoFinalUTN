@@ -1,17 +1,8 @@
+import { createElement, lazy, Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoArrowBack } from "react-icons/io5";
 import { Redirect, useLocation } from "wouter";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import MainLayout from "../../layouts/main-layout";
 import Loading from "../../components/loading";
 import {
@@ -23,6 +14,74 @@ import {
   getTenantStudentStatistics,
 } from "../../services/tenant";
 
+const StatisticsBarChart = lazy(() =>
+  import("recharts").then(
+    ({
+      Bar,
+      BarChart,
+      CartesianGrid,
+      ResponsiveContainer,
+      Tooltip,
+      XAxis,
+      YAxis,
+    }) => ({
+      default: function StatisticsBarChart({
+        data,
+        xDataKey,
+        yTickFormatter,
+        yAxisWidth,
+        dataKey,
+        name,
+        tooltipFormatter,
+      }) {
+        return createElement(
+          ResponsiveContainer,
+          { width: "100%", height: "100%" },
+          createElement(
+            BarChart,
+            {
+              data,
+              margin: { top: 8, right: 8, left: 8, bottom: 48 },
+            },
+            createElement(CartesianGrid, {
+              strokeDasharray: "3 3",
+              stroke: "#d1cbd3",
+            }),
+            createElement(XAxis, {
+              dataKey: xDataKey,
+              angle: -35,
+              textAnchor: "end",
+              height: 56,
+              tick: { fill: "#6b7280", fontSize: 11 },
+              interval: "preserveStartEnd",
+            }),
+            createElement(YAxis, {
+              allowDecimals: !yTickFormatter,
+              tickFormatter: yTickFormatter,
+              tick: { fill: "#6b7280", fontSize: yTickFormatter ? 11 : 12 },
+              width: yAxisWidth,
+            }),
+            createElement(Tooltip, {
+              formatter: tooltipFormatter,
+              contentStyle: {
+                backgroundColor: "#F1EEF3",
+                borderColor: "#9ca3af",
+                borderRadius: 8,
+              },
+            }),
+            createElement(Bar, {
+              dataKey,
+              name,
+              fill: "#fc697b",
+              radius: [4, 4, 0, 0],
+            }),
+          ),
+        );
+      },
+    }),
+  ),
+);
+
 const PERIODS = [
   { value: "month", label: "Este mes" },
   { value: "last3months", label: "Últimos 3 meses" },
@@ -30,20 +89,21 @@ const PERIODS = [
   { value: "all", label: "Todo el tiempo" },
 ];
 
-const formatCurrency = (value) =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 2,
-  }).format(value ?? 0);
+const currencyFormatter = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 2,
+});
+const compactCurrencyFormatter = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
 
+const formatCurrency = (value) => currencyFormatter.format(value ?? 0);
 const formatCompactCurrency = (value) =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value ?? 0);
+  compactCurrencyFormatter.format(value ?? 0);
 
 const LEGACY_DELIVERY_TRACKING_UNAVAILABLE =
   "El sistema no registra si una clase programada se dictó efectivamente. El estado Completed de una reserva se asigna automáticamente cuando pasa el horario y no representa asistencia.";
@@ -324,47 +384,28 @@ export default function Statistics({ tenantId }) {
                   (entry) => entry.newStudents > 0,
                 ) ? (
                   <div className="h-72 w-full min-w-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
+                    <Suspense
+                      fallback={
+                        <div className="flex h-full items-center">
+                          <Loading />
+                        </div>
+                      }
+                    >
+                      <StatisticsBarChart
                         data={students.data.monthlyEvolution}
-                        margin={{ top: 8, right: 8, left: 8, bottom: 48 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#d1cbd3" />
-                        <XAxis
-                          dataKey="month"
-                          angle={-35}
-                          textAnchor="end"
-                          height={56}
-                          tick={{ fill: "#6b7280", fontSize: 11 }}
-                          interval="preserveStartEnd"
-                        />
-                        <YAxis
-                          allowDecimals={false}
-                          tick={{ fill: "#6b7280", fontSize: 12 }}
-                        />
-                        <Tooltip
-                          formatter={(value) => [
-                            value,
-                            t("statistics.tooltips.newStudents", {
-                              defaultValue: "Altas",
-                            }),
-                          ]}
-                          contentStyle={{
-                            backgroundColor: "#F1EEF3",
-                            borderColor: "#9ca3af",
-                            borderRadius: 8,
-                          }}
-                        />
-                        <Bar
-                          dataKey="newStudents"
-                          name={t("statistics.tooltips.newStudents", {
+                        xDataKey="month"
+                        dataKey="newStudents"
+                        name={t("statistics.tooltips.newStudents", {
+                          defaultValue: "Altas",
+                        })}
+                        tooltipFormatter={(value) => [
+                          value,
+                          t("statistics.tooltips.newStudents", {
                             defaultValue: "Altas",
-                          })}
-                          fill="#fc697b"
-                          radius={[4, 4, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                          }),
+                        ]}
+                      />
+                    </Suspense>
                   </div>
                 ) : (
                   <Empty />
@@ -451,48 +492,30 @@ export default function Statistics({ tenantId }) {
                 <h3 className="mb-3 font-semibold">Ingresos por período</h3>
                 {payments.data?.revenueByPeriod.length ? (
                   <div className="h-72 w-full min-w-0">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
+                    <Suspense
+                      fallback={
+                        <div className="flex h-full items-center">
+                          <Loading />
+                        </div>
+                      }
+                    >
+                      <StatisticsBarChart
                         data={payments.data.revenueByPeriod}
-                        margin={{ top: 8, right: 8, left: 8, bottom: 48 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#d1cbd3" />
-                        <XAxis
-                          dataKey="period"
-                          angle={-35}
-                          textAnchor="end"
-                          height={56}
-                          tick={{ fill: "#6b7280", fontSize: 11 }}
-                          interval="preserveStartEnd"
-                        />
-                        <YAxis
-                          tickFormatter={formatCompactCurrency}
-                          tick={{ fill: "#6b7280", fontSize: 11 }}
-                          width={72}
-                        />
-                        <Tooltip
-                          formatter={(value) => [
-                            formatCurrency(Number(value)),
-                            t("statistics.tooltips.revenue", {
-                              defaultValue: "Ingresos",
-                            }),
-                          ]}
-                          contentStyle={{
-                            backgroundColor: "#F1EEF3",
-                            borderColor: "#9ca3af",
-                            borderRadius: 8,
-                          }}
-                        />
-                        <Bar
-                          dataKey="amount"
-                          name={t("statistics.tooltips.revenue", {
+                        xDataKey="period"
+                        yTickFormatter={formatCompactCurrency}
+                        yAxisWidth={72}
+                        dataKey="amount"
+                        name={t("statistics.tooltips.revenue", {
+                          defaultValue: "Ingresos",
+                        })}
+                        tooltipFormatter={(value) => [
+                          formatCurrency(Number(value)),
+                          t("statistics.tooltips.revenue", {
                             defaultValue: "Ingresos",
-                          })}
-                          fill="#fc697b"
-                          radius={[4, 4, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                          }),
+                        ]}
+                      />
+                    </Suspense>
                   </div>
                 ) : (
                   <Empty />

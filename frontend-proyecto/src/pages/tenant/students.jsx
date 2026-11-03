@@ -111,7 +111,7 @@ export default function Students({ tenantId }) {
                   <div
                     key={student.id}
                     onClick={() => setSelectedStudent(student)}
-                    className="cursor-pointer rounded-lg border bg-[#efecf0] border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                    className="cursor-pointer rounded-lg border bg-[#efecf0] border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
                   >
                     <h3 className="font-semibold text-xl">
                       {student.user.name} {student.user.surname}
@@ -171,6 +171,7 @@ export default function Students({ tenantId }) {
 
             {selectedStudent && (
               <StudentModal
+                key={selectedStudent.id}
                 tenantId={tenantId}
                 student={selectedStudent}
                 close={() => setSelectedStudent(null)}

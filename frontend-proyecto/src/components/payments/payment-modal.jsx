@@ -365,7 +365,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
             <select
               {...register("paymentMethod")}
-              className="w-full rounded-lg px-3 h-11.5 py-2.5 text-gray-600 cursor-pointer bg-[#f4f0f5] shadow-md border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+              className="w-full rounded-lg px-3 h-11.5 py-2.5 text-gray-600 cursor-pointer bg-[#f4f0f5] shadow-md border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
               <option value="Cash">Efectivo</option>
 

@@ -12,7 +12,7 @@ export default function ErrorModal({ close, message, isSuccesOrError }) {
         <p className="text-xl">{message}</p>
         <button
           onClick={close}
-          className="text-xl bg-[#ec5e66] text-white rounded-4xl px-7 py-3 mt-5 cursor-pointer hover:bg-[#cc4148] transition-all duration-200"
+          className="text-xl bg-[#ec5e66] text-white rounded-4xl px-7 py-3 mt-5 cursor-pointer hover:bg-[#cc4148] transition-colors duration-200"
         >
           Cerrar
         </button>

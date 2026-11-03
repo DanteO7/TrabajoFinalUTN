@@ -461,7 +461,7 @@ export default function TenantOnboarding({ tenantId }) {
 
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#fafafa]">
             <div
-              className="h-full rounded-full bg-[#fc697b] transition-all"
+              className="h-full rounded-full bg-[#fc697b] transition-[width]"
               style={{ width: `${progress}%` }}
             />
           </div>

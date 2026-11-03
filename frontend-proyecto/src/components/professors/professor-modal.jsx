@@ -1,5 +1,5 @@
 import { X, Pencil, Trash2, Plus } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Modal from "../modals/modal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateProfessor, deleteProfessor } from "../../services/professor";
@@ -26,8 +26,12 @@ export default function ProfessorModal({
   const [editing, setEditing] = useState(false);
   const [currentProfessor, setCurrentProfessor] = useState(professor);
   const [isActive, setIsActive] = useState(professor.isActive);
-  const [selectedSpecialityIds, setSelectedSpecialityIds] = useState(
+  const [selectedSpecialityIds, setSelectedSpecialityIds] = useState(() =>
     professor.specialities.map((spec) => spec.specialityId),
+  );
+  const selectedSpecialityIdSet = useMemo(
+    () => new Set(selectedSpecialityIds),
+    [selectedSpecialityIds],
   );
   const [openSpecialityModal, setOpenSpecialityModal] = useState(false);
   const [backendError, setBackendError] = useState();
@@ -52,7 +56,7 @@ export default function ProfessorModal({
   };
 
   const availableSpecialities = specialities.filter(
-    (speciality) => !selectedSpecialityIds.includes(speciality.id),
+    (speciality) => !selectedSpecialityIdSet.has(speciality.id),
   );
 
   const addSpeciality = (specialityId) => {
@@ -153,7 +157,6 @@ export default function ProfessorModal({
       );
     },
   });
-  console.log(currentProfessor);
 
   return (
     <Modal open onClose={close}>

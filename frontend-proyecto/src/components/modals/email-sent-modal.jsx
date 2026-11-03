@@ -31,7 +31,7 @@ export default function EmailSentModal({
           <button
             onClick={sendAgain}
             disabled={seconds > 0}
-            className={`text-xl rounded-4xl px-7 py-3 transition-all duration-200 ${
+            className={`text-xl rounded-4xl px-7 py-3 transition-colors duration-200 ${
               seconds > 0
                 ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                 : "bg-[#5f7de9] text-white hover:bg-[#5273e8] cursor-pointer"

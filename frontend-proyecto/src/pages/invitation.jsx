@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import MainLayout from "../layouts/main-layout";
 import { useLocation } from "wouter";
@@ -12,6 +12,7 @@ import WhiteButton from "../components/buttons/white-button";
 
 export default function Invitation({ token }) {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [backendError, setBackendError] = useState();
@@ -39,6 +40,7 @@ export default function Invitation({ token }) {
       }),
 
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myTenants"] });
       setSuccessMessage("Te uniste correctamente");
       setSuccessModal(true);
 

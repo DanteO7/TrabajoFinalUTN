@@ -71,7 +71,7 @@ export default function Permissions({ tenantId }) {
                 type="button"
                 key={professor.id}
                 onClick={() => setSelectedProfessor(professor)}
-                className="text-left cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className="text-left cursor-pointer rounded-lg border border-gray-400 bg-[#EFECF0] p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition-[transform,box-shadow] duration-300"
               >
                 <h2 className="font-semibold text-xl">
                   {professor.user.name} {professor.user.surname}

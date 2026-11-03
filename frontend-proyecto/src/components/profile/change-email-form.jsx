@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changeEmailSchema } from "../../schema/change-email-schema";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "../../store/auth-store";
 import { sendRegisterCode } from "../../services/auth";
 import { changeEmail } from "../../services/user";
@@ -15,6 +15,7 @@ import FormInput from "../inputs/form-input";
 
 export default function ChangeEmailForm({ user, close }) {
   const { login } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -51,6 +52,7 @@ export default function ChangeEmailForm({ user, close }) {
       setSuccesModal(true);
       setBackendError(null);
       login(data);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       setTimeout(() => {
         close();
       }, 2000);

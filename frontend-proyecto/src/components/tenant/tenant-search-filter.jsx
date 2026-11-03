@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import { useState } from "react";
 import SearchInput from "../inputs/search-input";
 
 export default function TenantSearchFilter({
@@ -9,16 +8,11 @@ export default function TenantSearchFilter({
   onStatusChange,
   t,
 }) {
-  const [inputValue, setInputValue] = useState(search);
-
   return (
     <div className="mb-6 flex flex-col gap-3 min-[700px]:flex-row">
       <SearchInput
-        value={inputValue}
-        onChange={(value) => {
-          setInputValue(value);
-          onSearchChange(value.trim());
-        }}
+        value={search}
+        onChange={onSearchChange}
         placeholder={t("tenants.searchPlaceholder")}
       />
 
@@ -26,7 +20,7 @@ export default function TenantSearchFilter({
         <select
           value={status}
           onChange={(event) => onStatusChange(event.target.value)}
-          className="cursor-pointer rounded-lg border border-gray-400 bg-[#f1eef3] px-3 pt-1.75 pb-2 text-gray-600 outline-none transition-all duration-200 focus:border-transparent focus:ring-[1.5px] focus:ring-[#fc697b]"
+          className="cursor-pointer rounded-lg border border-gray-400 bg-[#f1eef3] px-3 pt-1.75 pb-2 text-gray-600 outline-none transition-[border-color,box-shadow] duration-200 focus:border-transparent focus:ring-[1.5px] focus:ring-[#fc697b]"
           aria-label={t("tenants.statusFilter")}
         >
           <option value="all">{t("tenants.allStatuses")}</option>

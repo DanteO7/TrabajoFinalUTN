@@ -3,7 +3,7 @@ import Modal from "../modals/modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserSchema } from "../../schema/user-schema";
 import { useAuthStore } from "../../store/auth-store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateUser } from "../../services/user";
 import { useState } from "react";
 import WhiteButton from "../buttons/white-button";
@@ -16,6 +16,7 @@ import FormInput from "../inputs/form-input";
 
 export default function EditProfileModal({ close }) {
   const { user, login } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -56,6 +57,7 @@ export default function EditProfileModal({ close }) {
           pathologies: variables.data.pathologies ?? user?.pathologies ?? "",
         });
       }
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       setTimeout(() => {
         close();
       }, 2000);

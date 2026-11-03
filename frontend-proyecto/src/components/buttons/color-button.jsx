@@ -22,7 +22,7 @@ export default function ColorButton({
       }}
       className={`
         px-4.5 rounded-lg
-        transition-all duration-200
+        transition-colors duration-200
         cursor-pointer
         flex justify-center items-center gap-1
         ${wfit ? "w-fit" : "w-full"}

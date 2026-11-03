@@ -29,7 +29,7 @@ export default function ClassCard({
       onClickCapture={onClickCapture}
       onContextMenu={onContextMenu}
       onClick={onClick}
-      className={`relative cursor-pointer rounded-lg border p-5 shadow-md transition-all duration-300 ${
+      className={`relative cursor-pointer rounded-lg border p-5 shadow-md transition-[background-color,border-color,box-shadow,transform] duration-300 ${
         isSelected
           ? "border-[#FC697B] bg-red-100"
           : isFull
@@ -52,7 +52,7 @@ export default function ClassCard({
                   onToggleSelection?.();
                 }
               }}
-              className={`hidden h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded border transition-all duration-200 min-[900px]:flex ${
+              className={`hidden h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded border transition-[background-color,border-color] duration-200 min-[900px]:flex ${
                 isSelected
                   ? "border-[#FC697B] bg-red-100 hover:border-[#e93146]"
                   : "border-gray-400 hover:border-gray-500"

@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef } from "react";
+import { useEffect, useEffectEvent, useRef, forwardRef } from "react";
 import { createPortal } from "react-dom";
 
 // Contador global de modales abiertos
@@ -9,6 +9,7 @@ const Modal = forwardRef(function Modal(
   ref,
 ) {
   const mouseDownOutside = useRef(false);
+  const closeFromEffect = useEffectEvent(() => onClose());
 
   useEffect(() => {
     if (!open) return;
@@ -18,7 +19,7 @@ const Modal = forwardRef(function Modal(
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") closeFromEffect();
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -33,7 +34,7 @@ const Modal = forwardRef(function Modal(
         document.body.style.overflow = "";
       }
     };
-  }, [open, onClose]);
+  }, [open]);
 
   const handleOverlayMouseDown = (e) => {
     mouseDownOutside.current = e.target === e.currentTarget;
@@ -59,7 +60,7 @@ const Modal = forwardRef(function Modal(
         ref={ref}
         className={`bg-[#ede9ee] rounded-lg ${isSuccesOrError ? "p-0" : "p-6"} w-120 shadow-xl
           max-h-[90dvh] overflow-y-auto
-          transition-all duration-300 ease-out
+          transition-[opacity,transform] duration-300 ease-out
           translate-y-0 opacity-100
           animate-modal`}
         onClick={(e) => e.stopPropagation()}

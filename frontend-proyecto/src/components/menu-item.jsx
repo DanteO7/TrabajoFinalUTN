@@ -16,7 +16,7 @@ export default function MenuItem({ href, icon: Icon, children, onClick }) {
       className={`
         flex items-center gap-2.5
         px-3 py-2 rounded-lg
-        transition-all duration-200
+        transition-colors duration-200
         ${
           active
             ? "bg-[#2b2b2b] text-white"

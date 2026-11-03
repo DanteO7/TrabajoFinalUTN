@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { Check } from "lucide-react";
@@ -27,6 +27,10 @@ export default function AddStudentToClassModal({
   const queryClient = useQueryClient();
   const [inputValue, setInputValue] = useState("");
   const [selectedStudents, setSelectedStudents] = useState([]);
+  const selectedStudentIds = useMemo(
+    () => new Set(selectedStudents),
+    [selectedStudents],
+  );
 
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -167,7 +171,7 @@ export default function AddStudentToClassModal({
           </p>
         ) : (
           availableStudents.map((student) => {
-            const isSelected = selectedStudents.includes(student.id);
+            const isSelected = selectedStudentIds.has(student.id);
             return (
               <div
                 key={student.id}

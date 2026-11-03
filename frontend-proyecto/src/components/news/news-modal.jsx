@@ -19,7 +19,6 @@ import { useHasPermission } from "../../store/tenant-store";
 export default function NewsModal({ news, tenantId, close }) {
   const canUpdateNews = useHasPermission(tenantId, "NEWS_UPDATE");
   const canDeleteNews = useHasPermission(tenantId, "NEWS_DELETE");
-  console.log(news);
 
   const [editing, setEditing] = useState(false);
   const [currentNew, setCurrentNew] = useState(news);

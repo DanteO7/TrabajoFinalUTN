@@ -30,7 +30,7 @@ export default function Tenants() {
   });
 
   const filteredTenants = useMemo(() => {
-    const normalizedSearch = search.toLocaleLowerCase();
+    const normalizedSearch = search.trim().toLocaleLowerCase();
 
     return tenants.filter((tenant) => {
       const ownerName = [

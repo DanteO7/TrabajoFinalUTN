@@ -26,7 +26,7 @@ export default function ApprovalModal({ close, message, isSuccesOrError }) {
 
         <button
           onClick={close}
-          className="mt-3 rounded-4xl px-7 py-3 bg-[#5f7de9] text-white hover:bg-[#5273e8] transition-all duration-200 cursor-pointer"
+          className="mt-3 rounded-4xl px-7 py-3 bg-[#5f7de9] text-white hover:bg-[#5273e8] transition-colors duration-200 cursor-pointer"
         >
           Entendido
         </button>

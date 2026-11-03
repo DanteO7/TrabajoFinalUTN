@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useHasPermission } from "../../../store/tenant-store";
@@ -24,7 +24,6 @@ export default function ClassTemplateWeek({ tenantId }) {
   const queryClient = useQueryClient();
 
   const [openDay, setOpenDay] = useState(null);
-  const [pendingDay, setPendingDay] = useState(null);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
@@ -35,6 +34,10 @@ export default function ClassTemplateWeek({ tenantId }) {
 
   const [selectionModeByDay, setSelectionModeByDay] = useState({});
   const [selectedClassTemplateIds, setSelectedClassTemplateIds] = useState([]);
+  const selectedClassTemplateIdSet = useMemo(
+    () => new Set(selectedClassTemplateIds),
+    [selectedClassTemplateIds],
+  );
   const [activeSelectionDay, setActiveSelectionDay] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
@@ -46,6 +49,7 @@ export default function ClassTemplateWeek({ tenantId }) {
   const longPressTimer = useRef(null);
   const ignoreNextClick = useRef(false);
   const pointerStartPosition = useRef(null);
+  const pendingDay = useRef(null);
 
   const canCreateClass = useHasPermission(tenantId, "CLASS_CREATE");
   const canDeleteClass = useHasPermission(tenantId, "CLASS_DELETE");
@@ -80,30 +84,29 @@ export default function ClassTemplateWeek({ tenantId }) {
   };
 
   const toggleClassSelection = (classTemplateId, dayOfWeek) => {
-    setSelectedClassTemplateIds((prev) => {
-      const updated = prev.includes(classTemplateId)
-        ? prev.filter((id) => id !== classTemplateId)
-        : [...prev, classTemplateId];
+    const updated = selectedClassTemplateIds.includes(classTemplateId)
+      ? selectedClassTemplateIds.filter((id) => id !== classTemplateId)
+      : [...selectedClassTemplateIds, classTemplateId];
+    const updatedIds = new Set(updated);
 
-      const selectedForDay = classTemplates.filter(
-        (template) =>
-          template.dayOfWeek === dayOfWeek && updated.includes(template.id),
-      );
+    const selectedForDay = classTemplates.filter(
+      (template) =>
+        template.dayOfWeek === dayOfWeek && updatedIds.has(template.id),
+    );
 
-      setSelectionModeByDay((prevModes) => ({
-        ...prevModes,
-        [dayOfWeek]: selectedForDay.length > 0,
-      }));
+    setSelectedClassTemplateIds(updated);
 
-      setActiveSelectionDay((currentDay) => {
-        if (selectedForDay.length > 0) {
-          return dayOfWeek;
-        }
+    setSelectionModeByDay((prevModes) => ({
+      ...prevModes,
+      [dayOfWeek]: selectedForDay.length > 0,
+    }));
 
-        return currentDay === dayOfWeek ? null : currentDay;
-      });
+    setActiveSelectionDay((currentDay) => {
+      if (selectedForDay.length > 0) {
+        return dayOfWeek;
+      }
 
-      return updated;
+      return currentDay === dayOfWeek ? null : currentDay;
     });
   };
 
@@ -113,17 +116,18 @@ export default function ClassTemplateWeek({ tenantId }) {
     );
 
     const idsOfDay = templatesOfDay.map((template) => template.id);
+    const idsOfDaySet = new Set(idsOfDay);
 
     const allSelected =
       idsOfDay.length > 0 &&
-      idsOfDay.every((id) => selectedClassTemplateIds.includes(id));
+      idsOfDay.every((id) => selectedClassTemplateIdSet.has(id));
 
     setSelectedClassTemplateIds((prev) => {
       if (allSelected) {
-        return prev.filter((id) => !idsOfDay.includes(id));
+        return prev.filter((id) => !idsOfDaySet.has(id));
       }
 
-      return [...prev.filter((id) => !idsOfDay.includes(id)), ...idsOfDay];
+      return [...prev.filter((id) => !idsOfDaySet.has(id)), ...idsOfDay];
     });
 
     setSelectionModeByDay((prev) => ({
@@ -178,6 +182,23 @@ export default function ClassTemplateWeek({ tenantId }) {
   const handlePointerEnd = () => {
     clearTimeout(longPressTimer.current);
     pointerStartPosition.current = null;
+  };
+
+  const handleTemplateContextMenu = (event, classTemplate, dayOfWeek) => {
+    event.preventDefault();
+
+    if (!canDeleteClass) return;
+
+    setSelectedClassTemplateIds((prev) =>
+      prev.includes(classTemplate.id) ? prev : [...prev, classTemplate.id],
+    );
+
+    setSelectionModeByDay((prev) => ({
+      ...prev,
+      [dayOfWeek]: true,
+    }));
+
+    setActiveSelectionDay(dayOfWeek);
   };
 
   const handleCardClick = (classTemplate) => {
@@ -264,7 +285,7 @@ export default function ClassTemplateWeek({ tenantId }) {
           const isSelectionMode = Boolean(selectionModeByDay[day.value]);
 
           const selectedCount = classesOfDay.filter((template) =>
-            selectedClassTemplateIds.includes(template.id),
+            selectedClassTemplateIdSet.has(template.id),
           ).length;
 
           const allSelected =
@@ -283,9 +304,9 @@ export default function ClassTemplateWeek({ tenantId }) {
                 onClick={() => {
                   if (isOpen) {
                     setOpenDay(null);
-                    setPendingDay(null);
+                    pendingDay.current = null;
                   } else if (openDay !== null) {
-                    setPendingDay(day.value);
+                    pendingDay.current = day.value;
                     setOpenDay(null);
                   } else {
                     setOpenDay(day.value);
@@ -306,9 +327,13 @@ export default function ClassTemplateWeek({ tenantId }) {
                   if (event.propertyName !== "grid-template-rows") return;
 
                   // Terminó de cerrarse el día actual.
-                  if (!isOpen && pendingDay !== null && openDay === null) {
-                    setOpenDay(pendingDay);
-                    setPendingDay(null);
+                  if (
+                    !isOpen &&
+                    pendingDay.current !== null &&
+                    openDay === null
+                  ) {
+                    setOpenDay(pendingDay.current);
+                    pendingDay.current = null;
                     return;
                   }
 
@@ -397,9 +422,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                         <div className="grid gap-3">
                           {classesOfDay.map((classTemplate) => {
                             const isSelected =
-                              selectedClassTemplateIds.includes(
-                                classTemplate.id,
-                              );
+                              selectedClassTemplateIdSet.has(classTemplate.id);
 
                             return (
                               <ClassCard
@@ -430,24 +453,13 @@ export default function ClassTemplateWeek({ tenantId }) {
                                     event.stopPropagation();
                                   }
                                 }}
-                                onContextMenu={(event) => {
-                                  event.preventDefault();
-
-                                  if (!canDeleteClass) return;
-
-                                  setSelectedClassTemplateIds((prev) =>
-                                    prev.includes(classTemplate.id)
-                                      ? prev
-                                      : [...prev, classTemplate.id],
-                                  );
-
-                                  setSelectionModeByDay((prev) => ({
-                                    ...prev,
-                                    [day.value]: true,
-                                  }));
-
-                                  setActiveSelectionDay(day.value);
-                                }}
+                                onContextMenu={(event) =>
+                                  handleTemplateContextMenu(
+                                    event,
+                                    classTemplate,
+                                    day.value,
+                                  )
+                                }
                                 onClick={() => handleCardClick(classTemplate)}
                               />
                             );
@@ -464,7 +476,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                           setSelectedDay(day.value);
                           setOpenCreateModal(true);
                         }}
-                        className="flex min-h-24.5 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-gray-400 bg-[#F1EEF3] shadow-md transition-all duration-300 hover:border-gray-500 hover:bg-[#EFECF0]"
+                        className="flex min-h-24.5 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-gray-400 bg-[#F1EEF3] shadow-md transition-[background-color,border-color] duration-300 hover:border-gray-500 hover:bg-[#EFECF0]"
                       >
                         <Plus
                           size={32}
@@ -521,7 +533,7 @@ export default function ClassTemplateWeek({ tenantId }) {
             classTemplates.filter(
               (template) =>
                 template.dayOfWeek === activeSelectionDay &&
-                selectedClassTemplateIds.includes(template.id),
+                selectedClassTemplateIdSet.has(template.id),
             ).length
           } plantillas de ${
             days.find((day) => day.value === activeSelectionDay)?.label ??
@@ -540,7 +552,7 @@ export default function ClassTemplateWeek({ tenantId }) {
               .filter(
                 (template) =>
                   template.dayOfWeek === activeSelectionDay &&
-                  selectedClassTemplateIds.includes(template.id),
+                  selectedClassTemplateIdSet.has(template.id),
               )
               .map((template) => template.id);
 

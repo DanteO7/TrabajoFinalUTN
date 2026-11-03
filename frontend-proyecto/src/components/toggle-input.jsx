@@ -16,10 +16,10 @@ export default function ToggleInput({
     >
       <span>{text}</span>
       <div
-        className={`${state ? "bg-[#fa7282]" : "bg-gray-400"} p-1 rounded-full w-12 transition-all duration-200`}
+        className={`${state ? "bg-[#fa7282]" : "bg-gray-400"} p-1 rounded-full w-12 transition-colors duration-200`}
       >
         <div
-          className={`bg-white rounded-full w-5 h-5 transition-all duration-200 ${state ? "translate-x-5" : "translate-x-0"} `}
+          className={`bg-white rounded-full w-5 h-5 transition-transform duration-200 ${state ? "translate-x-5" : "translate-x-0"} `}
         ></div>
       </div>
     </button>

@@ -25,6 +25,10 @@ export default function OfficialClasses({ tenantId }) {
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedClassIds, setSelectedClassIds] = useState([]);
+  const selectedClassIdSet = useMemo(
+    () => new Set(selectedClassIds),
+    [selectedClassIds],
+  );
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const [backendError, setBackendError] = useState();
@@ -70,18 +74,16 @@ export default function OfficialClasses({ tenantId }) {
     formatLocalDate(selectedDate) < formatLocalDate(new Date());
 
   const toggleClassSelection = (classId) => {
-    setSelectedClassIds((prev) => {
-      const updated = prev.includes(classId)
-        ? prev.filter((id) => id !== classId)
-        : [...prev, classId];
+    const updated = selectedClassIds.includes(classId)
+      ? selectedClassIds.filter((id) => id !== classId)
+      : [...selectedClassIds, classId];
 
-      if (updated.length === 0) {
-        setSelectionMode(false);
-        setShowDeleteConfirmation(false);
-      }
+    setSelectedClassIds(updated);
 
-      return updated;
-    });
+    if (updated.length === 0) {
+      setSelectionMode(false);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   const clearSelection = () => {
@@ -92,17 +94,18 @@ export default function OfficialClasses({ tenantId }) {
 
   const selectAllClasses = () => {
     const idsOfDay = classesOfDay.map((classItem) => classItem.id);
+    const idsOfDaySet = new Set(idsOfDay);
 
     const allSelected =
       idsOfDay.length > 0 &&
-      idsOfDay.every((id) => selectedClassIds.includes(id));
+      idsOfDay.every((id) => selectedClassIdSet.has(id));
 
     if (allSelected) {
       setSelectedClassIds((prev) =>
-        prev.filter((id) => !idsOfDay.includes(id)),
+        prev.filter((id) => !idsOfDaySet.has(id)),
       );
 
-      if (selectedClassIds.every((id) => idsOfDay.includes(id))) {
+      if (selectedClassIds.every((id) => idsOfDaySet.has(id))) {
         setSelectionMode(false);
         setShowDeleteConfirmation(false);
       }
@@ -152,6 +155,18 @@ export default function OfficialClasses({ tenantId }) {
   const handlePointerEnd = () => {
     clearTimeout(longPressTimer.current);
     pointerStartPosition.current = null;
+  };
+
+  const handleClassContextMenu = (event, classItem) => {
+    event.preventDefault();
+
+    if (!canDeleteClass) return;
+
+    setSelectedClassIds((prev) =>
+      prev.includes(classItem.id) ? prev : [...prev, classItem.id],
+    );
+
+    setSelectionMode(true);
   };
 
   const handleCardClick = (classItem) => {
@@ -268,7 +283,7 @@ export default function OfficialClasses({ tenantId }) {
                     text={
                       classesOfDay.length > 0 &&
                       classesOfDay.every((classItem) =>
-                        selectedClassIds.includes(classItem.id),
+                        selectedClassIdSet.has(classItem.id),
                       )
                         ? "Deseleccionar todo"
                         : "Seleccionar todo"
@@ -307,7 +322,7 @@ export default function OfficialClasses({ tenantId }) {
           <div className="grid gap-5">
             {classesOfDay.length > 0 ? (
               classesOfDay.map((classItem) => {
-                const isSelected = selectedClassIds.includes(classItem.id);
+                const isSelected = selectedClassIdSet.has(classItem.id);
 
                 return (
                   <ClassCard
@@ -329,19 +344,9 @@ export default function OfficialClasses({ tenantId }) {
                         event.stopPropagation();
                       }
                     }}
-                    onContextMenu={(event) => {
-                      event.preventDefault();
-
-                      if (!canDeleteClass) return;
-
-                      setSelectedClassIds((prev) =>
-                        prev.includes(classItem.id)
-                          ? prev
-                          : [...prev, classItem.id],
-                      );
-
-                      setSelectionMode(true);
-                    }}
+                    onContextMenu={(event) =>
+                      handleClassContextMenu(event, classItem)
+                    }
                     onClick={() => handleCardClick(classItem)}
                   />
                 );

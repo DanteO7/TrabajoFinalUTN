@@ -4,12 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 export default function TargetAudience() {
   const items = [
-    { icon: Dumbbell, label: "Gimnasios" },
-    { icon: Flame, label: "Crossfit" },
-    { icon: HeartPulse, label: "Pilates" },
-    { icon: Waves, label: "Natación" },
-    { icon: Users, label: "Clases grupales" },
+    { id: "gyms", icon: Dumbbell, label: "Gimnasios" },
+    { id: "crossfit", icon: Flame, label: "Crossfit" },
+    { id: "pilates", icon: HeartPulse, label: "Pilates" },
+    { id: "swimming", icon: Waves, label: "Natación" },
+    { id: "group-classes", icon: Users, label: "Clases grupales" },
   ];
+  const repeatedItems = ["first", "second", "third"].flatMap((copy) =>
+    items.map((item) => ({ ...item, key: `${copy}-${item.id}` })),
+  );
 
   const [visible, setVisible] = useState(4);
   const [isDragging, setIsDragging] = useState(false);
@@ -169,13 +172,13 @@ export default function TargetAudience() {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        <div ref={trackRef} className="flex will-change-transform select-none">
-          {[...items, ...items, ...items].map((item, i) => {
+        <div ref={trackRef} className="flex select-none">
+          {repeatedItems.map((item) => {
             const Icon = item.icon;
 
             return (
               <div
-                key={i}
+                key={item.key}
                 style={{
                   width: `${100 / visible}%`,
                 }}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { useState } from "react";
 
 export default function CreateTenant() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
@@ -83,6 +84,7 @@ export default function CreateTenant() {
   const mutation = useMutation({
     mutationFn: (formData) => createTenantFromToken(token, formData),
     onSuccess: (createdTenant) => {
+      queryClient.invalidateQueries({ queryKey: ["myTenants"] });
       setCreatedTenantId(createdTenant.id);
       setShowEmailModal(true);
     },
@@ -161,7 +163,7 @@ export default function CreateTenant() {
 
             <select
               {...register("tenantPlanId")}
-              className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-all duration-200"
+              className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
               <option value="">Seleccionar plan</option>
 

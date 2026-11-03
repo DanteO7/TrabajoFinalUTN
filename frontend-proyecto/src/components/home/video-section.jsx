@@ -5,7 +5,7 @@ import BlackButton from "../buttons/black-button";
 export default function VideoSection() {
   const videos = [
     {
-      id: "VIDEO_ID_1",
+      id: "VIDEO_ID-1",
       title: "Cómo gestionar turnos",
       description: "Aprendé a crear, editar y cancelar turnos fácilmente.",
     },
@@ -49,10 +49,12 @@ export default function VideoSection() {
           <div className="aspect-video w-full">
             <iframe
               className="w-full h-full rounded-lg shadow-lg"
-              src={`https://www.youtube.com/embed/${videoId}`}
+              src={`https://www.youtube-nocookie.com/embed/${videoId}`}
               title="Video"
+              sandbox="allow-scripts allow-same-origin allow-presentation"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-            ></iframe>
+            />
           </div>
         </div>
 
