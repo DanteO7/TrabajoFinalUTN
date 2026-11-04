@@ -11,13 +11,16 @@ namespace backend_proyecto.Controllers
     {
         private readonly MercadoPagoServices _mercadoPagoServices;
         private readonly PaymentServices _paymentServices;
+        private readonly ILogger<MercadoPagoController> _logger;
 
         public MercadoPagoController(
             MercadoPagoServices mercadoPagoServices,
-            PaymentServices paymentServices)
+            PaymentServices paymentServices,
+            ILogger<MercadoPagoController> logger)
         {
             _mercadoPagoServices = mercadoPagoServices;
             _paymentServices = paymentServices;
+            _logger = logger;
         }
 
         [HttpGet("status/{tenantId}")]
@@ -122,31 +125,40 @@ namespace backend_proyecto.Controllers
         public async Task<IActionResult> Webhook(
             [FromBody] MercadoPagoWebhookDTO webhook)
         {
+            var correlationId = HttpContext.TraceIdentifier;
+
+            _logger.LogInformation(
+                "Mercado Pago webhook received. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType} NotificationAction={NotificationAction} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
+                correlationId,
+                webhook.Id,
+                webhook.Type,
+                webhook.Action,
+                webhook.Data?.Id,
+                webhook.UserId);
+
             try
             {
-                Console.WriteLine("=== WEBHOOK MERCADO PAGO ===");
-
-                Console.WriteLine(
-                    $"Type: {webhook.Type}"
-                );
-
-                Console.WriteLine(
-                    $"UserId: {webhook.UserId}"
-                );
-
-                Console.WriteLine(
-                    $"PaymentId: {webhook.Data?.Id}"
-                );
-
                 await _paymentServices
-                    .ProcessMercadoPagoWebhook(webhook);
+                    .ProcessMercadoPagoWebhook(webhook, correlationId);
+
+                _logger.LogInformation(
+                    "Mercado Pago webhook processing completed. CorrelationId={CorrelationId} NotificationId={NotificationId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
+                    correlationId,
+                    webhook.Id,
+                    webhook.Data?.Id);
 
                 return Ok();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(
-                    $"Error procesando webhook de Mercado Pago: {ex}"
+                _logger.LogError(
+                    "Mercado Pago webhook processing failed. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId} FailureType={FailureType}",
+                    correlationId,
+                    webhook.Id,
+                    webhook.Type,
+                    webhook.Data?.Id,
+                    webhook.UserId,
+                    ex.GetType().Name
                 );
 
                 return BadRequest();
