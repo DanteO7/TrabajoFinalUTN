@@ -1102,20 +1102,35 @@ namespace backend_proyecto.Services
                 return;
             }
 
+            if (!webhook.UserId.HasValue || webhook.UserId.Value <= 0)
+            {
+                _logger.LogWarning(
+                    "Mercado Pago payment notification rejected because it has no valid receiving account ID. CorrelationId={CorrelationId} NotificationId={NotificationId} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
+                    correlationId,
+                    webhook.Id,
+                    webhook.Data.Id,
+                    webhook.UserId);
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La notificación de Mercado Pago no contiene un identificador de cuenta receptora válido."
+                );
+            }
+
             var mercadoPagoPaymentId =
                 webhook.Data.Id;
+            var receiverAccountId = webhook.UserId.Value;
 
             _logger.LogInformation(
                 "Looking up receiving business for Mercado Pago account. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
                 correlationId,
-                webhook.UserId);
+                receiverAccountId);
 
             Tenant? tenant;
             try
             {
                 tenant = await _tenantRepository
                     .GetByMercadoPagoUserIdAsync(
-                        webhook.UserId.ToString()
+                        receiverAccountId.ToString()
                     );
             }
             catch (Exception ex)
@@ -1124,7 +1139,7 @@ namespace backend_proyecto.Services
                     ex,
                     "Receiving business lookup failed. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
                     correlationId,
-                    webhook.UserId);
+                    receiverAccountId);
                 throw;
             }
 
@@ -1133,7 +1148,7 @@ namespace backend_proyecto.Services
                 _logger.LogWarning(
                     "No business is linked to the receiving Mercado Pago account. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
                     correlationId,
-                    webhook.UserId);
+                    receiverAccountId);
                 throw new HttpResponseError(
                     HttpStatusCode.NotFound,
                     "No se encontró el tenant asociado a la cuenta de Mercado Pago."
@@ -1144,7 +1159,7 @@ namespace backend_proyecto.Services
                 "Receiving business found for Mercado Pago account. CorrelationId={CorrelationId} TenantId={TenantId} ReceiverAccountId={ReceiverAccountId} LinkedMercadoPagoAccountId={LinkedMercadoPagoAccountId}",
                 correlationId,
                 tenant.Id,
-                webhook.UserId,
+                receiverAccountId,
                 tenant.MercadoPagoUserId);
 
             MercadoPagoPaymentResponseDTO mercadoPagoPayment;
@@ -1155,7 +1170,7 @@ namespace backend_proyecto.Services
                     correlationId,
                     tenant.Id,
                     mercadoPagoPaymentId,
-                    webhook.UserId);
+                    receiverAccountId);
 
                 mercadoPagoPayment =
                     await _mercadoPagoServices.GetPayment(
@@ -1171,7 +1186,7 @@ namespace backend_proyecto.Services
                     correlationId,
                     tenant.Id,
                     mercadoPagoPaymentId,
-                    webhook.UserId,
+                    receiverAccountId,
                     ex.GetType().Name);
                 throw;
             }
@@ -1196,7 +1211,7 @@ namespace backend_proyecto.Services
                     "Mercado Pago payment collector does not match the receiving business linked account, or collector ID is missing. CorrelationId={CorrelationId} TenantId={TenantId} ReceiverAccountId={ReceiverAccountId} LinkedMercadoPagoAccountId={LinkedMercadoPagoAccountId} CollectorAccountId={CollectorAccountId}",
                     correlationId,
                     tenant.Id,
-                    webhook.UserId,
+                    receiverAccountId,
                     tenant.MercadoPagoUserId,
                     mercadoPagoPayment.CollectorId);
             }
