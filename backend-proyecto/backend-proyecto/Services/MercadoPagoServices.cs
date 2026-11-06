@@ -3,7 +3,6 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
-using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,7 +17,6 @@ namespace backend_proyecto.Services
         private readonly ITenantRepository _tenantRepository;
         private readonly MercadoPagoSettings _settings;
         private readonly IDataProtector _protector;
-        private readonly ILogger<MercadoPagoServices> _logger;
 
         public MercadoPagoServices(
             IHttpClientFactory httpClientFactory,
@@ -30,7 +28,6 @@ namespace backend_proyecto.Services
             _httpClientFactory = httpClientFactory;
             _tenantRepository = tenantRepository;
             _settings = settings.Value;
-            _logger = logger;
 
             _protector = dataProtectionProvider.CreateProtector(
                 "TurnoFacil.MercadoPago"
@@ -436,31 +433,12 @@ namespace backend_proyecto.Services
         {
             if (string.IsNullOrWhiteSpace(tenant.MercadoPagoAccessToken))
             {
-                _logger.LogWarning(
-                    "Mercado Pago payment API query cannot run because the receiving business has no linked access token. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId);
                 throw new InvalidOperationException(
                     "El gimnasio no tiene una cuenta de Mercado Pago conectada."
                 );
             }
 
-            string accessToken;
-            try
-            {
-                accessToken = await GetValidAccessToken(tenant);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    "Mercado Pago access token validation or refresh failed before payment query. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} FailureType={FailureType}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    ex.GetType().Name);
-                throw;
-            }
+            var accessToken = await GetValidAccessToken(tenant);
 
             var client = _httpClientFactory.CreateClient();
 
@@ -470,101 +448,35 @@ namespace backend_proyecto.Services
                     accessToken
                 );
 
-            var stopwatch = Stopwatch.StartNew();
-            HttpResponseMessage response;
-            try
-            {
-                response = await client.GetAsync(
-                    $"https://api.mercadopago.com/v1/payments/{paymentId}"
-                );
-            }
-            catch (OperationCanceledException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Mercado Pago payment API request timed out or was canceled. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} HttpClientTimeout={HttpClientTimeout} DurationMs={DurationMs}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    client.Timeout,
-                    stopwatch.ElapsedMilliseconds);
-                throw;
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Mercado Pago payment API request failed at the transport layer. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} DurationMs={DurationMs}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    stopwatch.ElapsedMilliseconds);
-                throw;
-            }
+            var response = await client.GetAsync(
+                $"https://api.mercadopago.com/v1/payments/{paymentId}"
+            );
 
             var responseBody =
                 await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError(
-                    "Mercado Pago payment API returned an unsuccessful HTTP status. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} HttpStatusCode={HttpStatusCode} DurationMs={DurationMs}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    (int)response.StatusCode,
-                    stopwatch.ElapsedMilliseconds);
                 throw new InvalidOperationException(
                     $"Mercado Pago rechazó la consulta del pago (HTTP {(int)response.StatusCode})."
                 );
             }
 
-            MercadoPagoPaymentResponseDTO? payment;
-            try
-            {
-                payment =
-                    JsonSerializer.Deserialize<MercadoPagoPaymentResponseDTO>(
-                        responseBody,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        }
-                    );
-            }
-            catch (JsonException ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Mercado Pago payment API response could not be deserialized. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} HttpStatusCode={HttpStatusCode} DurationMs={DurationMs}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    (int)response.StatusCode,
-                    stopwatch.ElapsedMilliseconds);
-                throw;
-            }
+            var payment =
+                JsonSerializer.Deserialize<MercadoPagoPaymentResponseDTO>(
+                    responseBody,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }
+                );
 
             if (payment == null)
             {
-                _logger.LogError(
-                    "Mercado Pago payment API returned an empty payment response. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} HttpStatusCode={HttpStatusCode} DurationMs={DurationMs}",
-                    correlationId,
-                    tenant.Id,
-                    paymentId,
-                    (int)response.StatusCode,
-                    stopwatch.ElapsedMilliseconds);
                 throw new InvalidOperationException(
                     "Mercado Pago devolvió una respuesta inválida."
                 );
             }
-
-            _logger.LogInformation(
-                "Mercado Pago payment API request completed successfully. CorrelationId={CorrelationId} TenantId={TenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} HttpStatusCode={HttpStatusCode} DurationMs={DurationMs}",
-                correlationId,
-                tenant.Id,
-                paymentId,
-                (int)response.StatusCode,
-                stopwatch.ElapsedMilliseconds);
 
             return payment;
         }

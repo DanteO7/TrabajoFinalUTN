@@ -25,7 +25,6 @@ namespace backend_proyecto.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _db;
         private readonly TenantSubscriptionService _tenantSubscriptionService;
-        private readonly ILogger<PaymentServices> _logger;
 
         public PaymentServices(
             IPaymentRepository paymentRepository,
@@ -56,7 +55,6 @@ namespace backend_proyecto.Services
             _httpContextAccessor = httpContextAccessor;
             _db = db;
             _tenantSubscriptionService = tenantSubscriptionService;
-            _logger = logger;
         }
 
         // =========================================================
@@ -1071,21 +1069,8 @@ namespace backend_proyecto.Services
             MercadoPagoWebhookDTO webhook,
             string correlationId)
         {
-            _logger.LogInformation(
-                "Processing Mercado Pago notification. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
-                correlationId,
-                webhook.Id,
-                webhook.Type,
-                webhook.Data?.Id,
-                webhook.UserId);
-
             if (webhook.Type != "payment")
             {
-                _logger.LogInformation(
-                    "Mercado Pago notification ignored because its type is not payment. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType}",
-                    correlationId,
-                    webhook.Id,
-                    webhook.Type);
                 return;
             }
 
@@ -1094,22 +1079,11 @@ namespace backend_proyecto.Services
                 string.IsNullOrWhiteSpace(webhook.Data.Id)
             )
             {
-                _logger.LogWarning(
-                    "Mercado Pago payment notification ignored because it has no payment ID. CorrelationId={CorrelationId} NotificationId={NotificationId} ReceiverAccountId={ReceiverAccountId}",
-                    correlationId,
-                    webhook.Id,
-                    webhook.UserId);
                 return;
             }
 
             if (!webhook.UserId.HasValue || webhook.UserId.Value <= 0)
             {
-                _logger.LogWarning(
-                    "Mercado Pago payment notification rejected because it has no valid receiving account ID. CorrelationId={CorrelationId} NotificationId={NotificationId} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
-                    correlationId,
-                    webhook.Id,
-                    webhook.Data.Id,
-                    webhook.UserId);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "La notificación de Mercado Pago no contiene un identificador de cuenta receptora válido."
@@ -1120,61 +1094,25 @@ namespace backend_proyecto.Services
                 webhook.Data.Id;
             var receiverAccountId = webhook.UserId.Value;
 
-            _logger.LogInformation(
-                "Looking up businesses linked to the Mercado Pago account for payment-query credentials. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
-                correlationId,
-                receiverAccountId);
-
-            List<Tenant> linkedTenants;
-            try
-            {
-                linkedTenants = await _tenantRepository.GetAllAsync(
-                    tenant =>
-                        tenant.MercadoPagoUserId ==
-                        receiverAccountId.ToString()
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Businesses linked to the Mercado Pago account could not be loaded. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
-                    correlationId,
-                    receiverAccountId);
-                throw;
-            }
+            var linkedTenants = await _tenantRepository.GetAllAsync(
+                tenant =>
+                    tenant.MercadoPagoUserId ==
+                    receiverAccountId.ToString()
+            );
 
             if (linkedTenants.Count == 0)
             {
-                _logger.LogWarning(
-                    "No business is linked to the receiving Mercado Pago account. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId}",
-                    correlationId,
-                    receiverAccountId);
                 throw new HttpResponseError(
                     HttpStatusCode.NotFound,
                     "No se encontró el tenant asociado a la cuenta de Mercado Pago."
                 );
             }
 
-            _logger.LogInformation(
-                "Businesses linked to the Mercado Pago account found. CorrelationId={CorrelationId} ReceiverAccountId={ReceiverAccountId} LinkedBusinessCount={LinkedBusinessCount}",
-                correlationId,
-                receiverAccountId,
-                linkedTenants.Count);
-
             MercadoPagoPaymentResponseDTO? mercadoPagoPayment = null;
             Exception? lastPaymentQueryException = null;
-            int? credentialTenantId = null;
 
             foreach (var credentialTenant in linkedTenants)
             {
-                _logger.LogInformation(
-                    "Querying Mercado Pago payment API with a linked business credential. CorrelationId={CorrelationId} CredentialTenantId={CredentialTenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
-                    correlationId,
-                    credentialTenant.Id,
-                    mercadoPagoPaymentId,
-                    receiverAccountId);
-
                 try
                 {
                     mercadoPagoPayment =
@@ -1183,55 +1121,19 @@ namespace backend_proyecto.Services
                             mercadoPagoPaymentId,
                             correlationId
                         );
-                    credentialTenantId = credentialTenant.Id;
                     break;
                 }
                 catch (Exception ex)
                 {
                     lastPaymentQueryException = ex;
-                    _logger.LogWarning(
-                        "Mercado Pago payment query failed with this linked business credential; trying the next linked credential if available. CorrelationId={CorrelationId} CredentialTenantId={CredentialTenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId} FailureType={FailureType}",
-                        correlationId,
-                        credentialTenant.Id,
-                        mercadoPagoPaymentId,
-                        receiverAccountId,
-                        ex.GetType().Name);
                 }
             }
 
             if (mercadoPagoPayment == null)
             {
-                _logger.LogError(
-                    lastPaymentQueryException,
-                    "Mercado Pago payment query failed with all linked business credentials. CorrelationId={CorrelationId} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId} LinkedBusinessCount={LinkedBusinessCount}",
-                    correlationId,
-                    mercadoPagoPaymentId,
-                    receiverAccountId,
-                    linkedTenants.Count);
                 throw new InvalidOperationException(
                     "No se pudo consultar el pago de Mercado Pago usando las credenciales de los negocios vinculados.",
                     lastPaymentQueryException);
-            }
-
-            _logger.LogInformation(
-                "Mercado Pago payment API returned a payment. CorrelationId={CorrelationId} CredentialTenantId={CredentialTenantId} MercadoPagoPaymentId={MercadoPagoPaymentId} MercadoPagoStatus={MercadoPagoStatus} ExternalReference={ExternalReference} CollectorAccountId={CollectorAccountId}",
-                correlationId,
-                credentialTenantId,
-                mercadoPagoPayment.Id,
-                mercadoPagoPayment.Status,
-                mercadoPagoPayment.ExternalReference,
-                mercadoPagoPayment.CollectorId);
-
-            if (!string.Equals(
-                mercadoPagoPayment.Status,
-                "approved",
-                StringComparison.OrdinalIgnoreCase))
-            {
-                _logger.LogInformation(
-                    "Mercado Pago payment is not approved. CorrelationId={CorrelationId} MercadoPagoPaymentId={MercadoPagoPaymentId} MercadoPagoStatus={MercadoPagoStatus}",
-                    correlationId,
-                    mercadoPagoPayment.Id,
-                    mercadoPagoPayment.Status);
             }
 
             if (!string.Equals(
@@ -1239,11 +1141,6 @@ namespace backend_proyecto.Services
                 mercadoPagoPaymentId,
                 StringComparison.Ordinal))
             {
-                _logger.LogWarning(
-                    "Mercado Pago API returned an ID different from the notification ID. CorrelationId={CorrelationId} NotificationPaymentId={NotificationPaymentId} ApiPaymentId={ApiPaymentId}",
-                    correlationId,
-                    mercadoPagoPaymentId,
-                    mercadoPagoPayment.Id);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "El identificador del pago consultado no coincide con el de la notificación."
@@ -1253,10 +1150,6 @@ namespace backend_proyecto.Services
             if (string.IsNullOrWhiteSpace(
                 mercadoPagoPayment.ExternalReference))
             {
-                _logger.LogWarning(
-                    "Mercado Pago payment has no external reference. CorrelationId={CorrelationId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    mercadoPagoPayment.Id);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "El pago de Mercado Pago no tiene external_reference."
@@ -1267,90 +1160,31 @@ namespace backend_proyecto.Services
                 mercadoPagoPayment.ExternalReference,
                 out var paymentId))
             {
-                _logger.LogWarning(
-                    "Mercado Pago external reference is not a valid TurnoFácil payment ID. CorrelationId={CorrelationId} MercadoPagoPaymentId={MercadoPagoPaymentId} ExternalReference={ExternalReference}",
-                    correlationId,
-                    mercadoPagoPayment.Id,
-                    mercadoPagoPayment.ExternalReference);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "El external_reference del pago no es válido."
                 );
             }
 
-            _logger.LogInformation(
-                "Looking up local payment from Mercado Pago external reference. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                correlationId,
-                paymentId,
-                mercadoPagoPayment.Id);
-
-            Payment? payment;
-            try
-            {
-                payment =
-                    await _paymentRepository.GetOneAsync(
-                        p => p.Id == paymentId
-                    );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Local payment lookup failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    paymentId,
-                    mercadoPagoPayment.Id);
-                throw;
-            }
+            var payment =
+                await _paymentRepository.GetOneAsync(
+                    p => p.Id == paymentId
+                );
 
             if (payment == null)
             {
-                _logger.LogWarning(
-                    "Local payment was not found. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    paymentId,
-                    mercadoPagoPayment.Id);
                 throw new HttpResponseError(
                     HttpStatusCode.NotFound,
                     $"No se encontró el pago de TurnoFacil con el Id = '{paymentId}'."
                 );
             }
 
-            _logger.LogInformation(
-                "Local payment found from external reference. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PaymentTenantId={PaymentTenantId} LocalPaymentStatus={PreviousPaymentStatus} LocalAmount={LocalAmount} PlanType={PlanType} StoredMercadoPagoPaymentId={StoredMercadoPagoPaymentId}",
-                correlationId,
-                payment.Id,
-                payment.TenantId,
-                payment.Status,
-                payment.Amount,
-                payment.PlanType,
-                payment.ExternalPaymentId);
-
-            Tenant? paymentTenant;
-            try
-            {
-                paymentTenant = await _tenantRepository.GetOneAsync(
-                    tenant => tenant.Id == payment.TenantId
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    ex,
-                    "Business linked to local payment could not be loaded. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PaymentTenantId={PaymentTenantId}",
-                    correlationId,
-                    payment.Id,
-                    payment.TenantId);
-                throw;
-            }
+            var paymentTenant = await _tenantRepository.GetOneAsync(
+                tenant => tenant.Id == payment.TenantId
+            );
 
             if (paymentTenant == null)
             {
-                _logger.LogWarning(
-                    "Business linked to local payment was not found. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PaymentTenantId={PaymentTenantId}",
-                    correlationId,
-                    payment.Id,
-                    payment.TenantId);
                 throw new HttpResponseError(
                     HttpStatusCode.NotFound,
                     "No se encontró el negocio asociado al pago local."
@@ -1361,89 +1195,38 @@ namespace backend_proyecto.Services
 
             if (paymentTenant.MercadoPagoUserId != receiverAccountIdString)
             {
-                _logger.LogWarning(
-                    "Payment business Mercado Pago account validation failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PaymentTenantId={PaymentTenantId} ReceiverAccountId={ReceiverAccountId} LinkedMercadoPagoAccountId={LinkedMercadoPagoAccountId}",
-                    correlationId,
-                    payment.Id,
-                    paymentTenant.Id,
-                    receiverAccountId,
-                    paymentTenant.MercadoPagoUserId);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "La cuenta de Mercado Pago de la notificación no coincide con la cuenta vinculada al negocio del pago."
                 );
             }
 
-            _logger.LogInformation(
-                "Payment business Mercado Pago account validation passed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PaymentTenantId={PaymentTenantId} ReceiverAccountId={ReceiverAccountId}",
-                correlationId,
-                payment.Id,
-                paymentTenant.Id,
-                receiverAccountId);
-
             if (mercadoPagoPayment.CollectorId != receiverAccountId)
             {
-                _logger.LogWarning(
-                    "Mercado Pago collector validation failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} ReceiverAccountId={ReceiverAccountId} CollectorAccountId={CollectorAccountId}",
-                    correlationId,
-                    payment.Id,
-                    receiverAccountId,
-                    mercadoPagoPayment.CollectorId);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "La cuenta receptora informada por Mercado Pago no coincide con el collector_id del pago."
                 );
             }
 
-            _logger.LogInformation(
-                "Mercado Pago collector validation passed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} ReceiverAccountId={ReceiverAccountId} CollectorAccountId={CollectorAccountId}",
-                correlationId,
-                payment.Id,
-                receiverAccountId,
-                mercadoPagoPayment.CollectorId);
-
             if (
                 payment.Amount !=
                 mercadoPagoPayment.TransactionAmount
             )
             {
-                _logger.LogWarning(
-                    "Payment amount validation failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} ExpectedAmount={ExpectedAmount} ActualAmount={ActualAmount}",
-                    correlationId,
-                    payment.Id,
-                    payment.Amount,
-                    mercadoPagoPayment.TransactionAmount);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "El monto del pago no coincide con el monto registrado."
                 );
             }
 
-            _logger.LogInformation(
-                "Payment amount validation passed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} Amount={Amount}",
-                correlationId,
-                payment.Id,
-                payment.Amount);
-
             if (mercadoPagoPayment.CurrencyId != "ARS")
             {
-                _logger.LogWarning(
-                    "Payment currency validation failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} ExpectedCurrency={ExpectedCurrency} ActualCurrency={ActualCurrency}",
-                    correlationId,
-                    payment.Id,
-                    "ARS",
-                    mercadoPagoPayment.CurrencyId);
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
                     "La moneda del pago no es válida."
                 );
             }
-
-            _logger.LogInformation(
-                "Payment currency validation passed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} Currency={Currency}",
-                correlationId,
-                payment.Id,
-                mercadoPagoPayment.CurrencyId);
 
             var incomingMercadoPagoPaymentId =
                 mercadoPagoPayment.Id.ToString();
@@ -1452,52 +1235,22 @@ namespace backend_proyecto.Services
             {
                 if (payment.ExternalPaymentId != incomingMercadoPagoPaymentId)
                 {
-                    _logger.LogWarning(
-                        "Paid local payment is already associated with a different Mercado Pago payment. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} StoredMercadoPagoPaymentId={StoredMercadoPagoPaymentId} IncomingMercadoPagoPaymentId={IncomingMercadoPagoPaymentId}",
-                        correlationId,
-                        payment.Id,
-                        payment.ExternalPaymentId,
-                        incomingMercadoPagoPaymentId);
                     throw new HttpResponseError(
                         HttpStatusCode.Conflict,
                         "El pago local ya fue completado con otro pago de Mercado Pago."
                     );
                 }
 
-                _logger.LogInformation(
-                    "Duplicate notification for an already paid local payment ignored without side effects. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    payment.Id,
-                    incomingMercadoPagoPaymentId);
                 return;
             }
 
             if (!string.IsNullOrWhiteSpace(payment.ExternalPaymentId) &&
                 payment.ExternalPaymentId != incomingMercadoPagoPaymentId)
             {
-                _logger.LogWarning(
-                    "Local payment is already associated with a different Mercado Pago payment. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} StoredMercadoPagoPaymentId={StoredMercadoPagoPaymentId} IncomingMercadoPagoPaymentId={IncomingMercadoPagoPaymentId}",
-                    correlationId,
-                    payment.Id,
-                    payment.ExternalPaymentId,
-                    incomingMercadoPagoPaymentId);
                 throw new HttpResponseError(
                     HttpStatusCode.Conflict,
                     "El pago local ya está asociado a otro pago de Mercado Pago."
                 );
-            }
-
-            var previousPaymentStatus = payment.Status;
-            var isDuplicatePaymentNotification =
-                payment.ExternalPaymentId == incomingMercadoPagoPaymentId;
-
-            if (isDuplicatePaymentNotification)
-            {
-                _logger.LogInformation(
-                    "Mercado Pago payment ID was already recorded on this local payment. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    payment.Id,
-                    mercadoPagoPayment.Id);
             }
 
             payment.ExternalPaymentId =
@@ -1581,51 +1334,15 @@ namespace backend_proyecto.Services
                     break;
             }
 
-            _logger.LogInformation(
-                "Local payment status transition evaluated. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PreviousPaymentStatus={PreviousPaymentStatus} NewPaymentStatus={NewPaymentStatus} MercadoPagoStatus={MercadoPagoStatus} IsDuplicatePaymentNotification={IsDuplicatePaymentNotification}",
-                correlationId,
-                payment.Id,
-                previousPaymentStatus,
-                payment.Status,
-                mercadoPagoPayment.Status,
-                isDuplicatePaymentNotification);
-
-            try
+            if (payment.PlanType == PlanType.TENANT)
             {
-                if (payment.PlanType == PlanType.TENANT)
-                {
-                    await _tenantSubscriptionService.RecalculateAsync(
-                        payment.TenantId
-                    );
-                }
-                else
-                {
-                    await _paymentRepository.UpdateOneAsync(payment);
-                }
-
-                _logger.LogInformation(
-                    "Mercado Pago webhook database save completed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PreviousPaymentStatus={PreviousPaymentStatus} PersistedPaymentStatus={PersistedPaymentStatus} PersistencePath={PersistencePath}",
-                    correlationId,
-                    payment.Id,
-                    previousPaymentStatus,
-                    payment.Status,
-                    payment.PlanType == PlanType.TENANT
-                        ? "TenantSubscriptionRecalculation"
-                        : "PaymentRepository");
+                await _tenantSubscriptionService.RecalculateAsync(
+                    payment.TenantId
+                );
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(
-                    ex,
-                    "Mercado Pago webhook database save failed. CorrelationId={CorrelationId} LocalPaymentId={LocalPaymentId} PreviousPaymentStatus={PreviousPaymentStatus} AttemptedPaymentStatus={AttemptedPaymentStatus} PersistencePath={PersistencePath}",
-                    correlationId,
-                    payment.Id,
-                    previousPaymentStatus,
-                    payment.Status,
-                    payment.PlanType == PlanType.TENANT
-                        ? "TenantSubscriptionRecalculation"
-                        : "PaymentRepository");
-                throw;
+                await _paymentRepository.UpdateOneAsync(payment);
             }
         }
 

@@ -11,7 +11,6 @@ namespace backend_proyecto.Controllers
     {
         private readonly MercadoPagoServices _mercadoPagoServices;
         private readonly PaymentServices _paymentServices;
-        private readonly ILogger<MercadoPagoController> _logger;
 
         public MercadoPagoController(
             MercadoPagoServices mercadoPagoServices,
@@ -20,7 +19,6 @@ namespace backend_proyecto.Controllers
         {
             _mercadoPagoServices = mercadoPagoServices;
             _paymentServices = paymentServices;
-            _logger = logger;
         }
 
         [HttpGet("status/{tenantId}")]
@@ -127,40 +125,15 @@ namespace backend_proyecto.Controllers
         {
             var correlationId = HttpContext.TraceIdentifier;
 
-            _logger.LogInformation(
-                "Mercado Pago webhook received. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType} NotificationAction={NotificationAction} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId}",
-                correlationId,
-                webhook.Id,
-                webhook.Type,
-                webhook.Action,
-                webhook.Data?.Id,
-                webhook.UserId);
-
             try
             {
                 await _paymentServices
                     .ProcessMercadoPagoWebhook(webhook, correlationId);
 
-                _logger.LogInformation(
-                    "Mercado Pago webhook processing completed. CorrelationId={CorrelationId} NotificationId={NotificationId} MercadoPagoPaymentId={MercadoPagoPaymentId}",
-                    correlationId,
-                    webhook.Id,
-                    webhook.Data?.Id);
-
                 return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(
-                    "Mercado Pago webhook processing failed. CorrelationId={CorrelationId} NotificationId={NotificationId} NotificationType={NotificationType} MercadoPagoPaymentId={MercadoPagoPaymentId} ReceiverAccountId={ReceiverAccountId} FailureType={FailureType}",
-                    correlationId,
-                    webhook.Id,
-                    webhook.Type,
-                    webhook.Data?.Id,
-                    webhook.UserId,
-                    ex.GetType().Name
-                );
-
                 return BadRequest();
             }
         }
