@@ -11,8 +11,10 @@ import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
+import { useTranslation } from "react-i18next";
 
 export default function Exercises({ tenantId }) {
+  const { t } = useTranslation();
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
   const [, setLocation] = useLocation();
   const [inputValue, setInputValue] = useState("");
@@ -46,24 +48,24 @@ export default function Exercises({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Ejercicios
+                {t("tenantPages.exercises.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar los ejercicios para las rutinas.
+                {t("tenantPages.exercises.description")}
               </p>
             </div>
 
@@ -72,13 +74,13 @@ export default function Exercises({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar ejercicio..."
+                  placeholder={t("tenantPages.exercises.search")}
                 />
 
                 {canCreateExercise && (
                   <div className="justify-self-end">
                     <BlackButton
-                      text="+ Nuevo ejercicio"
+                      text={t("tenantPages.exercises.new")}
                       onClick={() => setOpenForm(true)}
                       textSmall={true}
                       wfit={isSmallScreen}
@@ -100,33 +102,36 @@ export default function Exercises({ tenantId }) {
                       <h3 className="font-semibold text-xl">{exercise.name}</h3>
 
                       <p className="text-gray-500 mt-2 line-clamp-3">
-                        {exercise.description || "Sin descripción"}
+                        {exercise.description ||
+                          t("tenantPages.noDescription")}
                       </p>
                     </div>
                   ))
                 ) : (
                   <div className="col-span-full flex flex-col items-center justify-center py-20 border rounded-lg text-center">
                     <h3 className="text-xl font-semibold">
-                      No se encontraron ejercicios
+                      {t("tenantPages.exercises.noSearchResults")}
                     </h3>
 
                     <p className="text-gray-500 px-2 mt-2">
-                      Probá con otro término de búsqueda.
+                      {t("tenantPages.searchHint")}
                     </p>
                   </div>
                 )
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
-                  <h3 className="text-xl font-semibold">No hay ejercicios</h3>
+                  <h3 className="text-xl font-semibold">
+                    {t("tenantPages.exercises.emptyTitle")}
+                  </h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">
-                    Creá tu primer ejercicio para comenzar.
+                    {t("tenantPages.exercises.emptyDescription")}
                   </p>
 
                   {canCreateExercise && (
                     <div className="flex items-center justify-center">
                       <BlackButton
-                        text="+ Crear ejercicio"
+                        text={t("tenantPages.exercises.create")}
                         onClick={() => setOpenForm(true)}
                         textSmall={true}
                         wfit={true}

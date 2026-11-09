@@ -16,8 +16,10 @@ import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 import EditProfileModal from "../components/profile/edit-profile-modal";
 import FormInput from "../components/inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -103,7 +105,7 @@ export default function Profile() {
       setBackendError(
         typeof data === "string"
           ? data
-          : data?.message || "Error enviando el correo.",
+          : data?.message || t("profile.errorSendingEmail"),
       );
 
       setErrorModal(true);
@@ -116,11 +118,11 @@ export default function Profile() {
         <Navbar user={user} />
 
         <div className="w-full lg:max-w-120">
-          <h3 className="text-2xl font-semibold">Datos personales</h3>
+          <h3 className="text-2xl font-semibold">{t("profile.personalData")}</h3>
           {isAuthenticated ? (
             <div className="flex max-w flex-col gap-4 mt-4">
               <FormInput
-                label="Nombre"
+                label={t("profile.name")}
                 id="name"
                 type="text"
                 value={user?.name || ""}
@@ -128,7 +130,7 @@ export default function Profile() {
               />
 
               <FormInput
-                label="Apellido"
+                label={t("profile.surname")}
                 id="surname"
                 type="text"
                 value={user?.surname || ""}
@@ -136,35 +138,35 @@ export default function Profile() {
               />
 
               <FormInput
-                label="Telefono"
+                label={t("profile.phone")}
                 id="phoneNumber"
                 type="text"
-                placeholder="XX XXXX XXXXXX"
+                placeholder={t("profile.phoneExample")}
                 value={user?.phoneNumber || ""}
                 disabled={true}
               />
 
               <div className="flex gap-2">
                 <FormInput
-                  label="Edad"
+                  label={t("profile.age")}
                   id="age"
                   type="number"
-                  placeholder="Entre 1-120 años"
+                  placeholder={t("profile.ageExample")}
                   value={user?.age || ""}
                   disabled={true}
                 />
 
                 <FormInput
-                  label="Peso"
+                  label={t("profile.weight")}
                   id="weight"
                   type="number"
-                  placeholder="Entre 1-300kg"
+                  placeholder={t("profile.weightExample")}
                   value={user?.weight || ""}
                   disabled={true}
                 />
               </div>
               <FormInput
-                label="Patologías o condiciones médicas"
+                label={t("profile.pathologies")}
                 id="pathologies"
                 value={user?.pathologies || ""}
                 disabled={true}
@@ -172,20 +174,20 @@ export default function Profile() {
                 rows={3}
               />
               <BlackButton
-                text="Editar perfil"
+                text={t("profile.edit")}
                 onClick={() => setOpenEditProfileModal(true)}
                 textSmall={true}
                 wfit={true}
               />
               <FormInput
                 disabled={true}
-                label="Email"
+                label={t("profile.email")}
                 id="email"
                 type="email"
                 value={user?.email || ""}
               />
               <BlackButton
-                text="Cambiar Email"
+                text={t("profile.changeEmail")}
                 onClick={() => setOpenChangeEmail(true)}
                 textSmall={true}
                 wfit={true}
@@ -194,17 +196,17 @@ export default function Profile() {
                 disabled={seconds > 0 || forgotPasswordMutation.isPending}
                 text={
                   forgotPasswordMutation.isPending
-                    ? "Enviando correo..."
+                    ? t("profile.sendingEmail")
                     : seconds > 0
-                      ? `Reenviar en ${seconds}s`
-                      : "Cambiar contraseña"
+                      ? t("profile.resendIn", { seconds })
+                      : t("profile.changePassword")
                 }
                 onClick={() => forgotPasswordMutation.mutate()}
                 textSmall={true}
                 wfit={true}
               />
               <RedButton
-                text="Cerrar sesión"
+                text={t("profile.signOut")}
                 onClick={async () => {
                   queryClient.clear();
                   clearPermissions();
@@ -223,9 +225,9 @@ export default function Profile() {
             </div>
           ) : (
             <div className="flex flex-col mt-5 gap-3">
-              <span>No tienes iniciada la sesion</span>
+              <span>{t("profile.signInRequired")}</span>
               <Link href="/iniciar-sesion">
-                <BlackButton text="Iniciar sesion" wfit textSmall />
+                <BlackButton text={t("auth.signIn")} wfit textSmall />
               </Link>
             </div>
           )}

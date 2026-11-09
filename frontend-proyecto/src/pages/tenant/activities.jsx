@@ -11,8 +11,10 @@ import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useTranslation } from "react-i18next";
 
 export default function Activities({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
@@ -47,24 +49,24 @@ export default function Activities({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Actividades
+                {t("tenantPages.activities.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar todas las actividades del negocio.
+                {t("tenantPages.activities.description")}
               </p>
             </div>
 
@@ -73,13 +75,13 @@ export default function Activities({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar actividad..."
+                  placeholder={t("tenantPages.activities.search")}
                 />
 
                 {canCreateActivity && (
                   <div className="justify-self-end">
                     <BlackButton
-                      text="+ Nueva actividad"
+                      text={t("tenantPages.activities.new")}
                       onClick={() => setOpenForm(true)}
                       textSmall={true}
                       wfit={isSmallScreen}
@@ -100,22 +102,25 @@ export default function Activities({ tenantId }) {
                     <h3 className="font-semibold text-xl">{activity.name}</h3>
 
                     <p className="text-gray-500 mt-2 line-clamp-3">
-                      {activity.description || "Sin descripción"}
+                      {activity.description ||
+                        t("tenantPages.noDescription")}
                     </p>
                   </div>
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
-                  <h3 className="text-xl font-semibold">No hay actividades</h3>
+                  <h3 className="text-xl font-semibold">
+                    {t("tenantPages.activities.emptyTitle")}
+                  </h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">
-                    Creá tu primera actividad para comenzar.
+                    {t("tenantPages.activities.emptyDescription")}
                   </p>
 
                   {canCreateActivity && (
                     <div className="flex items-center justify-center">
                       <BlackButton
-                        text="+ Crear actividad"
+                        text={t("tenantPages.activities.create")}
                         onClick={() => setOpenForm(true)}
                         textSmall={true}
                         wfit={true}

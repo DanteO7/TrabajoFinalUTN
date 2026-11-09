@@ -1,28 +1,30 @@
 import { useState } from "react";
 import LinkModal from "../modals/link-modal";
 import BlackButton from "../buttons/black-button";
+import { useTranslation } from "react-i18next";
 
 export default function InviteStudentStep({ tenantId, isComplete }) {
+  const { t } = useTranslation();
   const [showLinkModal, setShowLinkModal] = useState(false);
 
   return (
     <div className="mt-6 flex flex-col gap-5">
       <p className="text-gray-600 mt-2">
         {isComplete
-          ? "¡Muy bien! Ya tenés un enlace vigente para invitar alumnos. ¡Sigamos con el próximo paso!"
-          : "Podés generar un enlace para que un alumno se una a tu espacio. Este paso es opcional y también podés hacerlo más adelante."}
+          ? t("onboardingSteps.studentInvited")
+          : t("onboardingSteps.studentInviteDescription")}
       </p>
 
       {isComplete ? (
         <BlackButton
-          text="Administrar invitación"
+          text={t("onboardingSteps.manageInvitation")}
           onClick={() => setShowLinkModal(true)}
           wfit
           textSmall
         />
       ) : (
         <BlackButton
-          text="Invitar a un alumno"
+          text={t("onboardingSteps.inviteStudent")}
           onClick={() => setShowLinkModal(true)}
           wfit
           textSmall

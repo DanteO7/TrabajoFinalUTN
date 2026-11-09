@@ -34,8 +34,11 @@ import {
 } from "react-icons/fa";
 import { FaListCheck, FaXTwitter } from "react-icons/fa6";
 import { useTenantStore } from "../store/tenant-store";
+import { getLocale } from "../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function Tenant({ id }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [openEditAdressModal, setOpenEditAdressModal] = useState(false);
 
@@ -63,92 +66,92 @@ export default function Tenant({ id }) {
 
   const sections = [
     {
-      title: "Novedades",
-      description: "Mira las novedades del negocio.",
+      title: t("tenantDashboard.news"),
+      description: t("tenantDashboard.newsDescription"),
       icon: <FaBell size={35} />,
       href: "novedades",
       permission: "NEWS_READ",
     },
     {
-      title: "Clases",
-      description: "Administrá las clases.",
+      title: t("tenantDashboard.classes"),
+      description: t("tenantDashboard.classesDescription"),
       icon: <FaCalendarAlt size={35} />,
       href: "clases",
       permission: "CLASS_READ",
     },
     {
-      title: "Alumnos",
-      description: "Administrá los alumnos del espacio.",
+      title: t("tenantDashboard.students"),
+      description: t("tenantDashboard.studentsDescription"),
       icon: <FaUsers size={35} />,
       href: "alumnos",
       permission: "STUDENT_READ",
     },
     {
-      title: "Profesores",
-      description: "Visualizá y gestioná profesores.",
+      title: t("tenantDashboard.professors"),
+      description: t("tenantDashboard.professorsDescription"),
       icon: <FaChalkboardTeacher size={35} />,
       href: "profesores",
       permission: "PROFESSOR_READ",
     },
     {
-      title: "Actividades",
-      description: "Gestioná actividades.",
+      title: t("tenantDashboard.activities"),
+      description: t("tenantDashboard.activitiesDescription"),
       icon: <FaRunning size={35} />,
       href: "actividades",
       permission: "ACTIVITY_READ",
     },
     {
-      title: "Profesiones",
-      description: "Configurá profesiones.",
+      title: t("tenantDashboard.specialities"),
+      description: t("tenantDashboard.specialitiesDescription"),
       icon: <FaBookOpen size={35} />,
       href: "profesiones",
       permission: "SPECIALITY_READ",
     },
     {
-      title: "Rutinas",
-      description: "Configurá rutinas de entrenamiento.",
+      title: t("tenantDashboard.routines"),
+      description: t("tenantDashboard.routinesDescription"),
       icon: <FaListCheck size={35} />,
       href: "rutinas",
       permission: "ROUTINE_READ",
     },
     {
-      title: "Ejercicios",
-      description: "Gestioná ejercicios.",
+      title: t("tenantDashboard.exercises"),
+      description: t("tenantDashboard.exercisesDescription"),
       icon: <FaDumbbell size={35} />,
       href: "ejercicios",
       permission: "EXERCISE_READ",
     },
     {
-      title: "Estadísticas",
-      description: "Consultá el rendimiento de tu negocio.",
+      title: t("tenantDashboard.statistics"),
+      description: t("tenantDashboard.statisticsDescription"),
       icon: <FaChartBar size={35} />,
       href: "estadisticas",
       ownerOnly: true,
     },
     {
-      title: "Permisos",
-      description: "Configurá los permisos de tus profesores.",
+      title: t("tenantDashboard.permissions"),
+      description: t("tenantDashboard.permissionsDescription"),
       icon: <FaUserShield size={35} />,
       href: "permisos",
       ownerOnly: true,
     },
     {
-      title: "Pagos",
-      description: "Consultá pagos.",
+      title: t("tenantDashboard.payments"),
+      description: t("tenantDashboard.paymentsDescription"),
       icon: <FaMoneyBillWave size={35} />,
       href: "pagos",
       permission: "PAYMENT_READ",
     },
     {
-      title: "Planes de Alumnos",
-      description: "Administrá los planes de tus alumnos.",
+      title: t("tenantDashboard.studentPlans"),
+      description: t("tenantDashboard.studentPlansDescription"),
       icon: <FaTags size={35} />,
       href: "planes",
       permission: "STUDENT_PLAN_READ",
     },
     {
-      title: "Reservas",
-      description: "Tus próximas clases.",
+      title: t("tenantDashboard.reservations"),
+      description: t("tenantDashboard.reservationsDescription"),
       icon: <FaClipboardList size={35} />,
       href: "reservas",
       permission: "RESERVATION_READ",
@@ -196,15 +199,15 @@ export default function Tenant({ id }) {
 
   const roleConfig = {
     Tenant: {
-      text: "Dueño",
+      text: t("tenants.roles.Tenant"),
       className: "bg-purple-300 text-purple-600",
     },
     Professor: {
-      text: "Profesor",
+      text: t("tenants.roles.Professor"),
       className: "bg-blue-300 text-blue-600",
     },
     Student: {
-      text: "Alumno",
+      text: t("tenants.roles.Student"),
       className: "bg-orange-200 text-yellow-600",
     },
   };
@@ -231,7 +234,7 @@ export default function Tenant({ id }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Mi espacio
+          {t("header.mySpace")}
         </button>
         {isLoading ? (
           <Loading />
@@ -239,7 +242,7 @@ export default function Tenant({ id }) {
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
             {backendError?.response?.data?.message ||
               backendError?.response?.data ||
-              "Ocurrió un error al cargar el negocio."}
+              t("tenantDashboard.loadError")}
           </div>
         ) : (
           <div className="flex flex-col justify-between items-start flex-wrap gap-5">
@@ -251,7 +254,7 @@ export default function Tenant({ id }) {
                 {tenant?.role === "Tenant" &&
                   tenant.onboardingCompleted === false && (
                     <RedButton
-                      text="Completar primeros pasos"
+                      text={t("tenantDashboard.completeOnboarding")}
                       onClick={() =>
                         setLocation(`/mi-espacio/${tenant.id}/primeros-pasos`)
                       }
@@ -262,8 +265,9 @@ export default function Tenant({ id }) {
               </div>
 
               <p className="text-gray-500">
-                Administrado por {tenant?.ownerUser.name}{" "}
-                {tenant?.ownerUser.surname}
+                {t("tenantDashboard.managedBy", {
+                  name: `${tenant?.ownerUser.name} ${tenant?.ownerUser.surname}`,
+                })}
               </p>
 
               {tenant?.socialNetworks &&
@@ -293,7 +297,7 @@ export default function Tenant({ id }) {
 
               {canUpdateTenant && (
                 <BlackButton
-                  text="Editar datos"
+                  text={t("tenantDashboard.editDetails")}
                   onClick={() => setOpenEditAdressModal(true)}
                   textSmall={true}
                   wfit={true}
@@ -309,7 +313,7 @@ export default function Tenant({ id }) {
                     : "bg-red-300 text-red-600"
                 }`}
                 >
-                  {tenant?.isActive ? "Activo" : "Inactivo"}
+                  {tenant?.isActive ? t("tenants.active") : t("tenants.inactive")}
                 </span>
 
                 <span
@@ -320,10 +324,10 @@ export default function Tenant({ id }) {
               </div>
               {tenant?.role == "Tenant" && (
                 <p className="text-gray-500">
-                  Vencimiento:{" "}
+                  {t("tenantDashboard.expiry")}{" "}
                   {tenant?.paymentDueDate
                     ? new Date(tenant.paymentDueDate).toLocaleDateString(
-                        "es-AR",
+                        getLocale(),
                       )
                     : "-"}
                 </p>
@@ -331,8 +335,8 @@ export default function Tenant({ id }) {
             </div>
             <p className="text-gray-500 mt-1">
               {tenant?.role == "Student"
-                ? "Desde acá podés gestionar tus clases, reservas y pagos."
-                : "Desde acá podés administrar todas las áreas de tu negocio."}
+                ? t("tenantDashboard.studentIntro")
+                : t("tenantDashboard.ownerIntro")}
             </p>
             <div className="grid gap-4 mt-3 min-[800px]:grid-cols-2 min-[1000px]:grid-cols-3 w-full">
               {newsCard && (

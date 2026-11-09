@@ -14,8 +14,10 @@ import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
 import { updateActivitySchema } from "../../schema/activity-schema";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function ActivityModal({ activity, tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const canUpdateActivity = useHasPermission(tenantId, "ACTIVITY_UPDATE");
@@ -60,7 +62,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       setConfirmModal(false);
 
-      setSuccessMessage("Actividad eliminada correctamente");
+      setSuccessMessage(t("activities.deleted"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -71,7 +73,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la actividad";
+      let msg = t("activities.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -112,7 +114,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       setEditing(false);
 
-      setSuccessMessage("Actividad actualizada correctamente");
+      setSuccessMessage(t("activities.updated"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -123,7 +125,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la actividad";
+      let msg = t("activities.updateError");
 
       if (typeof data === "string") {
         msg = data;
@@ -167,7 +169,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
           </h2>
 
           <p className="text-gray-600 whitespace-pre-wrap">
-            {currentActivity.description || "Sin descripción"}
+            {currentActivity.description || t("activities.noDescription")}
           </p>
 
           {(canUpdateActivity || canDeleteActivity) && (
@@ -176,7 +178,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
             >
               {canDeleteActivity && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("common.delete")}
                   disabled={deleteMutation.isPending}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -186,7 +188,7 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
               {canUpdateActivity && (
                 <BlackButton
-                  text="Editar"
+                  text={t("common.edit")}
                   onClick={() => setEditing(true)}
                   textSmall={true}
                   img={<Pencil size={18} />}
@@ -198,33 +200,33 @@ export default function ActivityModal({ activity, tenantId, close }) {
       ) : (
         <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">
-            Editar actividad
+            {t("activities.editTitle")}
           </h2>
 
           <FormInput
-            label="Nombre de la actividad"
+            label={t("activities.name")}
             id="name"
-            placeholder="Ej: Musculación"
+            placeholder={t("activities.example")}
             register={register("name")}
             error={errors.name}
           />
           <FormInput
             textarea
-            label="Descripción (opcional)"
+            label={t("activities.descriptionOptional")}
             register={register("description")}
             error={errors.description}
-            placeholder="Explicación de la actividad..."
+            placeholder={t("activities.descriptionPlaceholder")}
           />
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("common.cancel")}
               onClick={handleCancelEdit}
               textSmall={true}
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={updateMutation.isPending ? t("activities.updating") : t("common.update")}
               type="submit"
               disabled={updateMutation.isPending}
               textSmall={true}
@@ -235,8 +237,8 @@ export default function ActivityModal({ activity, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar esta actividad?"
-          message={`Estás por eliminar la actividad "${currentActivity.name}". Esta acción no se puede deshacer.`}
+          title={t("activities.deleteTitle")}
+          message={t("activities.deleteMessage", { name: currentActivity.name })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

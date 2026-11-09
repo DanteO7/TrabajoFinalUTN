@@ -16,8 +16,11 @@ import Loading from "../components/loading";
 import FormInput from "../components/inputs/form-input";
 import SendEmailUserModal from "../components/modals/send-email-user-modal";
 import { useState } from "react";
+import { formatCurrency } from "../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function CreateTenant() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -40,7 +43,7 @@ export default function CreateTenant() {
       setEmailError(
         typeof data === "string"
           ? data
-          : "No se pudo enviar el correo. El negocio ya está creado; podés volver a intentar.",
+          : t("createTenant.emailError"),
       );
     },
   });
@@ -101,8 +104,10 @@ export default function CreateTenant() {
     return (
       <MainLayout>
         <div className="p-6">
-          <h1 className="text-xl font-semibold">Enlace inválido</h1>
-          <p className="mt-2">No se encontró el token de creación.</p>
+          <h1 className="text-xl font-semibold">
+            {t("createTenant.invalidLink")}
+          </h1>
+          <p className="mt-2">{t("createTenant.missingToken")}</p>
         </div>
       </MainLayout>
     );
@@ -121,10 +126,10 @@ export default function CreateTenant() {
       <MainLayout>
         <div className="p-6">
           <h1 className="text-xl font-semibold">
-            No se pudo cargar la solicitud
+            {t("createTenant.loadError")}
           </h1>
           <p className="mt-2">
-            {error?.response?.data || "El enlace no es válido."}
+            {error?.response?.data || t("createTenant.invalidLinkDescription")}
           </p>
         </div>
       </MainLayout>
@@ -134,14 +139,18 @@ export default function CreateTenant() {
   return (
     <MainLayout>
       <div className="mt-12 w-full max-w-2xl">
-        <h1 className="text-4xl font-semibold text-center">Crear negocio</h1>
+        <h1 className="text-4xl font-semibold text-center">
+          {t("createTenant.title")}
+        </h1>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="mt-6 space-y-4 rounded-lg border p-6"
         >
           <div>
-            <p className="block text-sm font-medium mb-1">Usuario</p>
+            <p className="block text-sm font-medium mb-1">
+              {t("createTenant.user")}
+            </p>
             <div className="mt-1 rounded-lg border bg-[#F1EEF3] border-gray-400 p-3">
               <p className="font-medium">{data.userName}</p>
               <p className="text-sm text-gray-500">{data.userEmail}</p>
@@ -150,26 +159,28 @@ export default function CreateTenant() {
 
           <div>
             <FormInput
-              label="Nombre del negocio"
+              label={t("createTenant.businessName")}
               id="name"
               type="text"
-              placeholder="Ej: Gym power..."
+              placeholder={t("createTenant.namePlaceholder")}
               register={register("name")}
               error={errors.name}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Plan</label>
+            <label className="block text-sm font-medium mb-1">
+              {t("createTenant.plan")}
+            </label>
 
             <select
               {...register("tenantPlanId")}
               className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
-              <option value="">Seleccionar plan</option>
+              <option value="">{t("createTenant.selectPlan")}</option>
 
               {plans.map((plan) => (
                 <option key={plan.id} value={String(plan.id)}>
-                  {plan.name} - ${plan.price}
+                  {plan.name} - {formatCurrency(plan.price)}
                 </option>
               ))}
             </select>
@@ -185,14 +196,18 @@ export default function CreateTenant() {
             <p className="text-sm text-red-500">
               {typeof mutation.error?.response?.data === "string"
                 ? mutation.error.response.data
-                : "No se pudo crear el negocio. Intentá nuevamente."}
+                : t("createTenant.createError")}
             </p>
           )}
 
           <BlackButton
             type="submit"
             disabled={mutation.isPending}
-            text={mutation.isPending ? "Creando..." : "Crear negocio"}
+            text={
+              mutation.isPending
+                ? t("createTenant.creating")
+                : t("createTenant.create")
+            }
             textSmall
           />
         </form>

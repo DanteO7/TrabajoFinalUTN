@@ -10,8 +10,10 @@ import WhiteButton from "../components/buttons/white-button";
 import BlackButton from "../components/buttons/black-button";
 import FormInput from "../components/inputs/form-input";
 import { getReturnUrlPath, getSafeReturnUrl } from "../utils/return-url";
+import { useTranslation } from "react-i18next";
 
 export default function VerifyCode({ returnUrl }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
@@ -63,7 +65,7 @@ export default function VerifyCode({ returnUrl }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Error al crear la cuenta";
+      let msg = t("auth.createAccountError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -81,7 +83,7 @@ export default function VerifyCode({ returnUrl }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Error al reenviar el código";
+      let msg = t("auth.resendCodeError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -116,12 +118,12 @@ export default function VerifyCode({ returnUrl }) {
           </h2>
 
           <p className="text-center text-gray-700 font-semibold text-[17px] min-[900px]:text-2xl">
-            Verificar correo
+            {t("auth.verifyEmail")}
           </p>
 
           <div className="text-center">
             <p className="text-[13px] min-[900px]:text-[15px] text-gray-600 mb-1">
-              Hemos enviado el código de verificacion a:
+              {t("auth.verificationCodeSent")}
             </p>
             <p className="font-semibold text-[15px] text-[#333]">
               {formData.email}
@@ -132,19 +134,19 @@ export default function VerifyCode({ returnUrl }) {
             <FormInput
               id="verificationCode"
               type="text"
-              placeholder="Ingresá el código de verificación"
+              placeholder={t("auth.enterVerificationCode")}
               register={register("verificationCode", {
-                required: "El código es obligatorio",
+                required: t("validation.codeRequired"),
                 minLength: {
                   value: 4,
-                  message: "El código debe tener al menos 4 caracteres",
+                  message: t("validation.codeMin", { count: 4 }),
                 },
               })}
               error={errors.verificationCode}
             />
           </div>
           <WhiteButton
-            text={seconds > 0 ? `Reenviar en ${seconds}s` : "Reenviar código"}
+            text={seconds > 0 ? t("auth.resendIn", { seconds }) : t("auth.resendCode")}
             disabled={seconds > 0 || resendMutation.isPending}
             type="button"
             onClick={() => resendMutation.mutate()}
@@ -153,7 +155,7 @@ export default function VerifyCode({ returnUrl }) {
           <BlackButton
             type="submit"
             text={
-              signUpMutation.isPending ? "Creando cuenta..." : "Crear cuenta"
+              signUpMutation.isPending ? t("auth.creatingAccount") : t("auth.createAccount")
             }
             disabled={signUpMutation.isPending}
             textSmall={true}
@@ -161,12 +163,12 @@ export default function VerifyCode({ returnUrl }) {
 
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500">¿Cambiar email?</span>
+            <span className="text-gray-500">{t("auth.changeEmail")}</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
           <Link href={getReturnUrlPath(safeReturnUrl, "/registrarse")}>
-            <WhiteButton textSmall={true} text="Volver" />
+            <WhiteButton textSmall={true} text={t("common.back")} />
           </Link>
         </form>
       </div>
@@ -174,9 +176,9 @@ export default function VerifyCode({ returnUrl }) {
       <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
-          <p className="text-gray-400 font-semibold text-2xl">Verificación</p>
+          <p className="text-gray-400 font-semibold text-2xl">{t("auth.verification")}</p>
           <h3 className="text-gray-300 text-xl mt-2">
-            Gestioná todos tus negocios desde un solo lugar
+            {t("auth.tagline")}
           </h3>
         </div>
       </div>

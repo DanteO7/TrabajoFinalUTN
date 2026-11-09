@@ -10,8 +10,10 @@ import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
 import { useHasPermission } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function Specialities({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const [inputValue, setInputValue] = useState("");
@@ -40,25 +42,23 @@ export default function Specialities({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Profesiones
+                {t("tenantPages.specialities.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Define las áreas de estudio que ofrecen tus profesores. Cada
-                profesión se asigna a los docentes para que los alumnos conozcan
-                su especialización.
+                {t("tenantPages.specialities.description")}
               </p>
             </div>
 
@@ -67,12 +67,12 @@ export default function Specialities({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar profesión..."
+                  placeholder={t("tenantPages.specialities.search")}
                 />
                 {canCreateSpecialities && (
                   <div className="justify-self-end">
                     <BlackButton
-                      text="+ Nueva profesión"
+                      text={t("tenantPages.specialities.new")}
                       onClick={() => setOpenModal(true)}
                       textSmall={true}
                       wfit={true}
@@ -96,16 +96,16 @@ export default function Specialities({ tenantId }) {
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
-                    Todavía no hay profesiones
+                    {t("tenantPages.specialities.emptyTitle")}
                   </h3>
 
                   <p className="text-gray-500 mt-2 mb-6">
-                    Creá tu primera profesión para comenzar.
+                    {t("tenantPages.specialities.emptyDescription")}
                   </p>
                   {canCreateSpecialities && (
                     <div className="flex items-center justify-center">
                       <BlackButton
-                        text="+ Crear profesión"
+                        text={t("tenantPages.specialities.create")}
                         onClick={() => setOpenModal(true)}
                         textSmall={true}
                         wfit={true}

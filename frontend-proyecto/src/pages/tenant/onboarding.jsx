@@ -39,21 +39,23 @@ import { getSpecialities } from "../../services/speciality";
 import { getStudentPlans } from "../../services/student-plan";
 import { getNews } from "../../services/news";
 import { getTenantById } from "../../services/tenant";
+import { useTranslation } from "react-i18next";
 
 const steps = [
-  { id: "welcome", title: "Bienvenido a TurnoFácil" },
-  { id: "activities", title: "Creá tus actividades" },
-  { id: "firstClass", title: "Creá tu primera clase" },
-  { id: "inviteProfessor", title: "Invitá a un profesor" },
-  { id: "specialities", title: "Creá una profesión" },
-  { id: "studentPlans", title: "Creá un plan para alumnos" },
-  { id: "inviteStudent", title: "Invitá a un alumno" },
-  { id: "firstPayment", title: "Registrá un pago" },
-  { id: "welcomeNews", title: "Publicá una bienvenida" },
-  { id: "finish", title: "¡Todo listo!" },
+  { id: "welcome", titleKey: "stepWelcome" },
+  { id: "activities", titleKey: "stepActivities" },
+  { id: "firstClass", titleKey: "stepFirstClass" },
+  { id: "inviteProfessor", titleKey: "stepProfessor" },
+  { id: "specialities", titleKey: "stepSpecialities" },
+  { id: "studentPlans", titleKey: "stepStudentPlans" },
+  { id: "inviteStudent", titleKey: "stepStudent" },
+  { id: "firstPayment", titleKey: "stepPayment" },
+  { id: "welcomeNews", titleKey: "stepWelcomeNews" },
+  { id: "finish", titleKey: "stepFinish" },
 ];
 
 export default function TenantOnboarding({ tenantId }) {
+  const { t } = useTranslation();
   const isSmallScreen = useMediaQuery("(min-width: 500px)");
   const [paymentDemoCompletedTenantId, setPaymentDemoCompletedTenantId] =
     useState(null);
@@ -187,7 +189,7 @@ export default function TenantOnboarding({ tenantId }) {
   if (isError || !onboarding) {
     return (
       <div className="p-6 flex flex-col items-center text-center gap-4 mt-8">
-        <p>No se pudo cargar la configuración inicial del negocio.</p>
+        <p>{t("tenantOnboarding.loadError")}</p>
         <RedButton
           type="button"
           onClick={() =>
@@ -195,7 +197,7 @@ export default function TenantOnboarding({ tenantId }) {
               queryKey: ["tenant-onboarding", tenantId],
             })
           }
-          text="Reintentar"
+          text={t("tenantOnboarding.retry")}
           wfit
           textSmall
         />
@@ -206,13 +208,15 @@ export default function TenantOnboarding({ tenantId }) {
   if (onboarding.completed) {
     return (
       <div className="mx-auto max-w-2xl p-8 text-center mt-8">
-        <h1 className="text-3xl font-bold">¡Tu negocio está configurado!</h1>
+        <h1 className="text-3xl font-bold">
+          {t("tenantOnboarding.completedTitle")}
+        </h1>
         <p className="my-3">
-          Ya completaste la configuración inicial de TurnoFácil.
+          {t("tenantOnboarding.completedMessage")}
         </p>
 
         <RedButton
-          text="Ir a mi negocio"
+          text={t("tenantOnboarding.goToBusiness")}
           type="button"
           onClick={() => navigate(`/mi-espacio/${tenantId}`)}
           textSmall
@@ -252,7 +256,7 @@ export default function TenantOnboarding({ tenantId }) {
           responseError?.message ||
           responseError?.title ||
           validationErrors ||
-          "No se pudo guardar el progreso. Intentá nuevamente.",
+          t("tenantOnboarding.saveError"),
       );
     } finally {
       navigationRequestInProgress.current = false;
@@ -344,8 +348,7 @@ export default function TenantOnboarding({ tenantId }) {
     case 1:
       stepContent = (
         <p className="mt-4 leading-7 text-gray-600">
-          ¡Bienvenido a TurnoFácil! Vamos a dejar tu espacio listo para que
-          puedas empezar a usarlo.
+          {t("tenantOnboarding.welcome")}
         </p>
       );
       break;
@@ -436,9 +439,7 @@ export default function TenantOnboarding({ tenantId }) {
     default:
       stepContent = (
         <p className="mt-4 text-gray-600">
-          ¡Ya casi está todo listo! Completaste el recorrido inicial de
-          TurnoFácil y tu espacio está preparado para empezar. Cuando quieras,
-          podés continuar a tu espacio y seguir configurando tu negocio.
+          {t("tenantOnboarding.finishMessage")}
         </p>
       );
   }
@@ -448,14 +449,19 @@ export default function TenantOnboarding({ tenantId }) {
       <div className="mt-12 max-w-5xl w-full">
         <div className="mb-8">
           <p className="text-sm font-medium text-[#fc697b]">
-            CONFIGURACIÓN INICIAL
+            {t("tenantOnboarding.configuration")}
           </p>
 
           <div className="mt-2 flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-bold">Configurá tu negocio</h1>
+            <h1 className="text-2xl font-bold">
+              {t("tenantOnboarding.configureBusiness")}
+            </h1>
 
             <span className="shrink-0 text-sm text-gray-500">
-              Paso {currentStep} de {steps.length}
+              {t("tenantOnboarding.stepNumber", {
+                current: currentStep,
+                total: steps.length,
+              })}
             </span>
           </div>
 
@@ -469,14 +475,16 @@ export default function TenantOnboarding({ tenantId }) {
 
         <section className="rounded-lg border border-gray-400 bg-[#EFECF0] p-6 sm:p-8 shadow-md min-[900px]:min-h-100 flex flex-col justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">{step.title}</h2>
+            <h2 className="text-2xl font-semibold">
+              {t(`tenantOnboarding.${step.titleKey}`)}
+            </h2>
 
             {stepContent}
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
             <div className="grid grid-cols-2 w-full gap-2 min-[500px]:flex min-[500px]:justify-between">
               <BlackButton
-                text="Anterior"
+                text={t("tenantOnboarding.previous")}
                 type="button"
                 onClick={handlePrevious}
                 disabled={currentStep === 1 || updateStepMutation.isPending}
@@ -486,7 +494,7 @@ export default function TenantOnboarding({ tenantId }) {
               <div className="hidden min-[500px]:flex gap-2">
                 {!(currentStep === 10) && (
                   <WhiteButton
-                    text="Continuar más tarde"
+                    text={t("tenantOnboarding.later")}
                     type="button"
                     onClick={handleLater}
                     wfit={isSmallScreen}
@@ -499,11 +507,11 @@ export default function TenantOnboarding({ tenantId }) {
                     updateStepMutation.isPending ||
                     completeStepMutation.isPending
                       ? step.id === "finish"
-                        ? "Finalizando..."
-                        : "Guardando..."
+                        ? t("tenantOnboarding.finishPending")
+                        : t("tenantOnboarding.saving")
                       : !(currentStep === 10)
-                        ? "Continuar"
-                        : "Finalizar"
+                        ? t("tenantOnboarding.continue")
+                        : t("tenantOnboarding.finish")
                   }
                   type="button"
                   onClick={handleNext}
@@ -522,9 +530,9 @@ export default function TenantOnboarding({ tenantId }) {
                     updateStepMutation.isPending ||
                     completeStepMutation.isPending
                       ? step.id === "finish"
-                        ? "Finalizando..."
-                        : "Guardando..."
-                      : "Continuar"
+                        ? t("tenantOnboarding.finishPending")
+                        : t("tenantOnboarding.saving")
+                      : t("tenantOnboarding.continue")
                   }
                   type="button"
                   onClick={handleNext}
@@ -540,7 +548,7 @@ export default function TenantOnboarding({ tenantId }) {
             </div>
             <div className="flex w-full min-[500px]:hidden">
               <WhiteButton
-                text="Continuar más tarde"
+                text={t("tenantOnboarding.later")}
                 type="button"
                 onClick={handleLater}
                 wfit={isSmallScreen}

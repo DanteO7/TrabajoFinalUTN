@@ -14,6 +14,8 @@ import FormInput from "../components/inputs/form-input";
 import { GoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 import { getReturnUrlFromLocation, getReturnUrlPath } from "../utils/return-url";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 const getBackendErrorMessage = (data, fallback) => {
   if (typeof data === "string") return data;
@@ -24,6 +26,7 @@ const getBackendErrorMessage = (data, fallback) => {
 };
 
 export default function SignIn() {
+  const { t } = useTranslation();
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [, setLocation] = useLocation();
@@ -59,7 +62,7 @@ export default function SignIn() {
     onError: (error) => {
       const data = error?.response?.data;
       setBackendError(
-        getBackendErrorMessage(data, "Ocurrió un error al iniciar sesión"),
+        getBackendErrorMessage(data, t("auth.signInError")),
       );
       setErrorModal(true);
     },
@@ -87,7 +90,7 @@ export default function SignIn() {
     onError: (error) => {
       const data = error?.response?.data;
       setBackendError(
-        getBackendErrorMessage(data, "No se pudo continuar con Google."),
+        getBackendErrorMessage(data, t("auth.googleSignInError")),
       );
       setErrorModal(true);
     },
@@ -110,10 +113,10 @@ export default function SignIn() {
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
           <p className=" text-gray-400 font-semibold text-2xl">
-            Iniciar sesión
+            {t("auth.signIn")}
           </p>
           <h3 className="text-gray-300 text-xl mt-2">
-            Gestioná todos tus negocios desde un solo lugar
+            {t("auth.tagline")}
           </h3>
         </div>
       </div>
@@ -127,13 +130,13 @@ export default function SignIn() {
             Turno Fácil
           </h2>
           <p className="text-center font-semibold text-gray-700 text-[17px] min-[900px]:text-2xl">
-            Iniciar sesión
+            {t("auth.signIn")}
           </p>
           <div>
             <FormInput
               id="email"
               type="email"
-              placeholder="tu@email.com"
+              placeholder={t("common.emailPlaceholder")}
               register={register("email")}
               error={errors.email}
               disabled={isSubmitting || mutation.isPending}
@@ -143,7 +146,7 @@ export default function SignIn() {
             <FormInput
               id="password"
               type="password"
-              placeholder="Contraseña"
+              placeholder={t("auth.password")}
               register={register("password")}
               error={errors.password}
               disabled={isSubmitting || mutation.isPending}
@@ -152,14 +155,14 @@ export default function SignIn() {
           </div>
 
           <BlackButton
-            text={mutation.isPending ? "Iniciando sesión..." : "Iniciar sesión"}
+            text={mutation.isPending ? t("auth.signingIn") : t("auth.signIn")}
             disabled={isSubmitting || mutation.isPending}
             type="submit"
             textSmall={true}
           />
           <div className="relative">
             <WhiteButton
-              text="Acceder con Google"
+              text={t("auth.continueWithGoogle")}
               disabled={
                 isSubmitting || mutation.isPending || googleMutation.isPending
               }
@@ -178,13 +181,13 @@ export default function SignIn() {
                 }}
                 onError={() => {
                   setBackendError(
-                    "No se pudo conectar con Google. Intentá nuevamente.",
+                    t("auth.googleConnectionError"),
                   );
                   setErrorModal(true);
                 }}
                 text="signin_with"
                 shape="rectangular"
-                locale="es"
+                locale={i18n.language === "en" ? "en" : "es"}
                 width="300"
               />
             </div>
@@ -193,16 +196,16 @@ export default function SignIn() {
             href="/olvide-contraseña"
             className="text-gray-500 cursor-pointer underline"
           >
-            ¿Olvidaste tu contraseña?
+            {t("auth.forgotPassword")}
           </Link>
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500">si no tenes cuenta</span>
+            <span className="text-gray-500">{t("auth.noAccount")}</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
           <Link href={getReturnUrlPath(returnUrl, "/registrarse")}>
             <WhiteButton
-              text="Registrate"
+              text={t("auth.signUp")}
               disabled={isSubmitting || mutation.isPending}
               type="submit"
               textSmall={true}

@@ -1,4 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 export default function ReservationFilter({ filter, setFilter }) {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-3 flex-wrap">
       <button
@@ -7,7 +10,7 @@ export default function ReservationFilter({ filter, setFilter }) {
           filter === "all" ? "bg-[#333] text-white" : ""
         }`}
       >
-        Todas
+        {t("reservationUi.filters.all")}
       </button>
 
       <button
@@ -16,7 +19,7 @@ export default function ReservationFilter({ filter, setFilter }) {
           filter === "pending" ? "bg-[#333] text-white" : ""
         }`}
       >
-        Pendientes
+        {t("reservationUi.filters.pending")}
       </button>
 
       <button
@@ -25,7 +28,7 @@ export default function ReservationFilter({ filter, setFilter }) {
           filter === "completed" ? "bg-[#333] text-white" : ""
         }`}
       >
-        Completadas
+        {t("reservationUi.filters.completed")}
       </button>
     </div>
   );

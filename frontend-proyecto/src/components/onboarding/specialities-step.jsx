@@ -6,8 +6,10 @@ import Loading from "../loading";
 import BlackButton from "../buttons/black-button";
 import SpecialityForm from "../specialities/speciality-form";
 import ProfessorModal from "../professors/professor-modal";
+import { useTranslation } from "react-i18next";
 
 export default function SpecialitiesStep({ tenantId, isComplete }) {
+  const { t } = useTranslation();
   const [openSpecialityForm, setOpenSpecialityForm] = useState(false);
   const [selectedProfessor, setSelectedProfessor] = useState(null);
 
@@ -40,8 +42,7 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
     return (
       <div className="mt-6">
         <p className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-          No se pudieron cargar los profesores o las profesiones. Intentá
-          nuevamente.
+          {t("onboardingSteps.specialitiesLoadError")}
         </p>
         <button
           type="button"
@@ -51,7 +52,7 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
           }}
           className="mt-3 underline"
         >
-          Reintentar
+          {t("onboardingSteps.retry")}
         </button>
       </div>
     );
@@ -61,14 +62,14 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
     <div className="mt-6">
       <p className="text-gray-600">
         {isComplete
-          ? "Listo, ya asignaste una profesión a un profesor."
-          : "Creá al menos una profesión y asignásela a un profesor. Después de guardar la actualización, vas a poder continuar con la configuración."}
+          ? t("onboardingSteps.specialitiesComplete")
+          : t("onboardingSteps.specialitiesDescription")}
       </p>
 
       {!isComplete && (
         <div className="mt-5">
           <BlackButton
-            text="Crear profesión"
+            text={t("onboardingSteps.createProfession")}
             onClick={() => setOpenSpecialityForm(true)}
             wfit
             textSmall
@@ -78,7 +79,9 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
 
       {!isComplete && (
         <div className="mt-8">
-          <h3 className="text-lg font-semibold">Profesores</h3>
+          <h3 className="text-lg font-semibold">
+            {t("onboardingSteps.professors")}
+          </h3>
 
           {professors.length > 0 ? (
             <div className="mt-4 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -101,7 +104,9 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {professor.isActive ? "Activo" : "Inactivo"}
+                      {professor.isActive
+                        ? t("professorModal.active")
+                        : t("professorModal.inactive")}
                     </span>
                   </div>
 
@@ -111,7 +116,9 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
 
                   {professor.specialities.length > 0 && (
                     <div className="mt-4">
-                      <p className="text-xs text-gray-600 mb-2">Profesiones:</p>
+                      <p className="text-xs text-gray-600 mb-2">
+                        {t("onboardingSteps.professions")}
+                      </p>
 
                       <div className="flex flex-wrap gap-1">
                         {professor.specialities.map((speciality) => (
@@ -131,11 +138,10 @@ export default function SpecialitiesStep({ tenantId, isComplete }) {
           ) : (
             <div className="mt-4 flex flex-col items-center justify-center py-12 border border-gray-400 rounded-lg text-center">
               <h3 className="text-xl font-semibold">
-                Todavía no hay profesores
+                {t("onboardingSteps.noProfessors")}
               </h3>
               <p className="text-gray-500 px-2 mt-2">
-                Invitá a un profesor desde el paso anterior para poder asignarle
-                profesiones.
+                {t("onboardingSteps.noProfessorsDescription")}
               </p>
             </div>
           )}

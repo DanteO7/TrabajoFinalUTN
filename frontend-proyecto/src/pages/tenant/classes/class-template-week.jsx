@@ -19,8 +19,11 @@ import SuccessModal from "../../../components/modals/success-modal";
 import ErrorModal from "../../../components/modals/error-modal";
 import ConfirmModal from "../../../components/modals/confirm-modal";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../../utils/formatting";
 
 export default function ClassTemplateWeek({ tenantId }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [openDay, setOpenDay] = useState(null);
@@ -67,13 +70,13 @@ export default function ClassTemplateWeek({ tenantId }) {
   });
 
   const days = [
-    { value: 1, label: "Lunes" },
-    { value: 2, label: "Martes" },
-    { value: 3, label: "Miércoles" },
-    { value: 4, label: "Jueves" },
-    { value: 5, label: "Viernes" },
-    { value: 6, label: "Sábado" },
-    { value: 0, label: "Domingo" },
+    { value: 1, label: t("days.1") },
+    { value: 2, label: t("days.2") },
+    { value: 3, label: t("days.3") },
+    { value: 4, label: t("days.4") },
+    { value: 5, label: t("days.5") },
+    { value: 6, label: t("days.6") },
+    { value: 0, label: t("days.0") },
   ];
 
   const clearSelection = () => {
@@ -223,7 +226,7 @@ export default function ClassTemplateWeek({ tenantId }) {
       clearSelection();
 
       setSuccessMessage(
-        "Las plantillas seleccionadas se eliminaron correctamente.",
+        t("classPages.templateWeek.deleteSuccess"),
       );
       setSuccessModal(true);
 
@@ -235,7 +238,7 @@ export default function ClassTemplateWeek({ tenantId }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar las plantillas.";
+      let msg = t("classPages.templateWeek.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -257,7 +260,7 @@ export default function ClassTemplateWeek({ tenantId }) {
   if (isError) {
     return (
       <div className="mt-10 rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-        No se pudo cargar la semana modelo.
+        {t("classPages.templateWeek.loadError")}
       </div>
     );
   }
@@ -268,7 +271,7 @@ export default function ClassTemplateWeek({ tenantId }) {
         {canCreateClass && (
           <BlackButton
             onClick={() => setOpenCopyWeekModal(true)}
-            text="Copiar semana"
+            text={t("classPages.templateWeek.copyWeek")}
             wfit
             textSmall
           />
@@ -317,8 +320,12 @@ export default function ClassTemplateWeek({ tenantId }) {
                 <span className="text-lg font-semibold">{day.label}</span>
 
                 <span className="text-gray-500">
-                  {classesOfDay.length}{" "}
-                  {classesOfDay.length === 1 ? "clase" : "clases"}
+                  {t(
+                    classesOfDay.length === 1
+                      ? "classPages.classCount_one"
+                      : "classPages.classCount_other",
+                    { count: formatNumber(classesOfDay.length) },
+                  )}
                 </span>
               </button>
 
@@ -359,7 +366,9 @@ export default function ClassTemplateWeek({ tenantId }) {
                             <BlackButton
                               onClick={() => selectAllTemplates(day.value)}
                               text={
-                                allSelected ? "Deseleccionar" : "Seleccionar"
+                                allSelected
+                                  ? t("classPages.templateWeek.deselect")
+                                  : t("classPages.templateWeek.select")
                               }
                               wfit
                               textSmall
@@ -371,8 +380,8 @@ export default function ClassTemplateWeek({ tenantId }) {
                               onClick={() => selectAllTemplates(day.value)}
                               text={
                                 allSelected
-                                  ? "Deseleccionar todo"
-                                  : "Seleccionar todo"
+                                  ? t("classPages.templateWeek.deselectAll")
+                                  : t("classPages.templateWeek.selectAll")
                               }
                               wfit
                               textSmall
@@ -384,7 +393,9 @@ export default function ClassTemplateWeek({ tenantId }) {
                               setActiveSelectionDay(day.value);
                               setShowDeleteConfirmation(true);
                             }}
-                            text={`Eliminar (${selectedCount})`}
+                            text={t("classPages.templateWeek.deleteSelected", {
+                              count: formatNumber(selectedCount),
+                            })}
                             wfit
                             textSmall
                             disabled={
@@ -401,7 +412,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                             setSelectedDay(day.value);
                             setOpenCopyDayModal(true);
                           }}
-                          text="Copiar día"
+                          text={t("classPages.templateWeek.copyDay")}
                           wfit
                           textSmall
                         />
@@ -411,7 +422,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                             setSelectedDay(day.value);
                             setOpenCreateModal(true);
                           }}
-                          text="+ Nueva clase"
+                          text={t("classPages.newClass")}
                           wfit
                           textSmall
                         />
@@ -467,7 +478,7 @@ export default function ClassTemplateWeek({ tenantId }) {
                         </div>
                       ) : (
                         <p className="py-6 text-center text-gray-500">
-                          No hay clases configuradas para este día.
+                          {t("classPages.templateWeek.emptyDay")}
                         </p>
                       )}
                       <button
@@ -528,19 +539,35 @@ export default function ClassTemplateWeek({ tenantId }) {
 
       {showDeleteConfirmation && (
         <ConfirmModal
-          title="¿Eliminar las plantillas seleccionadas?"
-          message={`Vas a eliminar ${
+          title={t("classPages.templateWeek.deleteTitle")}
+          message={t(
             classTemplates.filter(
               (template) =>
                 template.dayOfWeek === activeSelectionDay &&
                 selectedClassTemplateIdSet.has(template.id),
-            ).length
-          } plantillas de ${
-            days.find((day) => day.value === activeSelectionDay)?.label ??
-            "este día"
-          }.\n\nEsta acción no se puede deshacer.`}
-          confirmText="Sí, eliminar"
-          cancelText="Volver"
+            ).length === 1
+              ? "classPages.templateWeek.deleteConfirmation_one"
+              : "classPages.templateWeek.deleteConfirmation_other",
+            {
+              count: classTemplates.filter(
+                (template) =>
+                  template.dayOfWeek === activeSelectionDay &&
+                  selectedClassTemplateIdSet.has(template.id),
+              ).length,
+              countDisplay: formatNumber(
+                classTemplates.filter(
+                  (template) =>
+                    template.dayOfWeek === activeSelectionDay &&
+                    selectedClassTemplateIdSet.has(template.id),
+                ).length,
+              ),
+              day:
+                days.find((day) => day.value === activeSelectionDay)?.label ??
+                t("classPages.thisDay"),
+            },
+          )}
+          confirmText={t("classPages.confirmDelete")}
+          cancelText={t("common.back")}
           isPending={deleteMutation.isPending}
           close={() => {
             if (!deleteMutation.isPending) {

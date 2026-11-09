@@ -1,4 +1,6 @@
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function ClassCard({
   classItem,
@@ -13,6 +15,7 @@ export default function ClassCard({
   onContextMenu,
   onClick,
 }) {
+  const { t } = useTranslation();
   const isFull =
     classItem.reservationsCount != null &&
     classItem.reservationsCount === classItem.maxCapacity;
@@ -43,7 +46,9 @@ export default function ClassCard({
             <button
               type="button"
               aria-label={
-                isSelected ? "Deseleccionar clase" : "Seleccionar clase"
+                isSelected
+                  ? t("classCard.deselect")
+                  : t("classCard.select")
               }
               onClick={(event) => {
                 event.stopPropagation();
@@ -84,7 +89,10 @@ export default function ClassCard({
           </p>
 
           <p className="mt-1 text-gray-500">
-            {studentsCount}/{classItem.maxCapacity} alumnos
+            {t("classModal.availabilityCount", {
+              count: formatNumber(studentsCount),
+              capacity: formatNumber(classItem.maxCapacity),
+            })}
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatMonthYear, getLocale } from "../../utils/formatting";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DayPicker } from "react-day-picker";
 import "../../css/day-picker.css";
@@ -12,6 +13,7 @@ import SuccessModal from "../modals/success-modal";
 
 import { copyClassTemplateDay } from "../../services/class-template";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function CopyClassTemplateDayModal({
   tenantId,
@@ -19,6 +21,7 @@ export default function CopyClassTemplateDayModal({
   close,
   onCopied,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -27,16 +30,6 @@ export default function CopyClassTemplateDayModal({
   const [errorMessage, setErrorMessage] = useState("");
 
   const [successModal, setSuccessModal] = useState(false);
-
-  const days = [
-    "Domingo",
-    "Lunes",
-    "Martes",
-    "Miércoles",
-    "Jueves",
-    "Viernes",
-    "Sábado",
-  ];
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -66,7 +59,7 @@ export default function CopyClassTemplateDayModal({
 
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "No se pudo copiar el día.";
+        error?.response?.data?.message || t("copyTemplate.dayError");
 
       setErrorMessage(message);
       setErrorModal(true);
@@ -80,15 +73,22 @@ export default function CopyClassTemplateDayModal({
     <Modal open onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
       >
         <X size={20} />
       </button>
-      <h2 className="text-2xl font-semibold mb-2">Copiar día</h2>
+      <h2 className="text-2xl font-semibold mb-2">
+        {t("copyTemplate.dayTitle")}
+      </h2>
 
       <p className="text-gray-600 mb-6">
-        Vas a copiar todas las clases del{" "}
-        <span className="font-semibold">{days[dayOfWeek]}</span>.
+        {t("copyTemplate.dayDescription", {
+          day: new Date(2024, 0, 7 + Number(dayOfWeek)).toLocaleDateString(
+            getLocale(),
+            { weekday: "long" },
+          ),
+        })}
       </p>
 
       <div className="flex justify-center">
@@ -105,27 +105,9 @@ export default function CopyClassTemplateDayModal({
           }}
           formatters={{
             formatWeekdayName: (date) => {
-              const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-              return days[date.getDay()];
+              return date.toLocaleDateString(getLocale(), { weekday: "short" });
             },
-            formatCaption: (date) => {
-              const months = [
-                "Enero",
-                "Febrero",
-                "Marzo",
-                "Abril",
-                "Mayo",
-                "Junio",
-                "Julio",
-                "Agosto",
-                "Septiembre",
-                "Octubre",
-                "Noviembre",
-                "Diciembre",
-              ];
-
-              return `${months[date.getMonth()]} ${date.getFullYear()}`;
-            },
+            formatCaption: (date) => formatMonthYear(date),
           }}
           className="copy-day-picker border rounded-2xl shadow-md px-3 py-3"
         />
@@ -133,19 +115,23 @@ export default function CopyClassTemplateDayModal({
 
       {selectedDate && (
         <p className="text-center text-gray-600 mt-4">
-          Fecha seleccionada:{" "}
+          {t("copyTemplate.selectedDate")}{" "}
           <span className="font-semibold">
-            {selectedDate.toLocaleDateString("es-AR")}
+            {selectedDate.toLocaleDateString(getLocale())}
           </span>
         </p>
       )}
 
       <div className="grid grid-cols-2 mt-6 gap-3">
-        <WhiteButton onClick={close} text="Cancelar" textSmall={true} />
+        <WhiteButton
+          onClick={close}
+          text={t("copyTemplate.cancel")}
+          textSmall={true}
+        />
 
         <BlackButton
           onClick={() => mutation.mutate()}
-          text="Copiar día"
+          text={t("copyTemplate.dayTitle")}
           textSmall={true}
           disabled={!selectedDate || mutation.isPending}
         />
@@ -159,7 +145,7 @@ export default function CopyClassTemplateDayModal({
       )}
       {successModal && (
         <SuccessModal
-          message="Día copiado correctamente"
+          message={t("copyTemplate.dayCopied")}
           close={() => setSuccessModal(false)}
           isSuccesOrError
         />

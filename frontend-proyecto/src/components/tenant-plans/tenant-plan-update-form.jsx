@@ -11,8 +11,10 @@ import { updateTenantPlanSchema } from "../../schema/tenant-plans-schema";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function TenantPlanUpdateForm({ planId, plan, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -52,7 +54,7 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
         queryKey: ["tenantById"],
       });
 
-      setSuccessMessage("Plan actualizado correctamente");
+      setSuccessMessage(t("planUi.tenantUpdateSuccess"));
       setSuccessModal(true);
       setBackendError(null);
 
@@ -64,7 +66,7 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el plan";
+      let msg = t("planUi.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -97,38 +99,38 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Actualizar plan
+        {t("planUi.updatePlan")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre del plan"
-          placeholder="Ej: Plan Premium, Plan Basico..."
+          label={t("planUi.name")}
+          placeholder={t("planUi.tenantPlanPlaceholder")}
           register={register("name")}
           error={errors.name}
         />
 
         <FormInput
-          label="Precio"
+          label={t("planUi.price")}
           type="number"
           step="0.01"
-          placeholder="Ej: 3000, 5000..."
+          placeholder={t("planUi.pricePlaceholder")}
           register={register("price")}
           error={errors.price}
         />
 
         <FormInput
-          label="Maximos alumnos"
+          label={t("planUi.maxStudents")}
           type="number"
-          placeholder="Ej: 8, 12, 16..."
+          placeholder={t("planUi.maxCountPlaceholder")}
           register={register("maxStudents")}
           error={errors.maxStudents}
         />
 
         <FormInput
-          label="Maximos profesores"
+          label={t("planUi.maxProfessors")}
           type="number"
-          placeholder="Ej: 8, 12, 16..."
+          placeholder={t("planUi.maxCountPlaceholder")}
           register={register("maxProfessors")}
           error={errors.maxProfessors}
         />
@@ -139,13 +141,13 @@ export default function TenantPlanUpdateForm({ planId, plan, close }) {
             className="h-4 w-4 accent-[#fa7282]"
             {...register("includesExercisesAndRoutines")}
           />
-          <span>Incluye ejercicios y rutinas</span>
+          <span>{t("planUi.includesExercisesRoutines")}</span>
         </label>
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton text={t("common.cancel")} onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Actualizando..." : "Actualizar"}
+            text={mutation.isPending ? t("planUi.updating") : t("planUi.updatePlan")}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

@@ -32,7 +32,9 @@ export default function ThemeSelector() {
           }}
           className="cursor-pointer px-3 py-2 rounded-lg bg-[#ace1f6] dark:bg-[#131934]"
         >
-          {theme.charAt(0).toUpperCase() + theme.slice(1)}
+          {theme === "light"
+            ? t("settings.light")
+            : t("settings.dark")}
         </button>
       </div>
 
@@ -45,7 +47,7 @@ export default function ThemeSelector() {
             }}
             className="block cursor-pointer px-4 w-full py-2 hover:bg-[#9ad5ec] dark:hover:bg-[#0d132c]"
           >
-            Light
+            {t("settings.light")}
           </button>
           <button
             onClick={() => {
@@ -54,7 +56,7 @@ export default function ThemeSelector() {
             }}
             className="block cursor-pointer px-4 py-2 hover:bg-[#9ad5ec] dark:hover:bg-[#0d132c]"
           >
-            Dark
+            {t("settings.dark")}
           </button>
         </div>
       )}

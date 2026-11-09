@@ -10,8 +10,10 @@ import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
 import FormInput from "../components/inputs/form-input";
 import { forgotPasswordSchema } from "../schema/auth-schema";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const [seconds, setSeconds] = useState(0);
   const [errorModal, setErrorModal] = useState(false);
   const [backendError, setBackendError] = useState();
@@ -50,7 +52,7 @@ export default function ForgotPassword() {
       }
 
       const data = error?.response?.data;
-      let msg = "Error al reenviar el código";
+      let msg = t("auth.resendCodeError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -69,9 +71,9 @@ export default function ForgotPassword() {
       <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
-          <p className="text-gray-400 font-semibold text-2xl">Verificación</p>
+          <p className="text-gray-400 font-semibold text-2xl">{t("auth.verification")}</p>
           <h3 className="text-gray-300 text-xl mt-2">
-            Gestioná todos tus negocios desde un solo lugar
+            {t("auth.tagline")}
           </h3>
         </div>
       </div>
@@ -86,12 +88,12 @@ export default function ForgotPassword() {
           </h2>
 
           <p className="text-center text-gray-700 font-semibold text-[17px] min-[900px]:text-2xl">
-            Olvidé mi contraseña
+            {t("auth.forgotPassword")}
           </p>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 mb-1">
-              Ingrese el mail para recuperar su contraseña:
+              {t("auth.recoveryInstructions")}
             </p>
           </div>
 
@@ -99,7 +101,7 @@ export default function ForgotPassword() {
             <FormInput
               id="email"
               type="text"
-              placeholder="tu@email.com"
+              placeholder={t("common.emailPlaceholder")}
               register={register("email")}
               error={errors.email}
             />
@@ -107,14 +109,14 @@ export default function ForgotPassword() {
 
           <BlackButton
             type="button"
-            text={seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar mail"}
+            text={seconds > 0 ? t("auth.resendIn", { seconds }) : t("auth.sendEmail")}
             onClick={() => resendMutation.mutate()}
             disabled={seconds > 0 || resendMutation.isPending}
             textSmall={true}
           />
 
           <Link href="/iniciar-sesion">
-            <WhiteButton textSmall={true} text="Volver" />
+            <WhiteButton textSmall={true} text={t("common.back")} />
           </Link>
         </form>
       </div>

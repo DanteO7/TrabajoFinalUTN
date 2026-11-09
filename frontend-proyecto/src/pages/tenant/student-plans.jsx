@@ -10,8 +10,10 @@ import { useLocation } from "wouter";
 import { IoArrowBack } from "react-icons/io5";
 import BlackButton from "../../components/buttons/black-button";
 import { useHasPermission } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function StudentPlans({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
@@ -49,11 +51,11 @@ export default function StudentPlans({ tenantId }) {
             className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
           >
             <IoArrowBack color="#fc697b" />
-            Volver
+            {t("common.back")}
           </button>
 
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         </div>
       </MainLayout>
@@ -68,22 +70,21 @@ export default function StudentPlans({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         <div className="mb-6 flex flex-col gap-3 min-[900px]:gap-5">
           <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
-            Planes de alumno
+            {t("tenantPages.studentPlans.title")}
           </h1>
           <div className="flex max-[900px]:flex-col justify-between gap-3 min-[900px]:items-center">
             <p className="text-gray-500">
-              Desde acá podés administrar todos los planes de alumnos del
-              negocio.
+              {t("tenantPages.studentPlans.description")}
             </p>
 
             {canCreateStudentPlan && (
               <BlackButton
-                text="+ Nuevo plan"
+                text={t("tenantPages.studentPlans.new")}
                 onClick={() => setOpenCreateForm(true)}
                 textSmall={true}
                 wfit={true}
@@ -104,16 +105,18 @@ export default function StudentPlans({ tenantId }) {
             ))
           ) : (
             <div className="col-span-full border border-gray-400 rounded-lg py-16 text-center">
-              <h3 className="text-xl font-semibold">No hay planes</h3>
+              <h3 className="text-xl font-semibold">
+                {t("tenantPages.studentPlans.emptyTitle")}
+              </h3>
 
               <p className="text-gray-500 mt-2 mb-6">
-                Creá un nuevo plan para comenzar.
+                {t("tenantPages.studentPlans.emptyDescription")}
               </p>
 
               {canCreateStudentPlan && (
                 <div className="flex items-center justify-center">
                   <BlackButton
-                    text="+ Crear plan"
+                    text={t("tenantPages.studentPlans.create")}
                     onClick={() => setOpenCreateForm(true)}
                     textSmall={true}
                     wfit={true}

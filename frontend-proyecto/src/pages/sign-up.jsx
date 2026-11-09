@@ -14,8 +14,11 @@ import { useTenantStore } from "../store/tenant-store";
 import { useAuthStore } from "../store/auth-store";
 import { FcGoogle } from "react-icons/fc";
 import { getReturnUrlPath, getSafeReturnUrl } from "../utils/return-url";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 
 export default function SignUp({ returnUrl }) {
+  const { t } = useTranslation();
   const { login } = useAuthStore();
   const clearPermissions = useTenantStore((state) => state.clearPermissions);
   const [, setLocation] = useLocation();
@@ -43,7 +46,7 @@ export default function SignUp({ returnUrl }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Error al enviar el código";
+      let msg = t("auth.sendCodeError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -76,7 +79,7 @@ export default function SignUp({ returnUrl }) {
       const msg =
         typeof data === "string"
           ? data
-          : data?.message || "No se pudo continuar con Google.";
+          : data?.message || t("auth.googleSignInError");
 
       setBackendError(msg);
       setErrorModal(true);
@@ -100,14 +103,14 @@ export default function SignUp({ returnUrl }) {
             Turno Fácil
           </h2>
           <p className="text-center text-gray-700 font-semibold text-[17px] min-[900px]:text-2xl">
-            Registrarse
+            {t("auth.signUp")}
           </p>
 
           <div>
             <FormInput
               id="name"
               type="text"
-              placeholder="Nombre"
+              placeholder={t("auth.name")}
               register={register("name")}
               error={errors.name}
               disabled={isSubmitting || mutation.isPending}
@@ -118,7 +121,7 @@ export default function SignUp({ returnUrl }) {
             <FormInput
               id="surname"
               type="text"
-              placeholder="Apellido"
+              placeholder={t("auth.surname")}
               register={register("surname")}
               error={errors.surname}
               disabled={isSubmitting || mutation.isPending}
@@ -129,7 +132,7 @@ export default function SignUp({ returnUrl }) {
             <FormInput
               id="email"
               type="email"
-              placeholder="tu@email.com"
+              placeholder={t("common.emailPlaceholder")}
               register={register("email")}
               error={errors.email}
               disabled={isSubmitting || mutation.isPending}
@@ -140,7 +143,7 @@ export default function SignUp({ returnUrl }) {
             <FormInput
               id="password"
               type="password"
-              placeholder="Contraseña"
+              placeholder={t("auth.password")}
               register={register("password")}
               error={errors.password}
               disabled={isSubmitting || mutation.isPending}
@@ -152,7 +155,7 @@ export default function SignUp({ returnUrl }) {
             <FormInput
               id="confirmPassword"
               type="password"
-              placeholder="Repite la Contraseña"
+              placeholder={t("auth.repeatPassword")}
               register={register("confirmPassword")}
               error={errors.confirmPassword}
               disabled={isSubmitting || mutation.isPending}
@@ -162,13 +165,13 @@ export default function SignUp({ returnUrl }) {
 
           <BlackButton
             type="submit"
-            text={mutation.isPending ? "Enviando..." : "Continuar"}
+            text={mutation.isPending ? t("auth.sending") : t("auth.continue")}
             disabled={isSubmitting || mutation.isPending}
             textSmall={true}
           />
           <div className="relative">
             <WhiteButton
-              text="Acceder con Google"
+              text={t("auth.continueWithGoogle")}
               disabled={
                 isSubmitting || mutation.isPending || googleMutation.isPending
               }
@@ -187,25 +190,25 @@ export default function SignUp({ returnUrl }) {
                 }}
                 onError={() => {
                   setBackendError(
-                    "No se pudo conectar con Google. Intentá nuevamente.",
+                    t("auth.googleConnectionError"),
                   );
                   setErrorModal(true);
                 }}
                 text="signin_with"
                 shape="rectangular"
-                locale="es"
+                locale={i18n.language === "en" ? "en" : "es"}
                 width="300"
               />
             </div>
           </div>
           <div className="flex items-center gap-3 my-3">
             <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500">si ya tienes cuenta</span>
+            <span className="text-gray-500">{t("auth.haveAccount")}</span>
             <div className="flex-1 h-px bg-gray-300"></div>
           </div>
 
           <Link href={getReturnUrlPath(safeReturnUrl, "/iniciar-sesion")}>
-            <WhiteButton textSmall={true} text="Inicia sesión" />
+            <WhiteButton textSmall={true} text={t("auth.signIn")} />
           </Link>
         </form>
       </div>
@@ -213,9 +216,9 @@ export default function SignUp({ returnUrl }) {
       <div className="hidden min-[900px]:flex w-[60%] pt-2 bg-[linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),url('/fondo-inicio.webp')] bg-size-[100%_auto] bg-no-repeat bg-position-[50%_center] flex-col">
         <div className="text-center flex flex-col w-full item-center mt-10">
           <h2 className="text-4xl font-bold text-[#efefef]">Turno Fácil</h2>
-          <p className="text-gray-400 font-semibold text-2xl">Registrarse</p>
+          <p className="text-gray-400 font-semibold text-2xl">{t("auth.signUp")}</p>
           <h3 className="text-gray-300 text-xl mt-2">
-            Gestioná todos tus negocios desde un solo lugar
+            {t("auth.tagline")}
           </h3>
         </div>
       </div>

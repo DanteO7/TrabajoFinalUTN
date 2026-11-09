@@ -9,23 +9,11 @@ import Loading from "../components/loading";
 import PaymentCard from "../components/payments/payment-card";
 import BlackButton from "../components/buttons/black-button";
 import PaymentForm from "../components/payments/payment-form";
-
-const MONTHS = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
+import { useTranslation } from "react-i18next";
+import { formatMonthYear } from "../utils/formatting";
 
 export default function AppPayments() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const now = new Date();
@@ -35,6 +23,8 @@ export default function AppPayments() {
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const monthDate = new Date(selectedYear, selectedMonth - 1, 1);
+  const monthYear = formatMonthYear(monthDate);
 
   const {
     data: payments = [],
@@ -71,20 +61,22 @@ export default function AppPayments() {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("adminPayments.accessDenied")}
           </div>
         ) : (
           <>
             <div>
-              <h1 className="text-4xl min-[900px]:text-5xl font-bold">Pagos</h1>
+              <h1 className="text-4xl min-[900px]:text-5xl font-bold">
+                {t("adminPayments.title")}
+              </h1>
 
               <p className="text-gray-500 mt-3">
-                Consultá los pagos realizados por los negocios a TurnoFácil.
+                {t("adminPayments.description")}
               </p>
             </div>
 
@@ -96,21 +88,21 @@ export default function AppPayments() {
                   <button
                     onClick={goToPreviousMonth}
                     className="p-2 rounded-full transition cursor-pointer"
-                    aria-label="Mes anterior"
+                    aria-label={t("adminPayments.previousMonth")}
                   >
                     <FaChevronLeft size={22} color="#fc697b" />
                   </button>
 
                   <div className="min-w-47.5 text-center">
                     <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
-                      {MONTHS[selectedMonth - 1]} {selectedYear}
+                      {monthYear}
                     </p>
                   </div>
 
                   <button
                     onClick={goToNextMonth}
                     className="p-2 rounded-full transition cursor-pointer"
-                    aria-label="Mes siguiente"
+                    aria-label={t("adminPayments.nextMonth")}
                   >
                     <FaChevronRight size={22} color="#fc697b" />
                   </button>
@@ -118,18 +110,18 @@ export default function AppPayments() {
                 <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-4 mt-8">
                   <div>
                     <h2 className="text-2xl font-semibold">
-                      Pagos de los negocios
+                      {t("adminPayments.businessPayments")}
                     </h2>
 
                     <p className="text-gray-500 mt-1">
-                      {payments.length}{" "}
-                      {payments.length === 1 ? "pago" : "pagos"} en{" "}
-                      {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                      {selectedYear}.
+                      {t("adminPayments.count", {
+                        count: payments.length,
+                        monthYear,
+                      })}
                     </p>
                   </div>
                   <BlackButton
-                    text="+ Registrar pago"
+                    text={t("adminPayments.register")}
                     onClick={() => setOpenCreateModal(true)}
                     textSmall={true}
                     wfit={true}
@@ -148,9 +140,7 @@ export default function AppPayments() {
                     ))
                   ) : (
                     <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                      No hay pagos registrados en{" "}
-                      {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                      {selectedYear}.
+                      {t("adminPayments.empty", { monthYear })}
                     </div>
                   )}
                 </div>

@@ -1,11 +1,15 @@
 import { Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SearchInput({
   value,
   onChange,
-  placeholder = "Buscar...",
+  placeholder,
   className = "",
 }) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("common.searchPlaceholder");
+
   return (
     <div className={`relative w-full sm:max-w-md ${className}`}>
       <Search
@@ -17,7 +21,7 @@ export default function SearchInput({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className="w-full text-gray-600 rounded-lg px-10 py-1.75 bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:ring-[#fc697b] focus:border-transparent transition-[border-color,box-shadow] duration-200"
       />
 

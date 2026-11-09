@@ -11,8 +11,10 @@ import { createSpecialitySchema } from "../../schema/speciality-schema";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function SpecialityForm({ tenantId, close, onCreated }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -39,7 +41,7 @@ export default function SpecialityForm({ tenantId, close, onCreated }) {
       });
 
       onCreated?.();
-      setSuccessMessage("Especialidad creada correctamente");
+      setSuccessMessage(t("specialityForm.created"));
       setSuccessModal(true);
       setBackendError(null);
 
@@ -51,7 +53,7 @@ export default function SpecialityForm({ tenantId, close, onCreated }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear la especialidad";
+      let msg = t("specialityForm.createError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -81,28 +83,36 @@ export default function SpecialityForm({ tenantId, close, onCreated }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear una profesión
+        {t("specialityForm.createTitle")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre de la profesión"
-          placeholder="Ej: Kinesiólogo, Instructor de Pilates..."
+          label={t("specialityForm.name")}
+          placeholder={t("specialityForm.namePlaceholder")}
           register={register("name")}
           error={errors.name}
         />
         <FormInput
           textarea
-          label="Descripción (opcional)"
+          label={t("specialityForm.description")}
           register={register("description")}
           error={errors.description}
-          placeholder="Explicación de la profesión..."
+          placeholder={t("specialityForm.descriptionPlaceholder")}
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton
+            text={t("specialityForm.cancel")}
+            onClick={close}
+            textSmall={true}
+          />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear"}
+            text={
+              mutation.isPending
+                ? t("specialityForm.creating")
+                : t("specialityForm.create")
+            }
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

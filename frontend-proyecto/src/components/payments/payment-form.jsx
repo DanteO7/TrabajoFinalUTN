@@ -11,6 +11,8 @@ import SuccessModal from "../modals/success-modal";
 import SelectStudentPaymentModal from "./select-student-payment-modal";
 import { X } from "lucide-react";
 import { createPaymentSchema } from "../../schema/payment-schema";
+import { formatCurrency } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentForm({
   tenantId,
@@ -19,6 +21,7 @@ export default function PaymentForm({
   demoMode = false,
   onDemoCompleted,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [selected, setSelected] = useState(null);
@@ -71,7 +74,7 @@ export default function PaymentForm({
         });
       }
 
-      setSuccessMessage("Pago registrado correctamente");
+      setSuccessMessage(t("paymentForm.success"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -82,7 +85,7 @@ export default function PaymentForm({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al registrar el pago";
+      let msg = t("paymentForm.error");
 
       if (typeof data === "string") {
         msg = data;
@@ -105,7 +108,7 @@ export default function PaymentForm({
 
       setDemoCompleted(true);
       setSuccessMessage(
-        "La demostración se completó correctamente. No se registró ningún pago real.",
+        t("paymentForm.demoSuccess"),
       );
       setSuccessModal(true);
       onDemoCompleted?.();
@@ -146,7 +149,7 @@ export default function PaymentForm({
     }
 
     if (!selected.user) {
-      return `Alumno #${selected.id}`;
+      return t("paymentForm.studentNumber", { id: selected.id });
     }
 
     return `${selected.user.name} ${selected.user.surname}`;
@@ -162,25 +165,31 @@ export default function PaymentForm({
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-semibold text-gray-900">Registrar pago</h2>
+        <h2 className="text-xl font-semibold text-gray-900">
+          {t("paymentForm.title")}
+        </h2>
 
         <p className="mt-1 text-sm text-gray-500">
           {isAdmin
-            ? "Registrá el pago mensual de un negocio."
-            : "Registrá el pago mensual de un alumno."}
+            ? t("paymentForm.adminDescription")
+            : t("paymentForm.studentDescription")}
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
-            {isAdmin ? "Negocio" : "Alumno"}
+            {isAdmin ? t("paymentForm.business") : t("paymentForm.student")}
           </label>
 
           {!selected ? (
             <BlackButton
               type="button"
-              text={isAdmin ? "Seleccionar negocio" : "Seleccionar alumno"}
+              text={
+                isAdmin
+                  ? t("paymentForm.selectBusiness")
+                  : t("paymentForm.selectStudent")
+              }
               textSmall={true}
               onClick={() => setSelectModal(true)}
               wfit={true}
@@ -190,7 +199,9 @@ export default function PaymentForm({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-medium tracking-wide text-gray-500">
-                    {isAdmin ? "NEGOCIO SELECCIONADO" : "ALUMNO SELECCIONADO"}
+                    {isAdmin
+                      ? t("paymentForm.selectedBusiness")
+                      : t("paymentForm.selectedStudent")}
                   </p>
 
                   <p className="mt-1 font-medium text-gray-900">
@@ -212,7 +223,7 @@ export default function PaymentForm({
                   type="button"
                   onClick={() => setSelected(null)}
                   className="shrink-0 text-gray-500 hover:text-black cursor-pointer transition"
-                  title="Quitar selección"
+                  title={t("paymentForm.removeSelection")}
                 >
                   <X size={20} />
                 </button>
@@ -230,16 +241,16 @@ export default function PaymentForm({
         {!isAdmin && selected && (
           <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
-              PLAN ACTUAL
+              {t("paymentForm.currentPlan")}
             </p>
 
             <p className="mt-1 font-medium text-gray-900">
-              {selected.studentPlan?.name || "Plan sin nombre"}
+              {selected.studentPlan?.name || t("paymentForm.unnamedPlan")}
             </p>
 
             {selected.studentPlan?.price != null && (
               <p className="mt-1 text-sm text-gray-600">
-                ${selected.studentPlan.price}
+                {formatCurrency(selected.studentPlan.price)}
               </p>
             )}
           </div>
@@ -248,16 +259,16 @@ export default function PaymentForm({
         {isAdmin && selected && (
           <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
             <p className="text-xs font-medium tracking-wide text-gray-500">
-              PLAN ACTUAL
+              {t("paymentForm.currentPlan")}
             </p>
 
             <p className="mt-1 font-medium text-gray-900">
-              {selected.tenantPlan?.name || "Plan sin nombre"}
+              {selected.tenantPlan?.name || t("paymentForm.unnamedPlan")}
             </p>
 
             {selected.tenantPlan?.price != null && (
               <p className="mt-1 text-sm text-gray-600">
-                ${selected.tenantPlan.price}
+                {formatCurrency(selected.tenantPlan.price)}
               </p>
             )}
           </div>
@@ -265,20 +276,20 @@ export default function PaymentForm({
 
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">
-            Método de pago
+            {t("paymentForm.paymentMethod")}
           </label>
 
           <select
             {...register("paymentMethod")}
             className="rounded-lg w-full px-3 pt-1.75 pb-2 shadow-md text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
           >
-            <option value="">Seleccionar método</option>
+            <option value="">{t("paymentForm.selectMethod")}</option>
 
-            <option value="Cash">Efectivo</option>
+            <option value="Cash">{t("paymentForm.cash")}</option>
 
-            <option value="Bank Transfer">Transferencia</option>
+            <option value="Bank Transfer">{t("paymentForm.transfer")}</option>
 
-            <option value="Debit Card">Tarjeta de débito</option>
+            <option value="Debit Card">{t("paymentForm.debitCard")}</option>
           </select>
 
           {errors.paymentMethod && (
@@ -290,7 +301,7 @@ export default function PaymentForm({
 
         <div className="grid grid-cols-2 gap-3 mt-8">
           <WhiteButton
-            text="Cancelar"
+            text={t("paymentForm.cancel")}
             textSmall={true}
             onClick={close}
             disabled={mutation.isPending}
@@ -298,7 +309,11 @@ export default function PaymentForm({
 
           <BlackButton
             type="submit"
-            text={mutation.isPending ? "Registrando..." : "Registrar"}
+            text={
+              mutation.isPending
+                ? t("paymentForm.registering")
+                : t("paymentForm.register")
+            }
             textSmall={true}
             disabled={mutation.isPending || !selected || demoCompleted}
           />

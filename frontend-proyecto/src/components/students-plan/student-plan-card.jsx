@@ -7,8 +7,11 @@ import { deleteStudentPlan } from "../../services/student-plan";
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import { useHasPermission } from "../../store/tenant-store";
+import { formatCurrency, formatNumber } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function StudentPlanCard({ plan, tenantId, onEdit }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [backendError, setBackendError] = useState();
   const [errorModal, setErrorModal] = useState(false);
@@ -36,7 +39,7 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
       setConfirmModal(false);
 
       const data = error?.response?.data;
-      let msg = "Error al eliminar el plan";
+      let msg = t("studentPlanCard.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -57,13 +60,15 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
             <h3 className="text-xl font-semibold text-[#333]">{plan.name}</h3>
 
             <p className="text-sm text-gray-500 mt-2">
-              {plan.classesPerMonth} clases/mes
+              {t("studentPlanCard.classesPerMonth", {
+                count: formatNumber(plan.classesPerMonth),
+              })}
             </p>
           </div>
 
           <div className="text-right">
             <p className="text-2xl font-bold text-[#333]">
-              ${plan.price.toLocaleString("es-AR")}
+              {formatCurrency(plan.price)}
             </p>
           </div>
         </div>
@@ -72,7 +77,7 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
           <div className="flex gap-2">
             {canDeleteStudentPlan && (
               <RedButton
-                text="Eliminar"
+                text={t("studentPlanCard.delete")}
                 disabled={deleteMutation.isPending}
                 onClick={() => setConfirmModal(true)}
                 textSmall={true}
@@ -82,7 +87,7 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
 
             {canUpdateStudentPlan && (
               <BlackButton
-                text="Editar"
+                text={t("studentPlanCard.edit")}
                 onClick={() => onEdit(plan)}
                 textSmall={true}
                 img={<Pencil size={18} />}
@@ -94,8 +99,8 @@ export default function StudentPlanCard({ plan, tenantId, onEdit }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar este plan?"
-          message={`Estás por eliminar el plan "${plan.name}". Esta acción no se puede deshacer.`}
+          title={t("studentPlanCard.confirmTitle")}
+          message={t("studentPlanCard.confirmMessage", { name: plan.name })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

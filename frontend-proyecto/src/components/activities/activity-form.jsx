@@ -11,8 +11,10 @@ import { createActivitySchema } from "../../schema/activity-schema";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function ActivityForm({ tenantId, close, onCreated }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -37,7 +39,7 @@ export default function ActivityForm({ tenantId, close, onCreated }) {
         queryKey: ["getActivities", tenantId],
       });
       onCreated?.();
-      setSuccessMessage("Actividad creada correctamente");
+      setSuccessMessage(t("activities.created"));
       setSuccesModal(true);
       setBackendError(null);
 
@@ -47,7 +49,7 @@ export default function ActivityForm({ tenantId, close, onCreated }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al crear la actividad";
+      let msg = t("activities.createError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -80,29 +82,29 @@ export default function ActivityForm({ tenantId, close, onCreated }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear una actividad
+        {t("activities.createTitle")}
       </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre de la actividad"
+          label={t("activities.name")}
           id="name"
-          placeholder="Ej: Pilates, Bicicleta, etc."
+          placeholder={t("activities.example")}
           register={register("name")}
           error={errors.name}
         />
 
         <FormInput
           textarea
-          label="Descripción (opcional)"
+          label={t("activities.descriptionOptional")}
           register={register("description")}
           error={errors.description}
-          placeholder="Explicación de la actividad..."
+          placeholder={t("activities.descriptionPlaceholder")}
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton text={t("common.cancel")} onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear actividad"}
+            text={mutation.isPending ? t("activities.creating") : t("activities.createTitle")}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

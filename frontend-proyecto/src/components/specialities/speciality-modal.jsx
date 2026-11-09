@@ -15,8 +15,10 @@ import FormInput from "../inputs/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateSpecialitySchema } from "../../schema/speciality-schema";
 import { useHasPermission } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function SpecialityModal({ speciality, tenantId, close }) {
+  const { t } = useTranslation();
   const canUpdateSpeciality = useHasPermission(tenantId, "SPECIALITY_UPDATE");
   const canDeleteSpeciality = useHasPermission(tenantId, "SPECIALITY_DELETE");
 
@@ -57,7 +59,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
       setConfirmModal(false);
 
-      setSuccessMessage("Profesión eliminada correctamente");
+      setSuccessMessage(t("specialityModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -69,7 +71,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
       setConfirmModal(false);
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la profesión";
+      let msg = t("specialityModal.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -89,7 +91,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         queryKey: ["getSpecialities", tenantId],
       });
 
-      setSuccessMessage("Profesión actualizada correctamente");
+      setSuccessMessage(t("specialityModal.updateSuccess"));
       setSuccessModal(true);
 
       setCurrentSpeciality(updatedSpeciality);
@@ -106,7 +108,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la profesión";
+      let msg = t("specialityModal.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -138,7 +140,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
           </h2>
 
           <p className="text-gray-600 whitespace-pre-wrap">
-            {currentSpeciality.description || "Sin descripción"}
+            {currentSpeciality.description || t("specialityModal.noDescription")}
           </p>
 
           {(canUpdateSpeciality || canDeleteSpeciality) && (
@@ -147,7 +149,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
             >
               {canDeleteSpeciality && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("specialityModal.delete")}
                   disabled={deleteMutation.isPending}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -157,7 +159,7 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
               {canUpdateSpeciality && (
                 <BlackButton
-                  text="Editar"
+                  text={t("specialityModal.edit")}
                   onClick={() => setEditing(true)}
                   textSmall={true}
                   img={<Pencil size={18} />}
@@ -168,26 +170,28 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
         </>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-center">Editar</h2>
+          <h2 className="text-2xl font-semibold text-center">
+            {t("specialityModal.edit")}
+          </h2>
 
           <FormInput
-            label="Nombre"
-            placeholder="Ej: Kinesiólogo, Instructor de Pilates..."
+            label={t("specialityModal.name")}
+            placeholder={t("specialityModal.namePlaceholder")}
             register={register("name")}
             error={errors.name}
           />
 
           <FormInput
             textarea
-            label="Descripción (opcional)"
+            label={t("specialityModal.description")}
             register={register("description")}
             error={errors.description}
-            placeholder="Explicación de la profesón..."
+            placeholder={t("specialityModal.descriptionPlaceholder")}
           />
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("specialityModal.cancel")}
               onClick={() => {
                 reset();
                 setEditing(false);
@@ -195,7 +199,11 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
               textSmall={true}
             />
             <BlackButton
-              text={mutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                mutation.isPending
+                  ? t("specialityModal.updating")
+                  : t("specialityModal.update")
+              }
               type="submit"
               disabled={mutation.isPending}
               textSmall={true}
@@ -206,8 +214,10 @@ export default function SpecialityModal({ speciality, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar esta profesión?"
-          message={`Estás por eliminar la profesion "${speciality.name}". Esta acción no se puede deshacer.`}
+          title={t("specialityModal.confirmTitle")}
+          message={t("specialityModal.confirmMessage", {
+            name: speciality.name,
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

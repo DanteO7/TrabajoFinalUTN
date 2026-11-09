@@ -11,8 +11,10 @@ import { createStudentPlanSchema } from "../../schema/students-plan-schema";
 import { createStudentPlan } from "../../services/student-plan";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
+import { useTranslation } from "react-i18next";
 
 export default function StudentPlanForm({ tenantId, close, onCreated }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -39,7 +41,7 @@ export default function StudentPlanForm({ tenantId, close, onCreated }) {
       });
 
       onCreated?.();
-      setSuccessMessage("Plan creado correctamente");
+      setSuccessMessage(t("planUi.studentCreateSuccess"));
       setSuccessModal(true);
       setBackendError(null);
 
@@ -51,7 +53,7 @@ export default function StudentPlanForm({ tenantId, close, onCreated }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear el plan";
+      let msg = t("planUi.createError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -83,38 +85,38 @@ export default function StudentPlanForm({ tenantId, close, onCreated }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear un plan de alumno
+        {t("planUi.createStudentPlan")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre del plan"
-          placeholder="Ej: Plan Mensual, Plan Trimestral..."
+          label={t("planUi.name")}
+          placeholder={t("planUi.studentPlanPlaceholder")}
           register={register("name")}
           error={errors.name}
         />
 
         <FormInput
-          label="Clases por mes"
+          label={t("planUi.classesPerMonth")}
           type="number"
-          placeholder="Ej: 8, 12, 16..."
+          placeholder={t("planUi.classesPlaceholder")}
           register={register("classesPerMonth")}
           error={errors.classesPerMonth}
         />
 
         <FormInput
-          label="Precio"
+          label={t("planUi.price")}
           type="number"
           step="0.01"
-          placeholder="Ej: 3000, 5000..."
+          placeholder={t("planUi.pricePlaceholder")}
           register={register("price")}
           error={errors.price}
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton text={t("common.cancel")} onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear plan"}
+            text={mutation.isPending ? t("planUi.creating") : t("planUi.createPlan")}
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

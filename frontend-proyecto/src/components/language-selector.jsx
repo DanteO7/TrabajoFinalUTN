@@ -32,7 +32,9 @@ export default function LanguageSelector() {
           }}
           className="cursor-pointer px-3 py-2 rounded-lg bg-[#ace1f6] dark:bg-[#131934]"
         >
-          {language === "en" ? "Inglés (EN)" : "Español (ES)"}
+          {language === "en"
+            ? t("settings.english")
+            : t("settings.spanish")}
         </button>
       </div>
 
@@ -45,7 +47,7 @@ export default function LanguageSelector() {
             }}
             className="block cursor-pointer px-4 w-full py-2 hover:bg-[#9ad5ec] dark:hover:bg-[#0d132c]"
           >
-            Español (ES)
+            {t("settings.spanish")}
           </button>
           <button
             onClick={() => {
@@ -54,7 +56,7 @@ export default function LanguageSelector() {
             }}
             className="block cursor-pointer px-4 py-2 hover:bg-[#9ad5ec] dark:hover:bg-[#0d132c]"
           >
-            Ingles (EN)
+            {t("settings.english")}
           </button>
         </div>
       )}

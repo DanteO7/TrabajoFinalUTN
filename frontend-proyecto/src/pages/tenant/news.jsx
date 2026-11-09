@@ -7,10 +7,13 @@ import Loading from "../../components/loading";
 import BlackButton from "../../components/buttons/black-button";
 import { useHasPermission } from "../../store/tenant-store";
 import { useState } from "react";
+import { getLocale } from "../../utils/formatting";
 import NewsForm from "../../components/news/news-form";
 import NewsModal from "../../components/news/news-modal";
+import { useTranslation } from "react-i18next";
 
 export default function News({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [openCreateModal, setOpenCreateModal] = useState();
@@ -49,35 +52,31 @@ export default function News({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Novedades
+                {t("tenantPages.news.title")}
               </h1>
 
               <div className="grid min-[900px]:grid-cols-2 gap-4">
                 <p className="text-gray-500 mt-3">
                   {canCreateNews ? (
                     <>
-                      Comparte anuncios y novedades de tu negocio. Los alumnos
-                      recibirán notificaciones y verán un contador de mensajes
-                      sin leer.
+                      {t("tenantPages.news.adminDescription")}
                     </>
                   ) : (
                     <>
-                      Aquí encontrarás todas las novedades y anuncios
-                      importantes de tu negocio. No te pierdas ninguna
-                      actualización.
+                      {t("tenantPages.news.studentDescription")}
                     </>
                   )}
                 </p>
@@ -85,7 +84,7 @@ export default function News({ tenantId }) {
                 {canCreateNews && (
                   <div className="h-fit min-[900px]:justify-self-end">
                     <BlackButton
-                      text="+ Nueva Noticia"
+                      text={t("tenantPages.news.new")}
                       onClick={() => setOpenCreateModal(true)}
                       textSmall={true}
                       wfit={true}
@@ -128,25 +127,25 @@ export default function News({ tenantId }) {
                     </div>
 
                     <p className="text-xs text-gray-500 mt-2">
-                      {new Date(novedad.createdAt).toLocaleDateString("es-AR")}
+                      {new Date(novedad.createdAt).toLocaleDateString(getLocale())}
                     </p>
                   </div>
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
-                    Todavía no hay noticias
+                    {t("tenantPages.news.emptyTitle")}
                   </h3>
 
                   {canCreateNews ? (
                     <>
                       <p className="text-gray-500 mt-2 mb-6">
-                        Creá noticias para avisar a tus alumnos.
+                        {t("tenantPages.news.createPrompt")}
                       </p>
 
                       <div className="flex items-center justify-center">
                         <BlackButton
-                          text="+ Crear"
+                          text={t("tenantPages.news.create")}
                           onClick={() => setOpenCreateModal(true)}
                           textSmall={true}
                           wfit={true}
@@ -155,7 +154,7 @@ export default function News({ tenantId }) {
                     </>
                   ) : (
                     <p className="text-gray-500 mt-2 mb-6">
-                      Todavía no hay noticias subidas.
+                      {t("tenantPages.news.noNews")}
                     </p>
                   )}
                 </div>

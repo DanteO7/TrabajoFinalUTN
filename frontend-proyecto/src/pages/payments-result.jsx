@@ -5,8 +5,10 @@ import Loading from "../components/loading";
 import RedButton from "../components/buttons/red-button";
 import ColorButton from "../components/buttons/color-button";
 import { getPayment } from "../services/payment";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentsResult() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
 
   const params = new URLSearchParams(window.location.search);
@@ -38,13 +40,13 @@ export default function PaymentsResult() {
       <MainLayout>
         <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
-            No se pudo consultar el pago
+            {t("payments.result.lookupError")}
           </h1>
 
-          <p>No pudimos encontrar la información de este pago.</p>
+          <p>{t("payments.result.notFound")}</p>
 
           <RedButton
-            text="Volver a pagos"
+            text={t("payments.backToPayments")}
             textSmall
             onClick={() => navigate("/")}
           />
@@ -62,13 +64,13 @@ export default function PaymentsResult() {
       <MainLayout>
         <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#1fc762] min-[900px]:text-2xl">
-            ¡Pago realizado correctamente!
+            {t("payments.result.approvedTitle")}
           </h1>
 
-          <p>Tu pago fue aprobado correctamente.</p>
+          <p>{t("payments.result.approved")}</p>
 
           <ColorButton
-            text="Volver a pagos"
+            text={t("payments.backToPayments")}
             textSmall
             onClick={goToPayments}
             bgColor="#1fc762"
@@ -86,16 +88,15 @@ export default function PaymentsResult() {
       <MainLayout>
         <div className="border border-gray-400 mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#e5a400] min-[900px]:text-2xl">
-            Pago pendiente
+            {t("payments.result.pendingTitle")}
           </h1>
 
           <p>
-            El pago todavía no fue confirmado. Esto puede demorar unos
-            instantes.
+            {t("payments.result.pending")}
           </p>
 
           <ColorButton
-            text="Volver a pagos"
+            text={t("payments.backToPayments")}
             textSmall
             onClick={goToPayments}
             bgColor="#e5a400"
@@ -113,12 +114,12 @@ export default function PaymentsResult() {
       <MainLayout>
         <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
-            Pago rechazado
+            {t("payments.result.rejectedTitle")}
           </h1>
 
-          <p>Mercado Pago rechazó el pago. Podés intentar nuevamente.</p>
+          <p>{t("payments.result.rejected")}</p>
 
-          <RedButton text="Volver a pagos" textSmall onClick={goToPayments} />
+          <RedButton text={t("payments.backToPayments")} textSmall onClick={goToPayments} />
         </div>
       </MainLayout>
     );
@@ -129,12 +130,12 @@ export default function PaymentsResult() {
       <MainLayout>
         <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
           <h1 className="font-semibold text-[19px] text-[#fc697b] min-[900px]:text-2xl">
-            Pago cancelado
+            {t("payments.result.cancelledTitle")}
           </h1>
 
-          <p>El pago fue cancelado.</p>
+          <p>{t("payments.result.cancelled")}</p>
 
-          <RedButton text="Volver a pagos" textSmall onClick={goToPayments} />
+          <RedButton text={t("payments.backToPayments")} textSmall onClick={goToPayments} />
         </div>
       </MainLayout>
     );
@@ -144,13 +145,13 @@ export default function PaymentsResult() {
     <MainLayout>
       <div className="border mt-12 p-4 rounded-lg flex flex-col gap-2 shadow-md max-w-100 min-[900px]:p-5 min-[900px]:gap-5">
         <h1 className="font-semibold text-[19px] min-[900px]:text-2xl">
-          Estado del pago
+          {t("payments.result.statusTitle")}
         </h1>
 
-        <p>Estado actual: {payment.status}</p>
+        <p>{t("payments.result.currentStatus", { status: payment.status })}</p>
 
         <ColorButton
-          text="Volver a pagos"
+          text={t("payments.backToPayments")}
           textSmall
           onClick={goToPayments}
           bgColor="#333"

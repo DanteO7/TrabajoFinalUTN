@@ -12,6 +12,7 @@ import BlackButton from "../buttons/black-button";
 import { createNews } from "../../services/news";
 import { useAuthStore } from "../../store/auth-store";
 import { createNewsSchema } from "../../schema/news-schema";
+import { useTranslation } from "react-i18next";
 
 export default function NewsForm({
   tenantId,
@@ -21,6 +22,7 @@ export default function NewsForm({
   tenantOnly = false,
   onCreated,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
 
@@ -54,7 +56,7 @@ export default function NewsForm({
       });
 
       onCreated?.();
-      setSuccessMessage("Noticia creada correctamente");
+      setSuccessMessage(t("newsUi.createSuccess"));
       setSuccessModal(true);
       setBackendError(null);
 
@@ -66,7 +68,7 @@ export default function NewsForm({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear la noticia";
+      let msg = t("newsUi.createError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -102,21 +104,21 @@ export default function NewsForm({
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear una noticia
+        {t("newsUi.createTitle")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Título de la noticia"
-          placeholder="Ej: Nuevas actividades, Nuevo plan, etc."
+          label={t("newsUi.title")}
+          placeholder={t("newsUi.titlePlaceholder")}
           register={register("title")}
           error={errors.title}
         />
 
         <FormInput
           textarea
-          placeholder="Explicación de la noticia"
-          label="Contenido"
+          placeholder={t("newsUi.contentPlaceholder")}
+          label={t("newsUi.content")}
           register={register("content")}
           error={errors.content}
         />
@@ -126,15 +128,19 @@ export default function NewsForm({
             {...register("tenantId")}
             className="rounded-lg border border-gray-400 bg-[#f1eef3] p-2 text-gray-700 cursor-pointer"
           >
-            <option value="global">Global</option>
-            <option value="tenant">Este negocio</option>
+            <option value="global">{t("newsUi.global")}</option>
+            <option value="tenant">{t("newsUi.thisBusiness")}</option>
           </select>
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton text={t("common.cancel")} onClick={close} textSmall={true} />
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear"}
+            text={
+              mutation.isPending
+                ? t("newsUi.creating")
+                : t("newsUi.create")
+            }
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

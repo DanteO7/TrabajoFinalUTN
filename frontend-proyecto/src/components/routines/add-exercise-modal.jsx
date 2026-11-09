@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import Modal from "../modals/modal";
 import BlackButton from "../buttons/black-button";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function AddExerciseModal({
   close,
@@ -11,21 +12,25 @@ export default function AddExerciseModal({
   exercises,
   handleAddExercise,
 }) {
+  const { t } = useTranslation();
   return (
     <Modal open={true} onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black transition duration-200 cursor-pointer"
       >
         <X size={20} />
       </button>
       <div className="">
-        <h3 className="font-semibold text-lg mb-4">Agregar ejercicio</h3>
+        <h3 className="font-semibold text-lg mb-4">
+          {t("addExerciseModal.title")}
+        </h3>
 
         <div className="flex flex-col gap-3">
           <div>
             <label htmlFor="exercise" className="block mb-2">
-              Ejercicio
+              {t("addExerciseModal.exercise")}
             </label>
 
             <select
@@ -37,8 +42,8 @@ export default function AddExerciseModal({
             >
               <option value="">
                 {exercisesLoading
-                  ? "Cargando ejercicios..."
-                  : "Seleccionar ejercicio"}
+                  ? t("addExerciseModal.loading")
+                  : t("addExerciseModal.select")}
               </option>
 
               {exercises.map((exercise) => (
@@ -50,7 +55,7 @@ export default function AddExerciseModal({
           </div>
 
           <BlackButton
-            text="Agregar ejercicio"
+            text={t("addExerciseModal.add")}
             onClick={handleAddExercise}
             disabled={!selectedExerciseId}
             textSmall={true}

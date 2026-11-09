@@ -17,6 +17,7 @@ import { getProfessors } from "../../services/professor";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 import { createClassTemplate } from "../../services/class-template";
+import { useTranslation } from "react-i18next";
 
 export default function ClassForm({
   tenantId,
@@ -26,6 +27,7 @@ export default function ClassForm({
   isTemplate = false,
   onCreated,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -72,8 +74,8 @@ export default function ClassForm({
 
       setSuccessMessage(
         isTemplate
-          ? "Clase modelo creada correctamente"
-          : "Clase creada correctamente",
+          ? t("classForm.templateCreated")
+          : t("classForm.created"),
       );
 
       setSuccessModal(true);
@@ -90,7 +92,7 @@ export default function ClassForm({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear la clase";
+      let msg = t("classForm.createError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -136,17 +138,21 @@ export default function ClassForm({
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold text-center mb-6">Crear clase</h2>
+      <h2 className="text-2xl font-semibold text-center mb-6">
+        {t("classForm.title")}
+      </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Actividad</label>
+          <label className="block text-sm font-medium mb-1">
+            {t("classForm.activity")}
+          </label>
 
           <select
             {...register("activityId")}
             className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
           >
-            <option value="">Seleccionar</option>
+            <option value="">{t("classForm.select")}</option>
 
             {activities.map((activity) => (
               <option key={activity.id} value={activity.id}>
@@ -163,13 +169,15 @@ export default function ClassForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Profesor</label>
+          <label className="block text-sm font-medium mb-1">
+            {t("classForm.professor")}
+          </label>
 
           <select
             {...register("professorId")}
             className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
           >
-            <option value="">Seleccionar</option>
+            <option value="">{t("classForm.select")}</option>
 
             {professors
               .filter((professor) => professor.isActive === true)
@@ -189,20 +197,22 @@ export default function ClassForm({
 
         {isTemplate ? (
           <div>
-            <label className="block text-sm font-medium mb-1">Día</label>
+            <label className="block text-sm font-medium mb-1">
+              {t("classForm.day")}
+            </label>
 
             <select
               {...register("dayOfWeek")}
               className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
-              <option value="">Seleccionar</option>
-              <option value="1">Lunes</option>
-              <option value="2">Martes</option>
-              <option value="3">Miércoles</option>
-              <option value="4">Jueves</option>
-              <option value="5">Viernes</option>
-              <option value="6">Sábado</option>
-              <option value="0">Domingo</option>
+              <option value="">{t("classForm.select")}</option>
+              <option value="1">{t("classForm.monday")}</option>
+              <option value="2">{t("classForm.tuesday")}</option>
+              <option value="3">{t("classForm.wednesday")}</option>
+              <option value="4">{t("classForm.thursday")}</option>
+              <option value="5">{t("classForm.friday")}</option>
+              <option value="6">{t("classForm.saturday")}</option>
+              <option value="0">{t("classForm.sunday")}</option>
             </select>
 
             {errors.dayOfWeek && (
@@ -214,7 +224,7 @@ export default function ClassForm({
         ) : (
           <FormInput
             type="date"
-            label="Fecha"
+            label={t("classForm.date")}
             register={register("date")}
             error={errors.date}
           />
@@ -223,14 +233,14 @@ export default function ClassForm({
         <div className="grid grid-cols-2 gap-4">
           <FormInput
             type="time"
-            label="Hora inicio"
+            label={t("classForm.startTime")}
             register={register("startTime")}
             error={errors.startTime}
           />
 
           <FormInput
             type="time"
-            label="Hora fin"
+            label={t("classForm.endTime")}
             register={register("endTime")}
             error={errors.endTime}
           />
@@ -238,14 +248,22 @@ export default function ClassForm({
 
         <FormInput
           type="number"
-          label="Capacidad máxima"
+          label={t("classForm.capacity")}
           register={register("maxCapacity")}
           error={errors.maxCapacity}
         />
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton
+            text={t("classForm.cancel")}
+            onClick={close}
+            textSmall={true}
+          />
 
-          <BlackButton text="Crear clase" type="submit" textSmall={true} />
+          <BlackButton
+            text={t("classForm.create")}
+            type="submit"
+            textSmall={true}
+          />
         </div>
       </form>
 

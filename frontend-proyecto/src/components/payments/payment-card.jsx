@@ -1,22 +1,25 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import PaymentModal from "./payment-modal";
+import { formatCurrency, getLocale } from "../../utils/formatting";
 
 export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
+  const { t } = useTranslation();
   const [openModal, setOpenModal] = useState(false);
 
   const getStatusText = (status) => {
     switch (status) {
       case "Paid":
-        return "Pagado";
+        return t("payments.statuses.paid");
 
       case "Pending":
-        return "Pendiente";
+        return t("payments.statuses.pending");
 
       case "Rejected":
-        return "Rechazado";
+        return t("payments.statuses.rejected");
 
       case "Cancelled":
-        return "Cancelado";
+        return t("payments.statuses.cancelled");
 
       default:
         return status;
@@ -43,16 +46,16 @@ export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
   const getPaymentMethodText = (method) => {
     switch (method) {
       case "Cash":
-        return "Efectivo";
+        return t("payments.methods.cash");
 
       case "Bank Transfer":
-        return "Transferencia";
+        return t("payments.methods.transfer");
 
       case "Debit Card":
-        return "Tarjeta de débito";
+        return t("payments.methods.debitCard");
 
       case "Mercado Pago":
-        return "Mercado Pago";
+        return t("payments.methods.mercadoPago");
 
       default:
         return method;
@@ -87,13 +90,13 @@ export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
       <div className="mt-5 space-y-2">
         <div className="flex justify-between text-sm">
           <span className="font-semibold">
-            ${Number(payment.amount).toLocaleString("es-AR", {})}
+            {formatCurrency(payment.amount)}
           </span>
           <span className="text-gray-600">
             {getPaymentMethodText(payment.paymentMethod)}
           </span>
           <span className="text-gray-600">
-            {new Date(payment.paymentDate).toLocaleDateString("es-AR")}
+            {new Date(payment.paymentDate).toLocaleDateString(getLocale())}
           </span>
         </div>
       </div>

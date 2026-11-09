@@ -13,8 +13,10 @@ import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
 import { X } from "lucide-react";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function EditProfileModal({ close }) {
+  const { t } = useTranslation();
   const { user, login } = useAuthStore();
   const queryClient = useQueryClient();
 
@@ -45,7 +47,7 @@ export default function EditProfileModal({ close }) {
     mutationKey: ["updateUser", user?.id],
     mutationFn: updateUser,
     onSuccess: async (data, variables) => {
-      setSuccessMessage("Perfil actualizado correctamente");
+      setSuccessMessage(t("profile.updateSuccess"));
       setSuccesModal(true);
       setBackendError(null);
       try {
@@ -64,7 +66,7 @@ export default function EditProfileModal({ close }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al iniciar sesión";
+      let msg = t("profile.updateError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -87,63 +89,65 @@ export default function EditProfileModal({ close }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-4 text-center">Editar datos</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-center">
+        {t("profile.editData")}
+      </h2>
       <form
         noValidate
         className="flex max-w flex-col gap-4 mt-4"
         onSubmit={handleSubmit(onSubmit)}
       >
         <FormInput
-          label="Nombre"
+          label={t("profile.name")}
           id="name"
           type="text"
-          placeholder="Nombre"
+          placeholder={t("profile.name")}
           register={register("name")}
           error={errors.name}
           disabled={isSubmitting || mutation.isPending}
         />
         <FormInput
-          label="Apellido"
+          label={t("profile.surname")}
           id="surname"
           type="text"
-          placeholder="Apellido"
+          placeholder={t("profile.surname")}
           register={register("surname")}
           error={errors.surname}
           disabled={isSubmitting || mutation.isPending}
         />
         <FormInput
-          label="Telefono"
+          label={t("profile.phone")}
           id="phoneNumber"
           type="text"
-          placeholder="XX XXXX XXXXXX"
+          placeholder={t("profile.phoneExample")}
           register={register("phoneNumber")}
           error={errors.phoneNumber}
           disabled={isSubmitting || mutation.isPending}
         />
         <div className="flex gap-2">
           <FormInput
-            label="Edad"
+            label={t("profile.age")}
             id="age"
             type="number"
-            placeholder="Entre 1-120 años"
+            placeholder={t("profile.ageExample")}
             register={register("age")}
             error={errors.age}
             disabled={isSubmitting || mutation.isPending}
           />
           <FormInput
-            label="Peso"
+            label={t("profile.weight")}
             id="weight"
             type="number"
-            placeholder="Entre 1-300 kg"
+            placeholder={t("profile.weightExample")}
             register={register("weight")}
             error={errors.weight}
             disabled={isSubmitting || mutation.isPending}
           />
         </div>
         <FormInput
-          label="Patologías o condiciones médicas"
+          label={t("profile.pathologies")}
           id="pathologies"
-          placeholder="Opcional"
+          placeholder={t("profile.optional")}
           register={register("pathologies")}
           error={errors.pathologies}
           disabled={isSubmitting || mutation.isPending}
@@ -151,17 +155,21 @@ export default function EditProfileModal({ close }) {
           rows={3}
         />
         <p className="text-sm text-gray-600 -mt-3">
-          Opcional. Indicá si tenés alguna condición médica relevante.
+          {t("profile.pathologiesHelp")}
         </p>
         <div className="grid grid-cols-2 gap-3 mt-4">
           <WhiteButton
             type="button"
-            text="Cancelar"
+            text={t("common.cancel")}
             onClick={close}
             textSmall={true}
           />
           <BlackButton
-            text={mutation.isPending ? "Actualizando" : "Actualizar"}
+            text={
+              mutation.isPending
+                ? t("profile.updating")
+                : t("common.update")
+            }
             type="submit"
             disabled={isSubmitting || mutation.isPending}
             textSmall={true}

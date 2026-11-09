@@ -11,8 +11,10 @@ import SuccessModal from "../components/modals/success-modal";
 import { useLocation } from "wouter";
 import FormInput from "../components/inputs/form-input";
 import BlackButton from "../components/buttons/black-button";
+import { useTranslation } from "react-i18next";
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const [backendError, setBackendError] = useState();
@@ -37,7 +39,7 @@ export default function ResetPassword() {
     mutationKey: ["changePassword"],
     mutationFn: changePassword,
     onSuccess: () => {
-      setSuccessMessage("Contraseña cambiada correctamente");
+      setSuccessMessage(t("auth.passwordChanged"));
       setSuccesModal(true);
       setBackendError(null);
       setTimeout(() => {
@@ -46,7 +48,7 @@ export default function ResetPassword() {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al intentar cambiar la contraseña";
+      let msg = t("auth.passwordChangeError");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -69,7 +71,7 @@ export default function ResetPassword() {
     <MainLayout>
       <div className="mt-15 lg:w-[25%]">
         <h2 className="text-[32px] font-semibold mb-10 lg:text-center">
-          Cambiar la contraseña
+          {t("auth.changePassword")}
         </h2>
         <form
           noValidate
@@ -77,20 +79,20 @@ export default function ResetPassword() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <FormInput
-            label="Nueva contraseña"
+            label={t("auth.newPassword")}
             id="newPassword"
             type="password"
-            placeholder="Nueva contraseña..."
+            placeholder={t("auth.newPasswordPlaceholder")}
             register={register("newPassword")}
             error={errors.newPassword}
             disabled={isSubmitting || mutation.isPending}
             isPassword
           />
           <FormInput
-            label="Confirmar contraseña"
+            label={t("auth.confirmPassword")}
             id="confirmNewPassword"
             type="password"
-            placeholder="Nueva contraseña..."
+            placeholder={t("auth.newPasswordPlaceholder")}
             register={register("confirmNewPassword")}
             error={errors.confirmNewPassword}
             disabled={isSubmitting || mutation.isPending}
@@ -100,7 +102,7 @@ export default function ResetPassword() {
           <BlackButton
             disabled={mutation.isPending}
             type="submit"
-            text={mutation.isPending ? "Cambiando..." : "Cambiar contraseña"}
+            text={mutation.isPending ? t("auth.changingPassword") : t("auth.changePassword")}
             textSmall
           />
         </form>

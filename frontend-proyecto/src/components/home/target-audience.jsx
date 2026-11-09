@@ -1,14 +1,20 @@
 import { Dumbbell, HeartPulse, Users, Waves, Flame } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 export default function TargetAudience() {
+  const { t } = useTranslation();
   const items = [
-    { id: "gyms", icon: Dumbbell, label: "Gimnasios" },
-    { id: "crossfit", icon: Flame, label: "Crossfit" },
-    { id: "pilates", icon: HeartPulse, label: "Pilates" },
-    { id: "swimming", icon: Waves, label: "Natación" },
-    { id: "group-classes", icon: Users, label: "Clases grupales" },
+    { id: "gyms", icon: Dumbbell, label: t("publicSite.audiences.gyms") },
+    { id: "crossfit", icon: Flame, label: t("publicSite.audiences.crossfit") },
+    { id: "pilates", icon: HeartPulse, label: t("publicSite.audiences.pilates") },
+    { id: "swimming", icon: Waves, label: t("publicSite.audiences.swimming") },
+    {
+      id: "group-classes",
+      icon: Users,
+      label: t("publicSite.audiences.groupClasses"),
+    },
   ];
   const repeatedItems = ["first", "second", "third"].flatMap((copy) =>
     items.map((item) => ({ ...item, key: `${copy}-${item.id}` })),
@@ -159,7 +165,7 @@ export default function TargetAudience() {
   return (
     <section className="w-full">
       <h2 className="text-center text-3xl font-semibold">
-        ¿Para quién es TurnoFacil?
+        {t("publicSite.targetAudienceTitle")}
       </h2>
 
       <div

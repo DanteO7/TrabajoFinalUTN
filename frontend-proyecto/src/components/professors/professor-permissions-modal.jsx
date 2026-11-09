@@ -11,105 +11,55 @@ import {
   getProfessorPermissions,
   updateProfessorPermissions,
 } from "../../services/professor";
-
-const PERMISSION_DETAILS = {
-  TENANT_READ: ["Consultar el negocio", "Ver la información del negocio."],
-  STUDENT_READ: ["Consultar alumnos", "Ver el listado y los datos de alumnos."],
-  STUDENT_CREATE: ["Crear alumnos", "Dar de alta alumnos en el negocio."],
-  STUDENT_UPDATE: ["Editar alumnos", "Modificar la información de alumnos."],
-  STUDENT_DELETE: ["Eliminar alumnos", "Dar de baja alumnos."],
-  PROFESSOR_READ: ["Consultar profesores", "Ver el listado de profesores."],
-  ACTIVITY_READ: ["Consultar actividades", "Ver las actividades del negocio."],
-  ACTIVITY_CREATE: ["Crear actividades", "Agregar actividades."],
-  ACTIVITY_UPDATE: ["Editar actividades", "Modificar actividades existentes."],
-  ACTIVITY_DELETE: ["Eliminar actividades", "Eliminar actividades."],
-  SPECIALITY_READ: [
-    "Consultar profesiones",
-    "Ver las profesiones configuradas.",
-  ],
-  SPECIALITY_CREATE: ["Crear profesiones", "Agregar profesiones."],
-  SPECIALITY_UPDATE: ["Editar profesiones", "Modificar profesiones."],
-  SPECIALITY_DELETE: ["Eliminar profesiones", "Eliminar profesiones."],
-  CLASS_READ: ["Consultar clases", "Ver las clases y sus detalles."],
-  CLASS_CREATE: ["Crear clases", "Programar nuevas clases."],
-  CLASS_UPDATE: ["Editar clases", "Modificar clases programadas."],
-  CLASS_DELETE: ["Eliminar clases", "Eliminar clases programadas."],
-  RESERVATION_READ: ["Consultar reservas", "Ver las reservas de clases."],
-  RESERVATION_CREATE: ["Crear reservas", "Reservar alumnos en clases."],
-  RESERVATION_DELETE: ["Eliminar reservas", "Cancelar reservas."],
-  PAYMENT_READ: ["Consultar pagos", "Ver pagos registrados."],
-  PAYMENT_CREATE: ["Registrar pagos", "Crear registros de pago."],
-  PAYMENT_UPDATE: ["Editar pagos", "Modificar registros de pago."],
-  PAYMENT_DELETE: ["Eliminar pagos", "Eliminar registros de pago."],
-  STUDENT_PLAN_READ: ["Consultar planes", "Ver planes de alumnos."],
-  STUDENT_PLAN_CREATE: ["Crear planes", "Agregar planes de alumnos."],
-  STUDENT_PLAN_UPDATE: ["Editar planes", "Modificar planes existentes."],
-  STUDENT_PLAN_DELETE: ["Eliminar planes", "Eliminar planes de alumnos."],
-  NEWS_READ: ["Consultar novedades", "Ver las novedades del negocio."],
-  NEWS_CREATE: ["Crear novedades", "Publicar novedades."],
-  NEWS_UPDATE: ["Editar novedades", "Modificar novedades publicadas."],
-  NEWS_DELETE: ["Eliminar novedades", "Eliminar novedades publicadas."],
-  EXERCISE_READ: ["Consultar ejercicios", "Ver ejercicios."],
-  EXERCISE_CREATE: ["Crear ejercicios", "Agregar ejercicios."],
-  EXERCISE_UPDATE: ["Editar ejercicios", "Modificar ejercicios existentes."],
-  EXERCISE_DELETE: ["Eliminar ejercicios", "Eliminar ejercicios."],
-  ROUTINE_READ: ["Consultar rutinas", "Ver rutinas de entrenamiento."],
-  ROUTINE_CREATE: ["Crear rutinas", "Agregar rutinas."],
-  ROUTINE_UPDATE: ["Editar rutinas", "Modificar rutinas existentes."],
-  ROUTINE_DELETE: ["Eliminar rutinas", "Eliminar rutinas."],
-  INVITATION_READ: ["Consultar invitaciones", "Ver invitaciones del negocio."],
-  INVITATION_CREATE: ["Crear invitaciones", "Invitar usuarios al negocio."],
-  INVITATION_DELETE: ["Eliminar invitaciones", "Cancelar invitaciones."],
-};
-
-const PERMISSION_SECTION_NAMES = {
-  TENANT: "Negocio",
-  STUDENT: "Alumnos",
-  PROFESSOR: "Profesores",
-  ACTIVITY: "Actividades",
-  SPECIALITY: "Profesiones",
-  CLASS: "Clases",
-  RESERVATION: "Reservas",
-  PAYMENT: "Pagos",
-  NEWS: "Novedades",
-  EXERCISE: "Ejercicios",
-  ROUTINE: "Rutinas",
-  INVITATION: "Invitaciones",
-  OTHER: "Otros",
-};
+import { useTranslation } from "react-i18next";
 
 const PERMISSION_SECTION_ORDER = [
-  "Negocio",
-  "Alumnos",
-  "Profesores",
-  "Actividades",
-  "Profesiones",
-  "Clases",
-  "Reservas",
-  "Pagos",
-  "Planes de alumnos",
-  "Novedades",
-  "Ejercicios",
-  "Rutinas",
-  "Invitaciones",
-  "Otros",
+  "tenant",
+  "student",
+  "professor",
+  "activity",
+  "speciality",
+  "class",
+  "reservation",
+  "payment",
+  "studentPlan",
+  "news",
+  "exercise",
+  "routine",
+  "invitation",
+  "other",
 ];
 
 function getPermissionSection(permissionName) {
   if (permissionName.startsWith("STUDENT_PLAN_")) {
-    return "Planes de alumnos";
+    return "studentPlan";
   }
 
   const prefix = permissionName.split("_")[0];
-  return PERMISSION_SECTION_NAMES[prefix] ?? PERMISSION_SECTION_NAMES.OTHER;
+  return (
+    {
+      TENANT: "tenant",
+      STUDENT: "student",
+      PROFESSOR: "professor",
+      ACTIVITY: "activity",
+      SPECIALITY: "speciality",
+      CLASS: "class",
+      RESERVATION: "reservation",
+      PAYMENT: "payment",
+      NEWS: "news",
+      EXERCISE: "exercise",
+      ROUTINE: "routine",
+      INVITATION: "invitation",
+    }[prefix] ?? "other"
+  );
 }
 
-function errorMessage(error) {
+function errorMessage(error, t) {
   const response = error?.response?.data;
   return (
     response?.message ||
     (typeof response === "string" ? response : null) ||
-    "No se pudieron guardar los permisos. Intentá nuevamente."
+    t("professorPermissions.saveError")
   );
 }
 
@@ -119,6 +69,7 @@ export default function ProfessorPermissionsModal({
   close,
   onSaved,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const permissionsKey = ["professorPermissions", tenantId, professor.id];
   const [draft, setDraft] = useState(null);
@@ -201,7 +152,7 @@ export default function ProfessorPermissionsModal({
       close();
       onSaved();
     },
-    onError: (error) => setErrorMessageModal(errorMessage(error)),
+    onError: (error) => setErrorMessageModal(errorMessage(error, t)),
   });
 
   return (
@@ -209,10 +160,12 @@ export default function ProfessorPermissionsModal({
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-2xl font-bold">
-            Permisos de {professor.user.name} {professor.user.surname}
+            {t("professorPermissions.title", {
+              name: `${professor.user.name} ${professor.user.surname}`,
+            })}
           </h2>
           <p className="text-gray-500 mt-1">
-            Los permisos mostrados reflejan el acceso efectivo actual.
+            {t("professorPermissions.description")}
           </p>
         </div>
 
@@ -220,33 +173,55 @@ export default function ProfessorPermissionsModal({
           <Loading />
         ) : isTenantError || isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            {errorMessage(tenantError ?? error)}
+            {errorMessage(tenantError ?? error, t)}
           </div>
         ) : isOwner ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            El dueño del negocio tiene todos los permisos habilitados y no se
-            pueden modificar.
+            {t("professorPermissions.owner")}
           </div>
         ) : (
           <>
             {configurablePermissions.length === 0 ? (
               <p className="text-gray-600">
-                No hay permisos de profesor configurados para este negocio.
+                {t("professorPermissions.empty")}
               </p>
             ) : (
               <div className="flex flex-col gap-5 max-h-[55dvh] overflow-y-auto pr-1">
                 {groupedPermissions.map(([section, sectionPermissions]) => (
                   <section key={section} className="flex flex-col gap-3">
                     <h3 className="border-b border-gray-300 pb-1 text-lg font-semibold text-gray-700">
-                      {section}
+                      {t(`professorPermissions.sections.${section}`)}
                     </h3>
                     {sectionPermissions.map((permission) => {
-                      const [label, description] = PERMISSION_DETAILS[
-                        permission.name
-                      ] ?? [
-                        permission.name.replaceAll("_", " "),
-                        "Permiso disponible para este profesor.",
-                      ];
+                      const [resourcePrefix, action] =
+                        permission.name.split(/_(?=[^_]+$)/);
+                      const resourceKey =
+                        resourcePrefix === "STUDENT_PLAN"
+                          ? "studentPlans"
+                          : {
+                              TENANT: "business",
+                              STUDENT: "students",
+                              PROFESSOR: "professors",
+                              ACTIVITY: "activities",
+                              SPECIALITY: "professions",
+                              CLASS: "classes",
+                              RESERVATION: "reservations",
+                              PAYMENT: "payments",
+                              NEWS: "news",
+                              EXERCISE: "exercises",
+                              ROUTINE: "routines",
+                              INVITATION: "invitations",
+                            }[resourcePrefix];
+                      const label = resourceKey
+                        ? `${t(`professorPermissions.actions.${action.toLowerCase()}`)} ${t(`professorPermissions.resources.${resourceKey}`)}`
+                        : permission.name.replaceAll("_", " ");
+                      const description = resourceKey
+                        ? t(`professorPermissions.descriptions.${action.toLowerCase()}`, {
+                            resource: t(
+                              `professorPermissions.resources.${resourceKey}`,
+                            ),
+                          })
+                        : t("professorPermissions.defaultLabel");
                       const isRequiredPermission =
                         permission.name === "TENANT_READ";
 
@@ -259,12 +234,12 @@ export default function ProfessorPermissionsModal({
                             <p className="font-semibold">{label}</p>
                             <p className="text-sm text-gray-600">
                               {isRequiredPermission
-                                ? "Este permiso es obligatorio para ingresar al negocio y no se puede desactivar."
+                                ? t("professorPermissions.required")
                                 : description}
                             </p>
                             {permission.isOverridden && (
                               <p className="text-xs text-[#bf5260] mt-1">
-                                Configuración personalizada
+                                {t("professorPermissions.custom")}
                               </p>
                             )}
                           </div>
@@ -283,8 +258,8 @@ export default function ProfessorPermissionsModal({
                             text={
                               isRequiredPermission ||
                               currentDraft[permission.name]
-                                ? "Habilitado"
-                                : "Deshabilitado"
+                                ? t("professorPermissions.enabled")
+                                : t("professorPermissions.disabled")
                             }
                             gap={2}
                             disabled={isOwner || isRequiredPermission}
@@ -298,9 +273,17 @@ export default function ProfessorPermissionsModal({
             )}
 
             <div className="grid grid-cols-2 gap-3 pt-1">
-              <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+              <WhiteButton
+                text={t("professorPermissions.cancel")}
+                onClick={close}
+                textSmall={true}
+              />
               <BlackButton
-                text={saveMutation.isPending ? "Guardando..." : "Guardar"}
+                text={
+                  saveMutation.isPending
+                    ? t("professorPermissions.saving")
+                    : t("professorPermissions.save")
+                }
                 onClick={() => saveMutation.mutate()}
                 type="button"
                 textSmall={true}

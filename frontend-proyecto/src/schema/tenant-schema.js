@@ -1,43 +1,44 @@
 import { z } from "zod";
+import { validationError, validationMessage } from "../utils/validation-message";
 
 export const createTenantSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre es obligatorio")
-    .max(50, "Máximo 50 caracteres"),
+    .min(1, validationMessage("nameRequired"))
+    .max(50, validationMessage("maxLength50")),
 
   tenantPlanId: z.coerce
     .number({
-      required_error: "Seleccioná un plan",
+      error: validationError("planRequired"),
     })
     .int()
-    .positive("Seleccioná un plan"),
+    .positive(validationMessage("planRequired")),
 });
 
 export const updateTenantSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre es obligatorio")
-    .max(50, "Máximo 50 caracteres"),
+    .min(1, validationMessage("nameRequired"))
+    .max(50, validationMessage("maxLength50")),
 
   alias: z
     .string()
     .trim()
-    .max(50, "El alias no puede tener más de 50 caracteres")
+    .max(50, validationMessage("aliasMax50"))
     .optional()
     .or(z.literal("")),
 
   cbu: z
     .string()
     .trim()
-    .regex(/^\d{22}$/, "El CBU debe tener exactamente 22 dígitos")
+    .regex(/^\d{22}$/, validationMessage("cbuLength"))
     .optional()
     .or(z.literal("")),
 
   address: z
     .string()
     .trim()
-    .max(200, "La dirección no puede tener más de 200 caracteres")
+    .max(200, validationMessage("addressMax200"))
     .optional()
     .or(z.literal("")),
 });

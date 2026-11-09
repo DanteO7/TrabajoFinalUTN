@@ -1,5 +1,10 @@
 import { X, Pencil } from "lucide-react";
 import { useState } from "react";
+import {
+  formatCurrency,
+  formatNumber,
+  getLocale,
+} from "../../utils/formatting";
 import Modal from "../modals/modal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStudentPlans } from "../../services/student-plan";
@@ -11,8 +16,10 @@ import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
 import { Trash2 } from "lucide-react";
 import WhiteButton from "../buttons/white-button";
+import { useTranslation } from "react-i18next";
 
 export default function StudentModal({ student, tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [editing, setEditing] = useState(false);
@@ -46,7 +53,7 @@ export default function StudentModal({ student, tenantId, close }) {
       });
       setConfirmModal(false);
 
-      setSuccessMessage("Alumno eliminado correctamente");
+      setSuccessMessage(t("studentModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -59,7 +66,7 @@ export default function StudentModal({ student, tenantId, close }) {
 
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar el alumno";
+      let msg = t("studentModal.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -83,7 +90,7 @@ export default function StudentModal({ student, tenantId, close }) {
         queryKey: ["getStudents", tenantId],
       });
 
-      setSuccessMessage("Estudiante actualizado correctamente");
+      setSuccessMessage(t("studentModal.updateSuccess"));
       setSuccessModal(true);
       setEditing(false);
       setCurrentStudent(updatedStudent);
@@ -96,7 +103,7 @@ export default function StudentModal({ student, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el estado";
+      let msg = t("studentModal.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -125,11 +132,11 @@ export default function StudentModal({ student, tenantId, close }) {
   const getStatusLabel = (status) => {
     switch (status) {
       case "Paid":
-        return "Pagado";
+        return t("tenantPaymentCard.paid");
       case "Pending":
-        return "Pendiente";
+        return t("tenantPaymentCard.pending");
       case "Overdue":
-        return "Vencido";
+        return t("tenantPaymentCard.overdue");
       default:
         return status;
     }
@@ -154,7 +161,9 @@ export default function StudentModal({ student, tenantId, close }) {
 
           <div className="space-y-4 mb-8">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Email</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("studentModal.email")}
+              </p>
               <p className="font-semibold text-[#333]">
                 {currentStudent.user.email}
               </p>
@@ -162,7 +171,9 @@ export default function StudentModal({ student, tenantId, close }) {
 
             {currentStudent.user.phoneNumber && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-                <p className="text-sm text-gray-600 mb-1">Teléfono</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  {t("profile.phone")}
+                </p>
                 <p className="font-semibold text-[#333]">
                   {currentStudent.user.phoneNumber}
                 </p>
@@ -173,17 +184,25 @@ export default function StudentModal({ student, tenantId, close }) {
               <div className="flex gap-4">
                 {currentStudent.user.age && (
                   <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
-                    <p className="text-sm text-gray-600 mb-1">Edad</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("profile.age")}
+                    </p>
                     <p className="font-semibold text-[#333]">
-                      {currentStudent.user.age} Años
+                      {t("studentModal.ageYears", {
+                        age: formatNumber(currentStudent.user.age),
+                      })}
                     </p>
                   </div>
                 )}
                 {currentStudent.user.weight && (
                   <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
-                    <p className="text-sm text-gray-600 mb-1">Peso</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("profile.weight")}
+                    </p>
                     <p className="font-semibold text-[#333]">
-                      {currentStudent.user.weight} Kg
+                      {t("studentModal.weightKg", {
+                        weight: formatNumber(currentStudent.user.weight),
+                      })}
                     </p>
                   </div>
                 )}
@@ -192,7 +211,7 @@ export default function StudentModal({ student, tenantId, close }) {
             {currentStudent.user.pathologies && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">
-                  Patologías o condiciones médicas
+                  {t("profile.pathologies")}
                 </p>
                 <p className="font-semibold text-[#333]">
                   {currentStudent.user.pathologies}
@@ -200,24 +219,32 @@ export default function StudentModal({ student, tenantId, close }) {
               </div>
             )}
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Plan</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("studentModal.plan")}
+              </p>
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-semibold text-[#333]">
                     {currentStudent.studentPlan.name}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    {currentStudent.studentPlan.classesPerMonth} clases/mes
+                    {t("studentModal.classesPerMonth", {
+                      count: formatNumber(
+                        currentStudent.studentPlan.classesPerMonth,
+                      ),
+                    })}
                   </p>
                 </div>
                 <p className="font-bold text-[#333]">
-                  ${currentStudent.studentPlan.price.toLocaleString("es-AR")}
+                  {formatCurrency(currentStudent.studentPlan.price)}
                 </p>
               </div>
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Estado de cuota</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("studentModal.feeStatus")}
+              </p>
               <span
                 className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${getStatusColor(
                   currentStudent.monthlyFeeStatus,
@@ -227,26 +254,28 @@ export default function StudentModal({ student, tenantId, close }) {
               </span>
             </div>
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Vencimiento de cuota</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("studentModal.dueDate")}
+              </p>
               <p className="font-semibold text-[#333]">
                 {currentStudent.paymentDueDate
                   ? new Date(currentStudent.paymentDueDate).toLocaleDateString(
-                      "es-AR",
+                      getLocale(),
                     )
-                  : "Sin fecha"}
+                  : t("studentModal.noDate")}
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">
             <RedButton
-              text="Eliminar"
+              text={t("studentModal.delete")}
               img={<Trash2 size={18} />}
               onClick={() => setConfirmModal(true)}
               textSmall={true}
             />
             <BlackButton
-              text="Editar"
+              text={t("studentModal.edit")}
               img={<Pencil size={18} />}
               onClick={() => setEditing(true)}
               textSmall={true}
@@ -255,11 +284,13 @@ export default function StudentModal({ student, tenantId, close }) {
         </>
       ) : (
         <div className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center">Editar alumno</h2>
+          <h2 className="text-2xl font-semibold text-center">
+            {t("studentModal.editTitle")}
+          </h2>
 
           <div>
             <label className="block text-sm font-semibold mb-3">
-              Cambiar plan
+              {t("studentModal.changePlan")}
             </label>
 
             <select
@@ -269,8 +300,10 @@ export default function StudentModal({ student, tenantId, close }) {
             >
               {plans.map((plan) => (
                 <option key={plan.id} value={plan.id}>
-                  {plan.name} - ${plan.price.toLocaleString("es-AR")} (
-                  {plan.classesPerMonth} clases/mes)
+                  {plan.name} - {formatCurrency(plan.price)} (
+                  {t("studentModal.classesPerMonth", {
+                    count: formatNumber(plan.classesPerMonth),
+                  })}
                 </option>
               ))}
             </select>
@@ -278,7 +311,7 @@ export default function StudentModal({ student, tenantId, close }) {
 
           <div className="flex justify-end gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("studentModal.cancel")}
               onClick={() => {
                 setEditing(false);
                 setSelectedStatus(currentStudent.monthlyFeeStatus);
@@ -287,7 +320,11 @@ export default function StudentModal({ student, tenantId, close }) {
               textSmall={true}
             />
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("studentModal.updating")
+                  : t("studentModal.update")
+              }
               onClick={() => updateMutation.mutate()}
               textSmall={true}
             />
@@ -296,8 +333,10 @@ export default function StudentModal({ student, tenantId, close }) {
       )}
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar este alumno?"
-          message={`Estás por eliminar el alumno "${currentStudent.user.name} ${currentStudent.user.surname} ". Esta acción no se puede deshacer.`}
+          title={t("studentModal.confirmTitle")}
+          message={t("studentModal.confirmMessage", {
+            name: `${currentStudent.user.name} ${currentStudent.user.surname}`,
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

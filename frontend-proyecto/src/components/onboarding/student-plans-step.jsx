@@ -4,8 +4,10 @@ import { getStudentPlans } from "../../services/student-plan";
 import Loading from "../loading";
 import BlackButton from "../buttons/black-button";
 import StudentPlanForm from "../students-plan/student-plan-form";
+import { useTranslation } from "react-i18next";
 
 export default function StudentPlansStep({ tenantId, isComplete }) {
+  const { t } = useTranslation();
   const [openPlanForm, setOpenPlanForm] = useState(false);
 
   const { isLoading, isError, refetch } = useQuery({
@@ -22,14 +24,14 @@ export default function StudentPlansStep({ tenantId, isComplete }) {
     return (
       <div className="mt-6">
         <p className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-          No se pudieron cargar los planes de alumnos. Intentá nuevamente.
+          {t("onboardingSteps.plansLoadError")}
         </p>
         <button
           type="button"
           onClick={() => refetch()}
           className="mt-3 underline"
         >
-          Reintentar
+          {t("onboardingSteps.retry")}
         </button>
       </div>
     );
@@ -39,14 +41,14 @@ export default function StudentPlansStep({ tenantId, isComplete }) {
     <div className="mt-6">
       <p className="text-gray-600">
         {isComplete
-          ? "Ya creaste un plan para tus alumnos. Continua."
-          : "Para incorporar alumnos, primero necesitás tener al menos un plan al que puedan asociarse."}
+          ? t("onboardingSteps.planComplete")
+          : t("onboardingSteps.planDescription")}
       </p>
 
       {!isComplete && (
         <div className="mt-5">
           <BlackButton
-            text="Crear plan"
+            text={t("onboardingSteps.createPlan")}
             onClick={() => setOpenPlanForm(true)}
             wfit
             textSmall

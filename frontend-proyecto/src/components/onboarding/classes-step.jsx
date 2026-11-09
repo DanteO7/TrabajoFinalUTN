@@ -8,18 +8,21 @@ import ClassForm from "../classes/class-form";
 import CopyClassTemplateDayModal from "../class-template/copy-class-template-day-modal";
 import CopyClassTemplateWeekModal from "../class-template/copy-class-template-week-modal";
 import ClassCard from "../classes/class-card";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 const days = [
-  { value: 1, label: "Lunes" },
-  { value: 2, label: "Martes" },
-  { value: 3, label: "Miércoles" },
-  { value: 4, label: "Jueves" },
-  { value: 5, label: "Viernes" },
-  { value: 6, label: "Sábado" },
-  { value: 0, label: "Domingo" },
+  { value: 1, labelKey: "monday" },
+  { value: 2, labelKey: "tuesday" },
+  { value: 3, labelKey: "wednesday" },
+  { value: 4, labelKey: "thursday" },
+  { value: 5, labelKey: "friday" },
+  { value: 6, labelKey: "saturday" },
+  { value: 0, labelKey: "sunday" },
 ];
 
 export default function ClassesStep({ tenantId, isComplete }) {
+  const { t } = useTranslation();
   const [openDay, setOpenDay] = useState(null);
 
   const [openTemplateForm, setOpenTemplateForm] = useState(false);
@@ -59,7 +62,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
     return (
       <div className="mt-6">
         <p className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-          No se pudieron cargar las clases. Intentá nuevamente.
+          {t("onboardingSteps.classesLoadError")}
         </p>
         <button
           type="button"
@@ -69,7 +72,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
           }}
           className="mt-3 underline"
         >
-          Reintentar
+          {t("onboardingSteps.retry")}
         </button>
       </div>
     );
@@ -79,30 +82,27 @@ export default function ClassesStep({ tenantId, isComplete }) {
     <div className="mt-6 flex flex-col gap-8">
       <p className="text-gray-600">
         {isComplete
-          ? "¡Bien! Ya tenés una clase en el calendario. Seguimos con lo siguiente."
-          : "Configurá al menos una clase en el calendario oficial. Podés crearla directamente o copiar tu semana modelo."}
+          ? t("onboardingSteps.classesComplete")
+          : t("onboardingSteps.classesDescription")}
       </p>
 
       {!isComplete && (
         <>
           <section>
             <h3 className="text-lg font-semibold">
-              1. Configurá tu semana modelo
+              {t("onboardingSteps.templateWeekTitle")}
             </h3>
             <p className="mt-2 text-sm text-gray-600">
-              Organizá las clases que se repiten habitualmente. Desplegá cada
-              día para consultar sus clases y agregar nuevas.
+              {t("onboardingSteps.templateWeekDescription")}
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Más adelante vas a poder editar o eliminar tus clases y modificar
-              la organización de tus actividades cuando lo necesites. Esta
-              configuración inicial es solo para ayudarte a empezar.
+              {t("onboardingSteps.templateWeekHint")}
             </p>
 
             <div className="mt-4 flex flex-col gap-3">
               <div className="mt-4">
                 <BlackButton
-                  text="Copiar semana"
+                  text={t("onboardingSteps.copyWeek")}
                   wfit
                   textSmall
                   onClick={() => setOpenCopyWeekModal(true)}
@@ -126,11 +126,15 @@ export default function ClassesStep({ tenantId, isComplete }) {
                       onClick={() => setOpenDay(isOpen ? null : day.value)}
                       className="flex w-full cursor-pointer items-center justify-between bg-[#EFECF0] px-5 py-4 transition"
                     >
-                      <span className="text-lg font-semibold">{day.label}</span>
+                      <span className="text-lg font-semibold">
+                        {t(`classForm.${day.labelKey}`)}
+                      </span>
 
                       <span className="text-gray-500">
-                        {classesOfDay.length}{" "}
-                        {classesOfDay.length === 1 ? "clase" : "clases"}
+                        {t("onboardingSteps.classCount", {
+                          count: classesOfDay.length,
+                          formattedCount: formatNumber(classesOfDay.length),
+                        })}
                       </span>
                     </button>
 
@@ -147,7 +151,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
                                 setSelectedDay(day.value);
                                 setOpenTemplateForm(true);
                               }}
-                              text="+ Nueva clase"
+                              text={t("onboardingSteps.newClass")}
                               wfit
                               textSmall
                             />
@@ -158,7 +162,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
                                   setSelectedDay(day.value);
                                   setOpenCopyDayModal(true);
                                 }}
-                                text="Copiar día"
+                                text={t("onboardingSteps.copyDay")}
                                 wfit
                                 textSmall
                               />
@@ -174,7 +178,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
                                     activityName:
                                       template.activity?.name ??
                                       template.activityName ??
-                                      "Clase configurada",
+                                      t("onboardingSteps.configuredClass"),
                                     professorName:
                                       template.professor?.user?.name ??
                                       template.professorName ??
@@ -193,7 +197,7 @@ export default function ClassesStep({ tenantId, isComplete }) {
                             </div>
                           ) : (
                             <p className="py-6 text-center text-gray-500">
-                              No hay clases configuradas para este día.
+                              {t("onboardingSteps.noClassesForDay")}
                             </p>
                           )}
                         </div>
@@ -207,17 +211,16 @@ export default function ClassesStep({ tenantId, isComplete }) {
 
           <section className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-semibold">
-              2. Creá una clase individual
+              {t("onboardingSteps.individualClassTitle")}
             </h3>
 
             <p className="mt-2 text-sm text-gray-600">
-              También podés crear una clase para una fecha específica sin
-              configurar una semana modelo.
+              {t("onboardingSteps.individualClassDescription")}
             </p>
 
             <div className="mt-4">
               <BlackButton
-                text="Crear clase individual"
+                text={t("onboardingSteps.createIndividualClass")}
                 onClick={() => setOpenIndividualForm(true)}
                 wfit
                 textSmall

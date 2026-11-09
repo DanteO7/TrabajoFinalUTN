@@ -5,6 +5,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { Redirect, useLocation } from "wouter";
 import MainLayout from "../../layouts/main-layout";
 import Loading from "../../components/loading";
+import { formatNumber, getLocale } from "../../utils/formatting";
 import {
   getTenantById,
   getTenantClassStatistics,
@@ -83,27 +84,25 @@ const StatisticsBarChart = lazy(() =>
 );
 
 const PERIODS = [
-  { value: "month", label: "Este mes" },
-  { value: "last3months", label: "Últimos 3 meses" },
-  { value: "year", label: "Este año" },
-  { value: "all", label: "Todo el tiempo" },
+  { value: "month", key: "periodThisMonth" },
+  { value: "last3months", key: "periodLastThreeMonths" },
+  { value: "year", key: "periodThisYear" },
+  { value: "all", key: "periodAllTime" },
 ];
 
-const currencyFormatter = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  maximumFractionDigits: 2,
-});
-const compactCurrencyFormatter = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
-
-const formatCurrency = (value) => currencyFormatter.format(value ?? 0);
+const formatCurrency = (value) =>
+  new Intl.NumberFormat(getLocale(), {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 2,
+  }).format(value ?? 0);
 const formatCompactCurrency = (value) =>
-  compactCurrencyFormatter.format(value ?? 0);
+  new Intl.NumberFormat(getLocale(), {
+    style: "currency",
+    currency: "ARS",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value ?? 0);
 
 const LEGACY_DELIVERY_TRACKING_UNAVAILABLE =
   "El sistema no registra si una clase programada se dictó efectivamente. El estado Completed de una reserva se asigna automáticamente cuando pasa el horario y no representa asistencia.";
@@ -120,6 +119,7 @@ const translateStatisticsMessage = (t, reason) => {
 };
 
 function PeriodSelect({ value, onChange, label }) {
+  const { t } = useTranslation();
   return (
     <label className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
       <span>{label}</span>
@@ -130,7 +130,7 @@ function PeriodSelect({ value, onChange, label }) {
       >
         {PERIODS.map((period) => (
           <option key={period.value} value={period.value}>
-            {period.label}
+            {t(`statistics.${period.key}`)}
           </option>
         ))}
       </select>
@@ -139,12 +139,17 @@ function PeriodSelect({ value, onChange, label }) {
 }
 
 function Section({ title, period, setPeriod, children }) {
+  const { t } = useTranslation();
   return (
     <section className="rounded-xl border border-gray-400 bg-[#efecf0] p-5 shadow-sm">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">{title}</h2>
         {period !== undefined && (
-          <PeriodSelect value={period} onChange={setPeriod} label="Período:" />
+          <PeriodSelect
+            value={period}
+            onChange={setPeriod}
+            label={t("statistics.period")}
+          />
         )}
       </div>
       {children}
@@ -153,20 +158,25 @@ function Section({ title, period, setPeriod, children }) {
 }
 
 function LoadingOrError({ isLoading, isError, children }) {
+  const { t } = useTranslation();
   if (isLoading) return <Loading />;
   if (isError) {
     return (
       <p className="rounded-lg text-sm bg-red-50 p-4 text-red-600 border border-red-600">
-        No se pudieron cargar las estadísticas. Verificá que seas el dueño de
-        este negocio e intentá nuevamente.
+        {t("statistics.loadError")}
       </p>
     );
   }
   return children;
 }
 
-function Empty({ children = "No hay datos para el período seleccionado." }) {
-  return <p className="py-6 text-center text-gray-500">{children}</p>;
+function Empty({ children }) {
+  const { t } = useTranslation();
+  return (
+    <p className="py-6 text-center text-gray-500">
+      {children || t("statistics.noData")}
+    </p>
+  );
 }
 
 export default function Statistics({ tenantId }) {
@@ -213,17 +223,17 @@ export default function Statistics({ tenantId }) {
   if (!isOwner) return <Redirect to={`/mi-espacio/${tenantId}`} />;
 
   const summaryCards = [
-    { title: "Alumnos activos", value: summary.data?.activeStudents },
-    { title: "Reservas del período", value: summary.data?.reservations },
+    { title: t("statistics.activeStudents"), value: summary.data?.activeStudents },
+    { title: t("statistics.periodReservations"), value: summary.data?.reservations },
     {
-      title: "Ocupación promedio",
+      title: t("statistics.averageOccupancy"),
       value:
         summary.data?.averageOccupancyPercentage == null
-          ? "No disponible"
+          ? t("tenants.notProvided")
           : `${summary.data.averageOccupancyPercentage}%`,
     },
     {
-      title: "Ingresos registrados",
+      title: t("statistics.recordedRevenue"),
       value: formatCurrency(summary.data?.recordedRevenue),
     },
   ];
@@ -236,20 +246,20 @@ export default function Statistics({ tenantId }) {
           className="flex items-center gap-2 self-start text-gray-500 transition hover:text-black"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         <header>
           <h1 className="text-4xl font-bold min-[900px]:text-5xl">
-            Estadísticas
+            {t("statistics.title")}
           </h1>
           <p className="mt-3 text-gray-500">
-            Indicadores y evolución del negocio.
+            {t("statistics.subtitle")}
           </p>
         </header>
 
         <Section
-          title="Resumen"
+          title={t("statistics.summary")}
           period={summaryPeriod}
           setPeriod={setSummaryPeriod}
         >
@@ -282,7 +292,7 @@ export default function Statistics({ tenantId }) {
         </Section>
 
         <Section
-          title="Clases y asistencia"
+          title={t("statistics.classesAndAttendance")}
           period={classesPeriod}
           setPeriod={setClassesPeriod}
         >
@@ -296,7 +306,7 @@ export default function Statistics({ tenantId }) {
               </p>
             ) : (
               <>
-                <h3 className="mb-3 font-semibold">Ocupación por día</h3>
+                <h3 className="mb-3 font-semibold">{t("statistics.occupancyByDay")}</h3>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {classes.data.weekdayOccupancy.map((day) => (
                     <div
@@ -310,13 +320,13 @@ export default function Statistics({ tenantId }) {
                       </p>
                       <p className="text-sm text-gray-500">
                         {day.occupancyPercentage}% · {day.occupiedSpots}/
-                        {day.availableSpots} lugares
+                        {day.availableSpots} {t("statistics.spots")}
                       </p>
                     </div>
                   ))}
                 </div>
                 <h3 className="mb-3 mt-6 font-semibold">
-                  Ocupación por actividad
+                  {t("statistics.occupancyByActivity")}
                 </h3>
                 {classes.data.activityOccupancy.length ? (
                   <div className="space-y-3">
@@ -345,32 +355,32 @@ export default function Statistics({ tenantId }) {
           </LoadingOrError>
         </Section>
 
-        <Section title="Alumnos">
+        <Section title={t("statistics.students")}>
           <LoadingOrError
             isLoading={students.isLoading}
             isError={students.isError}
           >
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <article className="rounded-lg bg-[#F1EEF3] border border-gray-400 p-4">
-                <p className="text-sm text-gray-500">Alumnos activos</p>
+                <p className="text-sm text-gray-500">{t("statistics.activeStudents")}</p>
                 <p className="text-2xl font-bold">
                   {students.data?.activeStudents}
                 </p>
               </article>
               <article className="rounded-lg bg-[#F1EEF3] border border-gray-400 p-4">
-                <p className="text-sm text-gray-500">Nuevos este mes</p>
+                <p className="text-sm text-gray-500">{t("statistics.newThisMonth")}</p>
                 <p className="text-2xl font-bold">
                   {students.data?.newStudentsThisMonth}
                 </p>
               </article>
               <article className="rounded-lg bg-[#F1EEF3] border border-gray-400 p-4">
-                <p className="text-sm text-gray-500">Nuevos últimos 3 meses</p>
+                <p className="text-sm text-gray-500">{t("statistics.newLastThreeMonths")}</p>
                 <p className="text-2xl font-bold">
                   {students.data?.newStudentsLastThreeMonths}
                 </p>
               </article>
               <article className="rounded-lg bg-[#F1EEF3] border border-gray-400 p-4">
-                <p className="text-sm text-gray-500">Nuevos este año</p>
+                <p className="text-sm text-gray-500">{t("statistics.newThisYear")}</p>
                 <p className="text-2xl font-bold">
                   {students.data?.newStudentsThisYear}
                 </p>
@@ -379,7 +389,7 @@ export default function Statistics({ tenantId }) {
 
             <div className="mt-6 grid gap-6 lg:grid-cols-2">
               <div>
-                <h3 className="mb-3 font-semibold">Evolución mensual</h3>
+                <h3 className="mb-3 font-semibold">{t("statistics.monthlyEvolution")}</h3>
                 {students.data?.monthlyEvolution.some(
                   (entry) => entry.newStudents > 0,
                 ) ? (
@@ -395,14 +405,10 @@ export default function Statistics({ tenantId }) {
                         data={students.data.monthlyEvolution}
                         xDataKey="month"
                         dataKey="newStudents"
-                        name={t("statistics.tooltips.newStudents", {
-                          defaultValue: "Altas",
-                        })}
+                        name={t("statistics.newStudentsSeries")}
                         tooltipFormatter={(value) => [
                           value,
-                          t("statistics.tooltips.newStudents", {
-                            defaultValue: "Altas",
-                          }),
+                          t("statistics.tooltips.newStudents", { count: value }),
                         ]}
                       />
                     </Suspense>
@@ -412,7 +418,7 @@ export default function Statistics({ tenantId }) {
                 )}
               </div>
               <div>
-                <h3 className="mb-3 font-semibold">Alumnos por plan</h3>
+                <h3 className="mb-3 font-semibold">{t("statistics.studentsByPlan")}</h3>
                 {students.data?.studentsByPlan.length ? (
                   <div className="space-y-2">
                     {students.data.studentsByPlan.map((plan) => (
@@ -434,7 +440,7 @@ export default function Statistics({ tenantId }) {
         </Section>
 
         <Section
-          title="Profesores"
+          title={t("statistics.professors")}
           period={professorsPeriod}
           setPeriod={setProfessorsPeriod}
         >
@@ -461,22 +467,22 @@ export default function Statistics({ tenantId }) {
                       {professor.name} {professor.surname}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Clases dictadas:{" "}
+                      {t("statistics.classesTaught")}:{" "}
                       {professor.classesTaught == null
-                        ? "No disponible"
+                        ? t("tenants.notProvided")
                         : professor.classesTaught}
                     </p>
                   </article>
                 ))}
               </div>
             ) : (
-              <Empty>No hay profesores activos.</Empty>
+              <Empty>{t("statistics.noActiveProfessors")}</Empty>
             )}
           </LoadingOrError>
         </Section>
 
         <Section
-          title="Pagos"
+          title={t("statistics.payments")}
           period={paymentsPeriod}
           setPeriod={setPaymentsPeriod}
         >
@@ -485,11 +491,11 @@ export default function Statistics({ tenantId }) {
             isError={payments.isError}
           >
             <p className="mb-4 text-2xl font-bold text-[#fc697b]">
-              Ingresos: {formatCurrency(payments.data?.totalRevenue)}
+              {t("statistics.revenue")}: {formatCurrency(payments.data?.totalRevenue)}
             </p>
             <div className="grid gap-6 lg:grid-cols-2">
               <div>
-                <h3 className="mb-3 font-semibold">Ingresos por período</h3>
+                <h3 className="mb-3 font-semibold">{t("statistics.revenueByPeriod")}</h3>
                 {payments.data?.revenueByPeriod.length ? (
                   <div className="h-72 w-full min-w-0">
                     <Suspense
@@ -505,14 +511,10 @@ export default function Statistics({ tenantId }) {
                         yTickFormatter={formatCompactCurrency}
                         yAxisWidth={72}
                         dataKey="amount"
-                        name={t("statistics.tooltips.revenue", {
-                          defaultValue: "Ingresos",
-                        })}
+                        name={t("statistics.revenue")}
                         tooltipFormatter={(value) => [
                           formatCurrency(Number(value)),
-                          t("statistics.tooltips.revenue", {
-                            defaultValue: "Ingresos",
-                          }),
+                          t("statistics.revenue"),
                         ]}
                       />
                     </Suspense>
@@ -523,7 +525,7 @@ export default function Statistics({ tenantId }) {
               </div>
               <div>
                 <h3 className="mb-3 font-semibold">
-                  Métodos de pago por cantidad
+                  {t("statistics.paymentMethodsByCount")}
                 </h3>
                 {payments.data?.paymentsByMethod.length ? (
                   <div className="space-y-2">
@@ -538,7 +540,9 @@ export default function Statistics({ tenantId }) {
                           })}
                         </span>
                         <span>
-                          {method.payments} pagos · {method.percentage}%
+                          {formatNumber(method.payments)}{" "}
+                          {t("statistics.paymentsCount")} ·{" "}
+                          {formatNumber(method.percentage)}%
                         </span>
                       </div>
                     ))}

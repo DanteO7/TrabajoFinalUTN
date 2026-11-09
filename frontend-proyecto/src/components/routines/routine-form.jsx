@@ -19,8 +19,10 @@ import { createRoutine } from "../../services/routine";
 import { createRoutineSchema } from "../../schema/routine-schema";
 import FormInput from "../inputs/form-input";
 import AddExerciseModal from "./add-exercise-modal";
+import { useTranslation } from "react-i18next";
 
 export default function RoutineForm({ tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [selectedExerciseId, setSelectedExerciseId] = useState("");
@@ -65,7 +67,7 @@ export default function RoutineForm({ tenantId, close }) {
         queryKey: ["getRoutines", tenantId],
       });
 
-      setSuccessMessage("Rutina creada correctamente");
+      setSuccessMessage(t("routineForm.created"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -76,7 +78,7 @@ export default function RoutineForm({ tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear la rutina";
+      let msg = t("routineForm.createError");
 
       if (typeof data === "string") {
         msg = data;
@@ -95,7 +97,7 @@ export default function RoutineForm({ tenantId, close }) {
 
   const handleAddExercise = () => {
     if (!selectedExerciseId) {
-      setBackendError("Seleccioná un ejercicio");
+      setBackendError(t("routineForm.selectExercise"));
       setErrorModal(true);
       return;
     }
@@ -153,29 +155,33 @@ export default function RoutineForm({ tenantId, close }) {
       </button>
 
       <form onSubmit={handleSubmit(onSubmit)} className=" space-y-6">
-        <h2 className="text-2xl font-semibold text-center">Crear una rutina</h2>
+        <h2 className="text-2xl font-semibold text-center">
+          {t("routineForm.title")}
+        </h2>
 
         <FormInput
-          label="Nombre de la rutina"
+          label={t("routineForm.name")}
           id="name"
-          placeholder="Ej: Rutina de pecho"
+          placeholder={t("routineForm.namePlaceholder")}
           register={register("name")}
           error={errors.name}
         />
         <FormInput
           textarea
-          label="Descripción (opcional)"
+          label={t("routineForm.description")}
           register={register("description")}
           error={errors.description}
-          placeholder="Explicación de la actividad..."
+          placeholder={t("routineForm.descriptionPlaceholder")}
         />
 
         <div className="border-t pt-5">
           <div className="flex items-center mb-3 justify-between">
-            <h3 className="font-semibold text-lg ">Ejercicios</h3>
+            <h3 className="font-semibold text-lg ">
+              {t("routineForm.exercises")}
+            </h3>
             <BlackButton
               type={"button"}
-              text={"+ Agregar"}
+              text={t("routineForm.add")}
               textSmall={true}
               wfit={true}
               onClick={() => setOpenAddExerciseModal(true)}
@@ -207,7 +213,7 @@ export default function RoutineForm({ tenantId, close }) {
                           </div>
                           <div className="grid grid-cols-3 gap-2 mt-3">
                             <FormInput
-                              label="Series"
+                              label={t("routineForm.sets")}
                               id={`sets-${exercise.id}`}
                               type="number"
                               register={register(`exercises.${index}.sets`)}
@@ -215,7 +221,7 @@ export default function RoutineForm({ tenantId, close }) {
                             />
 
                             <FormInput
-                              label="Reps"
+                              label={t("routineForm.reps")}
                               id={`repetitions-${exercise.id}`}
                               type="number"
                               register={register(
@@ -225,10 +231,10 @@ export default function RoutineForm({ tenantId, close }) {
                             />
 
                             <FormInput
-                              label="Peso"
+                              label={t("routineForm.weight")}
                               id={`weight-${exercise.id}`}
                               type="number"
-                              placeholder="Opcional"
+                              placeholder={t("routineForm.optional")}
                               register={register(`exercises.${index}.weight`)}
                               error={errors.exercises?.[index]?.weight}
                             />
@@ -236,7 +242,7 @@ export default function RoutineForm({ tenantId, close }) {
 
                           <div className="mt-2 flex">
                             <FormInput
-                              label="Orden"
+                              label={t("routineForm.order")}
                               id={`order-${exercise.id}`}
                               type="number"
                               register={register(`exercises.${index}.order`)}
@@ -251,7 +257,7 @@ export default function RoutineForm({ tenantId, close }) {
             </div>
           ) : (
             <div className="border border-gray-400 rounded-lg p-5 text-center text-gray-500">
-              Todavía no agregaste ejercicios.
+              {t("routineForm.emptyExercises")}
             </div>
           )}
 
@@ -264,14 +270,18 @@ export default function RoutineForm({ tenantId, close }) {
 
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton
-            text="Cancelar"
+            text={t("routineForm.cancel")}
             onClick={close}
             textSmall={true}
             type="button"
           />
 
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear rutina"}
+            text={
+              mutation.isPending
+                ? t("routineForm.creating")
+                : t("routineForm.create")
+            }
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

@@ -16,8 +16,11 @@ import RedButton from "../buttons/red-button";
 import FormInput from "../inputs/form-input";
 import { updateRoutineSchema } from "../../schema/routine-schema";
 import AddExerciseModal from "./add-exercise-modal";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function RoutineModal({ routine, tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const canUpdateRoutine = useHasPermission(tenantId, "ROUTINE_UPDATE");
@@ -71,7 +74,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
       });
 
       setConfirmModal(false);
-      setSuccessMessage("Rutina eliminada correctamente");
+      setSuccessMessage(t("routineModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -82,7 +85,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la rutina";
+      let msg = t("routineModal.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -136,7 +139,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
       });
 
       setEditing(false);
-      setSuccessMessage("Rutina actualizada correctamente");
+      setSuccessMessage(t("routineModal.updateSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -147,7 +150,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la rutina";
+      let msg = t("routineModal.updateError");
 
       if (typeof data === "string") {
         msg = data;
@@ -196,7 +199,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
   const handleAddExercise = () => {
     if (!selectedExerciseId) {
-      setBackendError("Seleccioná un ejercicio");
+      setBackendError(t("routineForm.selectExercise"));
       setErrorModal(true);
       return;
     }
@@ -245,11 +248,13 @@ export default function RoutineModal({ routine, tenantId, close }) {
           <h2 className="text-2xl font-semibold mb-2">{currentRoutine.name}</h2>
 
           <p className="text-gray-600 whitespace-pre-wrap">
-            {currentRoutine.description || "Sin descripción"}
+            {currentRoutine.description || t("routineModal.noDescription")}
           </p>
 
           <div className="mt-7">
-            <h3 className="font-semibold text-lg mb-3">Ejercicios</h3>
+            <h3 className="font-semibold text-lg mb-3">
+              {t("routineForm.exercises")}
+            </h3>
 
             {currentRoutine.exercises?.length > 0 ? (
               <div className="flex flex-col gap-3">
@@ -265,17 +270,22 @@ export default function RoutineModal({ routine, tenantId, close }) {
                       </h4>
 
                       <p className="text-sm text-gray-500 mt-1">
-                        {exercise.sets} series × {exercise.repetitions} reps
+                        {t("routineModal.exerciseDetails", {
+                          sets: formatNumber(exercise.sets),
+                          repetitions: formatNumber(exercise.repetitions),
+                        })}
                         {exercise.weight !== null &&
                           exercise.weight !== undefined &&
-                          ` · ${exercise.weight} kg`}
+                          ` · ${t("routineModal.weightKg", {
+                            weight: formatNumber(exercise.weight),
+                          })}`}
                       </p>
                     </div>
                   ))}
               </div>
             ) : (
               <div className="border rounded-lg p-5 text-center text-gray-500">
-                Esta rutina no tiene ejercicios.
+                {t("routineModal.noExercises")}
               </div>
             )}
           </div>
@@ -284,7 +294,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
             <div className="flex gap-2 mt-8">
               {canDeleteRoutine && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("routineModal.delete")}
                   disabled={deleteMutation.isPending}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -294,7 +304,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
               {canUpdateRoutine && (
                 <BlackButton
-                  text="Editar"
+                  text={t("routineModal.edit")}
                   onClick={handleStartEditing}
                   textSmall={true}
                   img={<Pencil size={18} />}
@@ -308,30 +318,34 @@ export default function RoutineModal({ routine, tenantId, close }) {
           onSubmit={handleSubmit(handleUpdate)}
           className="space-y-6 max-h-[80vh] overflow-y-auto pr-1"
         >
-          <h2 className="text-2xl font-semibold text-center">Editar rutina</h2>
+          <h2 className="text-2xl font-semibold text-center">
+            {t("routineModal.editTitle")}
+          </h2>
 
           <FormInput
-            label="Nombre de la rutina"
+            label={t("routineForm.name")}
             id="name"
-            placeholder="Ej: Rutina de pecho"
+            placeholder={t("routineForm.namePlaceholder")}
             register={register("name")}
             error={errors.name}
           />
           <FormInput
             textarea
-            label="Descripción (opcional)"
+            label={t("routineForm.description")}
             register={register("description")}
             error={errors.description}
-            placeholder="Explicación de la actividad..."
+            placeholder={t("routineForm.descriptionPlaceholder")}
           />
 
           <div className="border-t border-gray-400 pt-5">
             <div className="flex items-center mb-3 justify-between">
-              <h3 className="font-semibold text-lg">Ejercicios</h3>
+              <h3 className="font-semibold text-lg">
+                {t("routineForm.exercises")}
+              </h3>
 
               <BlackButton
                 type="button"
-                text="+ Agregar"
+                text={t("routineForm.add")}
                 textSmall={true}
                 wfit={true}
                 onClick={() => setOpenAddExerciseModal(true)}
@@ -373,7 +387,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
                             <div className="grid grid-cols-3 gap-2 mt-3">
                               <FormInput
-                                label="Series"
+                                label={t("routineForm.sets")}
                                 id={`sets-${exercise.id}`}
                                 type="number"
                                 register={register(`exercises.${index}.sets`)}
@@ -381,7 +395,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
                               />
 
                               <FormInput
-                                label="Reps"
+                                label={t("routineForm.reps")}
                                 id={`repetitions-${exercise.id}`}
                                 type="number"
                                 register={register(
@@ -391,10 +405,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
                               />
 
                               <FormInput
-                                label="Peso"
+                                label={t("routineForm.weight")}
                                 id={`weight-${exercise.id}`}
                                 type="number"
-                                placeholder="Opcional"
+                                placeholder={t("routineForm.optional")}
                                 register={register(`exercises.${index}.weight`)}
                                 error={errors.exercises?.[index]?.weight}
                               />
@@ -402,7 +416,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
                             <div className="mt-2">
                               <FormInput
-                                label="Orden"
+                                label={t("routineForm.order")}
                                 id={`order-${exercise.id}`}
                                 type="number"
                                 register={register(`exercises.${index}.order`)}
@@ -417,7 +431,7 @@ export default function RoutineModal({ routine, tenantId, close }) {
               </div>
             ) : (
               <div className="border rounded-lg p-5 text-center text-gray-500">
-                Esta rutina no tiene ejercicios.
+                {t("routineModal.noExercises")}
               </div>
             )}
 
@@ -430,14 +444,18 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("routineForm.cancel")}
               onClick={handleCancelEdit}
               textSmall={true}
               type="button"
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("studentModal.updating")
+                  : t("studentModal.update")
+              }
               type="submit"
               disabled={updateMutation.isPending}
               textSmall={true}
@@ -448,8 +466,10 @@ export default function RoutineModal({ routine, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar esta rutina?"
-          message={`Estás por eliminar la rutina "${currentRoutine.name}". Esta acción no se puede deshacer.`}
+          title={t("routineModal.confirmTitle")}
+          message={t("routineModal.confirmMessage", {
+            name: currentRoutine.name,
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

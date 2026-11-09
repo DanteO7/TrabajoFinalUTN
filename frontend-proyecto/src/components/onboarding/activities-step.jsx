@@ -4,8 +4,10 @@ import { getActivities } from "../../services/activity";
 import BlackButton from "../buttons/black-button";
 import Loading from "../loading";
 import ActivityForm from "../activities/activity-form";
+import { useTranslation } from "react-i18next";
 
 export default function ActivitiesStep({ tenantId, isComplete }) {
+  const { t } = useTranslation();
   const [openForm, setOpenForm] = useState(false);
 
   const { isLoading, isError, refetch } = useQuery({
@@ -22,7 +24,7 @@ export default function ActivitiesStep({ tenantId, isComplete }) {
     return (
       <div className="mt-6">
         <p className="text-red-600" role="alert">
-          No se pudieron cargar las actividades.
+          {t("onboardingSteps.activitiesLoadError")}
         </p>
 
         <button
@@ -30,7 +32,7 @@ export default function ActivitiesStep({ tenantId, isComplete }) {
           onClick={() => refetch()}
           className="mt-3 underline"
         >
-          Reintentar
+          {t("onboardingSteps.retry")}
         </button>
       </div>
     );
@@ -40,12 +42,12 @@ export default function ActivitiesStep({ tenantId, isComplete }) {
     <div className="mt-6 flex flex-col gap-5">
       <p className="text-gray-600">
         {isComplete
-          ? "Listo, ya tenés tus actividades configuradas. Podés continuar."
-          : "Las actividades representan los servicios que ofrece tu negocio, como Pilates, Yoga o Entrenamiento funcional."}
+          ? t("onboardingSteps.activitiesComplete")
+          : t("onboardingSteps.activitiesDescription")}
       </p>
       {!isComplete && (
         <BlackButton
-          text="Crear actividad"
+          text={t("onboardingSteps.createActivity")}
           onClick={() => setOpenForm(true)}
           wfit
           textSmall

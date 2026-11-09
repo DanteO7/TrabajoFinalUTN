@@ -7,41 +7,43 @@ import {
   Zap,
 } from "lucide-react";
 import FeatureCard from "./feature-card";
+import { useTranslation } from "react-i18next";
 
 export default function Features() {
+  const { t } = useTranslation();
   return (
     <section>
-      <h2 className="text-center font-semibold text-3xl">Características</h2>
+      <h2 className="text-center font-semibold text-3xl">{t("home.featuresTitle")}</h2>
       <div className="flex flex-col gap-14 mt-14 md:flex-row md:flex-wrap md:justify-center">
         <FeatureCard
           icon={Users}
-          title="Clientes"
-          text="Gestioná fácilmente tus alumnos con información clara y organizada. Controlá estados, asistencia y datos importantes desde un solo lugar."
+          title={t("home.features.customersTitle")}
+          text={t("home.features.customers")}
         />
         <FeatureCard
           icon={Calendar}
-          title="Turnos"
-          text="Administrá clases y reservas de forma automática. Tus clientes pueden anotarse, cancelar o modificar turnos sin necesidad de contactarte."
+          title={t("home.features.appointmentsTitle")}
+          text={t("home.features.appointments")}
         />
         <FeatureCard
           icon={CreditCard}
-          title="Pagos"
-          text="Llevá el control de pagos y planes de tus alumnos. Gestioná abonos, vencimientos y el estado de cada cliente, con la posibilidad de que paguen directamente desde la app de forma rápida y segura."
+          title={t("home.features.paymentsTitle")}
+          text={t("home.features.payments")}
         />
         <FeatureCard
           icon={FileText}
-          title="Informes"
-          text="Obtené información clara sobre tu negocio: asistencia, alumnos activos, turnos ocupados y más para tomar mejores decisiones."
+          title={t("home.features.reportsTitle")}
+          text={t("home.features.reports")}
         />
         <FeatureCard
           icon={BarChart}
-          title="Estadísticas"
-          text="Visualizá el rendimiento de tu actividad con datos simples: ocupación de clases, crecimiento de alumnos y uso del sistema."
+          title={t("home.features.statisticsTitle")}
+          text={t("home.features.statistics")}
         />
         <FeatureCard
           icon={Zap}
-          title="Automatización"
-          text="Ahorrá tiempo automatizando tareas repetitivas. Turnos, cupos y gestión diaria funcionando sin esfuerzo."
+          title={t("home.features.automationTitle")}
+          text={t("home.features.automation")}
         />
       </div>
     </section>

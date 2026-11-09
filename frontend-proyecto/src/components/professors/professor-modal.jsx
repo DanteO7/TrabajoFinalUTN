@@ -11,6 +11,8 @@ import ConfirmModal from "../modals/confirm-modal";
 import RedButton from "../buttons/red-button";
 import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function ProfessorModal({
   professor,
@@ -18,6 +20,7 @@ export default function ProfessorModal({
   close,
   onUpdated,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const canUpdateProfessor = useHasPermission(tenantId, "PROFESSOR_UPDATE");
@@ -84,7 +87,7 @@ export default function ProfessorModal({
       });
 
       setConfirmModal(false);
-      setSuccessMessage("Profesor eliminado correctamente");
+      setSuccessMessage(t("professorModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -95,7 +98,7 @@ export default function ProfessorModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar el profesor";
+      let msg = t("professorModal.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -129,7 +132,7 @@ export default function ProfessorModal({
       );
 
       setEditing(false);
-      setSuccessMessage("Profesor actualizado correctamente");
+      setSuccessMessage(t("professorModal.updateSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -140,7 +143,7 @@ export default function ProfessorModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el profesor";
+      let msg = t("professorModal.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -178,7 +181,9 @@ export default function ProfessorModal({
           <div className="space-y-4">
             {currentProfessor.user.phoneNumber && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-                <p className="text-sm text-gray-600 mb-1">Teléfono</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  {t("professorModal.phone")}
+                </p>
 
                 <p className="font-semibold text-[#333]">
                   {currentProfessor.user.phoneNumber}
@@ -190,20 +195,28 @@ export default function ProfessorModal({
               <div className="flex gap-4">
                 {currentProfessor.user.age && (
                   <div className="bg-[#f4f0f5] w-full rounded-lg border border-gray-400 shadow-md p-4">
-                    <p className="text-sm text-gray-600 mb-1">Edad</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("professorModal.age")}
+                    </p>
 
                     <p className="font-semibold text-[#333]">
-                      {currentProfessor.user.age} Años
+                      {t("professorModal.ageYears", {
+                        age: formatNumber(currentProfessor.user.age),
+                      })}
                     </p>
                   </div>
                 )}
 
                 {currentProfessor.user.weight && (
                   <div className="bg-[#f4f0f5] w-full rounded-lg border border-gray-400 shadow-md p-4">
-                    <p className="text-sm text-gray-600 mb-1">Peso</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("professorModal.weight")}
+                    </p>
 
                     <p className="font-semibold text-[#333]">
-                      {currentProfessor.user.weight} Kg
+                      {t("professorModal.weightKg", {
+                        weight: formatNumber(currentProfessor.user.weight),
+                      })}
                     </p>
                   </div>
                 )}
@@ -212,7 +225,7 @@ export default function ProfessorModal({
             {currentProfessor.user.pathologies && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">
-                  Patologías o condiciones médicas
+                  {t("professorModal.pathologies")}
                 </p>
                 <p className="font-semibold text-[#333]">
                   {currentProfessor.user.pathologies}
@@ -220,7 +233,9 @@ export default function ProfessorModal({
               </div>
             )}
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Estado</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("professorModal.status")}
+              </p>
 
               <span
                 className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${
@@ -229,13 +244,17 @@ export default function ProfessorModal({
                     : "bg-red-100 text-red-700"
                 }`}
               >
-                {currentProfessor.isActive ? "Activo" : "Inactivo"}
+                {currentProfessor.isActive
+                  ? t("professorModal.active")
+                  : t("professorModal.inactive")}
               </span>
             </div>
 
             {currentProfessor.specialities.length > 0 && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-                <p className="text-sm text-gray-600 mb-3">Profesiones</p>
+                <p className="text-sm text-gray-600 mb-3">
+                  {t("professorModal.professions")}
+                </p>
 
                 <div className="flex flex-wrap gap-2">
                   {currentProfessor.specialities.map((spec) => (
@@ -254,7 +273,7 @@ export default function ProfessorModal({
             <div className="flex gap-2 mt-8">
               {canDeleteProfessor && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("professorModal.delete")}
                   disabled={deleteMutation.isPending}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -264,7 +283,7 @@ export default function ProfessorModal({
 
               {canUpdateProfessor && (
                 <BlackButton
-                  text="Editar"
+                  text={t("professorModal.edit")}
                   onClick={startEditing}
                   textSmall={true}
                   img={<Pencil size={18} />}
@@ -276,11 +295,13 @@ export default function ProfessorModal({
       ) : (
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">
-            Editar profesor
+            {t("professorModal.editTitle")}
           </h2>
 
           <div>
-            <label className="block text-sm font-semibold mb-3">Estado</label>
+            <label className="block text-sm font-semibold mb-3">
+              {t("professorModal.status")}
+            </label>
 
             <div className="space-y-2">
               {[true, false].map((status) => (
@@ -294,7 +315,9 @@ export default function ProfessorModal({
                   }`}
                 >
                   <p className="font-semibold text-[#333]">
-                    {status ? "Activo" : "Inactivo"}
+                    {status
+                      ? t("professorModal.active")
+                      : t("professorModal.inactive")}
                   </p>
                 </div>
               ))}
@@ -303,7 +326,7 @@ export default function ProfessorModal({
 
           <div>
             <label className="block text-sm font-semibold mb-3">
-              Profesiones
+              {t("professorModal.professions")}
             </label>
 
             {selectedSpecialityIds.length > 0 ? (
@@ -337,12 +360,12 @@ export default function ProfessorModal({
               </div>
             ) : (
               <p className="text-sm text-gray-500 mb-4">
-                Este profesor no tiene profesiones asignadas.
+                {t("professorModal.noProfessions")}
               </p>
             )}
 
             <BlackButton
-              text="Agregar profesiones"
+              text={t("professorModal.addProfessions")}
               textSmall={true}
               img={<Plus size={18} />}
               onClick={() => setOpenSpecialityModal(true)}
@@ -352,7 +375,7 @@ export default function ProfessorModal({
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("professorModal.cancel")}
               onClick={() => {
                 setEditing(false);
                 setIsActive(currentProfessor.isActive);
@@ -366,7 +389,11 @@ export default function ProfessorModal({
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("professorModal.updating")
+                  : t("professorModal.update")
+              }
               onClick={() => updateMutation.mutate()}
               disabled={updateMutation.isPending}
               textSmall={true}
@@ -377,7 +404,9 @@ export default function ProfessorModal({
 
       {openSpecialityModal && (
         <Modal open onClose={() => setOpenSpecialityModal(false)}>
-          <h2 className="text-2xl font-semibold mb-5">Agregar profesiones</h2>
+          <h2 className="text-2xl font-semibold mb-5">
+            {t("professorModal.addProfessions")}
+          </h2>
 
           {availableSpecialities.length > 0 ? (
             <div className="space-y-2">
@@ -397,7 +426,7 @@ export default function ProfessorModal({
             </div>
           ) : (
             <p className="text-gray-500">
-              No hay profesiones disponibles para agregar.
+              {t("professorModal.noProfessionsAvailable")}
             </p>
           )}
         </Modal>
@@ -405,8 +434,10 @@ export default function ProfessorModal({
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar este profesor?"
-          message={`Estás por eliminar el profesor "${currentProfessor.user.name} ${currentProfessor.user.surname}". Esta acción no se puede deshacer.`}
+          title={t("professorModal.confirmTitle")}
+          message={t("professorModal.confirmMessage", {
+            name: `${currentProfessor.user.name} ${currentProfessor.user.surname}`,
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

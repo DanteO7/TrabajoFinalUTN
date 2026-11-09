@@ -15,7 +15,7 @@ export default function Profile() {
       <div className="mt-16 grid lg:grid-cols-[0.8fr_1fr] w-[80%] gap-10">
         <Navbar user={user} />
         <div className="w-full lg:max-w-120 flex flex-col gap-5 text-[18px]">
-          <h3 className="text-2xl font-semibold">Ajustes</h3>
+          <h3 className="text-2xl font-semibold">{t("header.settings")}</h3>
           <label className="flex flex-wrap items-center gap-2 text-[16px] text-gray-600">
             <span>{t("header.language")}:</span>
             <select
@@ -23,8 +23,8 @@ export default function Profile() {
               onChange={(event) => setLanguage(event.target.value)}
               className="rounded-lg border border-gray-400 bg-[#f1eef3] p-2 text-gray-700 cursor-pointer"
             >
-              <option value="es">Español (ES)</option>
-              <option value="en">Inglés (EN)</option>
+              <option value="es">{t("settings.spanish")}</option>
+              <option value="en">{t("settings.english")}</option>
             </select>
           </label>
           {/* <ThemeSelector /> */}

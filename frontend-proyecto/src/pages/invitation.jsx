@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { formatCurrency, getLocale } from "../utils/formatting";
 import MainLayout from "../layouts/main-layout";
 import { useLocation } from "wouter";
 import { getInvitationInfo, acceptInvitation } from "../services/invitation";
@@ -9,8 +10,11 @@ import Loading from "../components/loading";
 import { getStudentPlans } from "../services/student-plan";
 import BlackButton from "../components/buttons/black-button";
 import WhiteButton from "../components/buttons/white-button";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../utils/formatting";
 
 export default function Invitation({ token }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
 
@@ -41,7 +45,7 @@ export default function Invitation({ token }) {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myTenants"] });
-      setSuccessMessage("Te uniste correctamente");
+      setSuccessMessage(t("invitation.success"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -52,7 +56,7 @@ export default function Invitation({ token }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al aceptar la invitación";
+      let msg = t("invitation.error");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -66,7 +70,7 @@ export default function Invitation({ token }) {
 
   const handleAccept = () => {
     if (invitation?.role === "Student" && !selectedPlan) {
-      setBackendError("Debes seleccionar un plan");
+      setBackendError(t("invitation.selectPlanError"));
       setErrorModal(true);
       return;
     }
@@ -86,32 +90,42 @@ export default function Invitation({ token }) {
     <MainLayout>
       <div className="w-full max-w-md mx-auto mt-20">
         <div className="border border-gray-400 rounded-lg shadow-lg p-8 bg-[#EFECF0]">
-          <h1 className="text-3xl font-bold text-center mb-2">Invitación</h1>
+          <h1 className="text-3xl font-bold text-center mb-2">
+            {t("invitation.title")}
+          </h1>
 
           <p className="text-gray-500 text-center mb-8">
-            Te han invitado a unirte a un negocio
+            {t("invitation.description")}
           </p>
 
           <div className="space-y-6">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Negocio</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("invitation.business")}
+              </p>
               <h2 className="text-2xl font-bold text-[#333]">
                 {invitation?.tenantName}
               </h2>
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Rol</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("invitation.role")}
+              </p>
               <p className="text-lg font-semibold text-[#333]">
-                {invitation?.role === "Student" ? "Alumno" : "Profesor"}
+                {invitation?.role === "Student"
+                  ? t("invitation.student")
+                  : t("invitation.professor")}
               </p>
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Válido hasta</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("invitation.validUntil")}
+              </p>
               <p className="text-lg font-semibold text-[#333]">
                 {new Date(invitation?.expirationDate).toLocaleDateString(
-                  "es-AR",
+                  getLocale(),
                 )}
               </p>
             </div>
@@ -119,11 +133,13 @@ export default function Invitation({ token }) {
             {invitation?.role === "Student" && (
               <div>
                 <label className="block text-sm font-semibold mb-3">
-                  Selecciona un plan
+                  {t("invitation.selectPlan")}
                 </label>
 
                 {plansLoading ? (
-                  <p className="text-gray-500">Cargando planes...</p>
+                  <p className="text-gray-500">
+                    {t("invitation.loadingPlans")}
+                  </p>
                 ) : plans.length > 0 ? (
                   <div className="space-y-2">
                     {plans.map((plan) => {
@@ -145,11 +161,13 @@ export default function Invitation({ token }) {
                               {plan.name}
                             </p>
                             <p className="text-sm text-gray-600 mt-1">
-                              {plan.classesPerMonth} clases/mes
+                              {t("invitation.classesPerMonth", {
+                                count: formatNumber(plan.classesPerMonth),
+                              })}
                             </p>
                           </div>
                           <p className="font-bold text-[#333]">
-                            ${plan.price.toLocaleString("es-AR")}
+                            {formatCurrency(plan.price)}
                           </p>
                         </div>
                         </div>
@@ -157,7 +175,7 @@ export default function Invitation({ token }) {
                     })}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No hay planes disponibles</p>
+                  <p className="text-gray-500">{t("invitation.noPlans")}</p>
                 )}
               </div>
             )}
@@ -165,14 +183,16 @@ export default function Invitation({ token }) {
             <div className="space-y-2">
               <BlackButton
                 text={
-                  mutation.isPending ? "Aceptando..." : "Aceptar invitación"
+                  mutation.isPending
+                    ? t("invitation.accepting")
+                    : t("invitation.accept")
                 }
                 textSmall
                 onClick={handleAccept}
                 disabled={mutation.isPending}
               />
               <WhiteButton
-                text="Cancelar"
+                text={t("invitation.cancel")}
                 textSmall
                 onClick={() => setLocation("/")}
               />

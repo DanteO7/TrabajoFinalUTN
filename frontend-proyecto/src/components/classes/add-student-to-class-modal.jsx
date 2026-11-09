@@ -14,6 +14,8 @@ import {
   addStudentToClassTemplate,
   getClassTemplates,
 } from "../../services/class-template";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function AddStudentToClassModal({
   classId,
@@ -24,6 +26,7 @@ export default function AddStudentToClassModal({
   currentClass,
   onClassUpdated,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [inputValue, setInputValue] = useState("");
   const [selectedStudents, setSelectedStudents] = useState([]);
@@ -132,7 +135,7 @@ export default function AddStudentToClassModal({
       const msg =
         typeof data === "string"
           ? data
-          : data?.message || "Error al agregar alumnos";
+          : data?.message || t("addStudentsModal.error");
 
       setErrorMessage(msg);
       setErrorModal(true);
@@ -143,31 +146,37 @@ export default function AddStudentToClassModal({
     <Modal open onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
       >
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-4">Agregar alumnos</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        {t("addStudentsModal.title")}
+      </h2>
 
       <div className="mb-4">
         <SearchInput
           value={inputValue}
           onChange={setInputValue}
-          placeholder="Buscar por nombre, apellido o email..."
+          placeholder={t("addStudentsModal.search")}
         />
       </div>
 
       {selectedStudents.length > 0 && (
         <p className="text-sm text-gray-600 mb-3">
-          {selectedStudents.length} estudiante(s) seleccionado(s)
+          {t("addStudentsModal.selected", {
+            count: selectedStudents.length,
+            formattedCount: formatNumber(selectedStudents.length),
+          })}
         </p>
       )}
 
       <div className="max-h-96 overflow-y-auto space-y-2">
         {availableStudents.length === 0 ? (
           <p className="text-gray-500 text-center py-4">
-            No se encontraron alumnos disponibles
+            {t("addStudentsModal.empty")}
           </p>
         ) : (
           availableStudents.map((student) => {
@@ -204,15 +213,18 @@ export default function AddStudentToClassModal({
       <div className="grid grid-cols-2 gap-3 mt-8">
         <WhiteButton
           type="button"
-          text="Cancelar"
+          text={t("addStudentsModal.cancel")}
           onClick={close}
           textSmall={true}
         />
         <BlackButton
           text={
             addMutation.isPending
-              ? "Agregando..."
-              : `Agregar (${selectedStudents.length})`
+              ? t("addStudentsModal.adding")
+              : t("addStudentsModal.addCount", {
+                  count: selectedStudents.length,
+                  formattedCount: formatNumber(selectedStudents.length),
+                })
           }
           textSmall={true}
           onClick={() => addMutation.mutate()}
@@ -230,7 +242,10 @@ export default function AddStudentToClassModal({
 
       {successModal && (
         <SuccessModal
-          message={`${selectedStudents.length} estudiante(s) agregado(s) correctamente`}
+          message={t("addStudentsModal.success", {
+            count: selectedStudents.length,
+            formattedCount: formatNumber(selectedStudents.length),
+          })}
           close={() => setSuccessModal(false)}
           isSuccesOrError={true}
         />

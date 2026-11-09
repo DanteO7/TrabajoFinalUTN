@@ -5,8 +5,10 @@ import ClassTemplateWeek from "./classes/class-template-week";
 import { IoArrowBack } from "react-icons/io5";
 import { useLocation } from "wouter";
 import { useTenantStore } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function Classes({ tenantId }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("official");
   const [, setLocation] = useLocation();
 
@@ -24,13 +26,15 @@ export default function Classes({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
         <div>
-          <h1 className="text-4xl min-[900px]:text-5xl font-bold">Clases</h1>
+          <h1 className="text-4xl min-[900px]:text-5xl font-bold">
+            {t("tenantPages.classes.title")}
+          </h1>
 
           <p className="text-gray-500 mt-3">
-            Seleccioná un día para visualizar las clases programadas.
+            {t("tenantPages.classes.description")}
           </p>
         </div>
         {rolesLoaded && !isStudent && (
@@ -44,7 +48,7 @@ export default function Classes({ tenantId }) {
                   : "text-gray-400 border-gray-400 border-b"
               }`}
             >
-              Clases oficiales
+              {t("tenantPages.classes.official")}
             </button>
 
             <button
@@ -56,7 +60,7 @@ export default function Classes({ tenantId }) {
                   : "text-gray-400 border-gray-400 border-b"
               }`}
             >
-              Semana modelo
+              {t("tenantPages.classes.templateWeek")}
             </button>
           </div>
         )}

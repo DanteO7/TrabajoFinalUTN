@@ -1,6 +1,8 @@
 import { X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { getLocale } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 import Modal from "../modals/modal";
 import ErrorModal from "../modals/error-modal";
@@ -11,6 +13,7 @@ import ConfirmModal from "../modals/confirm-modal";
 import RedButton from "../buttons/red-button";
 
 export default function ReservationModal({ reservation, tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [backendError, setBackendError] = useState();
@@ -29,8 +32,8 @@ export default function ReservationModal({ reservation, tenantId, close }) {
     const [year, month, day] = dateString.split("T")[0].split("-");
     const date = new Date(year, month - 1, day);
 
-    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
-    const dateFormatted = date.toLocaleDateString("es-AR");
+    const dayName = date.toLocaleDateString(getLocale(), { weekday: "long" });
+    const dateFormatted = date.toLocaleDateString(getLocale());
 
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
   };
@@ -48,7 +51,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
       });
       setConfirmModal(false);
 
-      setSuccessMessage("Reserva cancelada correctamente");
+      setSuccessMessage(t("reservationUi.cancelSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -59,7 +62,7 @@ export default function ReservationModal({ reservation, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error";
+      let msg = t("reservationUi.error");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -85,7 +88,9 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
       <div className="space-y-4">
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Estado</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("reservationUi.status")}
+          </p>
 
           <span
             className={`rounded-full px-3 py-1 text-sm ${
@@ -95,19 +100,23 @@ export default function ReservationModal({ reservation, tenantId, close }) {
             }`}
           >
             {reservation.reservationStatus === "Completed"
-              ? "Completada"
-              : "Pendiente"}
+              ? t("reservationUi.filters.completed")
+              : t("reservationUi.filters.pending")}
           </span>
         </div>
 
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Fecha</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("reservationUi.date")}
+          </p>
 
           <p className="font-semibold">{formatDateWithDay(classItem.date)}</p>
         </div>
 
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Horario</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("reservationUi.schedule")}
+          </p>
 
           <p className="font-semibold">
             {classItem.startTime.slice(0, 5)} - {classItem.endTime.slice(0, 5)}
@@ -115,13 +124,17 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         </div>
 
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Actividad</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("reservationUi.activity")}
+          </p>
 
           <p className="font-semibold">{classItem.activityName}</p>
         </div>
 
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Profesor</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("reservationUi.professor")}
+          </p>
 
           <p className="font-semibold">
             {classItem.professor.user.name} {classItem.professor.user.surname}
@@ -133,7 +146,9 @@ export default function ReservationModal({ reservation, tenantId, close }) {
         <div className="mt-8">
           <RedButton
             text={
-              deleteMutation.isPending ? "Saliendo..." : "Salir de la clase"
+              deleteMutation.isPending
+                ? t("reservationUi.leaving")
+                : t("reservationUi.leaveClass")
             }
             onClick={() => setConfirmModal(true)}
             disabled={deleteMutation.isPending}
@@ -144,8 +159,12 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="Salir de esta clase?"
-          message={`Estás por salir de la clase del dia ${formatDateWithDay(classItem.date)} a las ${classItem.startTime.slice(0, 5)} - ${classItem.endTime.slice(0, 5)}.`}
+          title={t("reservationUi.leaveTitle")}
+          message={t("reservationUi.leaveConfirmation", {
+            date: formatDateWithDay(classItem.date),
+            startTime: classItem.startTime.slice(0, 5),
+            endTime: classItem.endTime.slice(0, 5),
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

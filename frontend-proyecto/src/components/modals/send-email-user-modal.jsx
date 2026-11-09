@@ -1,5 +1,6 @@
 import Modal from "./modal";
 import { Mail, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function SendEmailUserModal({
   close,
@@ -7,12 +8,13 @@ export default function SendEmailUserModal({
   isPending,
   error,
 }) {
+  const { t } = useTranslation();
   return (
     <Modal open={true} onClose={close} isSuccesOrError>
       <button
         onClick={close}
         className="absolute top-4 right-4 text-white hover:text-gray-300 transition duration-200 cursor-pointer"
-        aria-label="Cerrar"
+        aria-label={t("sendEmailUser.close")}
       >
         <X size={20} />
       </button>
@@ -23,12 +25,11 @@ export default function SendEmailUserModal({
 
       <div className="flex flex-col items-center justify-center text-center px-6 sm:px-10 gap-3 my-6">
         <h4 className="font-semibold text-2xl">
-          ¿Deseás enviar un mail al usuario?
+          {t("sendEmailUser.title")}
         </h4>
 
         <p className="text-base text-gray-700">
-          El negocio ya fue creado. Podés enviarle un correo para avisarle que
-          ya está listo para usar.
+          {t("sendEmailUser.description")}
         </p>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
@@ -40,7 +41,7 @@ export default function SendEmailUserModal({
             disabled={isPending}
             className="rounded-lg px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-100 transition cursor-pointer disabled:opacity-50"
           >
-            Ahora no
+            {t("sendEmailUser.notNow")}
           </button>
 
           <button
@@ -49,7 +50,9 @@ export default function SendEmailUserModal({
             disabled={isPending}
             className="rounded-lg px-6 py-3 bg-[#5f7de9] text-white hover:bg-[#5273e8] transition cursor-pointer disabled:opacity-50"
           >
-            {isPending ? "Enviando..." : "Enviar mail"}
+            {isPending
+              ? t("sendEmailUser.sending")
+              : t("sendEmailUser.send")}
           </button>
         </div>
       </div>

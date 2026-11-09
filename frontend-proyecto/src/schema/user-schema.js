@@ -1,14 +1,15 @@
 import { z } from "zod";
+import { validationMessage } from "../utils/validation-message";
 
 export const updateUserSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre es obligatorio")
-    .max(50, "Máximo 50 caracteres"),
+    .min(1, validationMessage("nameRequired"))
+    .max(50, validationMessage("maxLength50")),
   surname: z
     .string()
-    .min(1, "El apellido es obligatorio")
-    .max(50, "Máximo 50 caracteres"),
+    .min(1, validationMessage("surnameRequired"))
+    .max(50, validationMessage("maxLength50")),
   phoneNumber: z
     .string()
     .trim()
@@ -16,7 +17,7 @@ export const updateUserSchema = z.object({
       (val) =>
         val === "" ||
         (val.length >= 8 && val.length <= 20 && /^[0-9+\-\s()]+$/.test(val)),
-      "Formato de teléfono inválido",
+      validationMessage("phoneInvalid"),
     )
     .optional(),
   age: z
@@ -27,7 +28,7 @@ export const updateUserSchema = z.object({
     })
     .refine(
       (val) => val === undefined || (val >= 1 && val <= 120),
-      "La edad debe estar entre 1 y 120",
+      validationMessage("ageRange"),
     )
     .optional(),
 
@@ -39,7 +40,7 @@ export const updateUserSchema = z.object({
     })
     .refine(
       (val) => val === undefined || (val >= 1 && val <= 300),
-      "El peso debe estar entre 1 y 300",
+      validationMessage("weightRange"),
     )
     .optional(),
   pathologies: z.string().optional(),

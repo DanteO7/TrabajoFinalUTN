@@ -11,8 +11,10 @@ import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
+import { useTranslation } from "react-i18next";
 
 export default function Professors({ tenantId }) {
+  const { t } = useTranslation();
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
 
   const canCreateInvitation = useHasPermission(tenantId, "INVITATION_CREATE");
@@ -50,24 +52,24 @@ export default function Professors({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Profesores
+                {t("tenantPages.professors.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar todos los profesores del negocio.
+                {t("tenantPages.professors.description")}
               </p>
             </div>
 
@@ -76,12 +78,12 @@ export default function Professors({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar profesor..."
+                  placeholder={t("tenantPages.professors.search")}
                 />
 
                 {canReadInvitations && (
                   <BlackButton
-                    text="+ Invitar profesor"
+                    text={t("tenantPages.professors.invite")}
                     onClick={() => setOpenModal(true)}
                     textSmall={true}
                     wfit={isSmallScreen}
@@ -110,7 +112,9 @@ export default function Professors({ tenantId }) {
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {professor.isActive ? "Activo" : "Inactivo"}
+                        {professor.isActive
+                          ? t("tenantPages.active")
+                          : t("tenantPages.inactive")}
                       </span>
                     </div>
 
@@ -119,7 +123,7 @@ export default function Professors({ tenantId }) {
                     {professor.specialities.length > 0 && (
                       <div className="mt-4">
                         <p className="text-xs text-gray-600 mb-2">
-                          Profesiones:
+                          {t("tenantPages.professors.specialities")}:
                         </p>
 
                         <div className="flex flex-wrap gap-1">
@@ -139,19 +143,19 @@ export default function Professors({ tenantId }) {
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
-                    Todavía no hay profesores
+                    {t("tenantPages.professors.emptyTitle")}
                   </h3>
 
                   {canCreateInvitation ? (
                     <>
                       <p className="text-gray-500 px-2 mt-2 mb-6">
-                        Invitá tu primer profesor para comenzar.
+                        {t("tenantPages.professors.invitePrompt")}
                       </p>
 
                       {canReadInvitations && (
                         <div className="flex items-center justify-center">
                           <BlackButton
-                            text="+ Invitar profesor"
+                            text={t("tenantPages.professors.invite")}
                             onClick={() => setOpenModal(true)}
                             textSmall={true}
                             wfit={true}
@@ -161,7 +165,7 @@ export default function Professors({ tenantId }) {
                     </>
                   ) : (
                     <p className="text-gray-500 px-2 mt-2 mb-6">
-                      Todavía no hay profesores.
+                      {t("tenantPages.professors.noProfessors")}
                     </p>
                   )}
                 </div>

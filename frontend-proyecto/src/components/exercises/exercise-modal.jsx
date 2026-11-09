@@ -14,8 +14,10 @@ import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
 import FormInput from "../inputs/form-input";
 import { updateExerciseSchema } from "../../schema/exercise-schema";
+import { useTranslation } from "react-i18next";
 
 export default function ExerciseModal({ exercise, tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const canUpdateExercise = useHasPermission(tenantId, "EXERCISE_UPDATE");
@@ -56,7 +58,7 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
       });
 
       setConfirmModal(false);
-      setSuccessMessage("Ejercicio eliminado correctamente");
+      setSuccessMessage(t("exerciseModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -67,7 +69,7 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar el ejercicio";
+      let msg = t("exerciseModal.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -107,7 +109,7 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
       });
 
       setEditing(false);
-      setSuccessMessage("Ejercicio actualizado correctamente");
+      setSuccessMessage(t("exerciseModal.updateSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -118,7 +120,7 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el ejercicio";
+      let msg = t("exerciseModal.updateError");
 
       if (typeof data === "string") {
         msg = data;
@@ -162,14 +164,14 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
           </h2>
 
           <p className="text-gray-600 whitespace-pre-wrap">
-            {currentExercise.description || "Sin descripción"}
+            {currentExercise.description || t("exerciseModal.noDescription")}
           </p>
 
           {(canUpdateExercise || canDeleteExercise) && (
             <div className="flex gap-2 mt-8">
               {canDeleteExercise && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("exerciseModal.delete")}
                   disabled={deleteMutation.isPending}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -179,7 +181,7 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
 
               {canUpdateExercise && (
                 <BlackButton
-                  text="Editar"
+                  text={t("exerciseModal.edit")}
                   onClick={() => {
                     reset({
                       name: currentExercise.name || "",
@@ -198,33 +200,37 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
       ) : (
         <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
           <h2 className="text-2xl font-semibold text-center">
-            Editar ejercicio
+            {t("exerciseForm.editTitle")}
           </h2>
 
           <FormInput
-            label="Nombre del ejercicio"
+            label={t("exerciseForm.name")}
             id="name"
-            placeholder="Ej: Press banca"
+            placeholder={t("exerciseForm.namePlaceholder")}
             register={register("name")}
             error={errors.name}
           />
           <FormInput
             textarea
-            label="Descripción (opcional)"
+            label={t("exerciseForm.description")}
             register={register("description")}
             error={errors.description}
-            placeholder="Explicación de la actividad..."
+            placeholder={t("exerciseForm.descriptionPlaceholder")}
           />
 
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("exerciseForm.cancel")}
               onClick={handleCancelEdit}
               textSmall={true}
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("exerciseForm.updating")
+                  : t("exerciseForm.update")
+              }
               type="submit"
               disabled={updateMutation.isPending}
               textSmall={true}
@@ -235,8 +241,10 @@ export default function ExerciseModal({ exercise, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar este ejercicio?"
-          message={`Estás por eliminar el ejercicio "${currentExercise.name}". Las rutinas que ya lo utilizaron conservarán el nombre del ejercicio.`}
+          title={t("exerciseModal.confirmTitle")}
+          message={t("exerciseModal.confirmMessage", {
+            name: currentExercise.name,
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

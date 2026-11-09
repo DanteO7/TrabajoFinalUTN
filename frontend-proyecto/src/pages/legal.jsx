@@ -1,7 +1,10 @@
 import MainLayout from "../layouts/main-layout";
 import { IoArrowBack } from "react-icons/io5";
+import { useTranslation } from "react-i18next";
+import { formatDate } from "../utils/formatting";
 
 export default function Legal() {
+  const { t } = useTranslation();
   const handleBack = () => {
     window.history.back();
   };
@@ -14,63 +17,43 @@ export default function Legal() {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer "
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
-        <h2 className="text-4xl font-semibold">Aviso Legal</h2>
+        <h2 className="text-4xl font-semibold">{t("legal.title")}</h2>
         <span className="text-gray-600 text-[13px] my-20">
-          Última actualización: 8 de julio de 2026
+          {t("common.lastUpdated", {
+            date: formatDate("2026-07-08T12:00:00Z", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC",
+            }),
+          })}
         </span>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">Titular del sitio</h3>
-          <p>
-            Turno Fácil es una plataforma destinada a la gestión y
-            administración de turnos para distintos tipos de negocios.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.siteOwner")}</h3>
+          <p>{t("legal.siteDescription")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">Propiedad intelectual</h3>
-          <p>
-            Todo el contenido presente en este sitio, incluyendo textos,
-            logotipos, diseños, imágenes, código fuente y demás elementos,
-            pertenece a Turno Fácil o se utiliza con la correspondiente
-            autorización. Queda prohibida su reproducción total o parcial sin
-            autorización.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.intellectualProperty")}</h3>
+          <p>{t("legal.intellectualPropertyText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">Uso del sitio</h3>
-          <p>
-            El acceso y utilización del sitio implica la aceptación de este
-            Aviso Legal y del resto de los documentos legales publicados.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.use")}</h3>
+          <p>{t("legal.useText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">Enlaces externos</h3>
-          <p>
-            El sitio puede contener enlaces hacia servicios de terceros. Turno
-            Fácil no es responsable por el contenido ni por las políticas de
-            privacidad de dichos servicios.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.externalLinks")}</h3>
+          <p>{t("legal.externalLinksText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">
-            Limitación de responsabilidad
-          </h3>
-          <p>
-            Aunque trabajamos para ofrecer un servicio estable y seguro, no
-            garantizamos la disponibilidad ininterrumpida de la plataforma ni
-            nos responsabilizamos por daños derivados de interrupciones, fallos
-            técnicos o situaciones ajenas a nuestro control.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.liability")}</h3>
+          <p>{t("legal.liabilityText")}</p>
         </div>
         <div className="mt-7">
-          <h3 className="font-semibold text-xl">Legislación aplicable</h3>
-          <p>
-            Este sitio se regirá por la legislación vigente de la República
-            Argentina. Cualquier controversia será resuelta conforme a dicha
-            legislación.
-          </p>
+          <h3 className="font-semibold text-xl">{t("legal.applicableLaw")}</h3>
+          <p>{t("legal.applicableLawText")}</p>
         </div>
       </div>
     </MainLayout>

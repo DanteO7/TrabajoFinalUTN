@@ -12,8 +12,10 @@ import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
 import BlackButton from "../buttons/black-button";
 import FormInput from "../inputs/form-input";
+import { useTranslation } from "react-i18next";
 
 export default function ChangeEmailForm({ user, close }) {
+  const { t } = useTranslation();
   const { login } = useAuthStore();
   const queryClient = useQueryClient();
 
@@ -48,7 +50,7 @@ export default function ChangeEmailForm({ user, close }) {
     mutationKey: ["changeEmail", user?.id],
     mutationFn: changeEmail,
     onSuccess: (data) => {
-      setSuccessMessage("Email cambiado correctamente");
+      setSuccessMessage(t("profile.emailChanged"));
       setSuccesModal(true);
       setBackendError(null);
       login(data);
@@ -59,7 +61,7 @@ export default function ChangeEmailForm({ user, close }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error";
+      let msg = t("profile.errorSendingEmail");
       if (typeof data === "string") msg = data;
       else if (data?.errors)
         msg = Object.values(data.errors).flat().join(" - ");
@@ -73,7 +75,7 @@ export default function ChangeEmailForm({ user, close }) {
     const email = getValues("newEmail");
 
     if (!email) {
-      setBackendError("Ingresa un email");
+      setBackendError(t("profile.enterEmail"));
       setErrorModal(true);
       return;
     }
@@ -84,7 +86,7 @@ export default function ChangeEmailForm({ user, close }) {
       setSeconds(60);
     } catch (error) {
       const data = error?.response?.data;
-      let msg = "Error al enviar código";
+      let msg = t("profile.sendCodeError");
       if (typeof data === "string") msg = data;
       else if (data?.message) msg = data.message;
       setBackendError(msg);
@@ -106,21 +108,22 @@ export default function ChangeEmailForm({ user, close }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-4 text-center">Cambiar Email</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-center">
+        {t("profile.changeEmail")}
+      </h2>
       <form
         noValidate
         className="flex max-w flex-col gap-3.5"
         onSubmit={handleSubmit(onSubmit)}
       >
         <p className="text-gray-400 text-[15px]">
-          Ingresa tu nuevo correo electrónico. Te enviaremos un código de
-          verificación para confirmar que te pertenece.
+          {t("profile.changeEmailDescription")}
         </p>
         <FormInput
-          label="Nuevo Email"
+          label={t("profile.newEmail")}
           id="newEmail"
           type="email"
-          placeholder="nuevoemail@example.com..."
+          placeholder={t("profile.newEmailPlaceholder")}
           register={register("newEmail")}
           error={errors.newEmail}
           disabled={isSubmitting || mutation.isPending}
@@ -130,7 +133,7 @@ export default function ChangeEmailForm({ user, close }) {
             <FormInput
               id="verificationCode"
               type="text"
-              placeholder="Código de verificación"
+              placeholder={t("profile.verificationCode")}
               register={register("verificationCode")}
               error={errors.verificationCode}
             />
@@ -140,7 +143,11 @@ export default function ChangeEmailForm({ user, close }) {
           type="button"
           onClick={handleSendCode}
           disabled={seconds > 0}
-          text={seconds > 0 ? `Reenviar en ${seconds}s` : "Enviar código"}
+          text={
+            seconds > 0
+              ? t("profile.resendIn", { seconds })
+              : t("profile.sendCode")
+          }
           textSmall
         />
 
@@ -148,7 +155,11 @@ export default function ChangeEmailForm({ user, close }) {
           <BlackButton
             type="submit"
             disabled={isSubmitting || mutation.isPending || !codeSent}
-            text={mutation.isPending ? "Cambiando..." : "Cambiar email"}
+            text={
+              mutation.isPending
+                ? t("profile.changingEmail")
+                : t("profile.changeEmail")
+            }
             textSmall={true}
           />
         )}

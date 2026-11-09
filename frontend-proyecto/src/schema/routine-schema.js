@@ -1,57 +1,58 @@
 import { z } from "zod";
+import { validationError, validationMessage } from "../utils/validation-message";
 
 export const routineExerciseSchema = z.object({
-  exerciseId: z.string().min(1, "El ejercicio es obligatorio"),
+  exerciseId: z.string().min(1, validationMessage("exerciseRequired")),
 
   sets: z.coerce
     .number({
-      invalid_type_error: "Las series son obligatorias",
+      error: validationError("setsRequired"),
     })
-    .int("Las series deben ser un número entero")
-    .min(1, "Debe haber al menos 1 serie"),
+    .int(validationMessage("setsInteger"))
+    .min(1, validationMessage("setsMin")),
 
   repetitions: z.coerce
     .number({
-      invalid_type_error: "Las repeticiones son obligatorias",
+      error: validationError("repsRequired"),
     })
-    .int("Las repeticiones deben ser un número entero")
-    .min(1, "Debe haber al menos 1 repetición"),
+    .int(validationMessage("repsInteger"))
+    .min(1, validationMessage("repsMin")),
 
   weight: z.coerce
     .number({
-      invalid_type_error: "El peso debe ser un número",
+      error: validationError("weightNumber"),
     })
-    .min(0, "El peso no puede ser negativo")
+    .min(0, validationMessage("weightNonnegative"))
     .optional()
     .or(z.literal("")),
 
   order: z.coerce
     .number({
-      invalid_type_error: "El orden es obligatorio",
+      error: validationError("orderRequired"),
     })
-    .int("El orden debe ser un número entero")
-    .min(1, "El orden debe ser mayor a 0"),
+    .int(validationMessage("orderInteger"))
+    .min(1, validationMessage("orderMin")),
 });
 
 export const createRoutineSchema = z
   .object({
     name: z
       .string()
-      .min(1, "El nombre de la rutina es obligatorio")
-      .max(50, "El nombre de la rutina no puede tener más de 50 caracteres"),
+      .min(1, validationMessage("routineNameRequired"))
+      .max(50, validationMessage("routineNameMax50")),
 
     description: z
       .string()
       .max(
         300,
-        "La descripción de la rutina no puede tener más de 300 caracteres",
+        validationMessage("routineDescriptionMax300"),
       )
       .optional()
       .or(z.literal("")),
 
     exercises: z
       .array(routineExerciseSchema)
-      .min(1, "La rutina debe tener al menos un ejercicio"),
+      .min(1, validationMessage("routineExerciseRequired")),
   })
   .superRefine((data, ctx) => {
     const orders = data.exercises.map((exercise) => exercise.order);
@@ -59,7 +60,7 @@ export const createRoutineSchema = z
     if (new Set(orders).size !== orders.length) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "No puede haber dos ejercicios con el mismo orden",
+        message: validationError("duplicateExerciseOrder")(),
         path: ["exercises"],
       });
     }
@@ -69,8 +70,8 @@ export const updateRoutineSchema = z
   .object({
     name: z
       .string()
-      .min(1, "El nombre de la rutina es obligatorio")
-      .max(50, "El nombre de la rutina no puede tener más de 50 caracteres")
+      .min(1, validationMessage("routineNameRequired"))
+      .max(50, validationMessage("routineNameMax50"))
       .optional()
       .or(z.literal("")),
 
@@ -78,7 +79,7 @@ export const updateRoutineSchema = z
       .string()
       .max(
         300,
-        "La descripción de la rutina no puede tener más de 300 caracteres",
+        validationMessage("routineDescriptionMax300"),
       )
       .optional()
       .or(z.literal("")),
@@ -93,7 +94,7 @@ export const updateRoutineSchema = z
     if (new Set(orders).size !== orders.length) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "No puede haber dos ejercicios con el mismo orden",
+        message: validationError("duplicateExerciseOrder")(),
         path: ["exercises"],
       });
     }

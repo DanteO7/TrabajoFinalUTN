@@ -1,7 +1,10 @@
 import { Check } from "lucide-react";
 import BlackButton from "../buttons/black-button";
+import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../utils/formatting";
 
 export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
+  const { t } = useTranslation();
   const features = [
     `Hasta ${plan.maxStudents} alumnos`,
     `Hasta ${plan.maxProfessors} profesores`,
@@ -20,7 +23,10 @@ export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
       </h4>
 
       <span className="font-semibold text-3xl lg:text-[40px] text-[#fc697b]">
-        ${plan.price}
+        {formatCurrency(plan.price, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        })}
       </span>
       <ul className="my-4 space-y-2 flex-1 w-full items-center">
         {features.map((feature) => (
@@ -36,7 +42,7 @@ export default function PlanCard({ plan, onOpenModal, onSelectedPlan }) {
           onSelectedPlan(plan);
           onOpenModal(true);
         }}
-        text="Contratar"
+        text={t("publicSite.hirePlan")}
         wfit={true}
       />
     </div>

@@ -15,8 +15,11 @@ import { Copy } from "lucide-react";
 import { Check } from "lucide-react";
 import ApprovalModal from "../modals/approval-modal";
 import { Upload } from "lucide-react";
+import { formatCurrency } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
+  const { t } = useTranslation();
   const { data: plans, isLoading } = useQuery({
     queryKey: ["tenantsPlan"],
     queryFn: getTenantPlans,
@@ -69,7 +72,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
     mutationFn: requestTenant,
     onSuccess: () => {
       setSuccessMessage(
-        "Ya recibimos tu formulario y revisaremos el comprobante de pago. Te avisaremos por email cuando tu negocio esté creado o si detectamos algún error con el pago.",
+        t("tenantForm.requestSuccess"),
       );
 
       setSuccesModal(true);
@@ -79,7 +82,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al enviar la solicitud.";
+      let msg = t("tenantForm.requestError");
 
       if (typeof data === "string") {
         msg = data;
@@ -99,7 +102,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
 
   const onSubmit = (data) => {
     if (!comprobante) {
-      setBackendError("Tenés que adjuntar el comprobante de pago.");
+      setBackendError(t("tenantForm.receiptRequired"));
       setErrorModal(true);
       return;
     }
@@ -135,25 +138,27 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear tu negocio
+        {t("tenantForm.title")}
       </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre del negocio"
+          label={t("tenantForm.businessName")}
           id="name"
-          placeholder="Ej: Gym Power"
+          placeholder={t("tenantForm.namePlaceholder")}
           register={register("name")}
           error={errors.name}
         />
 
         <div>
-          <label className="block text-sm font-medium mb-1">Plan</label>
+          <label className="block text-sm font-medium mb-1">
+            {t("tenantForm.plan")}
+          </label>
           <select
             className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             {...register("tenantPlanId")}
           >
             <option value="">
-              {isLoading ? "Cargando..." : "Seleccionar plan"}
+              {isLoading ? t("tenantForm.loading") : t("tenantForm.selectPlan")}
             </option>
             {plans.map((plan) => (
               <option key={plan.id} value={plan.id}>
@@ -170,11 +175,15 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         </div>
 
         <div className="bg-[#F1EEF3] rounded-lg border border-gray-400 shadow-md p-4 text-center">
-          <p className="text-sm text-gray-600">Precio mensual</p>
-          <p className="text-2xl font-semibold">${currentPlan?.price || 0}</p>
+          <p className="text-sm text-gray-600">
+            {t("tenantForm.monthlyPrice")}
+          </p>
+          <p className="text-2xl font-semibold">{formatCurrency(currentPlan?.price || 0)}</p>
         </div>
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-2">Alias</p>
+          <p className="text-sm text-gray-600 mb-2">
+            {t("tenantForm.alias")}
+          </p>
 
           <div className="flex items-center justify-between gap-3">
             <p className="font-semibold text-[#333] break-all">
@@ -183,7 +192,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
 
             <BlackButton
               type="button"
-              text={copied ? "Copiado" : "Copiar"}
+              text={copied ? t("tenantForm.copied") : t("tenantForm.copy")}
               textSmall={true}
               wfit
               img={copied ? <Check size={16} /> : <Copy size={16} />}
@@ -194,7 +203,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
-            Comprobante de pago
+            {t("tenantForm.receipt")}
           </label>
 
           <input
@@ -216,12 +225,14 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
           >
             <Upload size={18} />
             <span className="font-medium">
-              {comprobante ? "Cambiar archivo" : "Seleccionar comprobante"}
+              {comprobante
+                ? t("tenantForm.changeFile")
+                : t("tenantForm.selectReceipt")}
             </span>
           </label>
 
           <p className="text-xs text-gray-500 mt-1">
-            Formatos permitidos: PDF, JPG o PNG. Máximo 5 MB.
+            {t("tenantForm.allowedFormats")}
           </p>
 
           {comprobante && (
@@ -237,7 +248,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
                   document.getElementById("comprobante").value = "";
                 }}
                 className="text-gray-500 hover:text-gray-700 cursor-pointer transition-colors"
-                aria-label="Eliminar comprobante"
+                aria-label={t("tenantForm.removeReceipt")}
               >
                 <X size={18} />
               </button>
@@ -245,7 +256,7 @@ export default function TenantForm({ close, selectedPlan, setSelectedPlan }) {
           )}
         </div>
         <BlackButton
-          text="Contratar"
+          text={t("tenantForm.hire")}
           type="submit"
           textSmall
           disabled={mutation.isPending}

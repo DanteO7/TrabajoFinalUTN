@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatMonthYear, getLocale } from "../../utils/formatting";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DayPicker } from "react-day-picker";
 import "../../css/day-picker.css";
@@ -11,12 +12,14 @@ import ErrorModal from "../modals/error-modal";
 import SuccessModal from "../modals/success-modal";
 import { copyClassTemplateWeek } from "../../services/class-template";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function CopyClassTemplateWeekModal({
   tenantId,
   close,
   onCopied,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -54,7 +57,7 @@ export default function CopyClassTemplateWeekModal({
 
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "No se pudo copiar la semana.";
+        error?.response?.data?.message || t("copyTemplate.weekError");
 
       setErrorMessage(message);
       setErrorModal(true);
@@ -68,18 +71,18 @@ export default function CopyClassTemplateWeekModal({
     <Modal open onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
       >
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-2">Copiar semana</h2>
+      <h2 className="text-2xl font-semibold mb-2">
+        {t("copyTemplate.weekTitle")}
+      </h2>
 
       <p className="text-gray-600 mb-6">
-        Seleccioná el día a partir del cual querés copiar las clases de la
-        semana modelo. Se copiarán las clases de ese día y los siguientes,
-        respetando los días y horarios originales. Se omitirán los días
-        anteriores y las clases cuyos horarios ya hayan pasado.
+        {t("copyTemplate.weekDescription")}
       </p>
 
       <div className="flex justify-center">
@@ -98,29 +101,10 @@ export default function CopyClassTemplateWeekModal({
           }}
           formatters={{
             formatWeekdayName: (date) => {
-              const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-              return days[date.getDay()];
+              return date.toLocaleDateString(getLocale(), { weekday: "short" });
             },
 
-            formatCaption: (date) => {
-              const months = [
-                "Enero",
-                "Febrero",
-                "Marzo",
-                "Abril",
-                "Mayo",
-                "Junio",
-                "Julio",
-                "Agosto",
-                "Septiembre",
-                "Octubre",
-                "Noviembre",
-                "Diciembre",
-              ];
-
-              return `${months[date.getMonth()]} ${date.getFullYear()}`;
-            },
+            formatCaption: (date) => formatMonthYear(date),
           }}
           className="copy-day-picker border rounded-2xl shadow-md px-3 py-3"
         />
@@ -128,19 +112,23 @@ export default function CopyClassTemplateWeekModal({
 
       {selectedDate && (
         <p className="text-center text-gray-600 mt-4">
-          Semana seleccionada desde:{" "}
+          {t("copyTemplate.selectedWeek")}{" "}
           <span className="font-semibold">
-            {selectedDate.toLocaleDateString("es-AR")}
+            {selectedDate.toLocaleDateString(getLocale())}
           </span>
         </p>
       )}
 
       <div className="grid grid-cols-2 mt-6 gap-3">
-        <WhiteButton onClick={close} text="Cancelar" textSmall={true} />
+        <WhiteButton
+          onClick={close}
+          text={t("copyTemplate.cancel")}
+          textSmall={true}
+        />
 
         <BlackButton
           onClick={() => mutation.mutate()}
-          text="Copiar"
+          text={t("copyTemplate.copy")}
           textSmall={true}
           disabled={!selectedDate || mutation.isPending}
         />
@@ -156,7 +144,7 @@ export default function CopyClassTemplateWeekModal({
 
       {successModal && (
         <SuccessModal
-          message="Semana copiada correctamente"
+          message={t("copyTemplate.weekCopied")}
           close={() => setSuccessModal(false)}
           isSuccesOrError
         />

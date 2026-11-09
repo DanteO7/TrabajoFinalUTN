@@ -1,13 +1,16 @@
 import { CalendarDays, Clock3 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { getLocale } from "../../utils/formatting";
 
 export default function ReservationCard({ reservation, onClick }) {
+  const { t } = useTranslation();
   const completed = reservation.reservationStatus === "Completed";
   const formatDateWithDay = (dateString) => {
     const [year, month, day] = dateString.split("T")[0].split("-");
     const date = new Date(year, month - 1, day);
 
-    const dayName = date.toLocaleDateString("es-AR", { weekday: "long" });
-    const dateFormatted = date.toLocaleDateString("es-AR");
+    const dayName = date.toLocaleDateString(getLocale(), { weekday: "long" });
+    const dateFormatted = date.toLocaleDateString(getLocale());
 
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
   };
@@ -49,7 +52,7 @@ export default function ReservationCard({ reservation, onClick }) {
               : "bg-yellow-100 text-yellow-700"
           }`}
         >
-          {completed ? "Completada" : "Pendiente"}
+          {completed ? t("reservations.completed") : t("reservations.pending")}
         </span>
       </div>
     </div>

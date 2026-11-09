@@ -1,23 +1,25 @@
 import { Play } from "lucide-react";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import BlackButton from "../buttons/black-button";
 
 export default function VideoSection() {
+  const { t } = useTranslation();
   const videos = [
     {
       id: "VIDEO_ID-1",
-      title: "Cómo gestionar turnos",
-      description: "Aprendé a crear, editar y cancelar turnos fácilmente.",
+      title: t("publicSite.videos.appointmentsTitle"),
+      description: t("publicSite.videos.appointmentsDescription"),
     },
     {
       id: "VIDEO_ID_2",
-      title: "Administrar alumnos",
-      description: "Controlá asistencia, estados y datos importantes.",
+      title: t("publicSite.videos.studentsTitle"),
+      description: t("publicSite.videos.studentsDescription"),
     },
     {
       id: "VIDEO_ID_3",
-      title: "Gestión de pagos",
-      description: "Manejá planes, cobros y vencimientos.",
+      title: t("publicSite.videos.paymentsTitle"),
+      description: t("publicSite.videos.paymentsDescription"),
     },
   ];
 
@@ -40,9 +42,11 @@ export default function VideoSection() {
   return (
     <section className="w-full">
       <div className="flex flex-col items-center text-center w-full gap-8">
-        <h2 className="text-3xl font-semibold">Cómo funciona TurnoFacil</h2>
+        <h2 className="text-3xl font-semibold">
+          {t("publicSite.howItWorksTitle")}
+        </h2>
         <p className="text-gray-600">
-          Descubrí lo fácil que es gestionar tu negocio en pocos minutos.
+          {t("publicSite.howItWorksDescription")}
         </p>
 
         <div ref={videoRef} className="w-[90%] md:w-[80%] scroll-m-16">
@@ -50,7 +54,7 @@ export default function VideoSection() {
             <iframe
               className="w-full h-full rounded-lg shadow-lg"
               src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-              title="Video"
+              title={t("publicSite.videoTitle")}
               sandbox="allow-scripts allow-same-origin allow-presentation"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -60,7 +64,11 @@ export default function VideoSection() {
 
         <BlackButton
           onClick={() => setShowMore(!showMore)}
-          text={showMore ? "Ocultar videos" : "Ver más"}
+          text={
+            showMore
+              ? t("publicSite.hideVideos")
+              : t("publicSite.showMoreVideos")
+          }
           wfit={true}
         />
 

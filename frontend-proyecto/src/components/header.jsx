@@ -31,6 +31,7 @@ export default function Header() {
         <div className="min-[900px]:hidden">
           <button
             className="flex flex-col gap-1.25 z-50 mx-1.5 mr-5"
+            aria-label={t("header.openMenu")}
             onClick={() => {
               setMenu(true);
             }}
@@ -44,7 +45,7 @@ export default function Header() {
         <Link href="/" onClick={handleHomeClick}>
           <img
             src="/logo.webp"
-            alt="logo de turno facil"
+            alt={t("header.logoAlt")}
             className="w-28 cursor-pointer"
           />
         </Link>
@@ -58,13 +59,13 @@ export default function Header() {
                     className="hidden min-[900px]:flex min-w-24.5 cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="/pagos-app"
                   >
-                    Pagos App
+                    {t("header.appPayments")}
                   </Link>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="/usuarios"
                   >
-                    Usuarios
+                    {t("header.users")}
                   </Link>
                   <Link
                     className="hidden min-[900px]:flex cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
@@ -76,7 +77,7 @@ export default function Header() {
                     className="hidden min-[900px]:flex cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13px] hover:bg-[#d4d4d4]"
                     href="/planes"
                   >
-                    Planes
+                    {t("header.plans")}
                   </Link>
                 </>
               )}
@@ -84,13 +85,13 @@ export default function Header() {
                 href="/mi-espacio"
                 className="whitespace-nowrap min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13.5px] hover:bg-[#d4d4d4] max-[900px]:mr-1"
               >
-                Mi espacio
+                {t("header.mySpace")}
               </Link>
               <Link
                 href="/mis-pagos"
                 className="hidden min-[900px]:min-w-[95.77px] min-[900px]:flex cursor-pointer transition-colors duration-200 bg-[#eaeaea] font-semibold text-[#333] rounded-lg px-2.5 py-1 max-[900px]:text-[13.5px] hover:bg-[#d4d4d4] max-[900px]:mr-1"
               >
-                Mis pagos
+                {t("header.myPayments")}
               </Link>
             </div>
           )}
@@ -103,7 +104,7 @@ export default function Header() {
               href="/iniciar-sesion"
               className="border rounded-lg px-2 py-1 text-[13px]"
             >
-              Inicia sesión
+              {t("header.signIn")}
             </Link>
           )}
 
@@ -134,7 +135,7 @@ export default function Header() {
           onClick={() => setMenu(false)}
           className="cursor-pointer self-end text-2xl leading-none"
         >
-          ✕
+          <span aria-label={t("common.close")}>✕</span>
         </button>
 
         <div className="flex flex-col justify-between h-full">
@@ -147,28 +148,28 @@ export default function Header() {
                   setMenu(false);
                 }}
               >
-                Inicio
+                {t("header.home")}
               </MenuItem>
               <MenuItem
                 href="/perfil"
                 icon={FaUser}
                 onClick={() => setMenu(false)}
               >
-                Perfil
+                {t("header.profile")}
               </MenuItem>
               <MenuItem
                 href="/mi-espacio"
                 icon={MdSpaceDashboard}
                 onClick={() => setMenu(false)}
               >
-                Mi espacio
+                {t("header.mySpace")}
               </MenuItem>
               <MenuItem
                 href="/mis-pagos"
                 icon={FaMoneyBillWave}
                 onClick={() => setMenu(false)}
               >
-                Mis pagos
+                {t("header.myPayments")}
               </MenuItem>
               {isAdmin && (
                 <>
@@ -177,7 +178,7 @@ export default function Header() {
                     icon={FaUsers}
                     onClick={() => setMenu(false)}
                   >
-                    Usuarios
+                    {t("header.users")}
                   </MenuItem>
 
                   <MenuItem
@@ -193,14 +194,14 @@ export default function Header() {
                     icon={FaBook}
                     onClick={() => setMenu(false)}
                   >
-                    Planes
+                    {t("header.plans")}
                   </MenuItem>
                   <MenuItem
                     href="/pagos-app"
                     icon={FaMoneyBillWave}
                     onClick={() => setMenu(false)}
                   >
-                    Pagos App
+                    {t("header.appPayments")}
                   </MenuItem>
                 </>
               )}
@@ -209,7 +210,7 @@ export default function Header() {
                 icon={IoMdSettings}
                 onClick={() => setMenu(false)}
               >
-                Ajustes
+                {t("header.settings")}
               </MenuItem>
             </ul>
           </nav>

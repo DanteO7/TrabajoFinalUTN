@@ -9,8 +9,10 @@ import TenantPlanForm from "../components/tenant-plans/tenant-plan-form";
 import TenantPlanUpdateForm from "../components/tenant-plans/tenant-plan-update-form";
 import TenantPlanCard from "../components/tenant-plans/tenant-plan-card";
 import BlackButton from "../components/buttons/black-button";
+import { useTranslation } from "react-i18next";
 
 export default function TenantPlans() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const [openCreateForm, setOpenCreateForm] = useState(false);
@@ -44,11 +46,11 @@ export default function TenantPlans() {
             className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
           >
             <IoArrowBack color="#fc697b" />
-            Volver
+            {t("common.back")}
           </button>
 
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         </div>
       </MainLayout>
@@ -63,19 +65,19 @@ export default function TenantPlans() {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         <div className=" mb-6 flex flex-col gap-3 min-[900px]:gap-5">
           <h1 className="text-[33px] min-[900px]:text-5xl font-bold">
-            Planes de negocio
+            {t("tenantPages.tenantPlans.title")}
           </h1>
           <div className="flex max-[900px]:flex-col justify-between gap-3 min-[900px]:items-center">
             <p className="text-gray-500">
-              Desde acá podés administrar todos los planes de negocio de la app.
+              {t("tenantPages.tenantPlans.description")}
             </p>
             <BlackButton
-              text="+ Nuevo plan"
+              text={t("tenantPages.tenantPlans.new")}
               onClick={() => setOpenCreateForm(true)}
               textSmall={true}
               wfit={true}
@@ -90,16 +92,18 @@ export default function TenantPlans() {
             ))
           ) : (
             <div className="col-span-full border border-gray-400 rounded-lg py-16 text-center">
-              <h3 className="text-xl font-semibold">No hay planes</h3>
+              <h3 className="text-xl font-semibold">
+                {t("tenantPages.tenantPlans.emptyTitle")}
+              </h3>
               <p className="text-gray-500 mt-2 mb-6">
-                Creá un nuevo plan para comenzar.
+                {t("tenantPages.tenantPlans.emptyDescription")}
               </p>
 
               <button
                 onClick={() => setOpenCreateForm(true)}
                 className="bg-[#333] text-white px-5 py-2 rounded-lg hover:bg-gray-700 transition cursor-pointer"
               >
-                + Crear plan
+                {t("tenantPages.tenantPlans.create")}
               </button>
             </div>
           )}

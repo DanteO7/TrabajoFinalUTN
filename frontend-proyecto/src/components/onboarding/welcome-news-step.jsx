@@ -6,6 +6,7 @@ import {
   getWelcomeNewsContent,
   getWelcomeNewsTitle,
 } from "./welcome-news-content";
+import { useTranslation } from "react-i18next";
 
 export default function WelcomeNewsStep({
   tenantId,
@@ -16,6 +17,7 @@ export default function WelcomeNewsStep({
   onRetry,
   onCreated,
 }) {
+  const { t } = useTranslation();
   const [openForm, setOpenForm] = useState(false);
 
   if (isLoading) {
@@ -26,11 +28,10 @@ export default function WelcomeNewsStep({
     return (
       <div className="mt-6">
         <p className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-          No se pudieron cargar los datos para preparar la noticia. Intentá
-          nuevamente.
+          {t("onboardingSteps.newsLoadError")}
         </p>
         <button type="button" onClick={onRetry} className="mt-3 underline">
-          Reintentar
+          {t("onboardingSteps.retry")}
         </button>
       </div>
     );
@@ -43,13 +44,13 @@ export default function WelcomeNewsStep({
     <div className="mt-6 flex flex-col gap-5">
       <p className="text-gray-600">
         {isComplete
-          ? "¡Listo! La noticia de bienvenida ya está publicada y tus alumnos podrán verla."
-          : "Prepará una noticia de bienvenida para que tus alumnos conozcan la comunidad y sepan dónde encontrar las novedades del negocio."}
+          ? t("onboardingSteps.newsComplete")
+          : t("onboardingSteps.newsDescription")}
       </p>
 
       {!isComplete && (
         <BlackButton
-          text="Crear noticia de bienvenida"
+          text={t("onboardingSteps.createWelcomeNews")}
           onClick={() => setOpenForm(true)}
           wfit
           textSmall

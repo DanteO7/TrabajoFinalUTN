@@ -36,6 +36,8 @@ import {
   deleteClassTemplate,
   updateClassTemplate,
 } from "../../services/class-template";
+import { getLocale, formatNumber } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function ClassModal({
   classItem,
@@ -43,6 +45,7 @@ export default function ClassModal({
   close,
   isTemplate = false,
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { user } = useAuthStore();
@@ -69,28 +72,20 @@ export default function ClassModal({
 
   const formatDateWithDay = (dateString) => {
     if (isTemplate) {
-      const days = [
-        "Domingo",
-        "Lunes",
-        "Martes",
-        "Miércoles",
-        "Jueves",
-        "Viernes",
-        "Sábado",
-      ];
-
-      return days[Number(dateString)];
+      const date = new Date(2024, 0, 7 + Number(dateString));
+      const dayName = date.toLocaleDateString(getLocale(), { weekday: "long" });
+      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
     }
 
     const [year, month, day] = dateString.split("T")[0].split("-");
 
     const date = new Date(year, month - 1, day);
 
-    const dayName = date.toLocaleDateString("es-AR", {
+    const dayName = date.toLocaleDateString(getLocale(), {
       weekday: "long",
     });
 
-    const dateFormatted = date.toLocaleDateString("es-AR");
+    const dateFormatted = date.toLocaleDateString(getLocale());
 
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dateFormatted}`;
   };
@@ -169,8 +164,8 @@ export default function ClassModal({
       setConfirmModal(false);
       setSuccessMessage(
         isTemplate
-          ? "Clase modelo eliminada correctamente"
-          : "Clase eliminada correctamente",
+          ? t("classModal.templateDeleteSuccess")
+          : t("classModal.deleteSuccess"),
       );
       setSuccessModal(true);
 
@@ -182,7 +177,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la clase";
+      let msg = t("classModal.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -230,8 +225,8 @@ export default function ClassModal({
 
       setSuccessMessage(
         isTemplate
-          ? "Clase modelo actualizada correctamente"
-          : "Clase actualizada correctamente",
+          ? t("classModal.templateUpdateSuccess")
+          : t("classModal.updateSuccess"),
       );
 
       setSuccessModal(true);
@@ -246,7 +241,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la clase";
+      let msg = t("classModal.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -271,7 +266,7 @@ export default function ClassModal({
         queryKey: ["getClasses", tenantId],
       });
 
-      setSuccessMessage("¡Te uniste a la clase correctamente!");
+      setSuccessMessage(t("classModal.joinSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -282,7 +277,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al unirse a la clase";
+      let msg = t("classModal.joinError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -306,7 +301,7 @@ export default function ClassModal({
         queryKey: ["getWaitlistByStudentId", currentStudent.id],
       });
 
-      setSuccessMessage("Te agregaste a la lista de espera correctamente.");
+      setSuccessMessage(t("classModal.waitlistJoinSuccess"));
 
       setSuccessModal(true);
 
@@ -318,7 +313,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al entrar a la lista de espera";
+      let msg = t("classModal.waitlistJoinError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -338,7 +333,7 @@ export default function ClassModal({
         queryKey: ["getWaitlistByStudentId", currentStudent.id],
       });
 
-      setSuccessMessage("Saliste de la lista de espera correctamente.");
+      setSuccessMessage(t("classModal.waitlistLeaveSuccess"));
 
       setSuccessModal(true);
 
@@ -350,7 +345,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al salir de la lista de espera";
+      let msg = t("classModal.waitlistLeaveError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -374,7 +369,7 @@ export default function ClassModal({
         queryKey: ["getReservationsByStudentId", currentStudent.id],
       });
 
-      setSuccessMessage("Saliste de la clase correctamente");
+      setSuccessMessage(t("classModal.leaveSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -385,7 +380,7 @@ export default function ClassModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al salir de la clase";
+      let msg = t("classModal.leaveError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -443,26 +438,20 @@ export default function ClassModal({
           <div className="space-y-4">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">
-                {isTemplate ? "Día" : "Fecha"}
+                {isTemplate ? t("classForm.day") : t("classForm.date")}
               </p>
 
               <p className="font-semibold text-[#333]">
                 {isTemplate
-                  ? [
-                      "Domingo",
-                      "Lunes",
-                      "Martes",
-                      "Miércoles",
-                      "Jueves",
-                      "Viernes",
-                      "Sábado",
-                    ][currentClass.dayOfWeek]
+                  ? formatDateWithDay(currentClass.dayOfWeek)
                   : formatDateWithDay(currentClass.date)}
               </p>
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Horario</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("classModal.schedule")}
+              </p>
 
               <p className="font-semibold text-[#333]">
                 {currentClass.startTime.slice(0, 5)} -{" "}
@@ -476,14 +465,23 @@ export default function ClassModal({
               }`}
             >
               <p className="text-sm text-gray-600 mb-1">
-                {isTemplate ? "Alumnos" : isFull ? "Lleno" : "Disponibilidad"}
+                {isTemplate
+                  ? t("classModal.students")
+                  : isFull
+                    ? t("classModal.full")
+                    : t("classModal.availability")}
               </p>
 
               <div className="flex justify-between items-center gap-3">
                 <p className="font-semibold text-[14px] min-[900px]:text-[16px] text-[#333]">
-                  {isTemplate
-                    ? `${currentClass.students.length} / ${currentClass.maxCapacity} alumnos`
-                    : `${currentClass.reservationsCount} / ${currentClass.maxCapacity} alumnos`}
+                  {t("classModal.availabilityCount", {
+                    count: formatNumber(
+                      isTemplate
+                        ? currentClass.students.length
+                        : currentClass.reservationsCount,
+                    ),
+                    capacity: formatNumber(currentClass.maxCapacity),
+                  })}
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -492,7 +490,7 @@ export default function ClassModal({
                       onClick={() => setStudentsModal(true)}
                       className="bg-[#333] text-[12px] min-[900px]:text-[16px] text-white px-3 min-[900px]:px-4 py-1.5 rounded-lg text-sm hover:bg-[#222] transition cursor-pointer"
                     >
-                      Ver alumnos
+                      {t("classModal.viewStudents")}
                     </button>
                   )}
                 </div>
@@ -503,13 +501,13 @@ export default function ClassModal({
           {canUpdateClass || canDeleteClass ? (
             classStarted ? (
               <div className="mt-8">
-                <WhiteButton text="No disponible" textSmall />
+                <WhiteButton text={t("classModal.unavailable")} textSmall />
               </div>
             ) : (
               <div className="flex gap-2 mt-8">
                 {canDeleteClass && (
                   <RedButton
-                    text="Eliminar"
+                    text={t("classModal.delete")}
                     disabled={deleteMutation.isPending}
                     onClick={() => setConfirmModal(true)}
                     textSmall={true}
@@ -519,7 +517,7 @@ export default function ClassModal({
 
                 {canUpdateClass && (
                   <BlackButton
-                    text="Editar"
+                    text={t("classModal.edit")}
                     onClick={() => setEditing(true)}
                     textSmall={true}
                     img={<Pencil size={18} />}
@@ -530,7 +528,7 @@ export default function ClassModal({
           ) : canCreateReservation ? (
             classStarted ? (
               <div className="mt-8">
-                <WhiteButton text="No disponible" textSmall />
+                <WhiteButton text={t("classModal.unavailable")} textSmall />
               </div>
             ) : isReserved ? (
               <div>
@@ -540,8 +538,8 @@ export default function ClassModal({
                     disabled={cancelReservationMutation.isPending}
                     text={
                       cancelReservationMutation.isPending
-                        ? "Saliendo..."
-                        : "Salir de la clase"
+                        ? t("classModal.leaving")
+                        : t("classModal.leaveClass")
                     }
                     textSmall={true}
                   />
@@ -551,8 +549,8 @@ export default function ClassModal({
               <RedButton
                 text={
                   deleteWaitlistMutation.isPending
-                    ? "Saliendo..."
-                    : "Salir de lista de espera"
+                    ? t("classModal.leaving")
+                    : t("classModal.leaveWaitlist")
                 }
                 textSmall={true}
                 onClick={() => deleteWaitlistMutation.mutate()}
@@ -562,8 +560,8 @@ export default function ClassModal({
               <BlackButton
                 text={
                   waitlistMutation.isPending
-                    ? "Agregando..."
-                    : "Entrar en lista de espera"
+                    ? t("classModal.adding")
+                    : t("classModal.joinWaitlist")
                 }
                 textSmall={true}
                 onClick={() => waitlistMutation.mutate()}
@@ -573,7 +571,7 @@ export default function ClassModal({
               <div className="flex gap-3">
                 <WhiteButton
                   type="button"
-                  text="Cancelar"
+                  text={t("classModal.cancel")}
                   onClick={close}
                   textSmall={true}
                 />
@@ -583,8 +581,8 @@ export default function ClassModal({
                   disabled={reservationMutation.isPending || !currentStudent}
                   text={
                     reservationMutation.isPending
-                      ? "Procesando..."
-                      : "Entrar a la clase"
+                      ? t("classModal.processing")
+                      : t("classModal.joinClass")
                   }
                   textSmall={true}
                 />
@@ -595,19 +593,19 @@ export default function ClassModal({
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <h2 className="text-2xl font-semibold text-center mb-6">
-            Editar clase
+            {t("classModal.editTitle")}
           </h2>
 
           <div>
             <label className="block text-sm font-semibold mb-2">
-              Actividad
+              {t("classForm.activity")}
             </label>
 
             <select
               {...register("activityId")}
               className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
-              <option value="">Selecciona una actividad</option>
+              <option value="">{t("classModal.selectActivity")}</option>
 
               {activities.map((activity) => (
                 <option key={activity.id} value={activity.id}>
@@ -624,13 +622,15 @@ export default function ClassModal({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2">Profesor</label>
+            <label className="block text-sm font-semibold mb-2">
+              {t("classForm.professor")}
+            </label>
 
             <select
               {...register("professorId")}
               className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
-              <option value="">Selecciona un profesor</option>
+              <option value="">{t("classModal.selectProfessor")}</option>
 
               {professors
                 .filter((professor) => professor.isActive === true)
@@ -650,20 +650,22 @@ export default function ClassModal({
 
           {isTemplate ? (
             <div>
-              <label className="block text-sm font-semibold mb-2">Día</label>
+              <label className="block text-sm font-semibold mb-2">
+                {t("classForm.day")}
+              </label>
 
               <select
                 {...register("dayOfWeek")}
                 className="rounded-lg w-full px-3 pt-1.75 pb-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
               >
-                <option value="">Selecciona un día</option>
-                <option value="1">Lunes</option>
-                <option value="2">Martes</option>
-                <option value="3">Miércoles</option>
-                <option value="4">Jueves</option>
-                <option value="5">Viernes</option>
-                <option value="6">Sábado</option>
-                <option value="0">Domingo</option>
+                <option value="">{t("classModal.selectDay")}</option>
+                <option value="1">{t("classForm.monday")}</option>
+                <option value="2">{t("classForm.tuesday")}</option>
+                <option value="3">{t("classForm.wednesday")}</option>
+                <option value="4">{t("classForm.thursday")}</option>
+                <option value="5">{t("classForm.friday")}</option>
+                <option value="6">{t("classForm.saturday")}</option>
+                <option value="0">{t("classForm.sunday")}</option>
               </select>
 
               {errors.dayOfWeek && (
@@ -674,7 +676,7 @@ export default function ClassModal({
             </div>
           ) : (
             <FormInput
-              label="Fecha"
+              label={t("classForm.date")}
               type="date"
               register={register("date")}
               error={errors.date}
@@ -682,21 +684,21 @@ export default function ClassModal({
           )}
 
           <FormInput
-            label="Hora de inicio"
+            label={t("classModal.startTime")}
             type="time"
             register={register("startTime")}
             error={errors.startTime}
           />
 
           <FormInput
-            label="Hora de fin"
+            label={t("classModal.endTime")}
             type="time"
             register={register("endTime")}
             error={errors.endTime}
           />
 
           <FormInput
-            label="Capacidad máxima"
+            label={t("classForm.capacity")}
             type="number"
             register={register("maxCapacity")}
             error={errors.maxCapacity}
@@ -705,13 +707,17 @@ export default function ClassModal({
           <div className="grid grid-cols-2 gap-3">
             <WhiteButton
               type="button"
-              text="Cancelar"
+              text={t("classModal.cancel")}
               onClick={() => setEditing(false)}
               textSmall={true}
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("classModal.updating")
+                  : t("classModal.update")
+              }
               type="submit"
               disabled={updateMutation.isPending}
               textSmall={true}
@@ -722,15 +728,14 @@ export default function ClassModal({
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar esta clase?"
-          message={`Estás por eliminar la clase del día ${
-            isTemplate
+          title={t("classModal.confirmTitle")}
+          message={t("classModal.confirmMessage", {
+            day: isTemplate
               ? formatDateWithDay(currentClass.dayOfWeek)
-              : formatDateWithDay(currentClass.date)
-          } a las ${currentClass.startTime.slice(
-            0,
-            5,
-          )} - ${currentClass.endTime.slice(0, 5)}.`}
+              : formatDateWithDay(currentClass.date),
+            startTime: currentClass.startTime.slice(0, 5),
+            endTime: currentClass.endTime.slice(0, 5),
+          })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

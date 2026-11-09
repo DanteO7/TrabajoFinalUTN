@@ -204,9 +204,11 @@ export default function UserModal({ user, close, onDeleted }) {
 
               <div className="space-y-4 mb-8">
                 <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-                  <p className="text-sm text-gray-600 mb-1">Teléfono</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    {t("users.phone")}
+                  </p>
                   <p className="font-semibold text-[#333]">
-                    {userDetail?.phoneNumber || "No proporcionado"}
+                    {userDetail?.phoneNumber || t("users.notProvided")}
                   </p>
                 </div>
               </div>
@@ -214,7 +216,7 @@ export default function UserModal({ user, close, onDeleted }) {
               {tenants.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold mb-4">
-                    Negocios ({tenants.length})
+                    {t("users.businessesCount", { count: tenants.length })}
                   </h3>
                   <div className="space-y-3">
                     {tenants.map((tenant) => (
@@ -226,7 +228,7 @@ export default function UserModal({ user, close, onDeleted }) {
                           <div>
                             <p className="font-semibold">{tenant.name}</p>
                             <p className="text-sm text-gray-600 mt-1">
-                              Rol:{" "}
+                              {t("users.role")}:{" "}
                               <span className="font-semibold">
                                 {tenant.role}
                               </span>
@@ -239,7 +241,9 @@ export default function UserModal({ user, close, onDeleted }) {
                                 : "bg-red-100 text-red-700"
                             }`}
                           >
-                            {tenant.isActive ? "Activo" : "Inactivo"}
+                            {tenant.isActive
+                              ? t("tenants.active")
+                              : t("tenants.inactive")}
                           </span>
                         </div>
                       </div>
@@ -251,7 +255,7 @@ export default function UserModal({ user, close, onDeleted }) {
               {tenants.length === 0 && (
                 <div className="text-center py-8">
                   <p className="text-gray-500">
-                    Este usuario no pertenece a ningún negocio
+                    {t("users.noBusinesses")}
                   </p>
                 </div>
               )}

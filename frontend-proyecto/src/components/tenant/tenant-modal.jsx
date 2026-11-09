@@ -15,13 +15,7 @@ import {
   deleteTenant,
 } from "../../services/tenant";
 import { useAuthStore } from "../../store/auth-store";
-
-const dueDateFormatter = new Intl.DateTimeFormat("es-AR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  timeZone: "UTC",
-});
+import { getLocale } from "../../utils/formatting";
 
 function DetailField({ label, value }) {
   return (
@@ -42,7 +36,12 @@ function formatDueDate(value, notProvidedText) {
     return notProvidedText;
   }
 
-  return dueDateFormatter.format(date);
+  return new Intl.DateTimeFormat(getLocale(), {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export default function TenantModal({ tenant, onTenantUpdated, close }) {

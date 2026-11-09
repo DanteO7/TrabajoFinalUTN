@@ -15,8 +15,10 @@ import { deleteNews, updateNews } from "../../services/news";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateNewSchema } from "../../schema/news-schema";
 import { useHasPermission } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function NewsModal({ news, tenantId, close }) {
+  const { t } = useTranslation();
   const canUpdateNews = useHasPermission(tenantId, "NEWS_UPDATE");
   const canDeleteNews = useHasPermission(tenantId, "NEWS_DELETE");
 
@@ -57,7 +59,7 @@ export default function NewsModal({ news, tenantId, close }) {
 
       setConfirmModal(false);
 
-      setSuccessMessage("Noticia eliminada correctamente");
+      setSuccessMessage(t("newsUi.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -69,7 +71,7 @@ export default function NewsModal({ news, tenantId, close }) {
       setConfirmModal(false);
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar la noticia";
+      let msg = t("newsUi.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -89,7 +91,7 @@ export default function NewsModal({ news, tenantId, close }) {
         queryKey: ["news", tenantId],
       });
 
-      setSuccessMessage("Noticia actualizada correctamente");
+      setSuccessMessage(t("newsUi.updateSuccess"));
       setSuccessModal(true);
 
       setCurrentNew(updatedNews);
@@ -106,7 +108,7 @@ export default function NewsModal({ news, tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar la noticia";
+      let msg = t("newsUi.updateError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -149,7 +151,7 @@ export default function NewsModal({ news, tenantId, close }) {
                 >
                   {canDeleteNews && (
                     <RedButton
-                      text="Eliminar"
+                      text={t("common.delete")}
                       disabled={deleteMutation.isPending}
                       onClick={() => setConfirmModal(true)}
                       textSmall={true}
@@ -159,7 +161,7 @@ export default function NewsModal({ news, tenantId, close }) {
 
                   {canUpdateNews && (
                     <BlackButton
-                      text="Editar"
+                      text={t("common.edit")}
                       onClick={() => setEditing(true)}
                       textSmall={true}
                       img={<Pencil size={18} />}
@@ -176,26 +178,28 @@ export default function NewsModal({ news, tenantId, close }) {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
-            <h2 className="text-2xl font-semibold text-center">Editar</h2>
+            <h2 className="text-2xl font-semibold text-center">
+              {t("newsUi.editTitle")}
+            </h2>
 
             <FormInput
-              label="Titulo"
+              label={t("newsUi.title")}
               register={register("title")}
               error={errors.title}
-              placeholder="Ej: Nuevas actividades, Nuevo plan, etc."
+              placeholder={t("newsUi.titlePlaceholder")}
             />
 
             <FormInput
               textarea
-              label="Contenido"
+              label={t("newsUi.content")}
               register={register("content")}
               error={errors.content}
-              placeholder="Explicación de la noticia"
+              placeholder={t("newsUi.contentPlaceholder")}
             />
 
             <div className="grid grid-cols-2 gap-3">
               <WhiteButton
-                text="Cancelar"
+                text={t("common.cancel")}
                 onClick={() => {
                   reset();
                   setEditing(false);
@@ -203,7 +207,11 @@ export default function NewsModal({ news, tenantId, close }) {
                 textSmall={true}
               />
               <BlackButton
-                text={mutation.isPending ? "Actualizando..." : "Actualizar"}
+                text={
+                  mutation.isPending
+                    ? t("newsUi.updating")
+                    : t("common.update")
+                }
                 type="submit"
                 disabled={mutation.isPending}
                 textSmall={true}
@@ -215,8 +223,8 @@ export default function NewsModal({ news, tenantId, close }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar esta profesión?"
-          message={`Estás por eliminar la profesion "${news.title}". Esta acción no se puede deshacer.`}
+          title={t("newsUi.deleteTitle")}
+          message={t("newsUi.deleteConfirmation", { title: news.title })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}
           isPending={deleteMutation.isPending}

@@ -15,8 +15,12 @@ import ClassCard from "../../../components/classes/class-card";
 import ConfirmModal from "../../../components/modals/confirm-modal";
 import SuccessModal from "../../../components/modals/success-modal";
 import ErrorModal from "../../../components/modals/error-modal";
+import { formatMonthYear, getLocale } from "../../../utils/formatting";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../../utils/formatting";
 
 export default function OfficialClasses({ tenantId }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -190,7 +194,7 @@ export default function OfficialClasses({ tenantId }) {
 
       clearSelection();
       setSuccessMessage(
-        "Las clases seleccionadas y sus reservas se eliminaron correctamente.",
+        t("classPages.official.deleteSuccess"),
       );
       setSuccessModal(true);
 
@@ -202,7 +206,7 @@ export default function OfficialClasses({ tenantId }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar las clases.";
+      let msg = t("classPages.official.deleteError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors) {
@@ -223,27 +227,10 @@ export default function OfficialClasses({ tenantId }) {
   if (isError) {
     return (
       <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-        Esta página no existe o no tienes acceso.
+        {t("tenantPages.accessError")}
       </div>
     );
   }
-
-  const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-
-  const months = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
 
   return (
     <>
@@ -261,9 +248,9 @@ export default function OfficialClasses({ tenantId }) {
               }
             }}
             formatters={{
-              formatWeekdayName: (date) => days[date.getDay()],
-              formatCaption: (date) =>
-                `${months[date.getMonth()]} ${date.getFullYear()}`,
+              formatWeekdayName: (date) =>
+                date.toLocaleDateString(getLocale(), { weekday: "short" }),
+              formatCaption: (date) => formatMonthYear(date),
             }}
             className="rounded-2xl border px-4 py-3 shadow-md"
           />
@@ -272,7 +259,9 @@ export default function OfficialClasses({ tenantId }) {
         <div className="min-w-0 flex-1">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold">
-              Clases del {selectedDate.toLocaleDateString("es-AR")}
+              {t("classPages.official.classesOnDate", {
+                date: selectedDate.toLocaleDateString(getLocale()),
+              })}
             </h2>
 
             <div className="grid grid-cols-[1.4fr_1fr]  min-[900px]:flex min-[900px]:gap-2">
@@ -285,8 +274,8 @@ export default function OfficialClasses({ tenantId }) {
                       classesOfDay.every((classItem) =>
                         selectedClassIdSet.has(classItem.id),
                       )
-                        ? "Deseleccionar todo"
-                        : "Seleccionar todo"
+                        ? t("classPages.official.deselectAll")
+                        : t("classPages.official.selectAll")
                     }
                     wfit
                     textSmall
@@ -296,7 +285,9 @@ export default function OfficialClasses({ tenantId }) {
                     <div className="justify-self-end">
                       <RedButton
                         onClick={() => setShowDeleteConfirmation(true)}
-                        text={`Eliminar (${selectedClassIds.length})`}
+                        text={t("classPages.official.deleteSelected", {
+                          count: formatNumber(selectedClassIds.length),
+                        })}
                         wfit
                         textSmall
                         disabled={
@@ -312,7 +303,7 @@ export default function OfficialClasses({ tenantId }) {
               {canCreateClass && !isDateInPast && !selectionMode && (
                 <BlackButton
                   onClick={() => setOpenModal(true)}
-                  text="+ Nueva clase"
+                  text={t("classPages.newClass")}
                   wfit
                   textSmall
                 />
@@ -355,37 +346,37 @@ export default function OfficialClasses({ tenantId }) {
               <div className="rounded-lg border border-gray-400 bg-[#EFECF0] py-16 text-center">
                 <h3 className="text-xl font-semibold text-red-600">
                   {canCreateClass
-                    ? "No puedes crear clases para días anteriores"
-                    : "No hubo clases este día"}
+                    ? t("classPages.official.pastCreateTitle")
+                    : t("classPages.official.pastEmptyTitle")}
                 </h3>
 
                 <p className="mt-2 text-gray-500">
-                  Seleccioná una fecha futura para ver las clases disponibles.
+                  {t("classPages.official.pastDescription")}
                 </p>
               </div>
             ) : !canCreateClass ? (
               <div className="rounded-lg border border-gray-400 bg-[#EFECF0] py-16 text-center">
                 <h3 className="text-xl font-semibold">
-                  No hay clases este día
+                  {t("classPages.official.emptyTitle")}
                 </h3>
 
                 <p className="mt-2 text-gray-500">
-                  Esperá a que los profesores creen clases para esta fecha.
+                  {t("classPages.official.emptyTeacherDescription")}
                 </p>
               </div>
             ) : (
               <div className="flex flex-col items-center rounded-lg border border-gray-400 bg-[#EFECF0] py-16 text-center">
                 <h3 className="text-xl font-semibold">
-                  No hay clases este día
+                  {t("classPages.official.emptyTitle")}
                 </h3>
 
                 <p className="mb-6 mt-2 text-gray-500">
-                  Creá una nueva clase para esta fecha.
+                  {t("classPages.official.emptyCreateDescription")}
                 </p>
 
                 <BlackButton
                   onClick={() => setOpenModal(true)}
-                  text="+ Crear clase"
+                  text={t("classPages.official.createClass")}
                   wfit
                   textSmall
                 />
@@ -413,12 +404,18 @@ export default function OfficialClasses({ tenantId }) {
 
       {showDeleteConfirmation && (
         <ConfirmModal
-          title="¿Eliminar las clases seleccionadas?"
-          message={`Vas a eliminar ${selectedClassIds.length} ${
-            selectedClassIds.length === 1 ? "clase" : "clases"
-          } y todas las reservas asociadas.\n\nEsta acción no se puede deshacer.`}
-          confirmText="Sí, eliminar"
-          cancelText="Volver"
+          title={t("classPages.official.deleteTitle")}
+          message={t(
+            selectedClassIds.length === 1
+              ? "classPages.official.deleteConfirmation_one"
+              : "classPages.official.deleteConfirmation_other",
+            {
+              count: selectedClassIds.length,
+              countDisplay: formatNumber(selectedClassIds.length),
+            },
+          )}
+          confirmText={t("classPages.confirmDelete")}
+          cancelText={t("common.back")}
           isPending={deleteMutation.isPending}
           close={() => {
             if (!deleteMutation.isPending) {

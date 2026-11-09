@@ -16,6 +16,7 @@ import FormInput from "../inputs/form-input";
 
 import { updateTenant } from "../../services/tenant";
 import { updateTenantSchema } from "../../schema/tenant-schema";
+import { useTranslation } from "react-i18next";
 
 const PLATFORMS = [
   { name: "facebook", label: "Facebook" },
@@ -28,6 +29,7 @@ const PLATFORMS = [
 ];
 
 export default function EditTenantModal({ tenant, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [networks, setNetworks] = useState(tenant.socialNetworks || {});
@@ -94,7 +96,7 @@ export default function EditTenantModal({ tenant, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el negocio";
+      let msg = t("editTenant.error");
 
       if (typeof data === "string") {
         msg = data;
@@ -147,19 +149,21 @@ export default function EditTenantModal({ tenant, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-6">
-        Editar información del negocio
+        {t("editTenant.title")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
         <div>
-          <h3 className="font-semibold text-lg mb-3">Nombre</h3>
+          <h3 className="font-semibold text-lg mb-3">
+            {t("editTenant.name")}
+          </h3>
 
           <div className="space-y-3">
             <FormInput
-              label="Nombre del negocio"
+              label={t("editTenant.businessName")}
               id="name"
               type="text"
-              placeholder="Gym power..."
+              placeholder={t("editTenant.businessNamePlaceholder")}
               register={register("name")}
               error={errors.name}
               disabled={isSubmitting || mutation.isPending}
@@ -168,15 +172,15 @@ export default function EditTenantModal({ tenant, close }) {
         </div>
         <div>
           <h3 className="font-semibold text-lg mb-3">
-            Datos de cuenta bancaria
+            {t("editTenant.bankDetails")}
           </h3>
 
           <div className="space-y-3">
             <FormInput
-              label="Alias"
+              label={t("editTenant.alias")}
               id="alias"
               type="text"
-              placeholder="turno.facil"
+              placeholder={t("editTenant.aliasPlaceholder")}
               register={register("alias")}
               error={errors.alias}
               disabled={isSubmitting || mutation.isPending}
@@ -195,14 +199,16 @@ export default function EditTenantModal({ tenant, close }) {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3">Dirección</h3>
+          <h3 className="font-semibold text-lg mb-3">
+            {t("editTenant.address")}
+          </h3>
 
           <FormInput
-            label="Dirección"
+            label={t("editTenant.address")}
             id="address"
             textarea
             rows={3}
-            placeholder="Ingresá la dirección del negocio"
+            placeholder={t("editTenant.addressPlaceholder")}
             register={register("address")}
             error={errors.address}
             disabled={isSubmitting || mutation.isPending}
@@ -210,10 +216,14 @@ export default function EditTenantModal({ tenant, close }) {
         </div>
 
         <div className="mb-6">
-          <h3 className="font-semibold text-lg mb-3">Redes Sociales</h3>
+          <h3 className="font-semibold text-lg mb-3">
+            {t("editTenant.socialNetworks")}
+          </h3>
 
           <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-2">Agregar red social:</p>
+            <p className="text-sm text-gray-600 mb-2">
+              {t("editTenant.addNetwork")}
+            </p>
 
             <div className="flex flex-wrap gap-2">
               {PLATFORMS.filter((p) => !(p.name in networks)).map(
@@ -253,6 +263,9 @@ export default function EditTenantModal({ tenant, close }) {
                       <button
                         type="button"
                         onClick={() => handleRemoveNetwork(platform)}
+                        aria-label={t("editTenant.removeNetwork", {
+                          network: platform,
+                        })}
                         className="text-red-600 text-xs hover:text-red-700 transition cursor-pointer"
                       >
                         <X size={18} color="#fc697b" />
@@ -267,13 +280,13 @@ export default function EditTenantModal({ tenant, close }) {
                           onChange={(e) =>
                             handleUrlChange(platform, e.target.value)
                           }
-                          placeholder="Ej: 5491234567890"
+                          placeholder={t("editTenant.whatsappNumberPlaceholder")}
                           disabled={isSubmitting || mutation.isPending}
                           className="rounded-lg text-[15px] px-3 py-2 w-full border-gray-400 border-[1.7px] bg-[#f1eef3]"
                         />
 
                         <p className="text-xs text-gray-500 mt-1">
-                          Ingresa solo el número (sin +, guiones ni espacios)
+                          {t("editTenant.whatsappNumberHelp")}
                         </p>
                       </div>
                     ) : (
@@ -294,21 +307,25 @@ export default function EditTenantModal({ tenant, close }) {
             </div>
           ) : (
             <p className="text-gray-500 text-sm">
-              No hay redes sociales agregadas
+              {t("editTenant.emptyNetworks")}
             </p>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <WhiteButton
-            text="Cancelar"
+            text={t("editTenant.cancel")}
             onClick={close}
             textSmall={true}
             type="button"
           />
 
           <BlackButton
-            text={mutation.isPending ? "Guardando..." : "Guardar"}
+            text={
+              mutation.isPending
+                ? t("editTenant.saving")
+                : t("editTenant.save")
+            }
             type="submit"
             disabled={mutation.isPending || isSubmitting}
             textSmall={true}
@@ -318,7 +335,7 @@ export default function EditTenantModal({ tenant, close }) {
 
       {successModal && (
         <SuccessModal
-          message="Información actualizada correctamente"
+          message={t("editTenant.updated")}
           close={() => setSuccessModal(false)}
           isSuccesOrError={true}
         />

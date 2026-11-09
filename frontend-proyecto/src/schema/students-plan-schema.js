@@ -1,28 +1,29 @@
 import { z } from "zod";
+import { validationMessage } from "../utils/validation-message";
 
 export const createStudentPlanSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre es requerido")
-    .max(50, "El nombre no puede tener más de 50 caracteres"),
+    .min(1, validationMessage("nameRequiredAlt"))
+    .max(50, validationMessage("nameMax50")),
   classesPerMonth: z.coerce
     .number()
-    .int("Debe ser un número entero")
-    .min(1, "Las clases por mes deben ser mayores a 0")
-    .max(50, "Las clases por mes no pueden ser mayores a 50"),
-  price: z.coerce.number().min(0.01, "El precio debe ser mayor a 0"),
+    .int(validationMessage("integerRequired"))
+    .min(1, validationMessage("classesPerMonthMin"))
+    .max(50, validationMessage("classesPerMonthMax")),
+  price: z.coerce.number().min(0.01, validationMessage("priceMin")),
 });
 
 export const updateStudentPlanSchema = z.object({
   name: z
     .string()
-    .max(50, "El nombre no puede tener más de 50 caracteres")
+    .max(50, validationMessage("nameMax50"))
     .optional(),
   classesPerMonth: z.coerce
     .number()
-    .int("Debe ser un número entero")
-    .min(1, "Las clases por mes deben ser mayores a 0")
-    .max(50, "Las clases por mes no pueden ser mayores a 50")
+    .int(validationMessage("integerRequired"))
+    .min(1, validationMessage("classesPerMonthMin"))
+    .max(50, validationMessage("classesPerMonthMax"))
     .optional(),
-  price: z.coerce.number().min(0.01, "El precio debe ser mayor a 0").optional(),
+  price: z.coerce.number().min(0.01, validationMessage("priceMin")).optional(),
 });

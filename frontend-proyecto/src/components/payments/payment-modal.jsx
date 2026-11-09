@@ -11,8 +11,11 @@ import BlackButton from "../buttons/black-button";
 import WhiteButton from "../buttons/white-button";
 import { deletePayment, updatePayment } from "../../services/payment";
 import { useHasPermission } from "../../store/tenant-store";
+import { formatCurrency, getLocale } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
+  const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
 
   const [backendError, setBackendError] = useState();
@@ -42,7 +45,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
     onSuccess: () => {
       setConfirmModal(false);
-      setSuccessMessage("Pago eliminado correctamente");
+      setSuccessMessage(t("paymentModal.deleteSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -75,7 +78,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al eliminar el pago";
+      let msg = t("paymentModal.deleteError");
 
       if (typeof data === "string") {
         msg = data;
@@ -108,7 +111,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
         queryKey: ["getTenantPaymentsForAdmin"],
       });
 
-      setSuccessMessage("Pago actualizado correctamente");
+      setSuccessMessage(t("paymentModal.updateSuccess"));
       setSuccessModal(true);
 
       setEditing(false);
@@ -125,7 +128,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al actualizar el pago";
+      let msg = t("paymentModal.updateError");
 
       if (typeof data === "string") {
         msg = data;
@@ -150,7 +153,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
   const getUserName = () => {
     if (!payment?.user) {
-      return `Usuario #${payment?.userId}`;
+      return t("paymentModal.userNumber", { id: payment?.userId });
     }
 
     return `${payment.user.name} ${payment.user.surname}`;
@@ -159,7 +162,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   const formatDate = (date) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString("es-AR", {
+    return new Date(date).toLocaleDateString(getLocale(), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -169,13 +172,13 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   const getPaymentMethodName = (method) => {
     switch (method) {
       case "Cash":
-        return "Efectivo";
+        return t("paymentModal.cash");
 
       case "Bank Transfer":
-        return "Transferencia";
+        return t("paymentModal.transfer");
 
       case "Debit Card":
-        return "Tarjeta de débito";
+        return t("paymentModal.debitCard");
 
       case "Mercado Pago":
         return "Mercado Pago";
@@ -205,16 +208,16 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   const getStatusLabel = (status) => {
     switch (status) {
       case "Paid":
-        return "Pagado";
+        return t("tenantPaymentCard.paid");
 
       case "Pending":
-        return "Pendiente";
+        return t("tenantPaymentCard.pending");
 
       case "Rejected":
-        return "Rechazado";
+        return t("paymentModal.rejected");
 
       case "Cancelled":
-        return "Cancelado";
+        return t("paymentModal.cancelled");
 
       default:
         return status;
@@ -222,7 +225,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   };
 
   const getPlanTypeLabel = () => {
-    return payment.planType === "Student" ? "Alumno" : "Negocio";
+    return payment.planType === "Student"
+      ? t("paymentModal.student")
+      : t("paymentModal.business");
   };
 
   return (
@@ -236,12 +241,14 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
       {!editing ? (
         <>
-          <h2 className="text-2xl font-semibold mb-5">Detalle del pago</h2>
+          <h2 className="text-2xl font-semibold mb-5">
+            {t("paymentModal.title")}
+          </h2>
 
           <div className="space-y-4">
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-1">
-                {payment.planType === "Student" ? "Alumno" : "Negocio"}
+                {getPlanTypeLabel()}
               </p>
 
               <p className="font-semibold text-[#333]">
@@ -252,7 +259,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Plan</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("paymentModal.plan")}
+              </p>
 
               <div className="flex justify-between items-start gap-4">
                 <div>
@@ -268,7 +277,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Método de pago</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("paymentModal.method")}
+              </p>
 
               <p className="font-semibold text-[#333]">
                 {getPaymentMethodName(payment.paymentMethod)}
@@ -276,7 +287,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Fecha</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("paymentModal.date")}
+              </p>
 
               <p className="font-semibold text-[#333]">
                 {formatDate(payment.paymentDate)}
@@ -284,15 +297,19 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">Monto</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {t("paymentModal.amount")}
+              </p>
 
               <p className="font-bold text-[#333] whitespace-nowrap">
-                ${payment.amount?.toLocaleString("es-AR")}
+                {formatCurrency(payment.amount)}
               </p>
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-2">Estado de pago</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {t("paymentModal.status")}
+              </p>
 
               <span
                 className={`inline-block text-sm font-medium rounded-full px-3 py-1 ${getStatusColor(
@@ -305,7 +322,9 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
             {payment.externalPaymentId && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-                <p className="text-sm text-gray-600 mb-1">ID de Mercado Pago</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  {t("paymentModal.externalId")}
+                </p>
 
                 <p className="font-semibold text-[#333] break-all">
                   {payment.externalPaymentId}
@@ -319,7 +338,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             >
               {canDeletePayment && (
                 <RedButton
-                  text="Eliminar"
+                  text={t("paymentModal.delete")}
                   img={<Trash2 size={18} />}
                   onClick={() => setConfirmModal(true)}
                   textSmall={true}
@@ -329,7 +348,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
               {canUpdatePayment && (
                 <BlackButton
-                  text="Editar"
+                  text={t("paymentModal.edit")}
                   img={<Pencil size={18} />}
                   onClick={() => setEditing(true)}
                   textSmall={true}
@@ -340,10 +359,14 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
         </>
       ) : (
         <div className="space-y-6">
-          <h2 className="text-2xl font-semibold text-center">Editar pago</h2>
+          <h2 className="text-2xl font-semibold text-center">
+            {t("paymentModal.editTitle")}
+          </h2>
 
           <div className="bg-[#f4f0f5] rounded-lg border border-gray-300 shadow-md p-4">
-            <p className="text-sm text-gray-600 mb-1">Pago</p>
+            <p className="text-sm text-gray-600 mb-1">
+              {t("paymentModal.payment")}
+            </p>
 
             <p className="font-semibold text-[#333]">
               {payment.planType === "Student"
@@ -354,24 +377,24 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             <p className="text-sm text-gray-600 mt-1">{payment.planName}</p>
 
             <p className="font-bold text-[#333] mt-2">
-              ${payment.amount?.toLocaleString("es-AR")}
+              {formatCurrency(payment.amount)}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-semibold mb-3">
-              Método de pago
+              {t("paymentModal.method")}
             </label>
 
             <select
               {...register("paymentMethod")}
               className="w-full rounded-lg px-3 h-11.5 py-2.5 text-gray-600 cursor-pointer bg-[#f4f0f5] shadow-md border border-gray-300 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
             >
-              <option value="Cash">Efectivo</option>
+              <option value="Cash">{t("paymentModal.cash")}</option>
 
-              <option value="Bank Transfer">Transferencia</option>
+              <option value="Bank Transfer">{t("paymentModal.transfer")}</option>
 
-              <option value="Debit Card">Tarjeta de débito</option>
+              <option value="Debit Card">{t("paymentModal.debitCard")}</option>
 
               <option value="Mercado Pago">Mercado Pago</option>
             </select>
@@ -379,7 +402,7 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
           <div className="flex justify-end gap-3">
             <WhiteButton
-              text="Cancelar"
+              text={t("paymentModal.cancel")}
               onClick={() => {
                 reset({
                   paymentMethod: payment.paymentMethod,
@@ -391,7 +414,11 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
             />
 
             <BlackButton
-              text={updateMutation.isPending ? "Actualizando..." : "Actualizar"}
+              text={
+                updateMutation.isPending
+                  ? t("paymentModal.updating")
+                  : t("paymentModal.update")
+              }
               onClick={handleSubmit(onSubmit)}
               textSmall={true}
               disabled={updateMutation.isPending}
@@ -402,11 +429,13 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
 
       {confirmModal && (
         <ConfirmModal
-          title="¿Eliminar este pago?"
+          title={t("paymentModal.confirmTitle")}
           message={
             payment.planType === "Student"
-              ? `Estás por eliminar el pago de "${getUserName()}". Esta acción no se puede deshacer.`
-              : `Estás por eliminar el pago del negocio "${payment.tenantName}". Esta acción no se puede deshacer.`
+              ? t("paymentModal.confirmStudent", { name: getUserName() })
+              : t("paymentModal.confirmBusiness", {
+                  name: payment.tenantName,
+                })
           }
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}

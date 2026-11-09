@@ -1,7 +1,10 @@
 import { IoArrowBack } from "react-icons/io5";
 import MainLayout from "../layouts/main-layout";
+import { useTranslation } from "react-i18next";
+import { formatDate } from "../utils/formatting";
 
 export default function Terms() {
+  const { t } = useTranslation();
   const handleBack = () => {
     window.history.back();
   };
@@ -14,91 +17,67 @@ export default function Terms() {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer "
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
-        <h2 className="text-4xl font-semibold">Términos y Condiciones</h2>
+        <h2 className="text-4xl font-semibold">{t("terms.title")}</h2>
         <span className="text-gray-600 text-[13px] my-20">
-          Última actualización: 8 de julio de 2026
+          {t("common.lastUpdated", {
+            date: formatDate("2026-07-08T12:00:00Z", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC",
+            }),
+          })}
         </span>
         <h3 className="font-semibold text-xl mt-4">
-          Al utilizar Turno Fácil aceptás los siguientes términos y condiciones.
+          {t("terms.intro")}
         </h3>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">1. Objeto del servicio</h3>
-          <p>
-            Turno Fácil es una plataforma destinada a la gestión de turnos,
-            alumnos, profesores y negocios.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.subjectTitle")}</h3>
+          <p>{t("terms.subjectText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">2. Registro</h3>
-          <p>
-            Para utilizar determinadas funciones es necesario crear una cuenta
-            proporcionando información veraz y actualizada. Cada usuario es
-            responsable de mantener la confidencialidad de sus credenciales.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.registrationTitle")}</h3>
+          <p>{t("terms.registrationText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">3. Uso permitido</h3>
-          <p>
-            El usuario se compromete a utilizar la plataforma únicamente con
-            fines legales y respetando los derechos de terceros.
-          </p>
-          <p>No está permitido:</p>
+          <h3 className="font-semibold text-xl">{t("terms.allowedTitle")}</h3>
+          <p>{t("terms.allowedText")}</p>
+          <p>{t("terms.prohibitedIntro")}</p>
           <ul className="list-disc ml-7">
-            <li>Intentar acceder a información de otros usuarios.</li>
-            <li>Alterar el funcionamiento del sistema.</li>
-            <li>Utilizar la plataforma para actividades ilícitas.</li>
+            <li>{t("terms.prohibitedAccess")}</li>
+            <li>{t("terms.prohibitedAlter")}</li>
+            <li>{t("terms.prohibitedIllegal")}</li>
           </ul>
         </div>
         <div className="my-7">
           <h3 className="font-semibold text-xl">
-            4. Responsabilidad sobre la información
+            {t("terms.informationTitle")}
           </h3>
-          <p>
-            Cada usuario es responsable de los datos que registra dentro de
-            Turno Fácil, incluyendo información de alumnos, profesores y
-            negocios.
-          </p>
+          <p>{t("terms.informationText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">5. Disponibilidad</h3>
-          <p>
-            Nos esforzamos por mantener el servicio disponible de forma
-            continua. Sin embargo, pueden existir interrupciones por
-            mantenimiento, actualizaciones o causas ajenas a nuestro control.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.availabilityTitle")}</h3>
+          <p>{t("terms.availabilityText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">6. Modificaciones</h3>
-          <p>
-            Turno Fácil podrá incorporar nuevas funcionalidades, modificar las
-            existentes o actualizar estos términos cuando resulte necesario.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.changesTitle")}</h3>
+          <p>{t("terms.changesText")}</p>
         </div>
         <div className="my-7">
-          <h3 className="font-semibold text-xl">7. Elimación de cuentas</h3>
-          <p>
-            Podremos eliminar cuentas que incumplan estos términos o que
-            utilicen la plataforma de manera indebida.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.accountRemovalTitle")}</h3>
+          <p>{t("terms.accountRemovalText")}</p>
         </div>
         <div className="my-7">
           <h3 className="font-semibold text-xl">
-            8. Limitación de responsabilidad
+            {t("terms.liabilityTitle")}
           </h3>
-          <p>
-            Turno Fácil actúa como una herramienta de gestión. Cada negocio es
-            responsable de la información que administra y de la organización de
-            sus actividades.
-          </p>
+          <p>{t("terms.liabilityText")}</p>
         </div>
         <div className="mt-7">
-          <h3 className="font-semibold text-xl">9. Contacto</h3>
-          <p>
-            Ante cualquier consulta relacionada con estos términos, podés
-            comunicarte mediante los canales oficiales de Turno Fácil.
-          </p>
+          <h3 className="font-semibold text-xl">{t("terms.contactTitle")}</h3>
+          <p>{t("terms.contactText")}</p>
         </div>
       </div>
     </MainLayout>

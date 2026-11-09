@@ -16,23 +16,11 @@ import ToggleInput from "../components/toggle-input";
 import { Link } from "wouter";
 import BlackButton from "../components/buttons/black-button";
 import { useAuthStore } from "../store/auth-store";
-
-const MONTHS = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
+import { useTranslation } from "react-i18next";
+import { formatMonthYear } from "../utils/formatting";
 
 export default function MyPayments() {
+  const { t } = useTranslation();
   const now = new Date();
   const { isAuthenticated } = useAuthStore();
 
@@ -44,6 +32,8 @@ export default function MyPayments() {
   const [selectedTenant, setSelectedTenant] = useState(null);
 
   const [showInactive, setShowInactive] = useState(false);
+  const monthDate = new Date(selectedYear, selectedMonth - 1, 1);
+  const monthYear = formatMonthYear(monthDate);
 
   const {
     data: myPayments = [],
@@ -108,17 +98,19 @@ export default function MyPayments() {
     <MainLayout>
       <div className="w-full max-w-6xl mt-12 flex-col flex gap-7">
         <div>
-          <h1 className="text-4xl min-[900px]:text-5xl font-bold">Mis pagos</h1>
+          <h1 className="text-4xl min-[900px]:text-5xl font-bold">
+            {t("myPayments.title")}
+          </h1>
 
           <p className="text-gray-500 mt-3">
-            Consultá el historial de todos tus pagos.
+            {t("myPayments.description")}
           </p>
         </div>
         {!isAuthenticated ? (
           <div className="flex flex-col gap-3 w-[90%] max-w-202.25">
-            <span>No tienes iniciada la sesion</span>
+            <span>{t("myPayments.signInRequired")}</span>
             <Link href="/iniciar-sesion">
-              <BlackButton text="Iniciar sesion" wfit textSmall />
+              <BlackButton text={t("auth.signIn")} wfit textSmall />
             </Link>
           </div>
         ) : (
@@ -127,7 +119,7 @@ export default function MyPayments() {
               <ToggleInput
                 state={showInactive}
                 setState={setShowInactive}
-                text="Mostrar inactivos:"
+                text={t("myPayments.showInactive")}
                 gap={4}
               />
             )}
@@ -136,7 +128,9 @@ export default function MyPayments() {
             ) : (
               myTenants.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-semibold">Mis negocios</h2>
+                  <h2 className="text-2xl font-semibold">
+                    {t("myPayments.businesses")}
+                  </h2>
 
                   <div className="grid gap-6 mt-6 sm:grid-cols-2">
                     {myTenants
@@ -159,21 +153,21 @@ export default function MyPayments() {
               <button
                 onClick={goToPreviousMonth}
                 className="p-2 rounded-full transition cursor-pointer"
-                aria-label="Mes anterior"
+                aria-label={t("adminPayments.previousMonth")}
               >
                 <FaChevronLeft size={22} color="#fc697b" />
               </button>
 
               <div className="min-w-47.5 text-center">
                 <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
-                  {MONTHS[selectedMonth - 1]} {selectedYear}
+                  {monthYear}
                 </p>
               </div>
 
               <button
                 onClick={goToNextMonth}
                 className="p-2 rounded-full transition cursor-pointer"
-                aria-label="Mes siguiente"
+                aria-label={t("adminPayments.nextMonth")}
               >
                 <FaChevronRight size={22} color="#fc697b" />
               </button>
@@ -182,17 +176,20 @@ export default function MyPayments() {
               <Loading />
             ) : isError ? (
               <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700 mt-8">
-                No se pudieron cargar tus pagos.
+                {t("myPayments.loadError")}
               </div>
             ) : (
               <>
                 <div className="mt-8">
-                  <h2 className="text-2xl font-semibold">Historial de pagos</h2>
+                  <h2 className="text-2xl font-semibold">
+                    {t("myPayments.history")}
+                  </h2>
 
                   <p className="text-gray-500 mt-1">
-                    {myPayments.length}{" "}
-                    {myPayments.length === 1 ? "pago" : "pagos"} en{" "}
-                    {MONTHS[selectedMonth - 1].toLowerCase()} de {selectedYear}.
+                    {t("adminPayments.count", {
+                      count: myPayments.length,
+                      monthYear,
+                    })}
                   </p>
                 </div>
 
@@ -203,9 +200,7 @@ export default function MyPayments() {
                     ))
                   ) : (
                     <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                      No realizaste pagos en{" "}
-                      {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                      {selectedYear}.
+                      {t("myPayments.empty", { monthYear })}
                     </div>
                   )}
                 </div>

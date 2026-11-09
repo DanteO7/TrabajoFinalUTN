@@ -10,8 +10,11 @@ import RoutineModal from "../../components/routines/routine-modal";
 import { useHasPermission } from "../../store/tenant-store";
 import BlackButton from "../../components/buttons/black-button";
 import SearchInput from "../../components/inputs/search-input";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function Routines({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [inputValue, setInputValue] = useState("");
   const [openForm, setOpenForm] = useState(false);
@@ -44,25 +47,24 @@ export default function Routines({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Rutinas
+                {t("tenantPages.routines.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar las rutinas de entrenamiento del
-                negocio.
+                {t("tenantPages.routines.description")}
               </p>
             </div>
 
@@ -71,13 +73,13 @@ export default function Routines({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar rutina..."
+                  placeholder={t("tenantPages.routines.search")}
                 />
 
                 {canCreateRoutine && (
                   <div className="justify-self-end">
                     <BlackButton
-                      text="+ Nueva rutina"
+                      text={t("tenantPages.routines.new")}
                       onClick={() => setOpenForm(true)}
                       textSmall={true}
                       wfit={true}
@@ -105,36 +107,38 @@ export default function Routines({ tenantId }) {
                       )}
 
                       <p className="text-sm text-gray-400 mt-4">
-                        {routine.exercises?.length || 0}{" "}
+                        {formatNumber(routine.exercises?.length || 0)}{" "}
                         {routine.exercises?.length === 1
-                          ? "ejercicio"
-                          : "ejercicios"}
+                          ? t("tenantPages.routines.exerciseCount_one")
+                          : t("tenantPages.routines.exerciseCount_other")}
                       </p>
                     </div>
                   ))
                 ) : (
                   <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                     <h3 className="text-xl font-semibold">
-                      No se encontraron rutinas
+                      {t("tenantPages.routines.noSearchResults")}
                     </h3>
 
                     <p className="text-gray-500 px-2 mt-2">
-                      Probá con otro término de búsqueda.
+                      {t("tenantPages.searchHint")}
                     </p>
                   </div>
                 )
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
-                  <h3 className="text-xl font-semibold">No hay rutinas</h3>
+                  <h3 className="text-xl font-semibold">
+                    {t("tenantPages.routines.emptyTitle")}
+                  </h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">
-                    Creá tu primera rutina para comenzar.
+                    {t("tenantPages.routines.emptyDescription")}
                   </p>
 
                   {canCreateRoutine && (
                     <div className="flex items-center justify-center">
                       <BlackButton
-                        text="+ Crear rutina"
+                        text={t("tenantPages.routines.create")}
                         onClick={() => setOpenForm(true)}
                         textSmall={true}
                         wfit={true}

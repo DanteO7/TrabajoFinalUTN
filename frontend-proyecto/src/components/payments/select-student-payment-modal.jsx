@@ -7,6 +7,7 @@ import { getPendingPaymentTenants } from "../../services/tenant";
 import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import SearchInput from "../inputs/search-input";
+import { useTranslation } from "react-i18next";
 
 export default function SelectStudentPaymentModal({
   tenantId,
@@ -15,6 +16,7 @@ export default function SelectStudentPaymentModal({
   isAdmin = false,
   demoMode = false,
 }) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [selected, setSelected] = useState(null);
 
@@ -36,12 +38,12 @@ export default function SelectStudentPaymentModal({
     tenantId,
     studentPlanId: "demo-plan",
     user: {
-      name: "Alumno",
-      surname: "demo",
+      name: t("paymentForm.demoStudent"),
+      surname: "",
       email: "alumno.demo@turnofacil.local",
     },
     studentPlan: {
-      name: "Plan mensual de demostración",
+      name: t("paymentForm.demoPlan"),
       price: 18000,
     },
   };
@@ -65,7 +67,7 @@ export default function SelectStudentPaymentModal({
     }
 
     if (!item?.user) {
-      return `Alumno #${item?.id}`;
+      return t("paymentForm.studentNumber", { id: item?.id });
     }
 
     return `${item.user.name} ${item.user.surname}`;
@@ -91,29 +93,34 @@ export default function SelectStudentPaymentModal({
     <Modal open={true} onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
       >
         <X size={20} />
       </button>
 
       <h2 className="text-2xl font-semibold mb-4">
-        {isAdmin ? "Seleccionar negocio" : "Seleccionar alumno"}
+        {isAdmin
+          ? t("selectPaymentRecipient.selectBusiness")
+          : t("selectPaymentRecipient.selectStudent")}
       </h2>
 
       <SearchInput
         value={inputValue}
         onChange={setInputValue}
-        placeholder="Buscar usuario..."
+        placeholder={t("selectPaymentRecipient.search")}
       />
 
       <div className="max-h-96 overflow-y-auto space-y-2 mt-4">
         {isLoading ? (
-          <p className="text-gray-500 text-center py-4">Cargando...</p>
+          <p className="text-gray-500 text-center py-4">
+            {t("selectPaymentRecipient.loading")}
+          </p>
         ) : filteredItems.length === 0 ? (
           <p className="text-gray-500 text-center py-4">
             {isAdmin
-              ? "No se encontraron negocios"
-              : "No se encontraron alumnos para pagar"}
+              ? t("selectPaymentRecipient.noBusinesses")
+              : t("selectPaymentRecipient.noStudents")}
           </p>
         ) : (
           filteredItems.map((item) => {
@@ -150,14 +157,14 @@ export default function SelectStudentPaymentModal({
       <div className="grid grid-cols-2 gap-3 mt-8">
         <WhiteButton
           type="button"
-          text="Cancelar"
+          text={t("selectPaymentRecipient.cancel")}
           onClick={close}
           textSmall={true}
         />
 
         <BlackButton
           type="button"
-          text="Seleccionar"
+          text={t("selectPaymentRecipient.select")}
           textSmall={true}
           onClick={handleSelect}
           disabled={!selected}

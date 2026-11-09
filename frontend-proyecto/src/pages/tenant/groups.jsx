@@ -1,5 +1,7 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Groups({ tenantId }) {
-  return <div>Groups{tenantId}</div>;
+  const { t } = useTranslation();
+  return <div>{t("tenantPages.groups.title")}{tenantId}</div>;
 }

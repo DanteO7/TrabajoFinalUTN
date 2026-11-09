@@ -1,50 +1,51 @@
 import { z } from "zod";
+import { validationError, validationMessage } from "../utils/validation-message";
 
 export const createClassSchema = z
   .object({
-    activityId: z.string().min(1, "La actividad es obligatoria"),
-    professorId: z.string().min(1, "El profesor es obligatorio"),
-    date: z.string().min(1, "La fecha es obligatoria"),
-    startTime: z.string().min(1, "La hora de inicio es obligatoria"),
-    endTime: z.string().min(1, "La hora de fin es obligatoria"),
+    activityId: z.string().min(1, validationMessage("activityRequired")),
+    professorId: z.string().min(1, validationMessage("professorRequired")),
+    date: z.string().min(1, validationMessage("dateRequired")),
+    startTime: z.string().min(1, validationMessage("startTimeRequired")),
+    endTime: z.string().min(1, validationMessage("endTimeRequired")),
     maxCapacity: z.coerce
       .number({
-        invalid_type_error: "La capacidad es obligatoria",
+        error: validationError("capacityRequired"),
       })
-      .int("Debe ser un número entero")
-      .min(1, "La capacidad debe ser mayor a 0")
-      .max(1000, "La capacidad es demasiado grande"),
+      .int(validationMessage("integerRequired"))
+      .min(1, validationMessage("capacityMin"))
+      .max(1000, validationMessage("capacityMax")),
   })
   .refine((data) => data.endTime > data.startTime, {
-    message: "La hora de finalización debe ser mayor a la hora de inicio",
+    error: validationError("endAfterStart"),
     path: ["endTime"],
   });
 
 export const createClassTemplateSchema = z
   .object({
-    activityId: z.string().min(1, "La actividad es obligatoria"),
+    activityId: z.string().min(1, validationMessage("activityRequired")),
 
-    professorId: z.string().min(1, "El profesor es obligatorio"),
+    professorId: z.string().min(1, validationMessage("professorRequired")),
 
     dayOfWeek: z.coerce
       .number()
-      .min(0, "El día es obligatorio")
-      .max(6, "El día no es válido"),
+      .min(0, validationMessage("dayRequired"))
+      .max(6, validationMessage("dayInvalid")),
 
-    startTime: z.string().min(1, "La hora de inicio es obligatoria"),
+    startTime: z.string().min(1, validationMessage("startTimeRequired")),
 
-    endTime: z.string().min(1, "La hora de fin es obligatoria"),
+    endTime: z.string().min(1, validationMessage("endTimeRequired")),
 
     maxCapacity: z.coerce
       .number({
-        invalid_type_error: "La capacidad es obligatoria",
+        error: validationError("capacityRequired"),
       })
-      .int("Debe ser un número entero")
-      .min(1, "La capacidad debe ser mayor a 0")
-      .max(1000, "La capacidad es demasiado grande"),
+      .int(validationMessage("integerRequired"))
+      .min(1, validationMessage("capacityMin"))
+      .max(1000, validationMessage("capacityMax")),
   })
   .refine((data) => data.endTime > data.startTime, {
-    message: "La hora de finalización debe ser mayor a la hora de inicio",
+    error: validationError("endAfterStart"),
     path: ["endTime"],
   });
 
@@ -52,36 +53,36 @@ export const updateClassSchema = z
   .object({
     activityId: z
       .string()
-      .min(1, "La actividad es obligatoria")
+      .min(1, validationMessage("activityRequired"))
       .optional()
       .or(z.literal("")),
     professorId: z
       .string()
-      .min(1, "El profesor es obligatorio")
+      .min(1, validationMessage("professorRequired"))
       .optional()
       .or(z.literal("")),
     date: z
       .string()
-      .min(1, "La fecha es obligatoria")
+      .min(1, validationMessage("dateRequired"))
       .optional()
       .or(z.literal("")),
     startTime: z
       .string()
-      .min(1, "La hora de inicio es obligatoria")
+      .min(1, validationMessage("startTimeRequired"))
       .optional()
       .or(z.literal("")),
     endTime: z
       .string()
-      .min(1, "La hora de fin es obligatoria")
+      .min(1, validationMessage("endTimeRequired"))
       .optional()
       .or(z.literal("")),
     maxCapacity: z.coerce
       .number({
-        invalid_type_error: "La capacidad es obligatoria",
+        error: validationError("capacityRequired"),
       })
-      .int("Debe ser un número entero")
-      .min(1, "La capacidad debe ser mayor a 0")
-      .max(1000, "La capacidad es demasiado grande")
+      .int(validationMessage("integerRequired"))
+      .min(1, validationMessage("capacityMin"))
+      .max(1000, validationMessage("capacityMax"))
       .optional(),
   })
   .refine(
@@ -92,7 +93,7 @@ export const updateClassSchema = z
       return true;
     },
     {
-      message: "La hora de finalización debe ser mayor a la hora de inicio",
+      error: validationError("endAfterStart"),
       path: ["endTime"],
     },
   );
@@ -101,41 +102,41 @@ export const updateClassTemplateSchema = z
   .object({
     activityId: z
       .string()
-      .min(1, "La actividad es obligatoria")
+      .min(1, validationMessage("activityRequired"))
       .optional()
       .or(z.literal("")),
 
     professorId: z
       .string()
-      .min(1, "El profesor es obligatorio")
+      .min(1, validationMessage("professorRequired"))
       .optional()
       .or(z.literal("")),
 
     dayOfWeek: z
       .string()
-      .min(1, "El día es obligatorio")
+      .min(1, validationMessage("dayRequired"))
       .optional()
       .or(z.literal("")),
 
     startTime: z
       .string()
-      .min(1, "La hora de inicio es obligatoria")
+      .min(1, validationMessage("startTimeRequired"))
       .optional()
       .or(z.literal("")),
 
     endTime: z
       .string()
-      .min(1, "La hora de fin es obligatoria")
+      .min(1, validationMessage("endTimeRequired"))
       .optional()
       .or(z.literal("")),
 
     maxCapacity: z.coerce
       .number({
-        invalid_type_error: "La capacidad es obligatoria",
+        error: validationError("capacityRequired"),
       })
-      .int("Debe ser un número entero")
-      .min(1, "La capacidad debe ser mayor a 0")
-      .max(1000, "La capacidad es demasiado grande")
+      .int(validationMessage("integerRequired"))
+      .min(1, validationMessage("capacityMin"))
+      .max(1000, validationMessage("capacityMax"))
       .optional(),
   })
   .refine(
@@ -147,7 +148,7 @@ export const updateClassTemplateSchema = z
       return true;
     },
     {
-      message: "La hora de finalización debe ser mayor a la hora de inicio",
+      error: validationError("endAfterStart"),
       path: ["endTime"],
     },
   );

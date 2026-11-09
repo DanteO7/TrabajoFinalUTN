@@ -9,8 +9,10 @@ import ToggleInput from "../components/toggle-input";
 import ErrorModal from "../components/modals/error-modal";
 import BlackButton from "../components/buttons/black-button";
 import { useAuthStore } from "../store/auth-store";
+import { useTranslation } from "react-i18next";
 
 export default function YourSpace() {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuthStore();
 
   const [openInactiveModal, setOpenInactiveModal] = useState(false);
@@ -29,19 +31,18 @@ export default function YourSpace() {
       <div className="w-full mt-10 flex flex-col items-center gap-7 lg:gap-10 lg:mt-15">
         <div className="text-center">
           <h2 className="font-semibold text-2xl mb-3 lg:text-4xl lg:mb-5">
-            Mi espacio
+            {t("yourSpace.title")}
           </h2>
 
           <p>
-            Acá podés encontrar todos tus espacios. Visualizá los negocios que
-            administrás y aquellos a los que fuiste invitado.
+            {t("yourSpace.intro")}
           </p>
         </div>
         {!isAuthenticated ? (
           <div className="flex flex-col gap-3 w-[90%] max-w-202.25">
-            <span>No tienes iniciada la sesion</span>
+            <span>{t("profile.signInRequired")}</span>
             <Link href="/iniciar-sesion">
-              <BlackButton text="Iniciar sesion" wfit textSmall />
+              <BlackButton text={t("auth.signIn")} wfit textSmall />
             </Link>
           </div>
         ) : (
@@ -50,7 +51,7 @@ export default function YourSpace() {
               <ToggleInput
                 state={showInactive}
                 setState={setShowInactive}
-                text="Mostrar inactivos:"
+                text={t("yourSpace.showInactive")}
                 gap={4}
               />
             )}
@@ -98,14 +99,14 @@ export default function YourSpace() {
       {openInactiveModal && (
         <ErrorModal
           close={() => setOpenInactiveModal(false)}
-          message="Este negocio está inactivo, por favor hable con el dueño o renueve su cuota para activarlo"
+          message={t("yourSpace.inactiveBusiness")}
           isSuccesOrError
         />
       )}
       {openInactiveProfessorModal && (
         <ErrorModal
           close={() => setOpenInactiveProfessorModal(false)}
-          message="Tu cuenta de profesor está inactiva en este negocio. Contactá al dueño para que la reactive."
+          message={t("yourSpace.inactiveProfessor")}
           isSuccesOrError
         />
       )}

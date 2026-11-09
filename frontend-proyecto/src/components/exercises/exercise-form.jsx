@@ -17,8 +17,10 @@ import WhiteButton from "../buttons/white-button";
 import BlackButton from "../buttons/black-button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createExerciseSchema } from "../../schema/exercise-schema";
+import { useTranslation } from "react-i18next";
 
 export default function ExerciseForm({ tenantId, close }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -52,7 +54,7 @@ export default function ExerciseForm({ tenantId, close }) {
 
       setBackendError(null);
 
-      setSuccessMessage("Ejercicio creado correctamente");
+      setSuccessMessage(t("exerciseForm.created"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -63,7 +65,7 @@ export default function ExerciseForm({ tenantId, close }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al crear el ejercicio";
+      let msg = t("exerciseForm.createError");
 
       if (typeof data === "string") {
         msg = data;
@@ -97,30 +99,38 @@ export default function ExerciseForm({ tenantId, close }) {
       </button>
 
       <h2 className="text-2xl font-semibold mb-4 text-center">
-        Crear un ejercicio
+        {t("exerciseForm.createTitle")}
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormInput
-          label="Nombre del ejercicio"
+          label={t("exerciseForm.name")}
           id="name"
-          placeholder="Ej: Press banca"
+          placeholder={t("exerciseForm.namePlaceholder")}
           register={register("name")}
           error={errors.name}
         />
         <FormInput
           textarea
-          label="Descripción (opcional)"
+          label={t("exerciseForm.description")}
           register={register("description")}
           error={errors.description}
-          placeholder="Explicación de la actividad..."
+          placeholder={t("exerciseForm.descriptionPlaceholder")}
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <WhiteButton text="Cancelar" onClick={close} textSmall={true} />
+          <WhiteButton
+            text={t("exerciseForm.cancel")}
+            onClick={close}
+            textSmall={true}
+          />
 
           <BlackButton
-            text={mutation.isPending ? "Creando..." : "Crear ejercicio"}
+            text={
+              mutation.isPending
+                ? t("exerciseForm.creating")
+                : t("exerciseForm.create")
+            }
             type="submit"
             disabled={mutation.isPending}
             textSmall={true}

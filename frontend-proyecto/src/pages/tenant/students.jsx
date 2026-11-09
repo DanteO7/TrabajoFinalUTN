@@ -11,8 +11,10 @@ import BlackButton from "../../components/buttons/black-button";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
 import { useHasPermission } from "../../store/tenant-store";
+import { useTranslation } from "react-i18next";
 
 export default function Students({ tenantId }) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const isSmallScreen = useMediaQuery("(min-width: 900px)");
@@ -47,11 +49,11 @@ export default function Students({ tenantId }) {
   const getStatusLabel = (status) => {
     switch (status) {
       case "Paid":
-        return "Pagado";
+        return t("tenants.monthlyFeeStatuses.paid");
       case "Pending":
-        return "Pendiente";
+        return t("tenants.monthlyFeeStatuses.pending");
       case "Overdue":
-        return "Vencido";
+        return t("tenants.monthlyFeeStatuses.overdue");
       default:
         return status;
     }
@@ -65,24 +67,24 @@ export default function Students({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {isLoading ? (
           <Loading />
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPages.accessError")}
           </div>
         ) : (
           <>
             <div>
               <h1 className="text-4xl min-[900px]:text-5xl font-bold">
-                Alumnos
+                {t("tenantPages.students.title")}
               </h1>
 
               <p className="text-gray-500 mt-3">
-                Desde acá podés administrar todos los alumnos del negocio.
+                {t("tenantPages.students.description")}
               </p>
             </div>
 
@@ -91,12 +93,12 @@ export default function Students({ tenantId }) {
                 <SearchInput
                   value={inputValue}
                   onChange={setInputValue}
-                  placeholder="Buscar alumno..."
+                  placeholder={t("tenantPages.students.search")}
                 />
 
                 {canReadInvitations && (
                   <BlackButton
-                    text="+ Invitar alumno"
+                    text={t("tenantPages.students.invite")}
                     onClick={() => setOpenModal(true)}
                     textSmall={true}
                     wfit={isSmallScreen}
@@ -142,16 +144,16 @@ export default function Students({ tenantId }) {
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 border border-gray-400 rounded-lg text-center">
                   <h3 className="text-xl font-semibold">
-                    Todavía no hay alumnos
+                    {t("tenantPages.students.emptyTitle")}
                   </h3>
 
                   <p className="text-gray-500 px-2 mt-2 mb-6">
-                    Invitá tu primer alumno para comenzar.
+                    {t("tenantPages.students.invitePrompt")}
                   </p>
 
                   {canReadInvitations && (
                     <BlackButton
-                      text="+ Invitar alumno"
+                      text={t("tenantPages.students.invite")}
                       onClick={() => setOpenModal(true)}
                       textSmall={true}
                       wfit={true}

@@ -1,16 +1,17 @@
 import { z } from "zod";
+import { validationMessage } from "../utils/validation-message";
 
 export const createExerciseSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre del ejercicio es obligatorio")
-    .max(50, "El nombre del ejercicio no puede tener más de 50 caracteres"),
+    .min(1, validationMessage("exerciseNameRequired"))
+    .max(50, validationMessage("exerciseNameMax50")),
 
   description: z
     .string()
     .max(
       300,
-      "La descripción del ejercicio no puede tener más de 300 caracteres",
+      validationMessage("exerciseDescriptionMax300"),
     )
     .optional()
     .or(z.literal("")),
@@ -19,14 +20,14 @@ export const createExerciseSchema = z.object({
 export const updateExerciseSchema = z.object({
   name: z
     .string()
-    .min(1, "El nombre del ejercicio es obligatorio")
-    .max(50, "El nombre del ejercicio no puede tener más de 50 caracteres"),
+    .min(1, validationMessage("exerciseNameRequired"))
+    .max(50, validationMessage("exerciseNameMax50")),
 
   description: z
     .string()
     .max(
       300,
-      "La descripción del ejercicio no puede tener más de 300 caracteres",
+      validationMessage("exerciseDescriptionMax300"),
     )
     .optional()
     .or(z.literal("")),

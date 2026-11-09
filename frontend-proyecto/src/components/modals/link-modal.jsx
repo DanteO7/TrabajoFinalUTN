@@ -16,8 +16,11 @@ import { Copy } from "lucide-react";
 import { Check } from "lucide-react";
 import FormInput from "../inputs/form-input";
 import { useHasPermission } from "../../store/tenant-store";
+import { getLocale } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function LinkModal({ tenantId, close, role, onCompleted }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const canCreateInvitations = useHasPermission(tenantId, "INVITATION_CREATE");
@@ -38,7 +41,7 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
         setCopied(false);
       }, 2000);
     } catch (error) {
-      console.error("No se pudo copiar:", error);
+      console.error(t("linkModal.copyError"), error);
     }
   };
   const { data: currentInvitation, isLoading } = useQuery({
@@ -63,7 +66,7 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
 
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Ocurrió un error al generar el link.";
+      let msg = t("linkModal.createError");
 
       if (typeof data === "string") msg = data;
       else if (data?.errors)
@@ -82,7 +85,7 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
     },
     onError: (error) => {
       const data = error?.response?.data;
-      let msg = "Error al eliminar el link.";
+      let msg = t("linkModal.deleteError");
       if (data?.message) msg = data.message;
 
       setBackendError(msg);
@@ -100,27 +103,32 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
     <Modal open onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black transition cursor-pointer"
       >
         <X size={20} />
       </button>
 
       <h2 className="text-2xl font-semibold text-center mb-6">
-        Invitar {role == "Student" ? "Alumno" : "Profesor"}
+        {role.toLowerCase() === "student"
+          ? t("linkModal.titleStudent")
+          : t("linkModal.titleProfessor")}
       </h2>
 
       {isLoading ? (
-        <p className="text-center text-gray-500">Cargando...</p>
+        <p className="text-center text-gray-500">
+          {t("linkModal.loading")}
+        </p>
       ) : hasValidLink ? (
         <>
           <div className="border rounded-lg p-4 flex flex-col gap-3">
-            <p className="font-semibold">Link de invitación activo</p>
+            <p className="font-semibold">{t("linkModal.active")}</p>
 
             <FormInput value={currentInvitation.link} />
 
             <BlackButton
               type="button"
-              text={copied ? "Copiado" : "Copiar"}
+              text={copied ? t("linkModal.copied") : t("linkModal.copy")}
               textSmall
               img={copied ? <Check size={16} /> : <Copy size={16} />}
               onClick={() => copyPaymentData(currentInvitation.link)}
@@ -128,9 +136,9 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
             />
 
             <p className="text-sm text-gray-600">
-              Expira el:{" "}
+              {t("linkModal.expires")}{" "}
               {new Date(currentInvitation.expirationDate).toLocaleDateString(
-                "es-AR",
+                getLocale(),
               )}
             </p>
           </div>
@@ -141,7 +149,9 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
                 <WhiteButton
                   disabled={mutation.isPending}
                   text={
-                    mutation.isPending ? "Generando..." : "Generar nuevo link"
+                    mutation.isPending
+                      ? t("linkModal.generating")
+                      : t("linkModal.generate")
                   }
                   onClick={() => mutation.mutate()}
                   textSmall={true}
@@ -151,7 +161,9 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
               {hasValidLink && canDeleteInvitations && (
                 <RedButton
                   text={
-                    deleteMutation.isPending ? "Eliminando..." : "Eliminar link"
+                    deleteMutation.isPending
+                      ? t("linkModal.deleting")
+                      : t("linkModal.delete")
                   }
                   disabled={deleteMutation.isPending}
                   onClick={() => deleteMutation.mutate(currentInvitation.id)}
@@ -165,13 +177,17 @@ export default function LinkModal({ tenantId, close, role, onCompleted }) {
         <>
           {isExpired && (
             <p className="text-center text-red-500 font-semibold mb-4">
-              El link ha expirado. Genera uno nuevo.
+              {t("linkModal.expired")}
             </p>
           )}
 
           <BlackButton
             disabled={mutation.isPending}
-            text={mutation.isPending ? "Generando..." : "Generar nuevo link"}
+            text={
+              mutation.isPending
+                ? t("linkModal.generating")
+                : t("linkModal.generate")
+            }
             onClick={() => mutation.mutate()}
             textSmall={true}
           />

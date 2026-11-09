@@ -1,7 +1,9 @@
 import { Link } from "wouter";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function Navbar({ user }) {
+  const { t } = useTranslation();
   const [location] = useLocation();
   const linkClass = (path) =>
     `px-2 border py-1 rounded-[6px] shadow-md ${location === path ? "text-[#efefef] bg-[#3f3f3f] border-black" : "bg-[#F1EEF3] border-gray-400"}`;
@@ -17,10 +19,10 @@ export default function Navbar({ user }) {
       <nav>
         <ul className="flex flex-col gap-3">
           <Link className={linkClass("/perfil")} href="/perfil">
-            Perfil
+            {t("header.profile")}
           </Link>
           <Link className={linkClass("/ajustes")} href="/ajustes">
-            Ajustes
+            {t("header.settings")}
           </Link>
         </ul>
       </nav>

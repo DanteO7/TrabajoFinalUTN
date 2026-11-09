@@ -2,8 +2,11 @@ import { useState } from "react";
 import { X, Copy, Check } from "lucide-react";
 import Modal from "../modals/modal";
 import BlackButton from "../buttons/black-button";
+import { formatCurrency } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 export default function PaymentDataModal({ close, name, price, paymentData }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const copyPaymentData = async (value) => {
@@ -29,22 +32,26 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
         <X size={20} />
       </button>
 
-      <h2 className="text-2xl font-semibold mb-2">Datos para transferir</h2>
+      <h2 className="text-2xl font-semibold mb-2">
+        {t("paymentData.title")}
+      </h2>
 
       <p className="text-gray-600 mb-6">{name}</p>
 
       <div className="space-y-4 mb-8">
         <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-          <p className="text-sm text-gray-600 mb-1">Importe a transferir</p>
+          <p className="text-sm text-gray-600 mb-1">
+            {t("paymentData.amount")}
+          </p>
 
           <p className="text-2xl font-bold text-[#333]">
-            ${price?.toLocaleString("es-AR")}
+            {formatCurrency(price)}
           </p>
         </div>
 
         {paymentData?.alias && (
           <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-            <p className="text-sm text-gray-600 mb-2">Alias</p>
+            <p className="text-sm text-gray-600 mb-2">{t("paymentData.alias")}</p>
 
             <div className="flex items-center justify-between gap-3">
               <p className="font-semibold text-[#333] break-all">
@@ -53,7 +60,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
 
               <BlackButton
                 type="button"
-                text={copied ? "Copiado" : "Copiar"}
+                text={copied ? t("paymentData.copied") : t("paymentData.copy")}
                 textSmall={true}
                 wfit
                 img={copied ? <Check size={16} /> : <Copy size={16} />}
@@ -66,7 +73,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
 
         {!paymentData?.alias && paymentData?.cbu && (
           <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-            <p className="text-sm text-gray-600 mb-2">CBU</p>
+            <p className="text-sm text-gray-600 mb-2">{t("paymentData.cbu")}</p>
 
             <div className="flex items-center justify-between gap-3">
               <p className="font-semibold text-[#333] break-all">
@@ -75,7 +82,7 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
 
               <BlackButton
                 type="button"
-                text={copied ? "Copiado" : "Copiar"}
+                text={copied ? t("paymentData.copied") : t("paymentData.copy")}
                 textSmall={true}
                 wfit
                 img={copied ? <Check size={16} /> : <Copy size={16} />}
@@ -89,15 +96,14 @@ export default function PaymentDataModal({ close, name, price, paymentData }) {
         {!paymentData?.alias && !paymentData?.cbu && (
           <div className="bg-red-50 rounded-lg p-4">
             <p className="text-sm text-red-600">
-              No hay datos de transferencia configurados.
+              {t("paymentData.missing")}
             </p>
           </div>
         )}
       </div>
 
       <p className="text-sm text-gray-500 text-center">
-        Realizá la transferencia por el importe indicado y luego enviá el
-        comprobante.
+        {t("paymentData.instructions")}
       </p>
     </Modal>
   );

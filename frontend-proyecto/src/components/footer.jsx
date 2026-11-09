@@ -1,26 +1,28 @@
 import { FooterDivider } from "flowbite-react";
 import { FaGithub, FaInstagram, FaWhatsapp, FaYoutube } from "react-icons/fa";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="p-6 mx-auto lg:px-[10%] flex flex-col gap-3">
       <div className="flex justify-between items-center flex-col-reverse gap-4 lg:gap-15 md:flex-row">
         <div className="max-[900px]:text-[15.3px]">
           <p className="m-2 text-center md:text-left max-[900px]:flex max-[900px]:flex-col">
             <span>
-              <span className="text-[#fc697b]">Teléfono: </span>(+54)
+              <span className="text-[#fc697b]">{t("common.phone")}: </span>(+54)
               3400-532514
             </span>{" "}
             <span className="max-[900px]:hidden">| </span>
             <span>
-              <span className="text-[#fc6476]">Email:</span>{" "}
+              <span className="text-[#fc6476]">{t("common.email")}:</span>{" "}
               contacto@turnofacilapp.com.ar
             </span>
           </p>
           <p className="m-2 text-center md:text-left">
-            <span className="text-[#fc6476]">&copy;2026 Turno Facil.</span>{" "}
-            Todos los derechos reservados.
+            <span className="text-[#fc6476]">&copy;2026 Turno Fácil.</span>{" "}
+            {t("footer.rights")}
           </p>
         </div>
         <div className="flex gap-5 text-3xl">
@@ -52,15 +54,15 @@ export default function Footer() {
       <hr className="text-gray-400" />
       <p className="text-center text-[0.8rem] text-gray-700">
         <Link href="/aviso-legal" className="hover:text-gray-900">
-          Aviso Legal
+          {t("footer.legalNotice")}
         </Link>{" "}
         |{" "}
         <Link href="/politica-y-privacidad" className="hover:text-gray-900">
-          Política de Privacidad
+          {t("footer.privacyPolicy")}
         </Link>{" "}
         |{" "}
         <Link href="/terminos-y-condiciones" className="hover:text-gray-900">
-          Términos y Condiciones
+          {t("footer.terms")}
         </Link>
       </p>
     </footer>

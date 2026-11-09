@@ -18,6 +18,8 @@ import {
   getClassTemplates,
   removeStudentFromClassTemplate,
 } from "../../services/class-template";
+import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../utils/formatting";
 
 export default function ClassStudentsModal({
   currentClass,
@@ -30,6 +32,7 @@ export default function ClassStudentsModal({
   isTemplate = false,
   onClassUpdated,
 }) {
+  const { t } = useTranslation();
   const classId = currentClass.id;
   const queryClient = useQueryClient();
 
@@ -72,7 +75,7 @@ export default function ClassStudentsModal({
         }
 
         setReservationToDelete(null);
-        setSuccessMessage("Alumno eliminado de la clase modelo");
+        setSuccessMessage(t("classStudentsModal.templateRemoveSuccess"));
         setSuccessModal(true);
 
         setTimeout(() => {
@@ -93,7 +96,7 @@ export default function ClassStudentsModal({
       decreaseReservationCount(1);
 
       setReservationToDelete(null);
-      setSuccessMessage("Alumno eliminado de la clase");
+      setSuccessMessage(t("classStudentsModal.removeSuccess"));
       setSuccessModal(true);
 
       setTimeout(() => {
@@ -104,7 +107,7 @@ export default function ClassStudentsModal({
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error";
+      let msg = t("classStudentsModal.error");
 
       if (typeof data === "string") {
         msg = data;
@@ -124,16 +127,22 @@ export default function ClassStudentsModal({
     <Modal open onClose={close}>
       <button
         onClick={close}
+        aria-label={t("common.close")}
         className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer"
       >
         <X size={20} />
       </button>
-      <h2 className="text-2xl font-semibold text-center">Alumnos inscriptos</h2>
+      <h2 className="text-2xl font-semibold text-center">
+        {t("classStudentsModal.title")}
+      </h2>
 
       <div className="flex justify-center items-center">
         <div></div>
         <p className=" text-center text-gray-500 mt-2">
-          {displayedStudents?.length || "0"} / {maxCapacity} alumnos
+          {t("classStudentsModal.studentCount", {
+            count: formatNumber(displayedStudents?.length ?? 0),
+            capacity: formatNumber(maxCapacity),
+          })}
         </p>
       </div>
 
@@ -143,7 +152,7 @@ export default function ClassStudentsModal({
         </div>
       ) : displayedStudents?.length === 0 ? (
         <div className="mt-8 text-center text-gray-500">
-          No hay alumnos inscriptos.
+          {t("classStudentsModal.empty")}
         </div>
       ) : (
         <div className="space-y-3 mt-8 max-h-100 overflow-y-auto">
@@ -163,33 +172,38 @@ export default function ClassStudentsModal({
       <div className="grid grid-cols-2 gap-3 mt-8">
         <WhiteButton
           type="button"
-          text="Cancelar"
+          text={t("classStudentsModal.cancel")}
           onClick={close}
           textSmall={true}
         />
         <BlackButton
-          text="Agregar"
+          text={t("classStudentsModal.add")}
           textSmall={true}
           onClick={() => setOpenAddStudentModal(true)}
         />
       </div>
       {reservationToDelete && (
         <ConfirmModal
-          title={isTemplate ? "¿Eliminar alumno?" : "¿Cancelar esta reserva?"}
-          message={`Estás por ${
-            isTemplate ? "eliminar a" : "cancelar la reserva de"
-          } ${
+          title={
             isTemplate
-              ? `${reservationToDelete.studentName} ${reservationToDelete.studentSurname}`
-              : reservationToDelete.name
-          } del día ${
+              ? t("classStudentsModal.deleteStudent")
+              : t("classStudentsModal.cancelReservation")
+          }
+          message={t(
             isTemplate
-              ? formatDateWithDay(currentClass.dayOfWeek)
-              : formatDateWithDay(currentClass.date)
-          } a las ${currentClass.startTime.slice(
-            0,
-            5,
-          )} - ${currentClass.endTime.slice(0, 5)}.`}
+              ? "classStudentsModal.deleteFromTemplate"
+              : "classStudentsModal.cancelStudentReservation",
+            {
+              name: isTemplate
+                ? `${reservationToDelete.studentName} ${reservationToDelete.studentSurname}`
+                : reservationToDelete.name,
+              day: isTemplate
+                ? formatDateWithDay(currentClass.dayOfWeek)
+                : formatDateWithDay(currentClass.date),
+              startTime: currentClass.startTime.slice(0, 5),
+              endTime: currentClass.endTime.slice(0, 5),
+            },
+          )}
           onConfirm={() => deleteMutation.mutate(reservationToDelete)}
           close={() => setReservationToDelete(null)}
           isPending={deleteMutation.isPending}

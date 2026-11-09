@@ -27,23 +27,11 @@ import PaymentDataModal from "../../components/payments/payment-data-modal";
 import RedButton from "../../components/buttons/red-button";
 import SuccessModal from "../../components/modals/success-modal";
 import ErrorModal from "../../components/modals/error-modal";
-
-const MONTHS = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
+import { useTranslation } from "react-i18next";
+import { formatCurrency, formatMonthYear } from "../../utils/formatting";
 
 export default function Payments({ tenantId }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const [, setLocation] = useLocation();
@@ -90,7 +78,7 @@ export default function Payments({ tenantId }) {
     onSuccess: () => {
       queryClient.invalidateQueries(["mercadoPagoStatus", tenantId]);
 
-      setSuccessMessage("Cuenta de Mercado Pago desvinculada correctamente");
+      setSuccessMessage(t("tenantPayments.disconnectSuccess"));
 
       setSuccessModal(true);
       setBackendError(null);
@@ -102,7 +90,7 @@ export default function Payments({ tenantId }) {
     onError: (error) => {
       const data = error?.response?.data;
 
-      let msg = "Ocurrió un error al desvincular Mercado Pago";
+      let msg = t("tenantPayments.disconnectError");
 
       if (typeof data === "string") {
         msg = data;
@@ -156,7 +144,11 @@ export default function Payments({ tenantId }) {
   );
 
   const tenantName =
-    myTenantStatus?.tenantName || tenantPayments[0]?.tenantName || "Mi negocio";
+    myTenantStatus?.tenantName ||
+    tenantPayments[0]?.tenantName ||
+    t("tenantPayments.myBusiness");
+  const monthDate = new Date(selectedYear, selectedMonth - 1, 1);
+  const monthYear = formatMonthYear(monthDate);
 
   const isLoading = canSeeReceivedPayments
     ? isLoadingTenantPayments || isLoadingMercadoPago
@@ -208,28 +200,30 @@ export default function Payments({ tenantId }) {
           className="text-gray-500 hover:text-black transition flex items-center gap-2 mb-6 cursor-pointer"
         >
           <IoArrowBack color="#fc697b" />
-          Volver
+          {t("common.back")}
         </button>
 
         {!rolesLoaded ? (
           <Loading />
         ) : !hasAccessToTenant ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPayments.accessDenied")}
           </div>
         ) : isError ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-red-700">
-            Esta página no existe o no tienes acceso.
+            {t("tenantPayments.accessDenied")}
           </div>
         ) : (
           <>
             <div>
-              <h1 className="text-4xl min-[900px]:text-5xl font-bold">Pagos</h1>
+              <h1 className="text-4xl min-[900px]:text-5xl font-bold">
+                {t("tenantPayments.title")}
+              </h1>
 
               <p className="text-gray-500 mt-3">
                 {canSeeReceivedPayments
-                  ? "Gestioná los pagos de tu negocio y consultá los pagos recibidos."
-                  : "Consultá tus pagos y el estado de tu cuota."}
+                  ? t("tenantPayments.businessDescription")
+                  : t("tenantPayments.studentDescription")}
               </p>
             </div>
 
@@ -262,12 +256,11 @@ export default function Payments({ tenantId }) {
 
                               {mercadoPagoStatus?.connected ? (
                                 <p className="text-green-600 mt-1">
-                                  Cuenta conectada correctamente
+                                  {t("tenantPayments.connected")}
                                 </p>
                               ) : (
                                 <p className="text-gray-500 mt-1">
-                                  Conectá tu cuenta para recibir pagos mediante
-                                  Mercado Pago.
+                                  {t("tenantPayments.connectPrompt")}
                                 </p>
                               )}
                             </div>
@@ -276,7 +269,7 @@ export default function Payments({ tenantId }) {
                           {mercadoPagoStatus?.connected ? (
                             <div className="flex gap-3 max-[700px]:flex-col justify-self-end max-[700px]:w-full">
                               <BlackButton
-                                text="Cuenta vinculada"
+                                text={t("tenantPayments.accountConnected")}
                                 img={<LinkIcon size={18} />}
                                 textSmall={true}
                                 wfit={isSmallScreen}
@@ -286,8 +279,8 @@ export default function Payments({ tenantId }) {
                               <RedButton
                                 text={
                                   disconnectMutation.isPending
-                                    ? "Desvinculando..."
-                                    : "Desvincular"
+                                    ? t("tenantPayments.disconnecting")
+                                    : t("tenantPayments.disconnect")
                                 }
                                 textSmall={true}
                                 wfit={isSmallScreen}
@@ -298,7 +291,7 @@ export default function Payments({ tenantId }) {
                           ) : (
                             <div className="justify-self-end max-[700px]:w-full">
                               <BlackButton
-                                text="Vincular Mercado Pago"
+                                text={t("tenantPayments.connect")}
                                 img={<LinkIcon size={18} />}
                                 textSmall={true}
                                 wfit={isSmallScreen}
@@ -314,21 +307,21 @@ export default function Payments({ tenantId }) {
                       <button
                         onClick={goToPreviousMonth}
                         className="p-2 rounded-full transition cursor-pointer"
-                        aria-label="Mes anterior"
+                        aria-label={t("adminPayments.previousMonth")}
                       >
                         <FaChevronLeft size={22} color="#fc697b" />
                       </button>
 
                       <div className="min-w-47.5 text-center">
                         <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
-                          {MONTHS[selectedMonth - 1]} {selectedYear}
+                          {monthYear}
                         </p>
                       </div>
 
                       <button
                         onClick={goToNextMonth}
                         className="p-2 rounded-full transition cursor-pointer"
-                        aria-label="Mes siguiente"
+                        aria-label={t("adminPayments.nextMonth")}
                       >
                         <FaChevronRight size={22} color="#fc697b" />
                       </button>
@@ -337,20 +330,20 @@ export default function Payments({ tenantId }) {
                     <div className="flex flex-col min-[700px]:flex-row min-[700px]:items-center min-[700px]:justify-between gap-4 mt-4">
                       <div>
                         <h2 className="text-2xl font-semibold">
-                          Pagos recibidos
+                          {t("tenantPayments.received")}
                         </h2>
 
                         <p className="text-gray-500 mt-1">
-                          {tenantPayments.length}{" "}
-                          {tenantPayments.length === 1 ? "pago" : "pagos"} en{" "}
-                          {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                          {selectedYear}.
+                          {t("adminPayments.count", {
+                            count: tenantPayments.length,
+                            monthYear,
+                          })}
                         </p>
                       </div>
 
                       {canCreatePayments && (
                         <BlackButton
-                          text="+ Registrar pago"
+                          text={t("tenantPayments.register")}
                           onClick={() => setOpenCreateModal(true)}
                           textSmall={true}
                           wfit={true}
@@ -370,9 +363,7 @@ export default function Payments({ tenantId }) {
                         ))
                       ) : (
                         <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                          No hay pagos registrados en{" "}
-                          {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                          {selectedYear}.
+                          {t("adminPayments.empty", { monthYear })}
                         </div>
                       )}
                     </div>
@@ -393,10 +384,12 @@ export default function Payments({ tenantId }) {
                         </div>
 
                         <div className="min-[700px]:text-right">
-                          <p className="text-gray-500">Cuota mensual</p>
+                          <p className="text-gray-500">
+                            {t("tenantPayments.monthlyFee")}
+                          </p>
 
                           <p className="text-2xl font-semibold">
-                            ${myTenantStatus?.planPrice}
+                            {formatCurrency(myTenantStatus?.planPrice)}
                           </p>
                         </div>
                       </div>
@@ -404,28 +397,28 @@ export default function Payments({ tenantId }) {
 
                     <div className="mt-6 bg-[#EFECF0] rounded-lg border border-gray-400 p-6 shadow-md">
                       <h2 className="text-xl font-semibold">
-                        Estado de la cuota
+                        {t("tenantPayments.feeStatus")}
                       </h2>
 
                       <div className="mt-4">
                         {myTenantStatus?.monthlyFeeStatus === "Paid" ? (
                           <div>
                             <p className="text-green-600 font-semibold">
-                              Cuota paga
+                              {t("tenantPayments.feePaid")}
                             </p>
 
                             <p className="text-gray-500 mt-1">
-                              Tu cuota de este mes está al día.
+                              {t("tenantPayments.feePaidDescription")}
                             </p>
                           </div>
                         ) : (
                           <div>
                             <p className="text-red-600 font-semibold">
-                              Cuota pendiente
+                              {t("tenantPayments.feePending")}
                             </p>
 
                             <p className="text-gray-500 mt-1">
-                              Tenés una cuota pendiente de pago.
+                              {t("tenantPayments.feePendingDescription")}
                             </p>
 
                             <div className="flex max-[550px]:flex-col gap-3 mt-5 min-[600px]:max-w-116">
@@ -433,8 +426,8 @@ export default function Payments({ tenantId }) {
                                 <BlackButton
                                   text={
                                     mercadoPagoMutation.isPending
-                                      ? "Generando pago..."
-                                      : "Pagar con Mercado Pago"
+                                      ? t("tenantPayments.generatingPayment")
+                                      : t("tenantPayments.payMercadoPago")
                                   }
                                   img={<SiMercadopago size={20} />}
                                   textSmall={true}
@@ -443,7 +436,7 @@ export default function Payments({ tenantId }) {
                                 />
                               )}
                               <BlackButton
-                                text="Ver datos para transferir"
+                                text={t("tenantPayments.transferDetails")}
                                 textSmall={true}
                                 onClick={() => setOpenModal(true)}
                               />
@@ -451,8 +444,7 @@ export default function Payments({ tenantId }) {
 
                             {!myTenantStatus?.mercadoPagoConnected && (
                               <p className="text-gray-500 mt-4">
-                                El negocio no tiene habilitados pagos mediante
-                                Mercado Pago.
+                                {t("tenantPayments.mercadoPagoUnavailable")}
                               </p>
                             )}
                           </div>
@@ -464,21 +456,21 @@ export default function Payments({ tenantId }) {
                       <button
                         onClick={goToPreviousMonth}
                         className="p-2 rounded-full transition cursor-pointer"
-                        aria-label="Mes anterior"
+                        aria-label={t("adminPayments.previousMonth")}
                       >
                         <FaChevronLeft size={22} color="#fc697b" />
                       </button>
 
                       <div className="min-w-47.5 text-center">
                         <p className="max-[900px]:text-[22px] text-[27px] font-semibold">
-                          {MONTHS[selectedMonth - 1]} {selectedYear}
+                          {monthYear}
                         </p>
                       </div>
 
                       <button
                         onClick={goToNextMonth}
                         className="p-2 rounded-full transition cursor-pointer"
-                        aria-label="Mes siguiente"
+                        aria-label={t("adminPayments.nextMonth")}
                       >
                         <FaChevronRight size={22} color="#fc697b" />
                       </button>
@@ -486,14 +478,16 @@ export default function Payments({ tenantId }) {
 
                     <div className="mt-4">
                       <h2 className="text-2xl font-semibold">
-                        Mis pagos en {tenantName}
+                        {t("tenantPayments.myPaymentsFor", {
+                          tenant: tenantName,
+                        })}
                       </h2>
 
                       <p className="text-gray-500 mt-1">
-                        {myTenantPayments.length}{" "}
-                        {myTenantPayments.length === 1 ? "pago" : "pagos"} en{" "}
-                        {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                        {selectedYear}.
+                        {t("adminPayments.count", {
+                          count: myTenantPayments.length,
+                          monthYear,
+                        })}
                       </p>
                     </div>
 
@@ -509,9 +503,7 @@ export default function Payments({ tenantId }) {
                         ))
                       ) : (
                         <div className="sm:col-span-2 xl:col-span-3 text-center py-12 text-gray-500">
-                          No hay pagos registrados en{" "}
-                          {MONTHS[selectedMonth - 1].toLowerCase()} de{" "}
-                          {selectedYear}.
+                          {t("adminPayments.empty", { monthYear })}
                         </div>
                       )}
                     </div>

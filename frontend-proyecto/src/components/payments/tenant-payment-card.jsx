@@ -1,18 +1,20 @@
 import { SiMercadopago } from "react-icons/si";
 
 import BlackButton from "../buttons/black-button";
+import { getLocale } from "../../utils/formatting";
+import { useTranslation } from "react-i18next";
 
 const roleConfig = {
   Owner: {
-    text: "Dueño",
+    key: "roleOwner",
     className: "bg-purple-300 text-purple-600",
   },
   Professor: {
-    text: "Profesor",
+    key: "roleProfessor",
     className: "bg-blue-300 text-blue-600",
   },
   Student: {
-    text: "Alumno",
+    key: "roleStudent",
     className: "bg-orange-200 text-yellow-600",
   },
 };
@@ -23,6 +25,7 @@ export default function TenantPaymentCard({
   mercadoPagoMutation,
   openTransferModal,
 }) {
+  const { t } = useTranslation();
   const status = tenant.monthlyFeeStatus?.toLowerCase();
 
   const isPaid = status === "paid";
@@ -32,10 +35,10 @@ export default function TenantPaymentCard({
 
   const formatDate = (date) => {
     if (!date) {
-      return "Sin fecha";
+      return t("tenantPaymentCard.noDate");
     }
 
-    return new Date(date).toLocaleDateString("es-AR", {
+    return new Date(date).toLocaleDateString(getLocale(), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -59,27 +62,27 @@ export default function TenantPaymentCard({
 
             <p className="text-gray-500 mt-1">
               {isPaid
-                ? "Cuota al día"
+                ? t("tenantPaymentCard.feeUpToDate")
                 : isOverdue
-                  ? "Cuota vencida"
-                  : "Cuota pendiente"}
+                  ? t("tenantPaymentCard.feeOverdue")
+                  : t("tenantPaymentCard.feePending")}
             </p>
           </div>
           <div className="flex flex-col gap-2">
             {tenant.isActive ? (
               <span className="flex items-center justify-center rounded-full px-2.25 py-px text-[13px] bg-[#a1f3be] text-green-600">
-                Activo
+                {t("tenantPaymentCard.active")}
               </span>
             ) : (
               <span className="flex items-center justify-center rounded-full px-2.25 py-px text-[13px] bg-red-300 text-red-600">
-                Inactivo
+                {t("tenantPaymentCard.inactive")}
               </span>
             )}
             {role && (
               <span
                 className={`flex items-center justify-center rounded-full px-2.25 py-px text-[13px] h-fit ${role.className}`}
               >
-                {role.text}
+                {t(`tenantPaymentCard.${role.key}`)}
               </span>
             )}
           </div>
@@ -87,7 +90,9 @@ export default function TenantPaymentCard({
 
         <div className="flex flex-col gap-px">
           <div className="flex justify-between">
-            <span className="text-gray-500">Estado</span>
+            <span className="text-gray-500">
+              {t("tenantPaymentCard.status")}
+            </span>
 
             <span
               className={
@@ -98,12 +103,18 @@ export default function TenantPaymentCard({
                     : "text-yellow-600 font-semibold"
               }
             >
-              {isPaid ? "Pagado" : isOverdue ? "Vencido" : "Pendiente"}
+              {isPaid
+                ? t("tenantPaymentCard.paid")
+                : isOverdue
+                  ? t("tenantPaymentCard.overdue")
+                  : t("tenantPaymentCard.pending")}
             </span>
           </div>
 
           <div className="flex justify-between">
-            <span className="text-gray-500">Vencimiento</span>
+            <span className="text-gray-500">
+              {t("tenantPaymentCard.dueDate")}
+            </span>
 
             <span className="font-medium">
               {formatDate(tenant.paymentDueDate)}
@@ -117,8 +128,8 @@ export default function TenantPaymentCard({
               <BlackButton
                 text={
                   mercadoPagoMutation.isPending
-                    ? "Generando pago..."
-                    : "Pagar con Mercado Pago"
+                    ? t("tenantPaymentCard.generating")
+                    : t("tenantPaymentCard.payMercadoPago")
                 }
                 img={<SiMercadopago size={20} />}
                 textSmall={true}
@@ -130,7 +141,7 @@ export default function TenantPaymentCard({
 
             {(paymentData?.alias || paymentData?.cbu) && (
               <BlackButton
-                text="Ver datos para transferir"
+                text={t("tenantPaymentCard.transferDetails")}
                 textSmall={true}
                 wfit={true}
                 onClick={() => openTransferModal(tenant)}
@@ -139,7 +150,7 @@ export default function TenantPaymentCard({
 
             {!paymentData?.alias && !paymentData?.cbu && (
               <p className="text-gray-500 text-sm">
-                No hay datos de transferencia configurados.
+                {t("tenantPaymentCard.noTransferData")}
               </p>
             )}
           </div>

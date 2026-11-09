@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { validationMessage } from "../utils/validation-message";
 
 export const changeEmailSchema = z.object({
   newEmail: z
     .string()
-    .min(3, "Email es requerido")
-    .max(100, "El email no debe tener mas de 100 caracteres")
-    .refine((value) => value.includes("@"), "Debe ser un email válido"),
+    .min(3, validationMessage("emailRequired"))
+    .max(100, validationMessage("emailMax100"))
+    .refine((value) => value.includes("@"), validationMessage("emailValid")),
   verificationCode: z
     .string()
-    .min(6, "El código debe tener al menos 6 caracteres")
-    .max(6, "El código no debe tener mas de 6 caracteres"),
+    .min(6, validationMessage("codeMin6"))
+    .max(6, validationMessage("codeMax6")),
 });
