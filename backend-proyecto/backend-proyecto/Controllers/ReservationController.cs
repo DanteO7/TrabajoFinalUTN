@@ -112,13 +112,23 @@ namespace backend_proyecto.Controllers
         [HttpGet("student/{studentId}")]
         [Authorize]
         [ProducesResponseType(typeof(List<ResponseReservationDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<ResponseReservationDTO>>> GetByStudentId(int studentId)
+        public async Task<ActionResult<List<ResponseReservationDTO>>> GetByStudentId(
+            int studentId,
+            [FromQuery] int? month,
+            [FromQuery] int? year,
+            [FromQuery] bool includeAllStatuses = false)
         {
             try
             {
-                var reservations = await _reservationServices.GetByStudentId(studentId);
+                var reservations = await _reservationServices.GetByStudentId(
+                    studentId,
+                    month,
+                    year,
+                    includeAllStatuses
+                );
                 return Ok(reservations);
             }
             catch (HttpResponseError ex)

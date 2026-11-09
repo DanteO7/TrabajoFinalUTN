@@ -244,16 +244,18 @@ namespace backend_proyecto.Services
             );
         }
 
-        private async Task UpdateCompletedReservations()
+        private async Task UpdateCompletedReservations(
+            DateOnly? startDate = null,
+            DateOnly? endDate = null,
+            int? tenantId = null)
         {
             var now = TimeHelper.Now();
             var today = DateOnly.FromDateTime(now);
             var currentTime = TimeOnly.FromDateTime(now);
 
-            var reservations =
-                await _reservationRepository.Query()
-                    .Include(r => r.Class)
-                    .Where(r =>
+            IQueryable<Reservation> query = _reservationRepository.Query()
+                .Include(r => r.Class)
+                .Where(r =>
                         r.ReservationStatus !=
                             ReservationStatus.COMPLETED &&
                         (
@@ -263,8 +265,25 @@ namespace backend_proyecto.Services
                                 r.Class.StartTime <= currentTime
                             )
                         )
-                    )
-                    .ToListAsync();
+                    );
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                query = query.Where(r =>
+                    r.Class.Date >= startDate.Value &&
+                    r.Class.Date < endDate.Value
+                );
+            }
+
+            if (tenantId.HasValue)
+            {
+                query = query.Where(r =>
+                    r.TenantId == tenantId.Value &&
+                    r.Class.TenantId == tenantId.Value
+                );
+            }
+
+            var reservations = await query.ToListAsync();
 
             foreach (var reservation in reservations)
             {
@@ -365,17 +384,74 @@ namespace backend_proyecto.Services
         }
 
         public async Task<List<ResponseReservationDTO>> GetByStudentId(
-            int studentId)
+            int studentId,
+            int? month = null,
+            int? year = null,
+            bool includeAllStatuses = false)
         {
             await _permissionServices.CheckPermission(
                 Permissions.RESERVATION_READ
             );
 
-            await UpdateCompletedReservations();
+            if (month.HasValue != year.HasValue)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "El mes y el año deben especificarse juntos"
+                );
+            }
+
+            var query = _reservationRepository.Query()
+                .Where(r => r.StudentId == studentId);
+
+            if (month.HasValue && year.HasValue)
+            {
+                if (
+                    month.Value < 1 ||
+                    month.Value > 12 ||
+                    year.Value < 1 ||
+                    year.Value > 9999 ||
+                    (year.Value == 9999 && month.Value == 12)
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El mes o el año solicitado no es válido"
+                    );
+                }
+
+                var startDate = new DateOnly(year.Value, month.Value, 1);
+                var endDate = startDate.AddMonths(1);
+                var tenantId = _currentTenantService.GetRequiredTenantId();
+
+                await UpdateCompletedReservations(
+                    startDate,
+                    endDate,
+                    tenantId
+                );
+
+                query = query.Where(r =>
+                    r.TenantId == tenantId &&
+                    r.Student.TenantId == tenantId &&
+                    r.Class.TenantId == tenantId &&
+                    r.Class.Date >= startDate &&
+                    r.Class.Date < endDate
+                );
+
+                if (!includeAllStatuses)
+                {
+                    query = query.Where(r =>
+                        r.ReservationStatus == ReservationStatus.COMPLETED
+                    );
+                }
+            }
+            else
+            {
+                await UpdateCompletedReservations();
+            }
 
             var reservations =
-                await _reservationRepository.Query()
-                    .Where(r => r.StudentId == studentId)
+                await query
                     .Include(r => r.Class)
                         .ThenInclude(c => c.Activity)
                     .Include(r => r.Class)
