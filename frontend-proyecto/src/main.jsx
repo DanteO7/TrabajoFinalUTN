@@ -11,3 +11,7 @@ createRoot(document.getElementById("root")).render(
     </GoogleOAuthProvider>
   </StrictMode>,
 );
+
+const loginBackgroundImage = new Image();
+loginBackgroundImage.fetchPriority = "low";
+loginBackgroundImage.src = "/fondo-inicio.webp";
