@@ -3,8 +3,11 @@
     public class Payment
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public int? UserId { get; set; }
+        public User? User { get; set; }
+
+        public int? StudentId { get; set; }
+        public Student? Student { get; set; }
         public int PlanId { get; set; }
         public string PlanType { get; set; } = null!;
         public int TenantId { get; set; }

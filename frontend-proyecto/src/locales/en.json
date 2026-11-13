@@ -1442,7 +1442,8 @@
       "title": "Students",
       "description": "Manage all students in the business here.",
       "search": "Search students...",
-      "invite": "+ Invite student",
+      "invite": "Invite student",
+      "create": "Create student",
       "emptyTitle": "There are no students yet",
       "invitePrompt": "Invite your first student to get started."
     },
@@ -1504,5 +1505,14 @@
     "4": "Thursday",
     "5": "Friday",
     "6": "Saturday"
+  },
+  "studentCreateModal": {
+    "success": "Student created successfully",
+    "error": "An error occurred while creating the student",
+    "title": "Create student",
+    "info": "This section is for registering students who don't have a Turno Fácil account. You can manage their information, assign them a plan, and manage their bookings through this business, but they won't be able to log in to the platform.",
+    "selectPlan": "Select a plan",
+    "creating": "Creating...",
+    "create": "Create"
   }
 }

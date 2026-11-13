@@ -3,8 +3,10 @@
     public class ResponseStudentDTO
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public UserWithoutPassDTO User { get; set; } = null!;
+        public int? UserId { get; set; }
+        public UserWithoutPassDTO? User { get; set; }
+        public string Name { get; set; } = null!;
+        public string Surname { get; set; } = null!;
         public int TenantId { get; set; }
         public int StudentPlanId { get; set; }
         public ResponseStudentPlanDTO StudentPlan { get; set; } = null!;

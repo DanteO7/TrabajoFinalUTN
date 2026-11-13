@@ -12,6 +12,7 @@ import { useMediaQuery } from "../../hooks/useMediaQuery";
 import SearchInput from "../../components/inputs/search-input";
 import { useHasPermission } from "../../store/tenant-store";
 import { useTranslation } from "react-i18next";
+import CreateStudentModal from "../../components/students/create-student-modal";
 
 export default function Students({ tenantId }) {
   const { t } = useTranslation();
@@ -22,6 +23,8 @@ export default function Students({ tenantId }) {
   const canReadInvitations = useHasPermission(tenantId, "INVITATION_READ");
 
   const [openModal, setOpenModal] = useState(false);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [inputValue, setInputValue] = useState("");
 
@@ -37,12 +40,11 @@ export default function Students({ tenantId }) {
   const filteredStudents = students.filter((student) => {
     const search = inputValue.toLowerCase();
 
-    const fullName =
-      `${student.user.name} ${student.user.surname}`.toLowerCase();
+    const fullName = `${student.name} ${student.surname}`.toLowerCase();
 
     return (
       fullName.includes(search) ||
-      student.user.email.toLowerCase().includes(search)
+      student.user?.email.toLowerCase().includes(search)
     );
   });
 
@@ -97,12 +99,20 @@ export default function Students({ tenantId }) {
                 />
 
                 {canReadInvitations && (
-                  <BlackButton
-                    text={t("tenantPages.students.invite")}
-                    onClick={() => setOpenModal(true)}
-                    textSmall={true}
-                    wfit={isSmallScreen}
-                  />
+                  <div className="grid grid-cols-2 min-[900px]:flex min-[900px]:justify-end items-center gap-2 w-full">
+                    <BlackButton
+                      text={t("tenantPages.students.invite")}
+                      onClick={() => setOpenModal(true)}
+                      textSmall={true}
+                      wfit={isSmallScreen}
+                    />
+                    <BlackButton
+                      text={t("tenantPages.students.create")}
+                      onClick={() => setOpenCreateModal(true)}
+                      textSmall={true}
+                      wfit={isSmallScreen}
+                    />
+                  </div>
                 )}
               </div>
             )}
@@ -116,10 +126,12 @@ export default function Students({ tenantId }) {
                     className="cursor-pointer rounded-lg border bg-[#efecf0] border-gray-400 p-6 shadow-md hover:shadow-xl hover:-translate-y-1 transition] duration-300"
                   >
                     <h3 className="font-semibold text-xl">
-                      {student.user.name} {student.user.surname}
+                      {student.name} {student.surname}
                     </h3>
 
-                    <p className="text-gray-500 mt-2">{student.user.email}</p>
+                    <p className="text-gray-500 mt-2 text-[14px]">
+                      {student.user?.email}
+                    </p>
 
                     <div className="mt-4 flex justify-between items-center">
                       <span className="text-sm font-medium">
@@ -152,12 +164,14 @@ export default function Students({ tenantId }) {
                   </p>
 
                   {canReadInvitations && (
-                    <BlackButton
-                      text={t("tenantPages.students.invite")}
-                      onClick={() => setOpenModal(true)}
-                      textSmall={true}
-                      wfit={true}
-                    />
+                    <div>
+                      <BlackButton
+                        text={t("tenantPages.students.invite")}
+                        onClick={() => setOpenModal(true)}
+                        textSmall={true}
+                        wfit={true}
+                      />
+                    </div>
                   )}
                 </div>
               )}
@@ -168,6 +182,13 @@ export default function Students({ tenantId }) {
                 tenantId={tenantId}
                 close={() => setOpenModal(false)}
                 role="Student"
+              />
+            )}
+
+            {openCreateModal && (
+              <CreateStudentModal
+                tenantId={tenantId}
+                close={() => setOpenCreateModal(false)}
               />
             )}
 

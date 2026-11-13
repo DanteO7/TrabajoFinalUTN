@@ -1,12 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace backend_proyecto.Models.DTOs
+﻿namespace backend_proyecto.Models.DTOs
 {
     public class ResponsePaymentDTO
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public UserWithoutPassDTO User { get; set; } = null!;
+
+        public int? UserId { get; set; }
+        public UserWithoutPassDTO? User { get; set; }
+
+        public int? StudentId { get; set; }
+        public string? StudentName { get; set; }
+        public string? StudentSurname { get; set; }
+
         public int PlanId { get; set; }
         public string PlanName { get; set; } = null!;
         public string PlanType { get; set; } = null!;

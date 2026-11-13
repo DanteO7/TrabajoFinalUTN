@@ -3,6 +3,9 @@ import { request } from "./api";
 export const assignStudent = (data) =>
   request("post", "/students/assign", data);
 
+export const createStudent = (data) =>
+  request("post", "/students", data);
+
 export const getStudents = (params) =>
   request("get", "/students", null, params);
 

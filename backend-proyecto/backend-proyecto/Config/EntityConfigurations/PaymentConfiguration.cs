@@ -22,6 +22,11 @@ namespace backend_proyecto.Config.EntityConfigurations
                   .HasForeignKey(p => p.UserId)
                   .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasOne(p => p.Student)
+                  .WithMany()
+                  .HasForeignKey(p => p.StudentId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
             entity.Property(p => p.Status)
                   .IsRequired();
 

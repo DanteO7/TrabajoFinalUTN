@@ -70,11 +70,11 @@ export default function PaymentCard({ payment, showUser, tenantId, isAdmin }) {
         <div className="min-w-0">
           <h3 className="font-semibold">
             {showUser
-              ? `${payment.user?.name} ${payment.user?.surname}`
+              ? (payment.user ? `${payment.user.name} ${payment.user.surname}` : `${payment.studentName || ""} ${payment.studentSurname || ""}`.trim())
               : `${payment.tenantName} `}
           </h3>
           <span className="text-gray-500 text-sm">
-            {!showUser && `${payment.user?.name} ${payment.user?.surname}`}
+            {!showUser && (payment.user ? `${payment.user.name} ${payment.user.surname}` : `${payment.studentName || ""} ${payment.studentSurname || ""}`.trim())}
           </span>
         </div>
 

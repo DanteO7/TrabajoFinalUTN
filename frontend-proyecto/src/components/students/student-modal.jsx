@@ -154,67 +154,68 @@ export default function StudentModal({ student, tenantId, close }) {
       {!editing ? (
         <>
           <h2 className="text-2xl font-semibold mb-2">
-            {currentStudent.user.name} {currentStudent.user.surname}
+            {currentStudent.name} {currentStudent.surname}
           </h2>
-
-          <p className="text-gray-600 mb-6">{currentStudent.user.email}</p>
+          <p className="text-gray-600 mb-6">{currentStudent.user?.email}</p>
 
           <div className="space-y-4 mb-8">
-            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
-              <p className="text-sm text-gray-600 mb-1">
-                {t("studentModal.email")}
-              </p>
-              <p className="font-semibold text-[#333]">
-                {currentStudent.user.email}
-              </p>
-            </div>
+            {currentStudent.user?.email && (
+              <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+                <p className="text-sm text-gray-600 mb-1">
+                  {t("studentModal.email")}
+                </p>
+                <p className="font-semibold text-[#333] text-[14px]">
+                  {currentStudent.user?.email}
+                </p>
+              </div>
+            )}
 
-            {currentStudent.user.phoneNumber && (
+            {currentStudent.user?.phoneNumber && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">
                   {t("profile.phone")}
                 </p>
                 <p className="font-semibold text-[#333]">
-                  {currentStudent.user.phoneNumber}
+                  {currentStudent.user?.phoneNumber}
                 </p>
               </div>
             )}
 
-            {(currentStudent.user.weight || currentStudent.user.age) && (
+            {(currentStudent.user?.weight || currentStudent.user?.age) && (
               <div className="flex gap-4">
-                {currentStudent.user.age && (
+                {currentStudent.user?.age && (
                   <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">
                       {t("profile.age")}
                     </p>
                     <p className="font-semibold text-[#333]">
                       {t("studentModal.ageYears", {
-                        age: formatNumber(currentStudent.user.age),
+                        age: formatNumber(currentStudent.user?.age),
                       })}
                     </p>
                   </div>
                 )}
-                {currentStudent.user.weight && (
+                {currentStudent.user?.weight && (
                   <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4 w-full">
                     <p className="text-sm text-gray-600 mb-1">
                       {t("profile.weight")}
                     </p>
                     <p className="font-semibold text-[#333]">
                       {t("studentModal.weightKg", {
-                        weight: formatNumber(currentStudent.user.weight),
+                        weight: formatNumber(currentStudent.user?.weight),
                       })}
                     </p>
                   </div>
                 )}
               </div>
             )}
-            {currentStudent.user.pathologies && (
+            {currentStudent.user?.pathologies && (
               <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
                 <p className="text-sm text-gray-600 mb-1">
                   {t("profile.pathologies")}
                 </p>
                 <p className="font-semibold text-[#333]">
-                  {currentStudent.user.pathologies}
+                  {currentStudent.user?.pathologies}
                 </p>
               </div>
             )}
@@ -335,7 +336,7 @@ export default function StudentModal({ student, tenantId, close }) {
         <ConfirmModal
           title={t("studentModal.confirmTitle")}
           message={t("studentModal.confirmMessage", {
-            name: `${currentStudent.user.name} ${currentStudent.user.surname}`,
+            name: `${currentStudent.name} ${currentStudent.surname}`,
           })}
           onConfirm={() => deleteMutation.mutate()}
           close={() => setConfirmModal(false)}

@@ -352,27 +352,23 @@ namespace backend_proyecto.Services
                 );
             }
 
-            var user = await _userRepository.GetOneAsync(
-                u => u.Id == createPaymentDTO.UserId
-            );
-
-            if (user == null)
-            {
-                throw new HttpResponseError(
-                    HttpStatusCode.NotFound,
-                    $"No se encontró un usuario con el Id = '{createPaymentDTO.UserId}'"
-                );
-            }
-
             // =====================================================
             // ALUMNO
             // =====================================================
 
             if (createPaymentDTO.PlanType == PlanType.STUDENT)
             {
+                if (!createPaymentDTO.StudentId.HasValue)
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "Debés seleccionar un alumno."
+                    );
+                }
+
                 var student = await _studentRepository.GetOneAsync(
                     s =>
-                        s.UserId == createPaymentDTO.UserId &&
+                        s.Id == createPaymentDTO.StudentId.Value &&
                         s.TenantId == createPaymentDTO.TenantId
                 );
 
@@ -381,6 +377,17 @@ namespace backend_proyecto.Services
                     throw new HttpResponseError(
                         HttpStatusCode.BadRequest,
                         "El usuario seleccionado no es alumno de este negocio."
+                    );
+                }
+
+                if (
+                    createPaymentDTO.UserId.HasValue &&
+                    createPaymentDTO.UserId.Value != student.UserId
+                )
+                {
+                    throw new HttpResponseError(
+                        HttpStatusCode.BadRequest,
+                        "El usuario indicado no corresponde al alumno seleccionado."
                     );
                 }
 
@@ -417,14 +424,13 @@ namespace backend_proyecto.Services
                     );
                 }
 
-                var pendingPayment =
-                    await _paymentRepository.GetOneAsync(
-                        p =>
-                            p.UserId == createPaymentDTO.UserId &&
-                            p.TenantId == createPaymentDTO.TenantId &&
-                            p.PlanType == PlanType.STUDENT &&
-                            p.Status == PaymentStatus.PENDING
-                    );
+                var pendingPayment = await _paymentRepository.GetOneAsync(
+                    p =>
+                        p.StudentId == student.Id &&
+                        p.TenantId == createPaymentDTO.TenantId &&
+                        p.PlanType == PlanType.STUDENT &&
+                        p.Status == PaymentStatus.PENDING
+                );
 
                 if (pendingPayment != null)
                 {
@@ -467,7 +473,9 @@ namespace backend_proyecto.Services
 
                 var payment = new Payment
                 {
-                    UserId = createPaymentDTO.UserId,
+                    UserId = student.UserId,
+                    StudentId = student.Id,
+                    Student = student,
                     PlanId = createPaymentDTO.PlanId,
                     PlanType = PlanType.STUDENT,
                     TenantId = createPaymentDTO.TenantId,
@@ -499,14 +507,38 @@ namespace backend_proyecto.Services
                     student
                 );
 
-                return _mapper.Map<ResponsePaymentDTO>(
-                    payment
-                );
+                var response = _mapper.Map<ResponsePaymentDTO>(payment);
+
+                response.StudentId = student.Id;
+                response.StudentName = student.Name;
+                response.StudentSurname = student.Surname;
+
+                return response;
             }
 
             // =====================================================
             // TENANT
             // =====================================================
+
+            if (!createPaymentDTO.UserId.HasValue)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "Los pagos de negocios requieren un usuario asociado."
+                );
+            }
+
+            var user = await _userRepository.GetOneAsync(
+                u => u.Id == createPaymentDTO.UserId.Value
+            );
+
+            if (user == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    $"No se encontró un usuario con el Id = '{createPaymentDTO.UserId}'"
+                );
+            }
 
             if (tenant.TenantPlanId != createPaymentDTO.PlanId)
             {

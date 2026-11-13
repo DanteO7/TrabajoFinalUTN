@@ -9,7 +9,16 @@ namespace backend_proyecto.Config.EntityConfigurations
         public void Configure(EntityTypeBuilder<Student> entity)
         {
             entity.HasKey(s => s.Id);
-            entity.Property(s => s.MonthlyFeeStatus).IsRequired();
+
+            entity.Property(s => s.Name)
+                  .IsRequired();
+
+            entity.Property(s => s.Surname)
+                  .IsRequired();
+
+            entity.Property(s => s.MonthlyFeeStatus)
+                  .IsRequired();
+
             entity.Property(s => s.JoinedAt)
                   .IsRequired()
                   .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -17,6 +26,7 @@ namespace backend_proyecto.Config.EntityConfigurations
             entity.HasOne(s => s.User)
                   .WithMany()
                   .HasForeignKey(s => s.UserId)
+                  .IsRequired(false)
                   .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(s => s.Tenant)

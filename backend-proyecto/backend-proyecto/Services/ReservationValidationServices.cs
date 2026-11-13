@@ -25,7 +25,7 @@ namespace backend_proyecto.Services
         )
         {
             var fullName =
-                $"{student.User.Name} {student.User.Surname}";
+                $"{student.Name} {student.Surname}".Trim();
 
             var studentPlan =
                 await _studentPlanRepository.GetOneAsync(

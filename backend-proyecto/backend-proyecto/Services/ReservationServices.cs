@@ -154,8 +154,9 @@ namespace backend_proyecto.Services
 
                 if (student.TenantId != tenantId)
                 {
+                    var studentName = $"{student.Name} {student.Surname}".Trim();
                     errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
+                        $"Alumno {studentName}: " +
                         "No pertenece a este tenant"
                     );
                     continue;
@@ -168,10 +169,12 @@ namespace backend_proyecto.Services
                             r.StudentId == studentId
                     );
 
+                var studentDisplayName = $"{student.Name} {student.Surname}".Trim();
+
                 if (existingReservation != null)
                 {
                     errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
+                        $"Alumno {studentDisplayName}: " +
                         "Ya tiene una reserva en esta clase"
                     );
                     continue;
@@ -185,7 +188,7 @@ namespace backend_proyecto.Services
                 if (reservationsCount >= classEntity.MaxCapacity)
                 {
                     errors.Add(
-                        $"Alumno {student.User.Name} {student.User.Surname}: " +
+                        $"Alumno {studentDisplayName}: " +
                         "La clase está llena"
                     );
                     continue;

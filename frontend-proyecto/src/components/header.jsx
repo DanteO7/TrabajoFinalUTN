@@ -102,7 +102,7 @@ export default function Header() {
           ) : (
             <Link
               href="/iniciar-sesion"
-              className="border rounded-lg px-2 py-1 text-[13px]"
+              className="border rounded-lg px-1.5 py-1 text-[13px]"
             >
               {t("header.signIn")}
             </Link>

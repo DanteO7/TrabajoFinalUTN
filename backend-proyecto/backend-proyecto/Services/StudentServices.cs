@@ -72,6 +72,11 @@ namespace backend_proyecto.Services
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{assignStudentDTO.StudentPlanId}'");
             }
 
+            if (studentPlan.TenantId != assignStudentDTO.TenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "El plan de alumno no pertenece a este negocio.");
+            }
+
             var existingStudent = await _studentRepository.GetOneAsync(
                 s => s.UserId == assignStudentDTO.UserId &&
                      s.TenantId == assignStudentDTO.TenantId
@@ -98,6 +103,8 @@ namespace backend_proyecto.Services
             }
 
             var student = _mapper.Map<Student>(assignStudentDTO);
+            student.Name = user.Name;
+            student.Surname = user.Surname;
             student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
             student.JoinedAt = TimeHelper.UtcNow();
 
@@ -108,6 +115,39 @@ namespace backend_proyecto.Services
                 assignStudentDTO.TenantId,
                 "STUDENT"
             );
+
+            return _mapper.Map<ResponseStudentDTO>(student);
+        }
+
+        public async Task<ResponseStudentDTO> CreateWithoutUser(CreateStudentDTO createStudentDTO)
+        {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_CREATE);
+
+            var tenant = await _tenantRepository.GetOneAsync(t => t.Id == createStudentDTO.TenantId);
+            if (tenant == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un tenant con el Id = '{createStudentDTO.TenantId}'");
+            }
+
+            var studentPlan = await _studentPlanRepository.GetOneAsync(s => s.Id == createStudentDTO.StudentPlanId);
+            if (studentPlan == null)
+            {
+                throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un plan de alumno con el Id = '{createStudentDTO.StudentPlanId}'");
+            }
+
+            if (studentPlan.TenantId != createStudentDTO.TenantId)
+            {
+                throw new HttpResponseError(HttpStatusCode.BadRequest, "El plan de alumno no pertenece a este negocio.");
+            }
+
+            var student = _mapper.Map<Student>(createStudentDTO);
+            student.UserId = null;
+            student.Name = createStudentDTO.Name.Trim();
+            student.Surname = createStudentDTO.Surname.Trim();
+            student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
+            student.JoinedAt = TimeHelper.UtcNow();
+
+            await _studentRepository.CreateOneAsync(student);
 
             return _mapper.Map<ResponseStudentDTO>(student);
         }
@@ -165,9 +205,9 @@ namespace backend_proyecto.Services
             {
                 var searchLower = search.ToLower();
                 query = query.Where(s =>
-                    s.User.Name.ToLower().Contains(searchLower) ||
-                    s.User.Surname.ToLower().Contains(searchLower) ||
-                    s.User.Email.ToLower().Contains(searchLower));
+                    (s.Name != null && s.Name.ToLower().Contains(searchLower)) ||
+                    (s.Surname != null && s.Surname.ToLower().Contains(searchLower)) ||
+                    (s.User != null && s.User.Email != null && s.User.Email.ToLower().Contains(searchLower)));
             }
 
             var students = await query.ToListAsync();

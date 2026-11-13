@@ -18,7 +18,7 @@ export default function ClassStudentCard({
         </p>
 
         {!isTemplate && (
-          <p className="text-sm text-gray-500">{student.email}</p>
+          <p className="text-[13px] text-gray-500">{student.email}</p>
         )}
       </div>
 

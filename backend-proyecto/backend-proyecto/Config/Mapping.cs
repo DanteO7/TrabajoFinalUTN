@@ -42,6 +42,7 @@ namespace backend_proyecto.Config
 
             // student
             CreateMap<AssignStudentDTO, Student>();
+            CreateMap<CreateStudentDTO, Student>();
             CreateMap<Student, ResponseStudentDTO>();
             CreateMap<UpdateStudentDTO, Student>();
 
@@ -85,11 +86,11 @@ namespace backend_proyecto.Config
                 .ForMember(d => d.StudentId,
                     o => o.MapFrom(s => s.Student.Id))
                 .ForMember(d => d.Name,
-                    o => o.MapFrom(s => s.Student.User.Name))
+                    o => o.MapFrom(s => s.Student.Name))
                 .ForMember(d => d.Surname,
-                    o => o.MapFrom(s => s.Student.User.Surname))
+                    o => o.MapFrom(s => s.Student.Surname))
                 .ForMember(d => d.Email,
-                    o => o.MapFrom(s => s.Student.User.Email))
+                    o => o.MapFrom(s => s.Student.User != null ? s.Student.User.Email : string.Empty))
                 .ForMember(d => d.ReservationStatus,
                     o => o.MapFrom(s => s.ReservationStatus));
 
@@ -152,9 +153,9 @@ namespace backend_proyecto.Config
 
             CreateMap<ClassTemplateStudent, ResponseClassTemplateStudentDTO>()
                 .ForMember(dest => dest.StudentName,
-                    opt => opt.MapFrom(src => src.Student.User.Name))
+                    opt => opt.MapFrom(src => src.Student.Name))
                 .ForMember(dest => dest.StudentSurname,
-                    opt => opt.MapFrom(src => src.Student.User.Surname));
+                    opt => opt.MapFrom(src => src.Student.Surname));
             CreateMap<ClassTemplate, Class>()
                 .ForMember(
                     dest => dest.Id,

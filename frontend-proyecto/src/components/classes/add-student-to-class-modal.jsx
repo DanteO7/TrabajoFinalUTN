@@ -194,10 +194,10 @@ export default function AddStudentToClassModal({
                 <div className="flex justify-between gap-3 items-center px-1">
                   <div>
                     <p className="font-semibold">
-                      {student.user.name} {student.user.surname}
+                      {student.name} {student.surname}
                     </p>
-                    <p className="text-sm text-gray-600">
-                      {student.user.email}
+                    <p className="text-[12px] text-gray-600">
+                      {student.user?.email}
                     </p>
                   </div>
                   <div className="mt-1 w-5 flex justify-center items-center">

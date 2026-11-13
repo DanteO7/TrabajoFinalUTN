@@ -107,9 +107,7 @@ export default function PaymentForm({
       if (demoCompleted) return;
 
       setDemoCompleted(true);
-      setSuccessMessage(
-        t("paymentForm.demoSuccess"),
-      );
+      setSuccessMessage(t("paymentForm.demoSuccess"));
       setSuccessModal(true);
       onDemoCompleted?.();
 
@@ -133,7 +131,8 @@ export default function PaymentForm({
     }
 
     mutation.mutate({
-      userId: selected.userId,
+      userId: selected.userId ?? null,
+      studentId: selected.id,
       planId: selected.studentPlanId,
       planType: "Student",
       tenantId: selected.tenantId,
@@ -148,13 +147,16 @@ export default function PaymentForm({
       return selected.name;
     }
 
-    if (!selected.user) {
-      return t("paymentForm.studentNumber", { id: selected.id });
-    }
-
-    return `${selected.user.name} ${selected.user.surname}`;
+    return `${selected.name} ${selected.surname}`;
   };
 
+  const getSecondaryText = (item) => {
+    if (isAdmin) {
+      return item.ownerUser?.name + " " + item.ownerUser?.surname;
+    }
+
+    return item.user?.email || "";
+  };
   return (
     <Modal open={true} onClose={close}>
       <div className="mb-6">
@@ -208,15 +210,9 @@ export default function PaymentForm({
                     {getSelectedName()}
                   </p>
 
-                  {!isAdmin && selected.user?.email ? (
-                    <p className="mt-1 text-sm text-gray-600">
-                      {selected.user.email}
-                    </p>
-                  ) : (
-                    <p className="mt-1 text-sm text-gray-600">
-                      {selected.ownerUser.name} {selected.ownerUser.surname}
-                    </p>
-                  )}
+                  <p className="mt-1 font-medium text-gray-900">
+                    {getSecondaryText(selected)}
+                  </p>
                 </div>
 
                 <button

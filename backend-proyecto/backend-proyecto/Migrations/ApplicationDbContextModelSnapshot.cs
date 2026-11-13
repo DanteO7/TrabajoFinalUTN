@@ -820,13 +820,18 @@ namespace backend_proyecto.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
 
                     b.HasIndex("TenantId");
 
@@ -977,16 +982,24 @@ namespace backend_proyecto.Migrations
                     b.Property<DateTime?>("MonthlyFeeStatusUpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("PaymentDueDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StudentPlanId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -1473,6 +1486,11 @@ namespace backend_proyecto.Migrations
 
             modelBuilder.Entity("backend_proyecto.Models.Payment", b =>
                 {
+                    b.HasOne("backend_proyecto.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("backend_proyecto.Models.Tenant", "Tenant")
                         .WithMany()
                         .HasForeignKey("TenantId")
@@ -1482,8 +1500,9 @@ namespace backend_proyecto.Migrations
                     b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Student");
 
                     b.Navigation("Tenant");
 
@@ -1602,8 +1621,7 @@ namespace backend_proyecto.Migrations
                     b.HasOne("backend_proyecto.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("StudentPlan");
 

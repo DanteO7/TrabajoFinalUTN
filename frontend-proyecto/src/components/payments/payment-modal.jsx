@@ -152,11 +152,16 @@ export default function PaymentModal({ payment, tenantId, close, isAdmin }) {
   };
 
   const getUserName = () => {
-    if (!payment?.user) {
-      return t("paymentModal.userNumber", { id: payment?.userId });
+    if (payment?.user) {
+      return `${payment.user.name} ${payment.user.surname}`;
     }
-
-    return `${payment.user.name} ${payment.user.surname}`;
+    if (payment?.studentName || payment?.studentSurname) {
+      return `${payment.studentName || ""} ${payment.studentSurname || ""}`.trim();
+    }
+    if (payment?.userId) {
+      return t("paymentModal.userNumber", { id: payment.userId });
+    }
+    return "-";
   };
 
   const formatDate = (date) => {

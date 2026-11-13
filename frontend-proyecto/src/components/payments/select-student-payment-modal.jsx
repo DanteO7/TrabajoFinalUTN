@@ -25,6 +25,7 @@ export default function SelectStudentPaymentModal({
     queryFn: () => getPendingPaymentStudents(tenantId),
     enabled: !demoMode && !isAdmin && !!tenantId,
   });
+  console.log(students);
 
   const { data: tenants = [], isLoading: isLoadingTenants } = useQuery({
     queryKey: ["pendingPaymentTenants"],
@@ -51,10 +52,10 @@ export default function SelectStudentPaymentModal({
 
   const filteredItems = items.filter((item) => {
     const text = isAdmin
-      ? item.name
-      : `${item.user?.name || ""} ${item.user?.surname || ""} ${
-          item.user?.email || ""
-        }`;
+      ? item.name || ""
+      : `${item.name || item.user?.name || ""} ${
+          item.surname || item.user?.surname || ""
+        } ${item.user?.email || ""}`;
 
     return text.toLowerCase().includes(inputValue.toLowerCase());
   });
@@ -66,11 +67,10 @@ export default function SelectStudentPaymentModal({
       return item.name;
     }
 
-    if (!item?.user) {
-      return t("paymentForm.studentNumber", { id: item?.id });
-    }
+    const name = item.name || item.user?.name || "";
+    const surname = item.surname || item.user?.surname || "";
 
-    return `${item.user.name} ${item.user.surname}`;
+    return `${name} ${surname}`.trim();
   };
 
   const getSecondaryText = (item) => {

@@ -41,6 +41,29 @@ namespace backend_proyecto.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ResponseStudentDTO>> CreateWithoutUser([FromBody] CreateStudentDTO createStudentDTO)
+        {
+            try
+            {
+                var student = await _studentServices.CreateWithoutUser(createStudentDTO);
+                return Created("Created", student);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpGet]
         [Authorize]
         [ProducesResponseType(typeof(List<ResponseStudentDTO>), StatusCodes.Status200OK)]
