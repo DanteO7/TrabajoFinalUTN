@@ -75,7 +75,9 @@ export default function SelectStudentPaymentModal({
 
   const getSecondaryText = (item) => {
     if (isAdmin) {
-      return item.ownerUser?.name + " " + item.ownerUser?.surname;
+      return item.ownerUser
+        ? `${item.ownerUser.name} ${item.ownerUser.surname}`
+        : "";
     }
 
     return item.user?.email || "";

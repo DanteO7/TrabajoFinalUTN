@@ -69,7 +69,11 @@ namespace backend_proyecto.Config
             );
             CreateMap<Payment, ResponsePaymentDTO>()
                 .ForMember(dest => dest.TenantName,
-                    opt => opt.MapFrom(src => src.Tenant.Name));
+                    opt => opt.MapFrom(src => src.Tenant != null ? src.Tenant.Name : string.Empty))
+                .ForMember(dest => dest.StudentName,
+                    opt => opt.MapFrom(src => src.Student != null ? src.Student.Name : null))
+                .ForMember(dest => dest.StudentSurname,
+                    opt => opt.MapFrom(src => src.Student != null ? src.Student.Surname : null));
 
             // class
             CreateMap<CreateClassDTO, Class>();

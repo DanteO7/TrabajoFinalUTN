@@ -52,7 +52,7 @@ const Modal = forwardRef(function Modal(
 
   return createPortal(
     <div
-      className="fixed inset-0 z-9999 bg-black/40 backdrop-blur-xs flex items-center justify-center px-4"
+      className="fixed inset-x-0 top-0 z-9999 h-screen bg-black/40 backdrop-blur-xs flex items-center justify-center px-4"
       onMouseDown={handleOverlayMouseDown}
       onMouseUp={handleOverlayMouseUp}
     >

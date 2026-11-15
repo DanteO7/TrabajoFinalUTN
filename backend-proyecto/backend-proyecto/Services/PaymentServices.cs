@@ -165,6 +165,29 @@ namespace backend_proyecto.Services
             return result;
         }
 
+        private Task<Student?> GetStudentForPayment(Payment payment)
+        {
+            if (payment.StudentId.HasValue)
+            {
+                return _studentRepository.GetOneAsync(
+                    s =>
+                        s.Id == payment.StudentId.Value &&
+                        s.TenantId == payment.TenantId
+                );
+            }
+
+            if (payment.UserId.HasValue)
+            {
+                return _studentRepository.GetOneAsync(
+                    s =>
+                        s.UserId == payment.UserId.Value &&
+                        s.TenantId == payment.TenantId
+                );
+            }
+
+            return Task.FromResult<Student?>(null);
+        }
+
         // =========================================================
         // MIS PAGOS
         // =========================================================
@@ -195,6 +218,7 @@ namespace backend_proyecto.Services
                     p.PaymentDate >= startOfMonth &&
                     p.PaymentDate < startOfNextMonth,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
@@ -251,6 +275,7 @@ namespace backend_proyecto.Services
                     p.PaymentDate >= startOfMonth &&
                     p.PaymentDate < startOfNextMonth,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
@@ -476,6 +501,7 @@ namespace backend_proyecto.Services
                     UserId = student.UserId,
                     StudentId = student.Id,
                     Student = student,
+                    Tenant = tenant,
                     PlanId = createPaymentDTO.PlanId,
                     PlanType = PlanType.STUDENT,
                     TenantId = createPaymentDTO.TenantId,
@@ -611,6 +637,7 @@ namespace backend_proyecto.Services
             var tenantPayment = new Payment
             {
                 UserId = createPaymentDTO.UserId,
+                Tenant = tenant,
                 PlanId = createPaymentDTO.PlanId,
                 PlanType = PlanType.TENANT,
                 TenantId = createPaymentDTO.TenantId,
@@ -677,6 +704,7 @@ namespace backend_proyecto.Services
                     p.PaymentDate >= startOfMonth &&
                     p.PaymentDate < startOfNextMonth,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
@@ -843,7 +871,13 @@ namespace backend_proyecto.Services
             var existingPayment =
                 await _paymentRepository.GetOneAsync(
                     p =>
-                        p.UserId == userId &&
+                        (
+                            p.StudentId == student.Id ||
+                            (
+                                p.StudentId == null &&
+                                p.UserId == userId
+                            )
+                        ) &&
                         p.TenantId == tenantId &&
                         p.PlanType == PlanType.STUDENT &&
                         p.Status == PaymentStatus.PENDING
@@ -862,6 +896,8 @@ namespace backend_proyecto.Services
             var payment = new Payment
             {
                 UserId = userId,
+                StudentId = student.Id,
+                Student = student,
                 PlanId = studentPlan.Id,
                 PlanType = PlanType.STUDENT,
                 TenantId = tenantId,
@@ -894,6 +930,7 @@ namespace backend_proyecto.Services
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == id,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
@@ -928,12 +965,7 @@ namespace backend_proyecto.Services
                 payment.Status == PaymentStatus.PAID
             )
             {
-                var student =
-                    await _studentRepository.GetOneAsync(
-                        s =>
-                            s.UserId == payment.UserId &&
-                            s.TenantId == payment.TenantId
-                    );
+                var student = await GetStudentForPayment(payment);
 
                 if (student == null)
                 {
@@ -947,10 +979,16 @@ namespace backend_proyecto.Services
                     await _paymentRepository.Query()
                         .Where(
                             p =>
-                                p.UserId == payment.UserId &&
                                 p.TenantId == payment.TenantId &&
                                 p.PlanType == PlanType.STUDENT &&
-                                p.Status == PaymentStatus.PAID
+                                p.Status == PaymentStatus.PAID &&
+                                (
+                                    p.StudentId == student.Id ||
+                                    (
+                                        p.StudentId == null &&
+                                        p.UserId == payment.UserId
+                                    )
+                                )
                         )
                         .OrderByDescending(p => p.PaymentDate)
                         .FirstOrDefaultAsync();
@@ -1038,6 +1076,7 @@ namespace backend_proyecto.Services
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == id,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
@@ -1307,12 +1346,7 @@ namespace backend_proyecto.Services
 
                     if (payment.PlanType == PlanType.STUDENT)
                     {
-                        var student =
-                            await _studentRepository.GetOneAsync(
-                                s =>
-                                    s.UserId == payment.UserId &&
-                                    s.TenantId == payment.TenantId
-                            );
+                        var student = await GetStudentForPayment(payment);
 
                         if (student != null)
                         {
@@ -1389,6 +1423,7 @@ namespace backend_proyecto.Services
             var payment = await _paymentRepository.GetOneAsync(
                 p => p.Id == paymentId,
                 p => p.User,
+                p => p.Student,
                 p => p.Tenant
             );
 
