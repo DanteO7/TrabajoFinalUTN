@@ -25,6 +25,7 @@ namespace backend_proyecto.Services
         private readonly GroupServices _groupServices;
         private readonly IPaymentRepository _paymentRepository; 
         private readonly ApplicationDbContext _context;
+        private readonly TenantCapacityService _tenantCapacityService;
 
         public StudentServices(
             IStudentRepository studentRepository,
@@ -37,7 +38,8 @@ namespace backend_proyecto.Services
             PermissionServices permissionServices,
             GroupServices groupServices,
             IPaymentRepository paymentRepository,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            TenantCapacityService tenantCapacityService)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
@@ -50,6 +52,7 @@ namespace backend_proyecto.Services
             _groupServices = groupServices;
             _paymentRepository = paymentRepository;
             _context = context;
+            _tenantCapacityService = tenantCapacityService;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -108,12 +111,22 @@ namespace backend_proyecto.Services
             student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
             student.JoinedAt = TimeHelper.UtcNow();
 
-            await _studentRepository.CreateOneAsync(student);
-
-            await _groupServices.AssignUserToGroupIfNotExists(
-                assignStudentDTO.UserId,
+            await _tenantCapacityService.ExecuteWithTenantLockAsync(
                 assignStudentDTO.TenantId,
-                "STUDENT"
+                async () =>
+                {
+                    await _tenantCapacityService.EnsureStudentCapacityAsync(
+                        assignStudentDTO.TenantId
+                    );
+
+                    await _studentRepository.CreateOneAsync(student);
+
+                    await _groupServices.AssignUserToGroupIfNotExists(
+                        assignStudentDTO.UserId,
+                        assignStudentDTO.TenantId,
+                        "STUDENT"
+                    );
+                }
             );
 
             return _mapper.Map<ResponseStudentDTO>(student);
@@ -147,7 +160,17 @@ namespace backend_proyecto.Services
             student.MonthlyFeeStatus = MonthlyFeeStatus.OVERDUE;
             student.JoinedAt = TimeHelper.UtcNow();
 
-            await _studentRepository.CreateOneAsync(student);
+            await _tenantCapacityService.ExecuteWithTenantLockAsync(
+                createStudentDTO.TenantId,
+                async () =>
+                {
+                    await _tenantCapacityService.EnsureStudentCapacityAsync(
+                        createStudentDTO.TenantId
+                    );
+
+                    await _studentRepository.CreateOneAsync(student);
+                }
+            );
 
             return _mapper.Map<ResponseStudentDTO>(student);
         }

@@ -77,6 +77,7 @@ builder.Services.AddScoped<WaitlistServices>();
 builder.Services.AddScoped<NewsServices>();
 builder.Services.AddScoped<CurrentTenantService>();
 builder.Services.AddScoped<TenantFeatureAccessService>();
+builder.Services.AddScoped<TenantCapacityService>();
 builder.Services.AddScoped<ProfessorPermissionServices>();
 builder.Services.AddScoped<ExerciseServices>();
 builder.Services.AddScoped<RoutineServices>();

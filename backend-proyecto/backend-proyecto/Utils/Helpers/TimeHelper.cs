@@ -19,5 +19,19 @@
         {
             return DateTime.UtcNow;
         }
+
+        public static DateTime ArgentinaTodayStartUtc()
+        {
+            var argentinaToday =
+                DateTime.SpecifyKind(
+                    Now().Date,
+                    DateTimeKind.Unspecified
+                );
+
+            return TimeZoneInfo.ConvertTimeToUtc(
+                argentinaToday,
+                Argentina
+            );
+        }
     }
 }

@@ -20,7 +20,8 @@ namespace backend_proyecto.Services
         private readonly ApplicationDbContext _context;
         private readonly GroupServices _groupServices;
         private readonly PermissionServices _permissionServices;
-        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IMapper mapper, ISpecialityRepository specialityRepository, ApplicationDbContext context, GroupServices groupServices, PermissionServices permissionServices)
+        private readonly TenantCapacityService _tenantCapacityService;
+        public ProfessorServices(IProfessorRepository professorRepository, IUserRepository userRepository, ITenantRepository tenantRepository, IMapper mapper, ISpecialityRepository specialityRepository, ApplicationDbContext context, GroupServices groupServices, PermissionServices permissionServices, TenantCapacityService tenantCapacityService)
         {
             _professorRepository = professorRepository;
             _userRepository = userRepository;
@@ -30,6 +31,7 @@ namespace backend_proyecto.Services
             _context = context;
             _groupServices = groupServices;
             _permissionServices = permissionServices;
+            _tenantCapacityService = tenantCapacityService;
         }
 
         public async Task<ResponseProfessorDTO> AssignOne(AssignProfessorDTO assignProfessorDTO)
@@ -49,12 +51,22 @@ namespace backend_proyecto.Services
             var professor = _mapper.Map<Professor>(assignProfessorDTO);
             professor.IsActive = true;
 
-            await _professorRepository.CreateOneAsync(professor);
-
-            await _groupServices.AssignUserToGroupIfNotExists(
-                assignProfessorDTO.UserId,
+            await _tenantCapacityService.ExecuteWithTenantLockAsync(
                 assignProfessorDTO.TenantId,
-                "BASIC_PROFESSOR"
+                async () =>
+                {
+                    await _tenantCapacityService.EnsureProfessorCapacityAsync(
+                        assignProfessorDTO.TenantId
+                    );
+
+                    await _professorRepository.CreateOneAsync(professor);
+
+                    await _groupServices.AssignUserToGroupIfNotExists(
+                        assignProfessorDTO.UserId,
+                        assignProfessorDTO.TenantId,
+                        "BASIC_PROFESSOR"
+                    );
+                }
             );
 
             return _mapper.Map<ResponseProfessorDTO>(professor);
@@ -188,6 +200,10 @@ namespace backend_proyecto.Services
                 );
             }
 
+            var isReactivating =
+                !professor.IsActive &&
+                updateProfessorDTO.IsActive == true;
+
             if (updateProfessorDTO.IsActive.HasValue)
             {
                 professor.IsActive = updateProfessorDTO.IsActive.Value;
@@ -254,7 +270,24 @@ namespace backend_proyecto.Services
                 }
             }
 
-            await _professorRepository.UpdateOneAsync(professor);
+            if (isReactivating)
+            {
+                await _tenantCapacityService.ExecuteWithTenantLockAsync(
+                    professor.TenantId,
+                    async () =>
+                    {
+                        await _tenantCapacityService.EnsureProfessorCapacityAsync(
+                            professor.TenantId
+                        );
+
+                        await _professorRepository.UpdateOneAsync(professor);
+                    }
+                );
+            }
+            else
+            {
+                await _professorRepository.UpdateOneAsync(professor);
+            }
 
             // Volver a cargar para devolver las relaciones actualizadas
             professor = await _professorRepository.Query()

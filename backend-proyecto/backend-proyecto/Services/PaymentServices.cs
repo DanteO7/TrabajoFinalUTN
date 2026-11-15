@@ -25,6 +25,7 @@ namespace backend_proyecto.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _db;
         private readonly TenantSubscriptionService _tenantSubscriptionService;
+        private readonly TenantCapacityService _tenantCapacityService;
 
         public PaymentServices(
             IPaymentRepository paymentRepository,
@@ -40,6 +41,7 @@ namespace backend_proyecto.Services
             IHttpContextAccessor httpContextAccessor,
             ApplicationDbContext db,
             TenantSubscriptionService tenantSubscriptionService,
+            TenantCapacityService tenantCapacityService,
             ILogger<PaymentServices> logger)
         {
             _paymentRepository = paymentRepository;
@@ -55,6 +57,7 @@ namespace backend_proyecto.Services
             _httpContextAccessor = httpContextAccessor;
             _db = db;
             _tenantSubscriptionService = tenantSubscriptionService;
+            _tenantCapacityService = tenantCapacityService;
         }
 
         // =========================================================
@@ -449,22 +452,6 @@ namespace backend_proyecto.Services
                     );
                 }
 
-                var pendingPayment = await _paymentRepository.GetOneAsync(
-                    p =>
-                        p.StudentId == student.Id &&
-                        p.TenantId == createPaymentDTO.TenantId &&
-                        p.PlanType == PlanType.STUDENT &&
-                        p.Status == PaymentStatus.PENDING
-                );
-
-                if (pendingPayment != null)
-                {
-                    throw new HttpResponseError(
-                        HttpStatusCode.BadRequest,
-                        "El alumno ya tiene un pago pendiente."
-                    );
-                }
-
                 var amount = studentPlan.Price;
 
                 if (amount <= 0)
@@ -496,48 +483,81 @@ namespace backend_proyecto.Services
                     student.MonthlyFeeStatus ==
                     MonthlyFeeStatus.OVERDUE;
 
-                var payment = new Payment
-                {
-                    UserId = student.UserId,
-                    StudentId = student.Id,
-                    Student = student,
-                    Tenant = tenant,
-                    PlanId = createPaymentDTO.PlanId,
-                    PlanType = PlanType.STUDENT,
-                    TenantId = createPaymentDTO.TenantId,
-                    Amount = amount,
-                    PaymentMethod = paymentMethod,
-                    PaymentDate = paymentDate,
-                    Status = PaymentStatus.PAID,
-                    ExternalPaymentId = null,
-                    StartedNewCycle = startedNewCycle
-                };
+                ResponsePaymentDTO response = null!;
 
-                await _paymentRepository.CreateOneAsync(
-                    payment
+                await _tenantCapacityService.ExecuteWithTenantLockAsync(
+                    createPaymentDTO.TenantId,
+                    async () =>
+                    {
+                        await _tenantCapacityService
+                            .EnsureStudentActivationCapacityAsync(
+                                createPaymentDTO.TenantId,
+                                student.Id
+                            );
+
+                        var pendingPayment =
+                            await _paymentRepository.GetOneAsync(
+                                p =>
+                                    p.StudentId == student.Id &&
+                                    p.TenantId == createPaymentDTO.TenantId &&
+                                    p.PlanType == PlanType.STUDENT &&
+                                    p.Status == PaymentStatus.PENDING
+                            );
+
+                        if (pendingPayment != null)
+                        {
+                            throw new HttpResponseError(
+                                HttpStatusCode.BadRequest,
+                                "El alumno ya tiene un pago pendiente."
+                            );
+                        }
+
+                        var payment = new Payment
+                        {
+                            UserId = student.UserId,
+                            StudentId = student.Id,
+                            Student = student,
+                            Tenant = tenant,
+                            PlanId = createPaymentDTO.PlanId,
+                            PlanType = PlanType.STUDENT,
+                            TenantId = createPaymentDTO.TenantId,
+                            Amount = amount,
+                            PaymentMethod = paymentMethod,
+                            PaymentDate = paymentDate,
+                            Status = PaymentStatus.PAID,
+                            ExternalPaymentId = null,
+                            StartedNewCycle = startedNewCycle
+                        };
+
+                        await _paymentRepository.CreateOneAsync(
+                            payment
+                        );
+
+                        student.MonthlyFeeStatus =
+                            MonthlyFeeStatus.PAID;
+
+                        student.MonthlyFeeStatusUpdatedAt =
+                            paymentDate;
+
+                        if (startedNewCycle)
+                        {
+                            student.PaymentDueDate =
+                                paymentDate.AddDays(30);
+                        }
+
+                        await _studentRepository.UpdateOneAsync(
+                            student
+                        );
+
+                        response = _mapper.Map<ResponsePaymentDTO>(
+                            payment
+                        );
+
+                        response.StudentId = student.Id;
+                        response.StudentName = student.Name;
+                        response.StudentSurname = student.Surname;
+                    }
                 );
-
-                student.MonthlyFeeStatus =
-                    MonthlyFeeStatus.PAID;
-
-                student.MonthlyFeeStatusUpdatedAt =
-                    paymentDate;
-
-                if (startedNewCycle)
-                {
-                    student.PaymentDueDate =
-                        paymentDate.AddDays(30);
-                }
-
-                await _studentRepository.UpdateOneAsync(
-                    student
-                );
-
-                var response = _mapper.Map<ResponsePaymentDTO>(payment);
-
-                response.StudentId = student.Id;
-                response.StudentName = student.Name;
-                response.StudentSurname = student.Surname;
 
                 return response;
             }
@@ -1327,52 +1347,81 @@ namespace backend_proyecto.Services
             payment.ExternalPaymentId =
                 incomingMercadoPagoPaymentId;
             var approvalDate = DateTime.UtcNow;
+            var paymentWasPersisted = false;
 
             switch (mercadoPagoPayment.Status)
             {
                 case "approved":
-
-                    if (payment.Status != PaymentStatus.PAID)
-                    {
-                        payment.PaymentDate = approvalDate;
-                    }
-
-                    payment.Status =
-                        PaymentStatus.PAID;
-
-                    // =================================================
-                    // ALUMNO
-                    // =================================================
-
                     if (payment.PlanType == PlanType.STUDENT)
                     {
-                        var student = await GetStudentForPayment(payment);
+                        await _tenantCapacityService
+                            .ExecuteWithTenantLockAsync(
+                                payment.TenantId,
+                                async () =>
+                                {
+                                    var student =
+                                        await GetStudentForPayment(payment);
 
-                        if (student != null)
-                        {
-                            var startedNewCycle =
-                                student.MonthlyFeeStatus ==
-                                MonthlyFeeStatus.OVERDUE;
+                                    if (student != null)
+                                    {
+                                        await _tenantCapacityService
+                                            .EnsureStudentActivationCapacityAsync(
+                                                payment.TenantId,
+                                                student.Id
+                                            );
+                                    }
 
-                            payment.StartedNewCycle =
-                                startedNewCycle;
+                                    if (payment.Status != PaymentStatus.PAID)
+                                    {
+                                        payment.PaymentDate = approvalDate;
+                                    }
 
-                            student.MonthlyFeeStatus =
-                                MonthlyFeeStatus.PAID;
+                                    payment.Status =
+                                        PaymentStatus.PAID;
 
-                            student.MonthlyFeeStatusUpdatedAt =
-                                approvalDate;
+                                    if (student != null)
+                                    {
+                                        var startedNewCycle =
+                                            student.MonthlyFeeStatus ==
+                                            MonthlyFeeStatus.OVERDUE;
 
-                            if (startedNewCycle)
-                            {
-                                student.PaymentDueDate =
-                                    approvalDate.AddDays(30);
-                            }
+                                        payment.StartedNewCycle =
+                                            startedNewCycle;
 
-                            await _studentRepository.UpdateOneAsync(
-                                student
+                                        student.MonthlyFeeStatus =
+                                            MonthlyFeeStatus.PAID;
+
+                                        student.MonthlyFeeStatusUpdatedAt =
+                                            approvalDate;
+
+                                        if (startedNewCycle)
+                                        {
+                                            student.PaymentDueDate =
+                                                approvalDate.AddDays(30);
+                                        }
+
+                                        await _studentRepository.UpdateOneAsync(
+                                            student
+                                        );
+                                    }
+
+                                    await _paymentRepository.UpdateOneAsync(
+                                        payment
+                                    );
+
+                                    paymentWasPersisted = true;
+                                }
                             );
+                    }
+                    else
+                    {
+                        if (payment.Status != PaymentStatus.PAID)
+                        {
+                            payment.PaymentDate = approvalDate;
                         }
+
+                        payment.Status =
+                            PaymentStatus.PAID;
                     }
 
                     break;
@@ -1406,7 +1455,7 @@ namespace backend_proyecto.Services
                     payment.TenantId
                 );
             }
-            else
+            else if (!paymentWasPersisted)
             {
                 await _paymentRepository.UpdateOneAsync(payment);
             }
