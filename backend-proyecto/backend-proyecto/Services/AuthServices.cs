@@ -190,7 +190,7 @@ namespace backend_proyecto.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
-                Expires = DateTime.UtcNow.AddDays(1),
+                Expires = DateTime.UtcNow.AddDays(14),
                 SigningCredentials = credentials
             };
 
