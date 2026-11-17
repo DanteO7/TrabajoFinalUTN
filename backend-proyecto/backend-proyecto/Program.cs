@@ -4,6 +4,7 @@ using backend_proyecto.Middlewares;
 using backend_proyecto.Repositories;
 using backend_proyecto.Services;
 using backend_proyecto.Services.Observer;
+using backend_proyecto.Utils.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -20,6 +21,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.Configure<FrontendOptions>(
+    builder.Configuration.GetSection(FrontendOptions.SectionName)
+);
+builder.Services
+    .AddOptions<FrontendOptions>()
+    .Bind(builder.Configuration.GetSection(FrontendOptions.SectionName))
+    .Validate(options => !string.IsNullOrWhiteSpace(options.BaseUrl),
+        "Frontend:BaseUrl no puede estar vacío.")
+    .ValidateOnStart();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 // Swagger

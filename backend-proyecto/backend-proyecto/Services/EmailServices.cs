@@ -4,6 +4,7 @@ using backend_proyecto.Utils.Errors;
 using Resend;
 using System.Net;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Options;
 
 namespace backend_proyecto.Services
 {
@@ -11,17 +12,21 @@ namespace backend_proyecto.Services
     {
         private readonly IResend _resend;
         private readonly ApplicationDbContext _context;
+        private readonly FrontendUrlBuilder _frontendUrlBuilder;
 
         private const string BrandColor = "#fc697b";
-        private const string SiteUrl = "https://turnofacilapp.com.ar";
 
-        public EmailServices(IResend resend, ApplicationDbContext context)
+        public EmailServices(
+            IResend resend,
+            ApplicationDbContext context,
+            IOptions<FrontendOptions> frontendOptions)
         {
             _resend = resend;
             _context = context;
+            _frontendUrlBuilder = new FrontendUrlBuilder(frontendOptions);
         }
 
-        private static string EmailLayout(string title, string content)
+        private string EmailLayout(string title, string content)
         {
             var safeTitle = WebUtility.HtmlEncode(title);
 
@@ -56,7 +61,7 @@ namespace backend_proyecto.Services
                                     <tr>
                                         <td style=""padding:30px 24px 20px;text-align:center; "">
                                             <img
-                                                src=""{SiteUrl}/logo.webp""
+                                                src=""{_frontendUrlBuilder.Build("logo.webp")}"" 
                                                 alt=""TurnoFácil""
                                                 width=""180""
                                                 style=""
@@ -234,7 +239,7 @@ namespace backend_proyecto.Services
             _context.PasswordResets.Add(passwordReset);
             await _context.SaveChangesAsync();
 
-            var resetUrl = $"{SiteUrl}/resetear-contraseña?token={Uri.EscapeDataString(token)}";
+            var resetUrl = _frontendUrlBuilder.BuildPasswordReset(token);
 
             var content = $@"
                 {EmailParagraph("Recibimos una solicitud para restablecer la contraseña de tu cuenta.")}
@@ -308,7 +313,7 @@ namespace backend_proyecto.Services
 
                 {EmailParagraph("Ingresá a TurnoFácil para consultar la clase y reservar tu lugar.")}
 
-                {EmailButton(SiteUrl, "Ver TurnoFácil")}";
+                {EmailButton(_frontendUrlBuilder.Build(string.Empty), "Ver TurnoFácil")}";
 
             var message = new EmailMessage
             {
@@ -339,7 +344,7 @@ namespace backend_proyecto.Services
             var safeTenantName = WebUtility.HtmlEncode(tenantName);
             var safePlanName = WebUtility.HtmlEncode(planName);
 
-            var reviewUrl = $"{SiteUrl}/crear-negocio?token={Uri.EscapeDataString(token)}";
+            var reviewUrl = _frontendUrlBuilder.BuildTenantCreationReview(token);
 
             var content = $@"
                 {EmailParagraph("Se recibió una nueva solicitud para crear un negocio en TurnoFácil.")}
@@ -406,7 +411,7 @@ namespace backend_proyecto.Services
 
                 {EmailParagraph("Ahora podés ingresar a la plataforma y empezar a organizar tu negocio, tus clases y tus alumnos.")}
 
-                {EmailButton(SiteUrl, "Ingresar a TurnoFácil")}
+                {EmailButton(_frontendUrlBuilder.Build(string.Empty), "Ingresar a TurnoFácil")}
 
                 <p style=""
                     margin:24px 0 0;

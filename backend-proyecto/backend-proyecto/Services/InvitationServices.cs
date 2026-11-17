@@ -3,6 +3,8 @@ using backend_proyecto.Models;
 using backend_proyecto.Models.DTOs;
 using backend_proyecto.Repositories;
 using backend_proyecto.Utils.Errors;
+using backend_proyecto.Config;
+using Microsoft.Extensions.Options;
 using System.Net;
 
 namespace backend_proyecto.Services
@@ -18,6 +20,7 @@ namespace backend_proyecto.Services
         private readonly StudentServices _studentServices;
         private readonly ProfessorServices _professorServices;
         private readonly PermissionServices _permissionServices;
+        private readonly FrontendUrlBuilder _frontendUrlBuilder;
 
         public InvitationServices(
             IInvitationRepository invitationRepository,
@@ -28,7 +31,8 @@ namespace backend_proyecto.Services
             IStudentPlanRepository studentPlanRepository,
             StudentServices studentServices,
             ProfessorServices professorServices, 
-            PermissionServices permissionServices
+            PermissionServices permissionServices,
+            IOptions<FrontendOptions> frontendOptions
             )
         {
             _invitationRepository = invitationRepository;
@@ -40,6 +44,7 @@ namespace backend_proyecto.Services
             _studentServices = studentServices;
             _professorServices = professorServices;
             _permissionServices = permissionServices;
+            _frontendUrlBuilder = new FrontendUrlBuilder(frontendOptions);
         }
 
         public async Task<ResponseInvitationDTO> CreateInvitation(CreateInvitationDTO dto)
@@ -73,7 +78,7 @@ namespace backend_proyecto.Services
             return new ResponseInvitationDTO
             {
                 Id = invitation.Id,
-                Link = $"https://turnofacilapp.com.ar/invitacion/{invitation.Token}",
+                Link = _frontendUrlBuilder.BuildInvitation(invitation.Token),
                 ExpirationDate = invitation.ExpirationDate
             };
         }
@@ -246,7 +251,7 @@ namespace backend_proyecto.Services
             return new ResponseInvitationDTO
             {
                 Id = invitation.Id,
-                Link = $"https://turnofacilapp.com.ar/invitacion/{invitation.Token}",
+                Link = _frontendUrlBuilder.BuildInvitation(invitation.Token),
                 ExpirationDate = invitation.ExpirationDate
             };
         }

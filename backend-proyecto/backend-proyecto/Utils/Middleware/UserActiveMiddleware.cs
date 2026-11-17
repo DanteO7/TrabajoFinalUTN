@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace backend_proyecto.Middlewares
+namespace backend_proyecto.Utils.Middleware
 {
     public class UserActiveMiddleware
     {
