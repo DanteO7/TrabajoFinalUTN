@@ -5,7 +5,14 @@ import { createPortal } from "react-dom";
 let openModalsCount = 0;
 
 const Modal = forwardRef(function Modal(
-  { open, onClose, children, isSuccesOrError },
+  {
+    open,
+    onClose,
+    children,
+    isSuccesOrError,
+    closeOnOverlayClick = true,
+    closeOnEscape = true,
+  },
   ref,
 ) {
   const mouseDownOutside = useRef(false);
@@ -19,15 +26,19 @@ const Modal = forwardRef(function Modal(
     document.body.style.overflow = "hidden";
 
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") closeFromEffect();
+      if (closeOnEscape && e.key === "Escape") closeFromEffect();
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    if (closeOnEscape) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
 
     return () => {
       // Decrementar cuando se cierra
       openModalsCount--;
-      document.removeEventListener("keydown", handleKeyDown);
+      if (closeOnEscape) {
+        document.removeEventListener("keydown", handleKeyDown);
+      }
 
       // Solo habilitar scroll si no hay más modales abiertos
       if (openModalsCount === 0) {
@@ -42,7 +53,11 @@ const Modal = forwardRef(function Modal(
 
   const handleOverlayMouseUp = (e) => {
     const mouseUpOutside = e.target === e.currentTarget;
-    if (mouseDownOutside.current && mouseUpOutside) {
+    if (
+      closeOnOverlayClick &&
+      mouseDownOutside.current &&
+      mouseUpOutside
+    ) {
       onClose();
     }
     mouseDownOutside.current = false;

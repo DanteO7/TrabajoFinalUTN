@@ -39,7 +39,10 @@
     "signInRequired": "You need to sign in to perform this action",
     "requestSent": "Request sent!",
     "requestSentMessage": "We received your form. We will notify you by email when your business is created or if we find any issue with the payment.",
-    "understood": "Understood"
+    "understood": "Understood",
+    "accept": "Accept",
+    "updateAvailable": "Update available",
+    "updateAvailableMessage": "A new version of TurnoFácil is available. Accept to restart the application."
   },
   "footer": {
     "rights": "All rights reserved.",

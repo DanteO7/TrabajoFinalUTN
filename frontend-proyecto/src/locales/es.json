@@ -39,7 +39,10 @@
     "signInRequired": "Necesitás iniciar sesión para realizar esta acción",
     "requestSent": "¡Solicitud enviada!",
     "requestSentMessage": "Ya recibimos tu formulario. Te avisaremos por correo electrónico cuando tu negocio esté creado o si detectamos algún problema con el pago.",
-    "understood": "Entendido"
+    "understood": "Entendido",
+    "accept": "Aceptar",
+    "updateAvailable": "Actualización disponible",
+    "updateAvailableMessage": "Hay una nueva versión de TurnoFácil. Aceptá para reiniciar la aplicación."
   },
   "footer": {
     "rights": "Todos los derechos reservados.",

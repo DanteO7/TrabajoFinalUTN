@@ -18,6 +18,7 @@ import ForgotPassword from "./pages/forgot-password";
 import { AdminRoute } from "./router/admin-route";
 import { getTenantById } from "./services/tenant";
 import { getReturnUrlFromLocation } from "./utils/return-url";
+import UpdateAvailableModal from "./components/update-available-modal";
 
 const Home = lazy(() => import("./pages/home"));
 const SignIn = lazy(() => import("./pages/sign-in"));
@@ -136,6 +137,7 @@ export default function App() {
 
   return (
     <>
+      <UpdateAvailableModal />
       {shouldShowHeader && <Header />}
       <QueryClientProvider client={queryClient}>
         <Suspense fallback={<Loading />}>
