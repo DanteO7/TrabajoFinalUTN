@@ -16,11 +16,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { updateNewSchema } from "../../schema/news-schema";
 import { useHasPermission } from "../../store/tenant-store";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "../../store/auth-store";
 
 export default function NewsModal({ news, tenantId, close }) {
   const { t } = useTranslation();
-  const canUpdateNews = useHasPermission(tenantId, "NEWS_UPDATE");
-  const canDeleteNews = useHasPermission(tenantId, "NEWS_DELETE");
+  const { user } = useAuthStore();
+  const isAdmin = user?.roles?.includes("Admin") ?? false;
+  const hasUpdatePermission = useHasPermission(tenantId, "NEWS_UPDATE");
+  const hasDeletePermission = useHasPermission(tenantId, "NEWS_DELETE");
+  const canUpdateNews = isAdmin
+    ? true
+    : !!news.tenantId && hasUpdatePermission;
+  const canDeleteNews = isAdmin
+    ? true
+    : !!news.tenantId && hasDeletePermission;
 
   const [editing, setEditing] = useState(false);
   const [currentNew, setCurrentNew] = useState(news);
@@ -143,33 +152,29 @@ export default function NewsModal({ news, tenantId, close }) {
           <p className="text-gray-600 whitespace-pre-wrap">
             {currentNew.content}
           </p>
-          {news.tenantId && (
-            <>
-              {(canUpdateNews || canDeleteNews) && (
-                <div
-                  className={`grid ${canUpdateNews && canDeleteNews ? "grid-cols-2" : "grid-cols-1"} gap-3 mt-4`}
-                >
-                  {canDeleteNews && (
-                    <RedButton
-                      text={t("common.delete")}
-                      disabled={deleteMutation.isPending}
-                      onClick={() => setConfirmModal(true)}
-                      textSmall={true}
-                      img={<Trash2 size={18} />}
-                    />
-                  )}
-
-                  {canUpdateNews && (
-                    <BlackButton
-                      text={t("common.edit")}
-                      onClick={() => setEditing(true)}
-                      textSmall={true}
-                      img={<Pencil size={18} />}
-                    />
-                  )}
-                </div>
+          {(canUpdateNews || canDeleteNews) && (
+            <div
+              className={`grid ${canUpdateNews && canDeleteNews ? "grid-cols-2" : "grid-cols-1"} gap-3 mt-4`}
+            >
+              {canDeleteNews && (
+                <RedButton
+                  text={t("common.delete")}
+                  disabled={deleteMutation.isPending}
+                  onClick={() => setConfirmModal(true)}
+                  textSmall={true}
+                  img={<Trash2 size={18} />}
+                />
               )}
-            </>
+
+              {canUpdateNews && (
+                <BlackButton
+                  text={t("common.edit")}
+                  onClick={() => setEditing(true)}
+                  textSmall={true}
+                  img={<Pencil size={18} />}
+                />
+              )}
+            </div>
           )}
         </>
       ) : (

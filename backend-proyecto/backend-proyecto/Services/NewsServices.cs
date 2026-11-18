@@ -19,9 +19,10 @@ namespace backend_proyecto.Services
         private readonly IUserRepository _userRepository;
         private readonly IAdminRepository _adminRepository;
         private readonly PermissionServices _permissionServices;
+        private readonly CurrentTenantService _currentTenant;
 
         public NewsServices(
-            INewsRepository newsRepository,ITenantRepository tenantRepository,IMapper mapper, IUserRepository userRepository, IAdminRepository adminRepository, PermissionServices permissionServices)
+            INewsRepository newsRepository,ITenantRepository tenantRepository,IMapper mapper, IUserRepository userRepository, IAdminRepository adminRepository, PermissionServices permissionServices, CurrentTenantService currentTenant)
         {
             _newsRepository = newsRepository;
             _tenantRepository = tenantRepository;
@@ -29,6 +30,7 @@ namespace backend_proyecto.Services
             _userRepository = userRepository;
             _adminRepository = adminRepository;
             _permissionServices = permissionServices;
+            _currentTenant = currentTenant;
         }
 
         public async Task<ResponseNewsDTO> CreateOne(CreateNewsDTO dto, int userId)
@@ -79,8 +81,6 @@ namespace backend_proyecto.Services
 
         public async Task<ResponseNewsDTO> UpdateOne(int newsId, UpdateNewsDTO dto, int userId)
         {
-            await _permissionServices.CheckPermission(Permissions.NEWS_UPDATE);
-
             var news = await _newsRepository.GetOneAsync(n => n.Id == newsId);
             if (news == null)
             {
@@ -88,30 +88,13 @@ namespace backend_proyecto.Services
                     "No se encontro la novedad");
             }
 
+            await EnsureCanManageNews(news, userId, Permissions.NEWS_UPDATE);
+
             var user = await _userRepository.GetOneAsync(u => u.Id == userId);
             if (user == null)
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound,
                     "No se encontro el usuario");
-            }
-
-            if (dto.TenantId.HasValue)
-            {
-                var tenant = await _tenantRepository.GetOneAsync(t => t.Id == dto.TenantId);
-                if (tenant == null || tenant.OwnerUserId != userId)
-                {
-                    throw new HttpResponseError(HttpStatusCode.Forbidden,
-                        "No tienes permisos para crear novedades en este negocio");
-                }
-            }
-            else
-            {
-                var isAdmin = await _adminRepository.ExistsByUserId(userId);
-                if (!isAdmin)
-                {
-                    throw new HttpResponseError(HttpStatusCode.Forbidden,
-                        "No puedes actualizar una noticia global");
-                }
             }
 
             if(dto.Title != null)
@@ -132,7 +115,15 @@ namespace backend_proyecto.Services
                 }
             }
 
-            _mapper.Map(dto, news);
+            if (dto.Title != null)
+            {
+                news.Title = dto.Title;
+            }
+
+            if (dto.Content != null)
+            {
+                news.Content = dto.Content;
+            }
 
             await _newsRepository.UpdateOneAsync(news);
             return _mapper.Map<ResponseNewsDTO>(news);
@@ -265,8 +256,6 @@ namespace backend_proyecto.Services
 
         public async Task DeleteOne(int newsId, int tenantId, int userId)
         {
-            await _permissionServices.CheckPermission(Permissions.NEWS_DELETE);
-
             var news = await _newsRepository.GetOneAsync(n => n.Id == newsId);
             if (news == null)
             {
@@ -274,32 +263,41 @@ namespace backend_proyecto.Services
                     "No se encontro la novedad");
             }
 
-            if (tenantId > 0)
-            {
-                if (news.TenantId != tenantId)
-                {
-                    throw new HttpResponseError(HttpStatusCode.Forbidden,
-                        "Esta noticia no pertenece a tu negocio");
-                }
-
-                var tenant = await _tenantRepository.GetOneAsync(t => t.Id == tenantId);
-                if (tenant == null || tenant.OwnerUserId != userId)
-                {
-                    throw new HttpResponseError(HttpStatusCode.Forbidden,
-                        "No tienes permisos para eliminar novedades en este negocio");
-                }
-            }
-            else
-            {
-                var isAdmin = await _adminRepository.ExistsByUserId(userId);
-                if (!isAdmin)
-                {
-                    throw new HttpResponseError(HttpStatusCode.Forbidden,
-                        "No puedes actualizar una noticia global");
-                }
-            }
+            await EnsureCanManageNews(
+                news,
+                userId,
+                Permissions.NEWS_DELETE,
+                tenantId > 0 ? tenantId : null);
 
             await _newsRepository.DeleteOneAsync(news);
+        }
+
+        private async Task EnsureCanManageNews(
+            News news,
+            int userId,
+            string permissionName,
+            int? operationTenantId = null)
+        {
+            var isAdmin = await _adminRepository.ExistsByUserId(userId);
+            if (isAdmin)
+            {
+                return;
+            }
+
+            if (!news.TenantId.HasValue)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden,
+                    "No tienes permisos para gestionar novedades globales");
+            }
+
+            var tenantId = operationTenantId ?? _currentTenant.TenantId;
+            if (!tenantId.HasValue || news.TenantId.Value != tenantId.Value)
+            {
+                throw new HttpResponseError(HttpStatusCode.Forbidden,
+                    "No tienes permisos para gestionar novedades de este negocio");
+            }
+
+            await _permissionServices.CheckPermission(permissionName, tenantId.Value);
         }
     }
 }
