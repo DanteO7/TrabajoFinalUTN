@@ -21,6 +21,10 @@ html {
   scrollbar-gutter: stable;
 }
 
+body {
+  background-color: #ede9ee;
+}
+
 @keyframes modal-up {
   from {
     opacity: 0;

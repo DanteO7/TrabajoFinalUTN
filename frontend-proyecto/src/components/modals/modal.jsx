@@ -53,11 +53,7 @@ const Modal = forwardRef(function Modal(
 
   const handleOverlayMouseUp = (e) => {
     const mouseUpOutside = e.target === e.currentTarget;
-    if (
-      closeOnOverlayClick &&
-      mouseDownOutside.current &&
-      mouseUpOutside
-    ) {
+    if (closeOnOverlayClick && mouseDownOutside.current && mouseUpOutside) {
       onClose();
     }
     mouseDownOutside.current = false;
@@ -67,14 +63,14 @@ const Modal = forwardRef(function Modal(
 
   return createPortal(
     <div
-      className="fixed inset-x-0 top-0 z-9999 h-screen bg-black/40 backdrop-blur-xs flex items-center justify-center px-4"
+      className="fixed inset-0 z-9999 bg-black/40 backdrop-blur-xs flex items-center justify-center px-4"
       onMouseDown={handleOverlayMouseDown}
       onMouseUp={handleOverlayMouseUp}
     >
       <div
         ref={ref}
         className={`bg-[#ede9ee] rounded-lg ${isSuccesOrError ? "p-0" : "p-6"} w-120 shadow-xl
-          max-h-[90dvh] overflow-y-auto
+          max-h-dvh overflow-y-auto
           transition-[opacity,transform] duration-300 ease-out
           translate-y-0 opacity-100
           animate-modal`}
