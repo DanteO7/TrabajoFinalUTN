@@ -96,7 +96,7 @@ namespace backend_proyecto.Services
 
             if (
                 totalReservations >=
-                studentPlan.ClassesPerMonth
+                studentPlan.ClassesPerMonth + student.AdditionalClasses
             )
             {
                 return

@@ -18,5 +18,9 @@ namespace backend_proyecto.Models.DTOs
 
         [MaxLength(22)]
         public string? CBU { get; set; }
+
+        [Range(1, 1440,
+            ErrorMessage = "La anticipación debe ser un número entero entre 1 y 1440 minutos.")]
+        public int? CancellationDeadlineMinutes { get; set; }
     }
 }

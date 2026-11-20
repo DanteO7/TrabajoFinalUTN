@@ -502,18 +502,36 @@ namespace backend_proyecto.Services
 
             var now = TimeHelper.Now();
 
-            var limit =
-                reservation.Class.Date
-                    .ToDateTime(
-                        reservation.Class.StartTime
-                    )
-                    .AddMinutes(-20);
+            var tenant = await _tenantRepository.GetOneAsync(
+                t => t.Id == reservation.TenantId
+            );
 
-            if (now >= limit)
+            if (tenant == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el negocio de la reserva"
+                );
+            }
+
+            var deadlineMinutes =
+                tenant.CancellationDeadlineMinutes > 0
+                    ? tenant.CancellationDeadlineMinutes
+                    : 20;
+
+            var classStart =
+                reservation.Class.Date.ToDateTime(
+                    reservation.Class.StartTime
+                );
+
+            if (!CanCancelReservation(
+                now,
+                classStart,
+                deadlineMinutes))
             {
                 throw new HttpResponseError(
                     HttpStatusCode.BadRequest,
-                    "No podés cancelar una reserva menos de 20 minutos antes del inicio de la clase."
+                    $"No podés cancelar una reserva con menos de {deadlineMinutes} minutos de anticipación."
                 );
             }
 
@@ -532,6 +550,21 @@ namespace backend_proyecto.Services
                     reservation.Class.Id
                 );
             }
+        }
+
+        public static bool CanCancelReservation(
+            DateTime now,
+            DateTime classStart,
+            int cancellationDeadlineMinutes)
+        {
+            var deadlineMinutes =
+                cancellationDeadlineMinutes > 0
+                    ? cancellationDeadlineMinutes
+                    : 20;
+
+            return now < classStart.AddMinutes(
+                -deadlineMinutes
+            );
         }
     }
 }

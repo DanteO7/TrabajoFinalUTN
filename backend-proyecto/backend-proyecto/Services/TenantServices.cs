@@ -259,6 +259,27 @@ namespace backend_proyecto.Services
         {
             await _permissionServices.CheckPermission(Permissions.TENANT_UPDATE);
 
+            var currentTenantId = _currentTenantService.GetRequiredTenantId();
+            if (id != currentTenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "No tenés acceso a este tenant"
+                );
+            }
+
+            if (updateTenantDTO.CancellationDeadlineMinutes.HasValue &&
+                (
+                    updateTenantDTO.CancellationDeadlineMinutes.Value < 1 ||
+                    updateTenantDTO.CancellationDeadlineMinutes.Value > 1440
+                ))
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La anticipación debe ser un número entero entre 1 y 1440 minutos"
+                );
+            }
+
             var tenant = await _tenantRepository.GetOneAsync(
                 t => t.Id == id,
                 t => t.OwnerUser,
@@ -357,6 +378,12 @@ namespace backend_proyecto.Services
             if (updateTenantDTO.CBU != null)
             {
                 tenant.CBU = updateTenantDTO.CBU.Trim();
+            }
+
+            if (updateTenantDTO.CancellationDeadlineMinutes.HasValue)
+            {
+                tenant.CancellationDeadlineMinutes =
+                    updateTenantDTO.CancellationDeadlineMinutes.Value;
             }
 
             await _tenantRepository.UpdateOneAsync(tenant);

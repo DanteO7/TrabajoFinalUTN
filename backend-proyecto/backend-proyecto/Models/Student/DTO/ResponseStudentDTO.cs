@@ -13,5 +13,6 @@
         public string MonthlyFeeStatus { get; set; } = null!;
         public DateTime? PaymentDueDate { get; set; }
         public int RemainingClasses { get; set; }
+        public int AdditionalClasses { get; set; }
     }
 }

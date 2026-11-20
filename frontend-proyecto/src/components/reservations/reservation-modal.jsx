@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { getLocale } from "../../utils/formatting";
 import { useTranslation } from "react-i18next";
 
@@ -11,6 +11,7 @@ import SuccessModal from "../modals/success-modal";
 import { deleteReservation } from "../../services/reservation";
 import ConfirmModal from "../modals/confirm-modal";
 import RedButton from "../buttons/red-button";
+import { getTenantById } from "../../services/tenant";
 
 export default function ReservationModal({ reservation, tenantId, close }) {
   const { t } = useTranslation();
@@ -26,7 +27,42 @@ export default function ReservationModal({ reservation, tenantId, close }) {
 
   const classItem = reservation.class;
 
-  const canCancel = reservation.reservationStatus === "Pending";
+  const { data: tenant } = useQuery({
+    queryKey: ["tenantById", tenantId],
+    queryFn: () => getTenantById(tenantId),
+  });
+
+  const deadlineMinutes =
+    tenant?.cancellationDeadlineMinutes > 0
+      ? tenant.cancellationDeadlineMinutes
+      : 20;
+
+  const classDate = classItem.date?.slice(0, 10);
+  const classStart = new Date(
+    `${classDate}T${classItem.startTime?.slice(0, 8) || "00:00:00"}`,
+  );
+  const classStartTime = classStart.getTime();
+  const [deadlinePassed, setDeadlinePassed] = useState(false);
+
+  useEffect(() => {
+    const updateDeadlineState = () => {
+      const now = new Date();
+      setDeadlinePassed(
+        Number.isNaN(classStartTime) ||
+          now.getTime() >=
+            classStartTime - deadlineMinutes * 60 * 1000,
+      );
+    };
+
+    const timeoutId = window.setTimeout(updateDeadlineState, 0);
+    const intervalId = window.setInterval(updateDeadlineState, 30000);
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+    };
+  }, [classStartTime, deadlineMinutes]);
+  const canCancel =
+    reservation.reservationStatus === "Pending" && !deadlinePassed;
 
   const formatDateWithDay = (dateString) => {
     const [year, month, day] = dateString.split("T")[0].split("-");
@@ -155,6 +191,14 @@ export default function ReservationModal({ reservation, tenantId, close }) {
             textSmall={true}
           />
         </div>
+      )}
+
+      {reservation.reservationStatus === "Pending" && !canCancel && (
+        <p className="mt-8 rounded-lg border border-gray-400 bg-[#f4f0f5] p-4 text-sm text-gray-600">
+          {t("reservationUi.cancellationDeadlineReached", {
+            minutes: deadlineMinutes,
+          })}
+        </p>
       )}
 
       {confirmModal && (

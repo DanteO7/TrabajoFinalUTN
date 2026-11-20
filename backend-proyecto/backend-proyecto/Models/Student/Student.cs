@@ -19,6 +19,7 @@
         public string MonthlyFeeStatus { get; set; } = null!;
         public DateTime? MonthlyFeeStatusUpdatedAt { get; set; }
         public DateTime? PaymentDueDate { get; set; }
+        public int AdditionalClasses { get; set; }
 
         public ICollection<Waitlist> Waitlists { get; set; } = new List<Waitlist>();
     }

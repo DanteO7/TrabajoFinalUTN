@@ -26,6 +26,7 @@ namespace backend_proyecto.Services
         private readonly IPaymentRepository _paymentRepository; 
         private readonly ApplicationDbContext _context;
         private readonly TenantCapacityService _tenantCapacityService;
+        private readonly CurrentTenantService? _currentTenantService;
 
         public StudentServices(
             IStudentRepository studentRepository,
@@ -39,7 +40,8 @@ namespace backend_proyecto.Services
             GroupServices groupServices,
             IPaymentRepository paymentRepository,
             ApplicationDbContext context,
-            TenantCapacityService tenantCapacityService)
+            TenantCapacityService tenantCapacityService,
+            CurrentTenantService? currentTenantService = null)
         {
             _studentRepository = studentRepository;
             _userRepository = userRepository;
@@ -53,6 +55,7 @@ namespace backend_proyecto.Services
             _paymentRepository = paymentRepository;
             _context = context;
             _tenantCapacityService = tenantCapacityService;
+            _currentTenantService = currentTenantService;
         }
 
         public async Task<ResponseStudentDTO> AssignOne(AssignStudentDTO assignStudentDTO)
@@ -234,7 +237,15 @@ namespace backend_proyecto.Services
             }
 
             var students = await query.ToListAsync();
-            return _mapper.Map<List<ResponseStudentDTO>>(students);
+            var response = _mapper.Map<List<ResponseStudentDTO>>(students);
+
+            for (var i = 0; i < students.Count; i++)
+            {
+                response[i].RemainingClasses =
+                    await CalculateRemainingClassesAsync(students[i]);
+            }
+
+            return response;
         }
 
         public async Task<ResponseStudentDTO> GetOneById(int id)
@@ -246,7 +257,10 @@ namespace backend_proyecto.Services
             {
                 throw new HttpResponseError(HttpStatusCode.NotFound, $"No se encontró un estudiante con el Id = '{id}'");
             }
-            return _mapper.Map<ResponseStudentDTO>(student);
+            var response = _mapper.Map<ResponseStudentDTO>(student);
+            response.RemainingClasses =
+                await CalculateRemainingClassesAsync(student);
+            return response;
         }
 
         public async Task DeleteOne(int id)
@@ -308,7 +322,10 @@ namespace backend_proyecto.Services
             _mapper.Map(updateStudentDTO, student);
 
             await _studentRepository.UpdateOneAsync(student);
-            return _mapper.Map<ResponseStudentDTO>(student);
+            var response = _mapper.Map<ResponseStudentDTO>(student);
+            response.RemainingClasses =
+                await CalculateRemainingClassesAsync(student);
+            return response;
         }
         public async Task<ResponseStudentDTO> GetByUserAndTenant(
             int userId,
@@ -363,11 +380,111 @@ namespace backend_proyecto.Services
 
             dto.RemainingClasses = Math.Max(
                 0,
-                student.StudentPlan.ClassesPerMonth - reservationsInCycle
+                student.StudentPlan.ClassesPerMonth +
+                student.AdditionalClasses -
+                reservationsInCycle
             );
 
             return dto;
         }
+
+        public async Task<ResponseStudentDTO> AssignAdditionalClasses(
+            int studentId,
+            AssignAdditionalClassesDTO dto)
+        {
+            await _permissionServices.CheckPermission(Permissions.STUDENT_UPDATE);
+
+            if (_currentTenantService == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "No se especificó un negocio"
+                );
+            }
+
+            var tenantId = _currentTenantService.GetRequiredTenantId();
+
+            if (dto.Quantity < 1 || dto.Quantity > 99)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.BadRequest,
+                    "La cantidad debe ser un número entero entre 1 y 99"
+                );
+            }
+
+            var student = await _studentRepository.GetOneAsync(
+                s => s.Id == studentId,
+                s => s.StudentPlan,
+                s => s.User
+            );
+
+            if (student == null)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.NotFound,
+                    "No se encontró el alumno"
+                );
+            }
+
+            if (student.TenantId != tenantId)
+            {
+                throw new HttpResponseError(
+                    HttpStatusCode.Forbidden,
+                    "El alumno no pertenece a este negocio"
+                );
+            }
+
+            await _context.Students
+                .Where(s => s.Id == studentId && s.TenantId == tenantId)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(
+                        s => s.AdditionalClasses,
+                        s => s.AdditionalClasses + dto.Quantity
+                    )
+                );
+
+            await _context.Entry(student).ReloadAsync();
+
+            var response = _mapper.Map<ResponseStudentDTO>(student);
+            response.RemainingClasses =
+                await CalculateRemainingClassesAsync(student);
+            return response;
+        }
+
+        private async Task<int> CalculateRemainingClassesAsync(Student student)
+        {
+            if (student.PaymentDueDate == null || student.StudentPlan == null)
+            {
+                return 0;
+            }
+
+            var cycleEnd = DateOnly.FromDateTime(student.PaymentDueDate.Value);
+            var cycleStart = DateOnly.FromDateTime(
+                student.PaymentDueDate.Value.AddDays(-30)
+            );
+
+            var today = DateOnly.FromDateTime(TimeHelper.Now());
+            while (today > cycleEnd)
+            {
+                cycleStart = cycleEnd.AddDays(1);
+                cycleEnd = cycleStart.AddDays(30);
+            }
+
+            var reservationsInCycle = await _reservationRepository.CountAsync(
+                r =>
+                    r.StudentId == student.Id &&
+                    r.Class.Date >= cycleStart &&
+                    r.Class.Date <= cycleEnd
+            );
+
+            return Math.Max(
+                0,
+                student.StudentPlan.ClassesPerMonth +
+                student.AdditionalClasses -
+                reservationsInCycle
+            );
+        }
+
         public async Task<List<ResponseStudentDTO>> GetPendingPaymentStudents(
             int tenantId,
             int userId)

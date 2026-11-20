@@ -711,7 +711,18 @@
     "updating": "Updating...",
     "update": "Update",
     "confirmTitle": "Delete this student?",
-    "confirmMessage": "You are about to delete student \"{{name}}\". This action cannot be undone."
+    "confirmMessage": "You are about to delete student \"{{name}}\". This action cannot be undone.",
+    "availableClasses": "Available classes in the current cycle",
+    "additionalClasses": "+{{count}} additional classes",
+    "assignClasses": "Assign classes",
+    "assignClassesTitle": "Assign additional classes",
+    "assignClassesDescription": "These classes will be added only to the student's current monthly cycle.",
+    "additionalQuantity": "Number of classes",
+    "quantityPlaceholder": "Between 1 and 99",
+    "assignClassesConfirm": "Assign",
+    "assigningClasses": "Assigning...",
+    "assignClassesSuccess": "Additional classes assigned successfully",
+    "assignClassesError": "Could not assign additional classes"
   },
   "professorModal": {
     "deleteSuccess": "Teacher deleted successfully",
@@ -897,7 +908,22 @@
     "cancel": "Cancel",
     "saving": "Saving...",
     "save": "Save",
-    "updated": "Information updated successfully"
+    "updated": "Information updated successfully",
+    "cancellationDeadlineTitle": "Advance time for class cancellations",
+    "cancellationDeadlineDescription": "Set how long before a class starts students can cancel their reservations.",
+    "cancellationDeadlineInvalid": "Advance time must be an integer between 1 and 1440 minutes.",
+    "cancellationOptions": {
+      "20": "20 minutes",
+      "30": "30 minutes",
+      "45": "45 minutes",
+      "60": "1 hour (60 minutes)",
+      "90": "90 minutes",
+      "120": "2 hours (120 minutes)",
+      "180": "3 hours (180 minutes)",
+      "360": "6 hours (360 minutes)",
+      "720": "12 hours (720 minutes)",
+      "1440": "24 hours (1440 minutes)"
+    }
   },
   "profile": {
     "personalData": "Personal information",
@@ -1291,7 +1317,8 @@
     "leaving": "Leaving...",
     "leaveClass": "Leave class",
     "leaveTitle": "Leave this class?",
-    "leaveConfirmation": "You are about to leave the class on {{date}} at {{startTime}} - {{endTime}}."
+    "leaveConfirmation": "You are about to leave the class on {{date}} at {{startTime}} - {{endTime}}.",
+    "cancellationDeadlineReached": "This business requires {{minutes}} minutes of advance notice to cancel this reservation."
   },
   "newsUi": {
     "createSuccess": "News created successfully",

@@ -1,4 +1,4 @@
-import { X, Pencil } from "lucide-react";
+import { X, Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 import {
   formatCurrency,
@@ -10,13 +10,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStudentPlans } from "../../services/student-plan";
 import SuccessModal from "../modals/success-modal";
 import ErrorModal from "../modals/error-modal";
-import { deleteStudent, updateStudent } from "../../services/student";
+import {
+  assignAdditionalClasses,
+  deleteStudent,
+  updateStudent,
+} from "../../services/student";
 import ConfirmModal from "../modals/confirm-modal";
 import BlackButton from "../buttons/black-button";
 import RedButton from "../buttons/red-button";
 import { Trash2 } from "lucide-react";
 import WhiteButton from "../buttons/white-button";
 import { useTranslation } from "react-i18next";
+import { useHasPermission } from "../../store/tenant-store";
 
 export default function StudentModal({ student, tenantId, close }) {
   const { t } = useTranslation();
@@ -38,6 +43,10 @@ export default function StudentModal({ student, tenantId, close }) {
   const [successModal, setSuccessModal] = useState(false);
 
   const [confirmModal, setConfirmModal] = useState(false);
+  const [assignClassesModal, setAssignClassesModal] = useState(false);
+  const [additionalClassesQuantity, setAdditionalClassesQuantity] =
+    useState("");
+  const canUpdateStudents = useHasPermission(tenantId, "STUDENT_UPDATE");
 
   const { data: plans = [] } = useQuery({
     queryKey: ["getStudentPlans", tenantId],
@@ -113,6 +122,43 @@ export default function StudentModal({ student, tenantId, close }) {
       setBackendError(msg);
       setErrorModal(true);
       setSelectedStatus(currentStudent.monthlyFeeStatus);
+    },
+  });
+
+  const assignClassesMutation = useMutation({
+    mutationFn: () =>
+      assignAdditionalClasses(
+        currentStudent.id,
+        Number(additionalClassesQuantity),
+      ),
+
+    onSuccess: (updatedStudent) => {
+      queryClient.invalidateQueries({
+        queryKey: ["getStudents", tenantId],
+      });
+      setCurrentStudent(updatedStudent);
+      setAdditionalClassesQuantity("");
+      setAssignClassesModal(false);
+      setSuccessMessage(t("studentModal.assignClassesSuccess"));
+      setSuccessModal(true);
+
+      setTimeout(() => {
+        setSuccessModal(false);
+      }, 2000);
+    },
+
+    onError: (error) => {
+      const data = error?.response?.data;
+
+      let msg = t("studentModal.assignClassesError");
+
+      if (typeof data === "string") msg = data;
+      else if (data?.errors)
+        msg = Object.values(data.errors).flat().join(" - ");
+      else if (data?.message) msg = data.message;
+
+      setBackendError(msg);
+      setErrorModal(true);
     },
   });
 
@@ -243,6 +289,25 @@ export default function StudentModal({ student, tenantId, close }) {
             </div>
 
             <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
+              <p className="text-sm text-gray-600 mb-1">
+                {t("studentModal.availableClasses")}
+              </p>
+              <p className="font-semibold text-[#333]">
+                {formatNumber(
+                  currentStudent.remainingClasses ??
+                    currentStudent.studentPlan.classesPerMonth,
+                )}
+              </p>
+              {(currentStudent.additionalClasses ?? 0) > 0 && (
+                <p className="text-sm text-gray-600 mt-1">
+                  {t("studentModal.additionalClasses", {
+                    count: formatNumber(currentStudent.additionalClasses),
+                  })}
+                </p>
+              )}
+            </div>
+
+            <div className="bg-[#f4f0f5] rounded-lg border border-gray-400 shadow-md p-4">
               <p className="text-sm text-gray-600 mb-2">
                 {t("studentModal.feeStatus")}
               </p>
@@ -268,19 +333,30 @@ export default function StudentModal({ student, tenantId, close }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px]">
-            <RedButton
-              text={t("studentModal.delete")}
-              img={<Trash2 size={18} />}
-              onClick={() => setConfirmModal(true)}
-              textSmall={true}
-            />
-            <BlackButton
-              text={t("studentModal.edit")}
-              img={<Pencil size={18} />}
-              onClick={() => setEditing(true)}
-              textSmall={true}
-            />
+          <div className="flex flex-col gap-4 w-full">
+            {canUpdateStudents && (
+              <BlackButton
+                text={t("studentModal.assignClasses")}
+                img={<Plus size={18} />}
+                onClick={() => setAssignClassesModal(true)}
+                textSmall={true}
+              />
+            )}
+            <div className="grid grid-cols-2 gap-3 max-[360px]:text-[13px] w-full">
+              <RedButton
+                text={t("studentModal.delete")}
+                img={<Trash2 size={18} />}
+                onClick={() => setConfirmModal(true)}
+                textSmall={true}
+              />
+
+              <BlackButton
+                text={t("studentModal.edit")}
+                img={<Pencil size={18} />}
+                onClick={() => setEditing(true)}
+                textSmall={true}
+              />
+            </div>
           </div>
         </>
       ) : (
@@ -331,6 +407,66 @@ export default function StudentModal({ student, tenantId, close }) {
             />
           </div>
         </div>
+      )}
+      {assignClassesModal && (
+        <Modal open onClose={() => setAssignClassesModal(false)}>
+          <h2 className="text-xl font-semibold mb-2">
+            {t("studentModal.assignClassesTitle")}
+          </h2>
+          <p className="text-sm text-gray-600 mb-5">
+            {t("studentModal.assignClassesDescription")}
+          </p>
+
+          <label className="block text-sm font-semibold mb-2">
+            {t("studentModal.additionalQuantity")}
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={99}
+            step={1}
+            value={additionalClassesQuantity}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (
+                value === "" ||
+                (/^\d+$/.test(value) &&
+                  Number(value) >= 1 &&
+                  Number(value) <= 99)
+              ) {
+                setAdditionalClassesQuantity(value);
+              }
+            }}
+            placeholder={t("studentModal.quantityPlaceholder")}
+            className="rounded-lg w-full px-3 py-2 text-gray-600 bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
+          />
+
+          <div className="flex justify-end gap-3 mt-6">
+            <WhiteButton
+              text={t("studentModal.cancel")}
+              onClick={() => {
+                setAssignClassesModal(false);
+                setAdditionalClassesQuantity("");
+              }}
+              textSmall={true}
+            />
+            <BlackButton
+              text={
+                assignClassesMutation.isPending
+                  ? t("studentModal.assigningClasses")
+                  : t("studentModal.assignClassesConfirm")
+              }
+              disabled={
+                assignClassesMutation.isPending ||
+                !/^\d+$/.test(additionalClassesQuantity) ||
+                Number(additionalClassesQuantity) < 1 ||
+                Number(additionalClassesQuantity) > 99
+              }
+              onClick={() => assignClassesMutation.mutate()}
+              textSmall={true}
+            />
+          </div>
+        </Modal>
       )}
       {confirmModal && (
         <ConfirmModal

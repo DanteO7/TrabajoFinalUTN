@@ -108,6 +108,12 @@ public class BillingCycleService : BackgroundService
                 continue;
             }
 
+            if (student.PaymentDueDate != result.PaymentDueDate &&
+                result.Status != MonthlyFeeStatus.OVERDUE)
+            {
+                student.AdditionalClasses = 0;
+            }
+
             student.MonthlyFeeStatus =
                 result.Status;
 

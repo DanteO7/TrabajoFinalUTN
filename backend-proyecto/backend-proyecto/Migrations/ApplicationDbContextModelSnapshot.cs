@@ -970,6 +970,11 @@ namespace backend_proyecto.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AdditionalClasses")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<DateTime>("JoinedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -1059,6 +1064,11 @@ namespace backend_proyecto.Migrations
 
                     b.Property<string>("CBU")
                         .HasColumnType("text");
+
+                    b.Property<int>("CancellationDeadlineMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(20);
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");

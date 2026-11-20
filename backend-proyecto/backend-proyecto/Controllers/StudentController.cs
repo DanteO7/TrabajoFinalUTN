@@ -157,6 +157,35 @@ namespace backend_proyecto.Controllers
             }
         }
 
+        [HttpPost("{id}/additional-classes")]
+        [Authorize]
+        [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(HttpMessage), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ResponseStudentDTO>> AssignAdditionalClasses(
+            int id,
+            [FromBody] AssignAdditionalClassesDTO dto)
+        {
+            try
+            {
+                var student =
+                    await _studentServices.AssignAdditionalClasses(id, dto);
+                return Ok(student);
+            }
+            catch (HttpResponseError ex)
+            {
+                return StatusCode((int)ex.StatusCode, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    (int)HttpStatusCode.InternalServerError,
+                    new { message = ex.Message }
+                );
+            }
+        }
+
         [HttpGet("me/{tenantId}")]
         [Authorize]
         [ProducesResponseType(typeof(ResponseStudentDTO), StatusCodes.Status200OK)]

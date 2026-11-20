@@ -12,6 +12,9 @@ namespace backend_proyecto.Config.EntityConfigurations
             entity.Property(t => t.Name).IsRequired().HasMaxLength(50);
             entity.Property(t => t.IsActive).IsRequired();
             entity.Property(t => t.MonthlyFeeStatus).IsRequired();
+            entity.Property(t => t.CancellationDeadlineMinutes)
+                  .IsRequired()
+                  .HasDefaultValue(20);
 
             entity.HasOne(t => t.OwnerUser)
                   .WithMany()

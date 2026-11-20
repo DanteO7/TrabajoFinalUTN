@@ -37,6 +37,18 @@ export default function EditTenantModal({ tenant, close }) {
   const [successModal, setSuccessModal] = useState(false);
   const [errorModal, setErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const cancellationOptions = [
+    20,
+    30,
+    45,
+    60,
+    90,
+    120,
+    180,
+    360,
+    720,
+    1440,
+  ];
 
   const {
     register,
@@ -49,6 +61,8 @@ export default function EditTenantModal({ tenant, close }) {
       alias: tenant.alias || "",
       cbu: tenant.cbu || "",
       address: tenant.address || "",
+      cancellationDeadlineMinutes:
+        tenant.cancellationDeadlineMinutes ?? 20,
     },
     mode: "onTouched",
   });
@@ -74,6 +88,8 @@ export default function EditTenantModal({ tenant, close }) {
         cbu: data.cbu || null,
         address: data.address || null,
         socialNetworks: networksToSend,
+        cancellationDeadlineMinutes:
+          data.cancellationDeadlineMinutes,
       });
     },
 
@@ -213,6 +229,33 @@ export default function EditTenantModal({ tenant, close }) {
             error={errors.address}
             disabled={isSubmitting || mutation.isPending}
           />
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-1">
+            {t("editTenant.cancellationDeadlineTitle")}
+          </h3>
+          <p className="text-sm text-gray-600 mb-3">
+            {t("editTenant.cancellationDeadlineDescription")}
+          </p>
+          <select
+            {...register("cancellationDeadlineMinutes", {
+              valueAsNumber: true,
+            })}
+            disabled={isSubmitting || mutation.isPending}
+            className="rounded-lg w-full px-3 py-2 text-gray-600 cursor-pointer bg-[#f1eef3] border border-gray-400 outline-none focus:ring-[1.5px] focus:border-transparent transition-[border-color,box-shadow] duration-200"
+          >
+            {cancellationOptions.map((minutes) => (
+              <option key={minutes} value={minutes}>
+                {t(`editTenant.cancellationOptions.${minutes}`, { minutes })}
+              </option>
+            ))}
+          </select>
+          {errors.cancellationDeadlineMinutes && (
+            <p className="mt-1 text-sm text-red-600">
+              {t("editTenant.cancellationDeadlineInvalid")}
+            </p>
+          )}
         </div>
 
         <div className="mb-6">

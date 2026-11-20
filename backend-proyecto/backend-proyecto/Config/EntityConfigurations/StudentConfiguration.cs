@@ -19,6 +19,9 @@ namespace backend_proyecto.Config.EntityConfigurations
             entity.Property(s => s.MonthlyFeeStatus)
                   .IsRequired();
 
+            entity.Property(s => s.AdditionalClasses)
+                  .HasDefaultValue(0);
+
             entity.Property(s => s.JoinedAt)
                   .IsRequired()
                   .HasDefaultValueSql("CURRENT_TIMESTAMP");

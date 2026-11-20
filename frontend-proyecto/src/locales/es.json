@@ -711,7 +711,18 @@
     "updating": "Actualizando...",
     "update": "Actualizar",
     "confirmTitle": "¿Eliminar este alumno?",
-    "confirmMessage": "Estás por eliminar al alumno \"{{name}}\". Esta acción no se puede deshacer."
+    "confirmMessage": "Estás por eliminar al alumno \"{{name}}\". Esta acción no se puede deshacer.",
+    "availableClasses": "Clases disponibles en el ciclo actual",
+    "additionalClasses": "+{{count}} clases adicionales",
+    "assignClasses": "Asignar clases",
+    "assignClassesTitle": "Asignar clases adicionales",
+    "assignClassesDescription": "Estas clases se sumarán únicamente al ciclo mensual actual del alumno.",
+    "additionalQuantity": "Cantidad de clases",
+    "quantityPlaceholder": "Entre 1 y 99",
+    "assignClassesConfirm": "Asignar",
+    "assigningClasses": "Asignando...",
+    "assignClassesSuccess": "Clases adicionales asignadas correctamente",
+    "assignClassesError": "No se pudieron asignar las clases adicionales"
   },
   "professorModal": {
     "deleteSuccess": "Profesor eliminado correctamente",
@@ -897,7 +908,22 @@
     "cancel": "Cancelar",
     "saving": "Guardando...",
     "save": "Guardar",
-    "updated": "Información actualizada correctamente"
+    "updated": "Información actualizada correctamente",
+    "cancellationDeadlineTitle": "Anticipación para cancelar clases",
+    "cancellationDeadlineDescription": "Establecé cuánto tiempo antes del comienzo de una clase pueden cancelar sus reservas los alumnos.",
+    "cancellationDeadlineInvalid": "La anticipación debe ser un número entero entre 1 y 1440 minutos.",
+    "cancellationOptions": {
+      "20": "20 minutos",
+      "30": "30 minutos",
+      "45": "45 minutos",
+      "60": "1 hora (60 minutos)",
+      "90": "90 minutos",
+      "120": "2 horas (120 minutos)",
+      "180": "3 horas (180 minutos)",
+      "360": "6 horas (360 minutos)",
+      "720": "12 horas (720 minutos)",
+      "1440": "24 horas (1440 minutos)"
+    }
   },
   "profile": {
     "personalData": "Datos personales",
@@ -1291,7 +1317,8 @@
     "leaving": "Saliendo...",
     "leaveClass": "Salir de la clase",
     "leaveTitle": "¿Salir de esta clase?",
-    "leaveConfirmation": "Estás por salir de la clase del día {{date}} a las {{startTime}} - {{endTime}}."
+    "leaveConfirmation": "Estás por salir de la clase del día {{date}} a las {{startTime}} - {{endTime}}.",
+    "cancellationDeadlineReached": "El negocio requiere {{minutes}} minutos de anticipación para cancelar esta reserva."
   },
   "newsUi": {
     "createSuccess": "Noticia creada correctamente",

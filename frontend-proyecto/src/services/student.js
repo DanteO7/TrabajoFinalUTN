@@ -21,3 +21,6 @@ export const getStudentByUser = (tenantId) =>
 
 export const getPendingPaymentStudents = (tenantId) =>
   request("get", `/students/pending-payment/${tenantId}`);
+
+export const assignAdditionalClasses = (studentId, quantity) =>
+  request("post", `/students/${studentId}/additional-classes`, { quantity });

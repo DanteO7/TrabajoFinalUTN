@@ -543,6 +543,7 @@ namespace backend_proyecto.Services
                         {
                             student.PaymentDueDate =
                                 paymentDate.AddDays(30);
+                            student.AdditionalClasses = 0;
                         }
 
                         await _studentRepository.UpdateOneAsync(
@@ -1033,6 +1034,7 @@ namespace backend_proyecto.Services
                         DateTime.UtcNow;
 
                     student.PaymentDueDate = null;
+                    student.AdditionalClasses = 0;
                 }
                 else
                 {
@@ -1398,6 +1400,7 @@ namespace backend_proyecto.Services
                                         {
                                             student.PaymentDueDate =
                                                 approvalDate.AddDays(30);
+                                            student.AdditionalClasses = 0;
                                         }
 
                                         await _studentRepository.UpdateOneAsync(

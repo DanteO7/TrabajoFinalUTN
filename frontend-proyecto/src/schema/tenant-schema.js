@@ -41,4 +41,10 @@ export const updateTenantSchema = z.object({
     .max(200, validationMessage("addressMax200"))
     .optional()
     .or(z.literal("")),
+
+  cancellationDeadlineMinutes: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(1440),
 });
